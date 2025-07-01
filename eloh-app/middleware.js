@@ -4,7 +4,7 @@ export const middleware = (req) => {
   const pathname = req.nextUrl.pathname;
 
   const isProtected =
-    pathname === "/" ||
+    
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/onboarding");
 
@@ -19,5 +19,5 @@ export const middleware = (req) => {
 };
 
 export const config = {
-  matcher: ["/", "/dashboard/:path*", "/onboarding/:path*"],
+  matcher: [ "/dashboard/:path*", "/onboarding/:path*"],
 };
