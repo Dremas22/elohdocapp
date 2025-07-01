@@ -2,19 +2,17 @@
 
 import React from "react";
 
-export default function Video() {
+const Video = () => {
   return (
-    <div className="flex items-center justify-center">
-      <div className="flex w-full">
-        <video
-          className="w-full h-auto object-cover"
-          src="/videos/elohdocvid.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-      </div>
-    </div>
+    <video
+      className="absolute top-0 left-0 w-full h-full object-cover"
+      src="/videos/elohdocvid.mp4"
+      autoPlay
+      loop
+      muted
+      playsInline
+    />
   );
-}
+};
+
+export default Video;
