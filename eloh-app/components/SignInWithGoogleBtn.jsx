@@ -39,7 +39,9 @@ const GoogleSignInButton = ({ role }) => {
       // Optionally you can add a toast
       alert("LoggedIn successfully");
 
-      router.push(`/onboarding/${role}`);
+      router.push(`/onboarding/${role}`); // for doctors and nurses
+
+      // TODO: Make sure users are redirected to payment
     } catch (error) {
       let message = "Login failed. Please try again.";
       let description = "An unknown error occurred during sign-in.";

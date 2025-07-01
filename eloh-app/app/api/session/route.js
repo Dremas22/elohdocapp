@@ -19,8 +19,6 @@ export async function POST(req) {
     const nowMs = Date.now();
     const expiresIn = expirationTimeMs - nowMs;
 
-    console.log(expiresIn, "api/session");
-
     if (expiresIn <= 0) {
       return NextResponse.json(
         { error: "Token already expired." },
