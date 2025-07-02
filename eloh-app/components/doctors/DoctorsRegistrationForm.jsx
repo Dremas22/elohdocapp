@@ -2,10 +2,11 @@
 import { useState, useEffect } from "react";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { doctorCategories, phoneCodes } from "@/constants";
+import { useRouter } from "next/navigation";
 
 const DoctorsRegistrationForm = () => {
   const { loading, currentUser } = useCurrentUser();
-
+  const router = useRouter();
   const [formData, setFormData] = useState({
     practiceNumber: "",
     phoneCode: "+27",
@@ -101,8 +102,8 @@ const DoctorsRegistrationForm = () => {
 
       if (response.status === 200 && result.message === "User already exists") {
         alert("User already exists");
+        router.push("/dashboard/doctor");
       } else if (response.status === 201) {
-        alert("User successfully registered");
         setFormData({
           practiceNumber: "",
           phoneCode: "+27",
@@ -111,12 +112,12 @@ const DoctorsRegistrationForm = () => {
           role: "doctor",
           email: currentUser?.email,
         });
+        router.push("/dashboard/doctor");
       } else {
-        alert(result.error || "Something went wrong");
+        console.error(result.error || "Something went wrong");
       }
     } catch (err) {
       console.error(err);
-      alert("Unexpected error occurred");
     } finally {
       setSubmitting(false);
     }
