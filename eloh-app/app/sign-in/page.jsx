@@ -1,16 +1,11 @@
 import GoogleSignInButton from "@/components/SignInWithGoogleBtn";
+import { redirect } from "next/navigation";
 
 const SignInPage = async ({ searchParams }) => {
   const role = (await searchParams).role;
 
-  if (!["doctor", "nurse", "patient"].includes(role || "")) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-red-600 text-lg font-medium bg-red-100 px-4 py-2 rounded-lg shadow">
-          Invalid role selected. Please go back and choose a valid designation.
-        </p>
-      </div>
-    );
+  if (!["doctor", "nurse", "patient"].includes(role)) {
+    redirect("/");
   }
 
   return (

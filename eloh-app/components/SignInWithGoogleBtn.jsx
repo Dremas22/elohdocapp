@@ -11,17 +11,17 @@ const GoogleSignInButton = ({ role }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   /**
-   * Handles the Google sign-in process using Firebase authentication.
-   *
-   * 1. Initiates sign-in with a popup using the configured Google provider.
-   * 2. Retrieves the user's ID token upon successful authentication.
-   * 3. Sends the ID token to the backend to create a secure session cookie.
-   * 4. Redirects the user to the onboarding page based on their selected role.
-   *
-   * If any step fails, handles specific Firebase errors and shows appropriate feedback.
-   *
-   * @returns {Promise<void>}
-   */
+  * Handles the Google sign-in process using Firebase authentication.
+  *
+  * 1. Initiates sign-in with a popup using the configured Google provider.
+  * 2. Retrieves the user's ID token upon successful authentication.
+  * 3. Sends the ID token to the backend to create a secure session cookie.
+  * 4. Redirects the user to the onboarding page based on their selected role.
+  *
+  * If any step fails, handles specific Firebase errors and shows appropriate feedback.
+  *
+  * @returns {Promise<void>}
+  */
   const handleSignIn = async () => {
     setIsLoading(true);
     try {
@@ -35,11 +35,12 @@ const GoogleSignInButton = ({ role }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token }),
       });
-
       // Optionally you can add a toast
       alert("LoggedIn successfully");
 
-      router.push(`/onboarding/${role}`);
+      router.push(`/onboarding/${role}`); // for doctors and nurses
+
+      // TODO: Make sure users are redirected to payment
     } catch (error) {
       let message = "Login failed. Please try again.";
       let description = "An unknown error occurred during sign-in.";
@@ -58,7 +59,8 @@ const GoogleSignInButton = ({ role }) => {
             break;
           case "auth/user-disabled":
             message = "Account Disabled";
-            description = "This account has been disabled. Contact support.";
+            description =
+              "This account has been disabled. Contact support.";
             break;
           default:
             description = error.message;
@@ -75,14 +77,29 @@ const GoogleSignInButton = ({ role }) => {
     }
   };
 
+  const capitalizedRole =
+    role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className="flex items-center justify-center mt-10">
       <button
         onClick={handleSignIn}
         disabled={isLoading}
-        className="w-full max-w-xl p-1 cursor-pointer"
+        className="
+          w-full max-w-xs px-6 py-3 
+          bg-[#00b4d8]                 
+          text-white font-semibold 
+          rounded-lg shadow-md 
+          hover:bg-[#009ec0]           /* Darker blue on hover */
+          cursor-pointer              /* Pointer cursor on hover */
+          transition duration-300     /* Smooth transition when hover */
+          disabled:opacity-60        /* Reduce opacity when disabled */
+          disabled:cursor-not-allowed  
+        "
       >
-        <span> Sign in with Google</span>
+        {isLoading
+          ? `${capitalizedRole} signing in...`
+          : `${capitalizedRole} Sign In`}
       </button>
     </div>
   );
