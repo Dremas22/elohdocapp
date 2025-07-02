@@ -67,31 +67,42 @@ const DoctorsRegistrationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const validationErrors = validate();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length !== 0) return;
+
+    setSubmitting(true);
+
     try {
-      const validationErrors = validate();
-      setErrors(validationErrors);
+      const { phoneCode, ...cleanFormData } = formData;
+      const combinedPhoneNumber = `${phoneCode}${formData.phoneNumber}`;
 
-      if (Object.keys(validationErrors).length === 0) {
-        setSubmitting(true);
+      const payload = {
+        ...cleanFormData,
+        phoneNumber: combinedPhoneNumber,
+        userId: currentUser?.uid,
+        fullName: currentUser?.displayName,
+        photoUrl: currentUser?.photoURL,
+        email: currentUser?.email,
+        role: "doctor",
+      };
 
-        const { phoneCode, ...cleanFormData } = formData;
-        // No errors — submit form (for now just console.log)
-        const combinedPhoneNumber = `${phoneCode}${formData.phoneNumber}`;
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/register-user`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
-        const submitData = {
-          ...cleanFormData,
-          userId: currentUser?.uid,
-          phoneNumber: combinedPhoneNumber,
-          fullName: currentUser?.displayName,
-          photoUrl: currentUser?.photoURL,
-          isVerified: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
+      const result = await response.json();
 
-        // TODO: Add Data submission logic to database
-
-        console.log("Submitting data:", submitData);
+      if (response.status === 200 && result.message === "User already exists") {
+        alert("User already exists");
+      } else if (response.status === 201) {
+        alert("User successfully registered");
         setFormData({
           practiceNumber: "",
           phoneCode: "+27",
@@ -100,9 +111,12 @@ const DoctorsRegistrationForm = () => {
           role: "doctor",
           email: currentUser?.email,
         });
+      } else {
+        alert(result.error || "Something went wrong");
       }
-    } catch (error) {
-      console.error("Error: ", error);
+    } catch (err) {
+      console.error(err);
+      alert("Unexpected error occurred");
     } finally {
       setSubmitting(false);
     }
