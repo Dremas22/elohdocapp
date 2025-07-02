@@ -19,11 +19,10 @@ const ChooseDesignation = () => {
   return (
     <div
       // Fullscreen absolute overlay positioned over video 
-      // Used 'inset-0' to stretche the div to cover entire viewport
-      // Used 'flex flex-col items-center justify-start' to align the buttons vertically and horizontally
-      // justification starts from the top 
-      // Used 'pt-130' adds large padding-top to move buttons lower on the page
-      // Used 'px-4' adds horizontal padding for mobile responsiveness
+      // 'inset-0' stretches the div to cover entire viewport
+      // 'flex flex-col items-center justify-start' aligns content
+      // 'pt-130' pushes the content lower down the page
+      // 'px-4' provides horizontal padding for responsiveness
       className="absolute inset-0 flex flex-col items-center justify-start pt-130 px-4"
     >
       <h2 className="text-3xl md:text-4xl font-bold text-[#03045e] mb-6 text-center">
@@ -35,7 +34,7 @@ const ChooseDesignation = () => {
           <button
             key={designation.id}
             onClick={() => handleSelect(designation.role)}
-            className="w-full py-3 px-6 bg-blue-600 text-white font-medium text-lg rounded-xl shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105"
+            className="w-full py-3 px-6 bg-[#03045e] text-white font-medium text-lg rounded-xl shadow-lg hover:bg-[#021f3e] transition duration-300 transform hover:scale-105 cursor-pointer"
           >
             {designation.title}
           </button>
