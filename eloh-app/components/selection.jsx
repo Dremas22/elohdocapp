@@ -3,33 +3,33 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 
-// This component renders role selection buttons over the video
 const ChooseDesignation = () => {
   const router = useRouter();
 
-  // Array of designations (each with a role and display title)
   const designations = [
     { id: 1, title: "I AM DOCTOR", role: "doctor" },
     { id: 2, title: "I AM NURSE", role: "nurse" },
     { id: 3, title: "I AM PATIENT", role: "patient" },
   ];
 
-  // Function to handle button click and navigate to sign-in page with role as a query param
   const handleSelect = (role) => {
     router.push(`/sign-in?role=${role}`);
   };
 
   return (
     <div
-      // Fullscreen overlay centered with black transparency
-      className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4"
+      // Fullscreen absolute overlay positioned over video 
+      // Used 'inset-0' to stretche the div to cover entire viewport
+      // Used 'flex flex-col items-center justify-start' to align the buttons vertically and horizontally
+      // justification starts from the top 
+      // Used 'pt-130' adds large padding-top to move buttons lower on the page
+      // Used 'px-4' adds horizontal padding for mobile responsiveness
+      className="absolute inset-0 flex flex-col items-center justify-start pt-130 px-4"
     >
-      {/* Title */}
-      <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 text-center">
+      <h2 className="text-3xl md:text-4xl font-bold text-[#03045e] mb-6 text-center">
         Select Your Designation
       </h2>
 
-      {/* Render each designation as a button */}
       <div className="grid gap-4 w-full max-w-md">
         {designations.map((designation) => (
           <button
