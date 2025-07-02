@@ -1,4 +1,5 @@
-import { db } from "@/db/firebase";
+import { db } from "@/db/server";
+import { db as firestore } from "@/db/client";
 import {
   collection,
   getDocs,
@@ -23,12 +24,36 @@ export const fetchCollection = async (collectionName) => {
   }
 
   try {
-    const snapshot = await getDocs(collection(db, collectionName));
+    const snapshot = await getDocs(collection(firestore, collectionName));
 
     return snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
+  } catch (error) {
+    console.error(`Error fetching collection "${collectionName}":`, error);
+    return [];
+  }
+};
+
+export const fetchServerCollection = async (collectionName) => {
+  if (!collectionName || typeof collectionName !== "string") {
+    throw new Error("A valid collection name must be provided.");
+  }
+
+  try {
+    const snapshot = await db.collection(collectionName).get();
+
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate().toISOString() || null,
+        updatedAt: data.updatedAt?.toDate().toISOString() || null,
+      };
+    });
   } catch (error) {
     console.error(`Error fetching collection "${collectionName}":`, error);
     return [];

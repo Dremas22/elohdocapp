@@ -14,7 +14,7 @@ export async function POST(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verify token with Firebase Admin SDK
+    // Verify token with Firebase Admin SDK (using verifySessionCookie)
     const decodedToken = await auth?.verifySessionCookie(token, true);
 
     const data = await request.json();
@@ -52,6 +52,10 @@ export async function POST(request) {
     };
 
     await userDocRef.set(userDoc);
+
+    if (role === "doctor" || role === "nurse") {
+      await auth.setCustomUserClaims(userId, { role }); // use role from data
+    }
 
     return NextResponse.json(
       { message: "User successfully created" },
