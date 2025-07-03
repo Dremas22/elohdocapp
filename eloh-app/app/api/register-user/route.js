@@ -32,7 +32,7 @@ export async function POST(request) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
-    const collectionName = role + "s"; // 'doctors', 'nurses', 'patients'
+    const collectionName = role + "s";
     const userDocRef = db.collection(collectionName).doc(userId);
     const docSnapshot = await userDocRef.get();
 
@@ -44,12 +44,17 @@ export async function POST(request) {
     }
 
     const now = new Date();
-    const userDoc = {
+    let userDoc = {
       ...data,
-      isVerified: false,
       createdAt: now,
       updatedAt: now,
     };
+
+    if (role === "doctor" || role === "nurse") {
+      userDoc.isVerified = false;
+    } else if (role === "patient") {
+      userDoc.isActive = true;
+    }
 
     await userDocRef.set(userDoc);
 
