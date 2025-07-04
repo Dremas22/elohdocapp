@@ -61,7 +61,7 @@ const DoctorDashboardNavbar = () => {
     };
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-[#123158] py-3 px-6 shadow-md flex justify-between items-center">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-[#123158] py-3 px-6 flex justify-between items-center">
             {/* User info */}
             <div className="flex items-center gap-4">
                 {photoUrl ? (
