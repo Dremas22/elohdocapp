@@ -1,84 +1,109 @@
-import { auth, db } from "@/db/server";
-import { cookies } from "next/headers";
-import DoctorsCollectionViewer from "./DoctorsCollectionViewer";
-import Link from "next/link";
+"use client";
 
-const DoctorsDashboard = async () => {
-  const cookieStore = await cookies();
-  const session = cookieStore?.get("session")?.value;
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/db/client";
+import DoctorDashboardNavbar from "@/components/navbar/doctorNav";
+import PatientDisplay from "@/components/patients/PatientDisplay";
+import SidebarMenu from "./doctorSidebar"; 
 
-  if (!session) {
-    return <p className="text-center mt-20 text-red-600">Unauthorized</p>;
-  }
+const DoctorsCollectionViewer = ({ patients }) => {
+  const [userDoc, setUserDoc] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  try {
-    const decoded = await auth.verifySessionCookie(session, true);
-    const uid = decoded.uid;
-
-    const doctorSnap = await db.collection("doctors").doc(uid).get();
-
-    if (!doctorSnap.exists) {
-      return (
-        <div className="text-center mt-20 text-gray-700 space-y-4">
-          <p className="text-lg font-medium">Doctor not registered</p>
-          <Link
-            href="/"
-            className="inline-block text-blue-600 hover:underline font-semibold"
-          >
-            Register
-          </Link>
-        </div>
-      );
-    }
-
-    const doctorDataRaw = doctorSnap.data();
-
-    // ✅ Convert Firestore Timestamps to plain JS values
-    const convertTimestamp = (timestamp) => {
-      if (!timestamp) return null;
-      if (typeof timestamp.toDate === "function") {
-        return timestamp.toDate().toISOString();
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        setLoading(false);
+        return;
       }
-      if (timestamp instanceof Date) {
-        return timestamp.toISOString();
-      }
-      // If it's a string or unknown format, try new Date conversion
+
+      const userId = user.uid;
+      const collectionName = `doctors`;
+
       try {
-        return new Date(timestamp).toISOString();
-      } catch {
-        return null;
+        const userRef = doc(db, collectionName, userId);
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          setUserDoc(docSnap.data());
+        } else {
+          console.warn("User document not found.");
+        }
+      } catch (error) {
+        console.error("Error fetching user document:", error);
       }
+
+      setLoading(false);
     };
 
-    const doctorData = {
-      ...doctorDataRaw,
-      createdAt: convertTimestamp(doctorDataRaw.createdAt),
-      updatedAt: convertTimestamp(doctorDataRaw.updatedAt),
-    };
+    const unsubscribe = auth.onAuthStateChanged(() => {
+      fetchUserData();
+    });
 
-    let patients = [];
-    if (doctorData.isVerified) {
-      const patientsSnap = await db.collection("patients").get();
-      patients = patientsSnap.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          ...data,
-          createdAt: data.createdAt?.toDate().toISOString() || null,
-          updatedAt: data.updatedAt?.toDate().toISOString() || null,
-          id: doc.id,
-        };
-      });
-    }
+    return () => unsubscribe();
+  }, []);
 
+  if (loading) {
     return (
-      <div>
-        <DoctorsCollectionViewer userDoc={doctorData} patients={patients} />
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-gray-700 text-sm">Loading dashboard...</p>
+        </div>
       </div>
     );
-  } catch (error) {
-    console.error("Error in DoctorsDashboard:", error);
-    return <p className="text-center mt-20 text-red-600">Server Error</p>;
   }
+
+  if (!userDoc) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-20">
+        <DoctorDashboardNavbar />
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center text-gray-600">
+            <p className="text-lg font-medium">No user data found.</p>
+            <p className="text-sm mt-1">
+              Please make sure your account is registered correctly.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const { practiceNumber, isVerified } = userDoc;
+
+  return (
+    <div className="min-h-screen flex flex-col pt-20">
+      {/* Top Navbar */}
+      <DoctorDashboardNavbar />
+
+      {/* Sidebar + Main Content Layout */}
+      <div className="flex flex-1">
+        {/* SidebarMenu here */}
+        <SidebarMenu practiceNumber={practiceNumber} isVerified={isVerified} />
+
+        {/* Main Content */}
+        <main className="flex-1 p-6 bg-gray-50">
+          {isVerified ? (
+            <div>
+              <h1 className="text-xl font-semibold mb-4">Patient Info</h1>
+              <p>This is where sensitive patient information would be shown.</p>
+              <PatientDisplay patients={patients} />
+            </div>
+          ) : (
+            <div className="text-center mt-12 text-gray-600">
+              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
+              <p>
+                Once your account is verified, you'll be able to access
+                sensitive patient information here.
+              </p>
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  );
 };
 
-export default DoctorsDashboard;
+export default DoctorsCollectionViewer;
