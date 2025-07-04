@@ -1,3 +1,5 @@
+export const revalidate = 300;
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -13,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "ElohApp",
-  description: "Developed by Dramas Solutions",
+  description: "Developed by Dremas Solutions",
   icons: {
     icon: "/favicon.ico",
   },
