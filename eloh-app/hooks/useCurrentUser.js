@@ -29,7 +29,7 @@ const useCurrentUser = () => {
       const data = await res.json();
       alert(data.message); // Logs: "Logged out successfully"
       // Optionally redirect or update UI here
-      router.push("/sign-in");
+      router.push("/");
     } catch (error) {
       console.error("Error signing out:", error);
     }

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/db/client";
 import DoctorDashboardNavbar from "@/components/navbar/doctorNav";
+import PatientDisplay from "@/components/patients/PatientDisplay";
 import SidebarMenu from "./doctorSidebar";
 const DoctorsCollectionViewer = ({ patients }) => {
   const [userDoc, setUserDoc] = useState(null);
@@ -91,13 +92,13 @@ const DoctorsCollectionViewer = ({ patients }) => {
             <div>
               <h1 className="text-xl font-semibold mb-4">Patient Info</h1>
               <p>This is where sensitive patient information would be shown.</p>
-              <pre className="bg-gray-100 p-4 rounded text-sm text-gray-800 overflow-auto whitespace-pre-wrap border border-gray-200 shadow-sm max-h-96">
-                {JSON.stringify(patients, null, 2)}
-              </pre>
+              <PatientDisplay patients={patients} />
             </div>
           ) : (
             <div className="text-center mt-12 text-gray-600">
-              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                Verification Pending
+              </h2>
               <p>
                 Once your account is verified, you&apos;ll be able to access
                 sensitive patient information here.
