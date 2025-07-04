@@ -74,3 +74,24 @@ export async function POST(request) {
     );
   }
 }
+
+export async function PATCH(request) {
+  try {
+    const data = await request.json();
+    const { userId, fcmToken } = data;
+    if (!userId || !fcmToken) {
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
+
+    const userDocRef = db.collection("doctors").doc(userId);
+    await userDocRef.update({ fcmToken, updatedAt: new Date() });
+
+    return NextResponse.json({ message: "FCM token updated" }, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Failed to update FCM token" },
+      { status: 500 }
+    );
+  }
+}

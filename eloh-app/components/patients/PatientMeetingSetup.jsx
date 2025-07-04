@@ -1,6 +1,5 @@
 "use client";
 
-import { dummyDoctors } from "@/constants";
 import { db } from "@/db/client";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { collection, getDocs } from "firebase/firestore";

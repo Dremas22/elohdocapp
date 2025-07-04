@@ -1,7 +1,47 @@
+"use client";
+
 import PatientsRegistrationForm from "@/components/patients/PatientsRegistrationForm";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const PatientOnboarding = () => {
-  const role = "patient";
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    async function checkUser() {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/check-registration`
+        );
+        const data = await res.json();
+
+        if (!data.authenticated) {
+          router.push("/sign-in?role=patient");
+
+          return;
+        }
+
+        if (data.registered && data.role) {
+          router.push(`/dashboard/${data.role}`);
+          return;
+        }
+
+        // Authenticated but not registered, show the form
+        setShowForm(true);
+      } catch (error) {
+        console.error("Error checking registration:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    checkUser();
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+  if (!showForm) return null;
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] px-6 py-12 flex items-center justify-center">
