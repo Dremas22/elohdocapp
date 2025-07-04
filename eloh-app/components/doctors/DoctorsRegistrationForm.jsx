@@ -175,9 +175,8 @@ const DoctorsRegistrationForm = () => {
               value={formData.practiceNumber}
               onChange={handleChange}
               placeholder="Practice Number"
-              className={`w-full px-4 py-3 rounded-lg border ${
-                errors.practiceNumber ? "border-red-500" : "border-gray-300"
-              } bg-white text-gray-900`}
+              className={`w-full px-4 py-3 rounded-lg border ${errors.practiceNumber ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900`}
             />
             {errors.practiceNumber && (
               <p className="mt-1 text-sm text-red-600">
@@ -192,9 +191,8 @@ const DoctorsRegistrationForm = () => {
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-lg border ${
-                errors.category ? "border-red-500" : "border-gray-300"
-              } bg-white text-gray-900`}
+              className={`w-full px-4 py-3 rounded-lg border ${errors.category ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900`}
             >
               <option value="" disabled>
                 Select Category
@@ -232,9 +230,8 @@ const DoctorsRegistrationForm = () => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 placeholder="Phone Number"
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.phoneNumber ? "border-red-500" : "border-gray-300"
-                } bg-white text-gray-900`}
+                className={`w-full px-4 py-3 rounded-lg border ${errors.phoneNumber ? "border-red-500" : "border-gray-300"
+                  } bg-white text-gray-900`}
                 pattern="^[0-9]{6,10}$"
               />
             </div>
@@ -249,8 +246,7 @@ const DoctorsRegistrationForm = () => {
           <button
             type="submit"
             disabled={loading || submitting}
-            className="w-full max-w-xs py-3 px-6 bg-blue-600 text-white rounded-lg font-semibold
-              hover:bg-blue-700 active:bg-blue-800 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="bg-[#03045e] text-white py-3 px-5 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
           >
             {submitting ? "Submitting..." : "Register"}
           </button>

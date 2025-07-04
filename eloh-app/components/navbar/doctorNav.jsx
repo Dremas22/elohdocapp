@@ -96,7 +96,7 @@ const DoctorDashboardNavbar = () => {
             <div>
                 <button
                     onClick={auth.currentUser ? handleSignOut : handleSignIn}
-                    className="bg-[#001E42] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-black transition shadow-sm shadow-white/20"
+                    className=" bg-[#03045e] text-white py-2 px-3 text-lg font-semibold rounded-xl active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out shadow-sm shadow-white/20 "
                 >
                     {auth.currentUser ? "Sign Out" : "Sign In"}
                 </button>
