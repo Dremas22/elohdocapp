@@ -32,13 +32,16 @@ const MeetingRoom = () => {
       setNotifyError(null);
 
       try {
-        const res = await fetch("/api/notify-doctor", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ doctorId: roomID, patientId }),
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/notify-doctor`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ doctorId: roomID, patientId }),
+          }
+        );
 
         if (!res.ok) {
           const errorText = await res.text();
@@ -163,6 +166,8 @@ const MeetingRoom = () => {
       alert("Something went wrong");
     }
   };
+
+  console.log({ patientData, patientId }, "PATIENT");
 
   return (
     <div className="w-full h-screen flex flex-col bg-gray-900 text-white">

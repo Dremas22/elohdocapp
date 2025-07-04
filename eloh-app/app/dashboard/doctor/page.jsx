@@ -34,10 +34,26 @@ const DoctorsDashboard = async () => {
     const doctorDataRaw = doctorSnap.data();
 
     // ✅ Convert Firestore Timestamps to plain JS values
+    const convertTimestamp = (timestamp) => {
+      if (!timestamp) return null;
+      if (typeof timestamp.toDate === "function") {
+        return timestamp.toDate().toISOString();
+      }
+      if (timestamp instanceof Date) {
+        return timestamp.toISOString();
+      }
+      // If it's a string or unknown format, try new Date conversion
+      try {
+        return new Date(timestamp).toISOString();
+      } catch {
+        return null;
+      }
+    };
+
     const doctorData = {
       ...doctorDataRaw,
-      createdAt: doctorDataRaw.createdAt?.toDate().toISOString() || null,
-      updatedAt: doctorDataRaw.updatedAt?.toDate().toISOString() || null,
+      createdAt: convertTimestamp(doctorDataRaw.createdAt),
+      updatedAt: convertTimestamp(doctorDataRaw.updatedAt),
     };
 
     let patients = [];
