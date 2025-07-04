@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/db/client";
-import Image from "next/image";
 
 const DoctorsCollectionViewer = ({ patients }) => {
   const [userDoc, setUserDoc] = useState(null);
@@ -69,35 +68,41 @@ const DoctorsCollectionViewer = ({ patients }) => {
     );
   }
 
-  const { photoUrl, practiceNumber, isVerified, fullName, email } = userDoc;
+  const { practiceNumber, isVerified } = userDoc;
 
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r shadow p-4 space-y-4">
-        {photoUrl ? (
-          <Image
-            src={photoUrl}
-            alt="User Avatar"
-            width={100}
-            height={100}
-            className="rounded-full mx-auto"
-          />
-        ) : (
-          <div className="w-24 h-24 mx-auto rounded-full bg-gray-300" />
-        )}
+      <aside className="w-80 bg-white border-r shadow p-4 space-y-4">
         <div className="text-center">
-          <p className="font-semibold text-gray-900">{fullName || email}</p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 font-medium">
             Practice No: {practiceNumber || "N/A"}
           </p>
         </div>
 
+        {/* Verification Warning */}
         {!isVerified && (
-          <div className="bg-yellow-100 text-yellow-800 border border-yellow-800  text-sm p-2 rounded">
+          <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-sm p-2 rounded">
             Your account is pending verification.
           </div>
         )}
+
+        {/* Action Buttons */}
+        <div className="flex flex-col gap-4 pt-2">
+          {[
+            "Start Consultation",
+            "Create Prescription",
+            "Create Sick Note",
+            "View Patient History"
+          ].map((label) => (
+            <button
+              key={label}
+              className="bg-[#03045e] text-white py-3 px-5 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </aside>
 
       {/* Main Content */}
@@ -105,7 +110,6 @@ const DoctorsCollectionViewer = ({ patients }) => {
         {isVerified ? (
           <div>
             <h1 className="text-xl font-semibold mb-4">Patient Info</h1>
-            {/* TODO: Replace this with real patient data */}
             <p>This is where sensitive patient information would be shown.</p>
             <pre className="bg-gray-100 p-4 rounded text-sm text-gray-800 overflow-auto whitespace-pre-wrap border border-gray-200 shadow-sm max-h-96">
               {JSON.stringify(patients, null, 2)}
