@@ -5,6 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/db/client";
 import DoctorDashboardNavbar from "@/components/navbar/doctorNav";
 import PatientDisplay from "@/components/patients/PatientDisplay";
+import SidebarMenu from "./doctorSidebar"; 
 
 const DoctorsCollectionViewer = ({ patients }) => {
   const [userDoc, setUserDoc] = useState(null);
@@ -13,20 +14,17 @@ const DoctorsCollectionViewer = ({ patients }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       const user = auth.currentUser;
-
       if (!user) {
         setLoading(false);
         return;
       }
 
       const userId = user.uid;
-      const role = "doctor";
-      const collectionName = `${role}s`;
+      const collectionName = `doctors`;
 
       try {
         const userRef = doc(db, collectionName, userId);
         const docSnap = await getDoc(userRef);
-
         if (docSnap.exists()) {
           setUserDoc(docSnap.data());
         } else {
@@ -59,12 +57,9 @@ const DoctorsCollectionViewer = ({ patients }) => {
 
   if (!userDoc) {
     return (
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        {/* Navbar at top */}
+      <div className="min-h-screen bg-gray-50 pt-20">
         <DoctorDashboardNavbar />
-
-        {/* Centered message below navbar */}
-        <div className="flex flex-1 items-center justify-center">
+        <div className="flex items-center justify-center h-full">
           <div className="text-center text-gray-600">
             <p className="text-lg font-medium">No user data found.</p>
             <p className="text-sm mt-1">
@@ -79,48 +74,17 @@ const DoctorsCollectionViewer = ({ patients }) => {
   const { practiceNumber, isVerified } = userDoc;
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
+    <div className="min-h-screen flex flex-col pt-20">
+      {/* Top Navbar */}
       <DoctorDashboardNavbar />
 
-      {/* Content area with sidebar and main */}
+      {/* Sidebar + Main Content Layout */}
       <div className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-80 bg-white border-r shadow p-4 space-y-4">
-          <div className="text-center">
-            <p className="text-sm text-gray-500 font-medium">
-              Practice No: {practiceNumber || "N/A"}
-            </p>
-          </div>
-
-          {/* Verification Warning */}
-          {!isVerified && (
-            <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-sm p-2 rounded">
-              Your account is pending verification.
-            </div>
-          )}
-
-          {isVerified && (
-            <div className="flex flex-col gap-4 pt-2">
-              {[
-                "Start Consultation",
-                "Create Prescription",
-                "Create Sick Note",
-                "View Patient History",
-              ].map((label) => (
-                <button
-                  key={label}
-                  className="bg-[#03045e] text-white py-3 px-5 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
-        </aside>
+        {/* SidebarMenu here */}
+        <SidebarMenu practiceNumber={practiceNumber} isVerified={isVerified} />
 
         {/* Main Content */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 bg-gray-50">
           {isVerified ? (
             <div>
               <h1 className="text-xl font-semibold mb-4">Patient Info</h1>
@@ -129,11 +93,9 @@ const DoctorsCollectionViewer = ({ patients }) => {
             </div>
           ) : (
             <div className="text-center mt-12 text-gray-600">
-              <h2 className="text-lg font-semibold mb-2">
-                Verification Pending
-              </h2>
+              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
               <p>
-                Once your account is verified, you&apos;ll be able to access
+                Once your account is verified, you'll be able to access
                 sensitive patient information here.
               </p>
             </div>
