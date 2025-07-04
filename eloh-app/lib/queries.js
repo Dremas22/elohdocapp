@@ -61,6 +61,36 @@ export const fetchServerCollection = async (collectionName) => {
 };
 
 /**
+ * Sends a notification request to the doctor and retrieves patient data.
+ *
+ * @async
+ * @function notifyDoctorAndGetPatient
+ * @param {string} doctorId - The user ID of the doctor to notify.
+ * @param {string} patientId - The user ID of the patient initiating the request.
+ * @throws {Error} Throws an error if the notification request fails.
+ * @returns {Promise<Object>} Resolves with the patient data object returned from the API.
+ */
+export async function notifyDoctorAndGetPatient(doctorId, patientId) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/notify-doctor`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ doctorId, patientId }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to notify doctor");
+  }
+
+  const data = await res.json();
+  // data.patient contains your patient info
+  return data.patient;
+}
+
+// // Usage example in React event handler
+// const patientData = await notifyDoctorAndGetPatient(doc.userId, currentUser.uid);
+// console.log("Patient info from API:", patientData);
+
+/**
  * Adds or updates a document in a specified Firestore collection.
  *
  * @param {string} collectionName - The name of the Firestore collection.

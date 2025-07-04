@@ -1,8 +1,16 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics, isSupported } from "firebase/analytics";
+import {
+  getAnalytics,
+  isSupported as analyticsSupported,
+} from "firebase/analytics";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import {
+  getMessaging,
+  isSupported as messagingSupported,
+} from "firebase/messaging";
 
+// Firebase Config
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -15,18 +23,30 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-let analytics;
 
-// Make sure analystics is only initialized on the client by checking first if window object is not undefined
-if (typeof window !== undefined) {
-  isSupported().then((supported) => {
+// Auth and Firestore
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleAuth = new GoogleAuthProvider();
+
+// Optional: Analytics
+let analytics;
+if (typeof window !== "undefined") {
+  analyticsSupported().then((supported) => {
     if (supported) {
       analytics = getAnalytics(app);
     }
   });
 }
 
-const db = getFirestore(app);
-const auth = getAuth();
-const googleAuth = new GoogleAuthProvider();
-export { db, auth, googleAuth, analytics };
+// Optional: Messaging
+let messaging;
+if (typeof window !== "undefined") {
+  messagingSupported().then((supported) => {
+    if (supported) {
+      messaging = getMessaging(app);
+    }
+  });
+}
+
+export { app, db, auth, googleAuth, analytics, messaging };
