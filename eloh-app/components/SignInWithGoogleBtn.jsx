@@ -96,17 +96,7 @@ const GoogleSignInButton = ({ role }) => {
       <button
         onClick={handleSignIn}
         disabled={isLoading}
-        className="
-          w-full max-w-xs px-6 py-3 
-          bg-[#00b4d8]                 
-          text-white font-semibold 
-          rounded-lg shadow-md 
-          hover:bg-[#009ec0]          
-          cursor-pointer             
-          transition duration-300     
-          disabled:opacity-60        
-          disabled:cursor-not-allowed  
-        "
+        className="bg-[#03045e] text-white py-3 px-5 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
       >
         {isLoading
           ? `${capitalizedRole} signing in...`
