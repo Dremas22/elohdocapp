@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/db/client";
+import DoctorDashboardNavbar from "@/components/navbar/doctorNav";
 
 const DoctorsCollectionViewer = ({ patients }) => {
   const [userDoc, setUserDoc] = useState(null);
@@ -71,60 +72,66 @@ const DoctorsCollectionViewer = ({ patients }) => {
   const { practiceNumber, isVerified } = userDoc;
 
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="w-80 bg-white border-r shadow p-4 space-y-4">
-        <div className="text-center">
-          <p className="text-sm text-gray-500 font-medium">
-            Practice No: {practiceNumber || "N/A"}
-          </p>
-        </div>
+    <div className="min-h-screen flex flex-col">
+      {/* Navbar */}
+      <DoctorDashboardNavbar />
 
-        {/* Verification Warning */}
-        {!isVerified && (
-          <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-sm p-2 rounded">
-            Your account is pending verification.
-          </div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-4 pt-2">
-          {[
-            "Start Consultation",
-            "Create Prescription",
-            "Create Sick Note",
-            "View Patient History"
-          ].map((label) => (
-            <button
-              key={label}
-              className="bg-[#03045e] text-white py-3 px-5 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-6">
-        {isVerified ? (
-          <div>
-            <h1 className="text-xl font-semibold mb-4">Patient Info</h1>
-            <p>This is where sensitive patient information would be shown.</p>
-            <pre className="bg-gray-100 p-4 rounded text-sm text-gray-800 overflow-auto whitespace-pre-wrap border border-gray-200 shadow-sm max-h-96">
-              {JSON.stringify(patients, null, 2)}
-            </pre>
-          </div>
-        ) : (
-          <div className="text-center mt-12 text-gray-600">
-            <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
-            <p>
-              Once your account is verified, you&apos;ll be able to access
-              sensitive patient information here.
+      {/* Content area with sidebar and main */}
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        <aside className="w-80 bg-white border-r shadow p-4 space-y-4">
+          <div className="text-center">
+            <p className="text-sm text-gray-500 font-medium">
+              Practice No: {practiceNumber || "N/A"}
             </p>
           </div>
-        )}
-      </main>
+
+          {/* Verification Warning */}
+          {!isVerified && (
+            <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-sm p-2 rounded">
+              Your account is pending verification.
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex flex-col gap-4 pt-2">
+            {[
+              "Start Consultation",
+              "Create Prescription",
+              "Create Sick Note",
+              "View Patient History",
+            ].map((label) => (
+              <button
+                key={label}
+                className="bg-[#03045e] text-white py-3 px-5 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 p-6">
+          {isVerified ? (
+            <div>
+              <h1 className="text-xl font-semibold mb-4">Patient Info</h1>
+              <p>This is where sensitive patient information would be shown.</p>
+              <pre className="bg-gray-100 p-4 rounded text-sm text-gray-800 overflow-auto whitespace-pre-wrap border border-gray-200 shadow-sm max-h-96">
+                {JSON.stringify(patients, null, 2)}
+              </pre>
+            </div>
+          ) : (
+            <div className="text-center mt-12 text-gray-600">
+              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
+              <p>
+                Once your account is verified, you&apos;ll be able to access
+                sensitive patient information here.
+              </p>
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 };

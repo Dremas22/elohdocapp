@@ -1,5 +1,11 @@
+import PatientMeetingSetup from "@/components/patients/PatientMeetingSetup";
+
 const PatientDashboard = () => {
-  return <div>PatientDashboard</div>;
+  return (
+    <div>
+      <PatientMeetingSetup />
+    </div>
+  );
 };
 
 export default PatientDashboard;

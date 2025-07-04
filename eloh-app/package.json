@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@zegocloud/zego-uikit-prebuilt": "^2.15.0",
     "firebase": "^11.9.0",
     "firebase-admin": "^13.4.0",
     "next": "15.3.3",

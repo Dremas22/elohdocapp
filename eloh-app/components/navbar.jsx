@@ -6,30 +6,35 @@ import Link from "next/link";
 const Navbar = () => {
   return (
     <nav className="bg-[#00b4d8] p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="ml-4">
-          {/* 
-            Used ml to add left margin to move the logo right
-            Wrapped logo in a Link to navigate to the landing page (/)
-          */}
-          <Link href="/">
-            <img
-              src="/images/elohdoc.png"
-              alt="Eloh Logo"
-              className="h-15 w-15 object-cover transform scale-[3.5] cursor-pointer"
-            />
-          </Link>
+      <div className="container mx-auto flex flex-wrap justify-between items-center">
+
+        <div className="w-full sm:w-auto flex justify-center sm:justify-start mb-2 sm:mb-0">
+
+          <img
+            src="/images/elohdoc.png"
+            alt="Eloh Logo"
+            className="h-10 w-auto object-contain px-5 cursor-pointer transform scale-350"
+          />
+
         </div>
-        <ul className="flex space-x-8 mr-7">
+
+        <ul className="w-full sm:w-auto flex flex-col sm:flex-row justify-center sm:justify-end items-center gap-2 sm:gap-8 mt-2 sm:mt-0">
           <li>
-            <a href="/about" className="text-black font-bold hover:text-white">
+            <Link
+              href="/about"
+              className="text-black text-sm sm:text-base font-semibold hover:text-white transition"
+            >
               Our Team
-            </a>
+            </Link>
+
           </li>
           <li>
-            <a href="/contact" className="text-black font-bold hover:text-white">
+            <Link
+              href="/contact"
+              className="text-black text-sm sm:text-base font-semibold hover:text-white transition"
+            >
               Contact
-            </a>
+            </Link>
           </li>
         </ul>
       </div>
