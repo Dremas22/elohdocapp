@@ -5,7 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/db/client";
 import DoctorDashboardNavbar from "@/components/navbar/doctorNav";
 import PatientDisplay from "@/components/patients/PatientDisplay";
-import SidebarMenu from "./doctorSidebar";
+import SidebarMenu from "./doctorSidebar"; 
 
 const DoctorsCollectionViewer = ({ patients }) => {
   const [userDoc, setUserDoc] = useState(null);
@@ -80,8 +80,10 @@ const DoctorsCollectionViewer = ({ patients }) => {
 
       {/* Sidebar + Main Content Layout */}
       <div className="flex flex-1">
+        {/* SidebarMenu here */}
         <SidebarMenu practiceNumber={practiceNumber} isVerified={isVerified} />
 
+        {/* Main Content */}
         <main className="flex-1 p-6 bg-gray-50">
           {isVerified ? (
             <div>
