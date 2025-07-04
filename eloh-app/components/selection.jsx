@@ -23,13 +23,13 @@ const ChooseDesignation = () => {
       // 'flex flex-col items-center justify-start' aligns content
       // 'pt-130' pushes the content lower down the page
       // 'px-4' provides horizontal padding for responsiveness
-      className="absolute inset-0 flex flex-col items-center justify-start pt-130 px-4"
+      className="absolute inset-0 flex flex-col items-center justify-start pt-140 px-4"
     >
       <h2 className="text-3xl md:text-4xl font-bold text-[#03045e] mb-6 text-center">
         Select Your Designation
       </h2>
 
-      <div className="grid gap-4 w-full max-w-md">
+      <div className="grid py-3 gap-4 w-full max-w-md">
         {designations.map((designation) => (
           <button
             key={designation.id}
