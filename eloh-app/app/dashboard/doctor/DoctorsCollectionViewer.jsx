@@ -6,6 +6,7 @@ import { auth, db } from "@/db/client";
 import DoctorDashboardNavbar from "@/components/navbar/doctorNav";
 import PatientDisplay from "@/components/patients/PatientDisplay";
 import SidebarMenu from "./doctorSidebar";
+import SidebarMenu from "./doctorSidebar";
 const DoctorsCollectionViewer = ({ patients }) => {
   const [userDoc, setUserDoc] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -80,6 +81,11 @@ const DoctorsCollectionViewer = ({ patients }) => {
 
       {/* Layout: Sidebar + Main */}
       <div className="flex flex-1">
+        {/* ✅ Sidebar Component */}
+        <SidebarMenu
+          practiceNumber={practiceNumber}
+          isVerified={isVerified}
+        />
         {/* ✅ Sidebar Component */}
         <SidebarMenu
           practiceNumber={practiceNumber}
