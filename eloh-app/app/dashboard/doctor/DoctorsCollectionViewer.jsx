@@ -58,16 +58,23 @@ const DoctorsCollectionViewer = ({ patients }) => {
 
   if (!userDoc) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="text-center text-gray-600">
-          <p className="text-lg font-medium">No user data found.</p>
-          <p className="text-sm mt-1">
-            Please make sure your account is registered correctly.
-          </p>
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        {/* Navbar at top */}
+        <DoctorDashboardNavbar />
+
+        {/* Centered message below navbar */}
+        <div className="flex flex-1 items-center justify-center">
+          <div className="text-center text-gray-600">
+            <p className="text-lg font-medium">No user data found.</p>
+            <p className="text-sm mt-1">
+              Please make sure your account is registered correctly.
+            </p>
+          </div>
         </div>
       </div>
     );
   }
+
 
   const { practiceNumber, isVerified } = userDoc;
 

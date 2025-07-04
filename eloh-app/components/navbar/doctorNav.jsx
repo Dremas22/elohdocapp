@@ -59,7 +59,8 @@ const DoctorDashboardNavbar = () => {
     const { photoUrl, fullName, email } = userDoc || {};
 
     return (
-        <header className="w-full bg-[#90e0ef] py-3 px-6 shadow-md flex justify-between items-center">
+        <header className="w-full bg-[#123158] py-3 px-6 shadow-md flex justify-between items-center">
+
             {/* Left: User Info */}
             <div className="flex items-center gap-4">
                 {photoUrl ? (
@@ -73,7 +74,7 @@ const DoctorDashboardNavbar = () => {
                 ) : (
                     <div className="w-12 h-12 rounded-full bg-gray-300" />
                 )}
-                <div className="leading-tight text-sm text-[#03045e]">
+                <div className="leading-tight text-sm text-[#E4E9EE]">
                     <p className="font-semibold">
                         {fullName || email || "Doctor"}
                     </p>
@@ -93,22 +94,14 @@ const DoctorDashboardNavbar = () => {
 
             {/* Right: Auth Button */}
             <div>
-                {auth.currentUser ? (
-                    <button
-                        onClick={handleSignOut}
-                        className="bg-[#03045e] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-black transition"
-                    >
-                        Sign Out
-                    </button>
-                ) : (
-                    <button
-                        onClick={handleSignIn}
-                        className="bg-[#03045e] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-black transition"
-                    >
-                        Sign In
-                    </button>
-                )}
+                <button
+                    onClick={auth.currentUser ? handleSignOut : handleSignIn}
+                    className="bg-[#001E42] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-black transition shadow-sm shadow-white/20"
+                >
+                    {auth.currentUser ? "Sign Out" : "Sign In"}
+                </button>
             </div>
+
         </header>
     );
 };
