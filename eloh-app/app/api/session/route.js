@@ -1,4 +1,4 @@
-import { auth } from "@/db/server";
+import { auth, db } from "@/db/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -47,7 +47,7 @@ export async function POST(req) {
       const role = decodedToken.role || "doctor";
       const collectionName = role + "s"; // doctors, nurses, patients
 
-      const userDocRef = db.collection(collectionName).doc(uid);
+      const userDocRef = db?.collection(collectionName).doc(uid);
       await userDocRef.set(
         {
           fcmToken,
