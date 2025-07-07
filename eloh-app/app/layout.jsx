@@ -1,7 +1,9 @@
 export const revalidate = 300;
 
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import './globals.css';
+import 'react-day-picker/dist/style.css';
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
