@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 const useCurrentUser = () => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {

@@ -1,52 +1,87 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import RichTextEditor from "@/components/editor/TextEditor";
-import MeetingRoom from "@/components/video-conferencing/MeetingRoom";
+import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 
 const Room = () => {
   const { currentUser, loading } = useCurrentUser();
   const params = useParams();
+  const searchParams = useSearchParams();
+  const patientIdFromQuery = searchParams.get("patientId");
 
   const roomID = params.roomId;
   const doctorId = roomID;
   const userId = currentUser?.userId || currentUser?.uid || null;
+  const userName = currentUser?.displayName || `Guest-${Date.now()}`;
   const isDoctor = userId === doctorId;
-  const patientId = isDoctor ? null : userId;
+  const patientId = patientIdFromQuery || (isDoctor ? null : userId);
 
-  const [patientData, setPatientData] = useState(null);
-  const [currentNote, setCurrentNote] = useState("");
+  const containerRef = useRef(null);
+  const hasJoined = useRef(false);
 
-  console.log({ patientData, patientId }, "PATIENT");
-  console.log({ isDoctor, currentNote }, "DOCTOR");
+  useEffect(() => {
+    const myMeeting = async () => {
+      if (!containerRef.current || hasJoined.current || !currentUser || loading)
+        return;
 
+      hasJoined.current = true; // mark before join to prevent race conditions
+
+      const appID = parseInt(process.env.NEXT_PUBLIC_ZEGO_APP_ID);
+      const serverSecret = process.env.NEXT_PUBLIC_ZEGO_SERVER_SECRET;
+
+      const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+        appID,
+        serverSecret,
+        roomID,
+        userId,
+        userName,
+        1800
+      );
+
+      const zp = ZegoUIKitPrebuilt.create(kitToken);
+
+      // defer to next JS tick to avoid hydration-related duplication
+      setTimeout(() => {
+        zp.joinRoom({
+          container: containerRef.current,
+          sharedLinks: [
+            {
+              name: "Copy Link",
+              url:
+                window.location.protocol +
+                "//" +
+                window.location.host +
+                "/room/" +
+                roomID +
+                `?patientId=${patientId}`,
+            },
+          ],
+
+          scenario: {
+            mode: ZegoUIKitPrebuilt.VideoConference,
+          },
+        });
+      }, 0);
+    };
+
+    myMeeting();
+  }, [roomID, userId, userName, currentUser, loading]);
+
+  console.log(patientId, "PATIENT_ID");
   return (
     <div className="flex h-screen">
-      {/* Video Meeting Section */}
-      <div className="flex-1 relative">
-        <MeetingRoom
-          doctorId={doctorId}
-          patientId={patientId}
-          isDoctor={isDoctor}
-          userId={userId}
-          currentUser={currentUser}
-          loading={loading}
-          patientData={patientData}
-          setPatientData={setPatientData}
-        />
+      {/* Video Section */}
+      <div className="flex-1 bg-black text-white">
+        <div className="w-full h-screen flex flex-col bg-gray-900 text-white">
+          <div className="flex-grow" ref={containerRef}></div>
+        </div>
       </div>
 
-      <RichTextEditor
-        doctorId={doctorId}
-        isDoctor={isDoctor}
-        patientData={patientData}
-        currentNote={currentNote}
-        setCurrentNote={setCurrentNote}
-        setPatientData={setPatientData}
-        currentUser={currentUser}
-      />
+      {/* Notes Section with only patientId and roomID passed */}
+      <RichTextEditor patientId={patientId} roomID={roomID} />
     </div>
   );
 };
