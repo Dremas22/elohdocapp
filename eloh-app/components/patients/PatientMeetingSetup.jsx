@@ -10,11 +10,12 @@ import { useEffect, useState } from "react";
 const PatientMeetingSetup = () => {
   const { currentUser, loading } = useCurrentUser();
   const [roomID, setRoomID] = useState("");
-  const router = useRouter();
   const [doctors, setDoctors] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter();
 
+  // 🧠 Fetch all doctors
   useEffect(() => {
     const fetchDoctors = async () => {
       setIsLoading(true);
@@ -27,11 +28,10 @@ const PatientMeetingSetup = () => {
           ...doc.data(),
         }));
         setDoctors(doctorsList);
-        setError(null);
       } catch (error) {
         console.error("Error fetching doctors:", error);
         setDoctors([]);
-        setError("Error fetching doctors:");
+        setError("Error fetching doctors");
       } finally {
         setIsLoading(false);
       }
@@ -41,6 +41,15 @@ const PatientMeetingSetup = () => {
   }, []);
 
   const fullName = currentUser?.displayName || `Unknown-user_${Date.now()}`;
+
+  // ✅ Wait for currentUser before rendering UI
+  if (loading || !currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white bg-gray-900">
+        Loading user info...
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-gray-950 text-white">
@@ -80,7 +89,13 @@ const PatientMeetingSetup = () => {
               />
               <button
                 className="rounded-md bg-blue-600 px-6 py-2 text-sm font-medium text-white"
-                onClick={() => router.push(`/room/${roomID}`)}
+                onClick={() => {
+                  if (currentUser?.uid && doc.userId) {
+                    router.push(
+                      `/room/${doc.userId}?patientId=${currentUser.uid}`
+                    );
+                  }
+                }}
                 disabled={!roomID}
               >
                 Join
@@ -93,7 +108,7 @@ const PatientMeetingSetup = () => {
           <h2 className="text-2xl font-semibold text-center mb-6">
             Available Doctors
           </h2>
-          {loading || isLoading ? (
+          {isLoading ? (
             <p className="text-center text-gray-500 mt-20">
               Loading doctors...
             </p>
@@ -111,14 +126,11 @@ const PatientMeetingSetup = () => {
                 <div
                   key={doc.userId}
                   onClick={() => {
-                    if (!loading && !isLoading) {
-                      router.push(`/room/${doc.userId}`);
-                    }
+                    router.push(
+                      `/room/${doc.userId}?patientId=${currentUser.uid}`
+                    );
                   }}
-                  className={`rounded-lg p-5 shadow-md transition duration-200 flex justify-between items-center gap-4 ${loading || isLoading
-                      ? "cursor-not-allowed bg-gray-700 opacity-60"
-                      : "cursor-pointer bg-gray-800 hover:bg-gray-700"
-                    }`}
+                  className={`rounded-lg p-5 shadow-md transition duration-200 flex justify-between items-center gap-4 ${"cursor-pointer bg-gray-800 hover:bg-gray-700"}`}
                 >
                   {/* Left - Text Info */}
                   <div className="space-y-2">

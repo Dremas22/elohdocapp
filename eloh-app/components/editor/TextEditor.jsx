@@ -1,14 +1,35 @@
 "use client";
 
-const RichTextEditor = ({
-  doctorId,
-  isDoctor,
-  patientData,
-  currentNote,
-  setCurrentNote,
-  setPatientData,
-  currentUser,
-}) => {
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { useEffect, useState } from "react";
+
+const RichTextEditor = ({ roomID, patientId }) => {
+  const { loading, currentUser } = useCurrentUser();
+  const [currentNote, setCurrentNote] = useState("");
+  const [patientData, setPatientData] = useState(null);
+
+  const isDoctor = roomID === currentUser?.uid;
+
+  // 🔁 Fetch patient data on mount
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      if (!patientId) return;
+
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/patients/${patientId}`
+        );
+        if (!res.ok) throw new Error("Failed to fetch patient data");
+        const data = await res.json();
+        setPatientData(data);
+      } catch (error) {
+        console.error("Error fetching patient:", error);
+      }
+    };
+
+    fetchPatientData();
+  }, [patientId]);
+
   const handleSaveNotes = async () => {
     const trimmedNote = currentNote.trim();
     if (!trimmedNote) return alert("Note cannot be empty");
@@ -30,7 +51,7 @@ const RichTextEditor = ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            patientId: patientData?.id,
+            patientId,
             medicalHistory: updatedHistory,
           }),
         }
@@ -52,18 +73,28 @@ const RichTextEditor = ({
     }
   };
 
-  if (!patientData || !isDoctor) return null;
+  if (loading || !currentUser) return <p>Loading...</p>;
+
+  console.log(patientId, "PATIENT_ID", isDoctor);
+  console.log(roomID, "DOCTOR_ID");
+  console.log(patientData, "PATIENTS_DATA");
 
   return (
     <div className="w-[400px] p-4 bg-gray-800 text-white border-l border-gray-700 flex flex-col justify-between">
       <div>
         <h2 className="text-xl font-semibold mb-2">Patient Info</h2>
-        <p>
-          <strong>Name:</strong> {patientData.fullName || "Unknown"}
-        </p>
-        <p>
-          <strong>Patient ID:</strong> {patientData.id || "Unknown"}
-        </p>
+        {patientData ? (
+          <>
+            <p>
+              <strong>Name:</strong> {patientData.fullName || "Unknown"}
+            </p>
+            <p>
+              <strong>Patient ID:</strong> {patientData.id || patientId}
+            </p>
+          </>
+        ) : (
+          <p className="text-gray-400">Loading patient details...</p>
+        )}
 
         {isDoctor && (
           <>
