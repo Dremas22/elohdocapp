@@ -53,7 +53,9 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
             </>
           ) : isVerified === false ? (
             <div className="text-center mt-12 text-gray-600">
-              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                Verification Pending
+              </h2>
               <p>
                 Once your account is verified, you'll be able to access
                 sensitive patient information here.
