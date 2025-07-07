@@ -33,23 +33,27 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
         <DoctorDashboardNavbar />
       </div>
 
-      {/* Sidebar + Main Content Layout */}
-      <div className="flex flex-1">
-        {/* SidebarMenu here */}
-        <SidebarMenu practiceNumber={practiceNumber} isVerified={isVerified} />
+      {/* Sidebar + Main Content */}
+      <div className="flex pt-24 transition-all duration-300 ease-in-out">
+        <SidebarMenu
+          practiceNumber={practiceNumber}
+          isVerified={isVerified}
+          isOpen={sidebarOpen}
+          setIsOpen={setSidebarOpen}
+        />
 
-        {/* Main Content */}
-        <main className="flex-1 p-6 bg-gray-50">
+        <main
+          className={`flex-1 p-6 transition-all duration-300 ease-in-out ${sidebarOpen ? "ml-40" : "ml-0"
+            }`}
+        >
           {isVerified === true ? (
-            <div>
+            <>
               <h1 className="text-xl font-semibold mb-4">Patient Info</h1>
               <PatientDisplay patients={patients} />
-            </div>
+            </>
           ) : isVerified === false ? (
             <div className="text-center mt-12 text-gray-600">
-              <h2 className="text-lg font-semibold mb-2">
-                Verification Pending
-              </h2>
+              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
               <p>
                 Once your account is verified, you'll be able to access
                 sensitive patient information here.
@@ -57,9 +61,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
             </div>
           ) : (
             <div className="text-center mt-12 text-red-600">
-              <h2 className="text-lg font-semibold mb-2">
-                Verification Declined
-              </h2>
+              <h2 className="text-lg font-semibold mb-2">Verification Declined</h2>
               <p>
                 We could not verify your account. Please ensure your practice
                 number is registered or contact support for help.
