@@ -116,12 +116,21 @@ const SidebarMenu = ({ practiceNumber, isVerified, isOpen, setIsOpen }) => {
                 <div className="flex flex-col px-4 pt-2.5 pb-6 space-y-4 h-full">
                     <div className="text-white text-sm font-medium pl-2 mt-2">Practice No: {practiceNumber || "N/A"}</div>
 
-                    {!isVerified && (
-                        <div className="flex items-center bg-yellow-100 text-yellow-800 border border-yellow-800 py-2 rounded text-sm px-2 justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 1010 10A10 10 0 0012 2z" />
-                            </svg>
-                            <span>Verification pending</span>
+                    {/* Verification alert */}
+                    {isVerified === false && (
+                        <div className="max-w-xl mx-auto mb-4">
+                            <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-sm p-2 rounded">
+                                Your account is pending verification.
+                            </div>
+                        </div>
+                    )}
+
+                    {isVerified === null && (
+                        <div className="max-w-xl mx-auto mb-4">
+                            <div className="bg-red-100 text-red-800 border border-red-800 text-sm p-2 rounded">
+                                Your account verification was declined. Please check your
+                                practice number or contact support.
+                            </div>
                         </div>
                     )}
 
