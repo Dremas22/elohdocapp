@@ -1,31 +1,29 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
-import useCurrentUser from "@/hooks/useCurrentUser";
 
-const MeetingRoom = () => {
-  const { currentUser, loading } = useCurrentUser();
-  const params = useParams();
-
-  const roomID = params.roomId; // doctorId used as roomId
-
-  // Try multiple fields if userId isn't present on currentUser
-  const patientId = currentUser?.userId || currentUser?.uid || null;
-
+const MeetingRoom = ({
+  doctorId,
+  patientId,
+  isDoctor,
+  userId,
+  currentUser,
+  loading,
+  patientData,
+  setPatientData,
+}) => {
   const containerRef = useRef(null);
   const hasJoined = useRef(false);
 
-  const [patientData, setPatientData] = useState(null);
   const [isNotifying, setIsNotifying] = useState(false);
   const [notifyError, setNotifyError] = useState(null);
   const [isJoining, setIsJoining] = useState(false);
-  const [currentNote, setCurrentNote] = useState("");
+  const [participants, setParticipants] = useState([]);
 
-  // Notify doctor & fetch patient data by calling the API route directly
+  // Notify doctor and fetch patient data
   useEffect(() => {
-    if (!roomID || !patientId || loading) return;
+    if (!doctorId || !patientId || loading) return;
 
     const notifyAndFetchPatient = async () => {
       setIsNotifying(true);
@@ -36,10 +34,8 @@ const MeetingRoom = () => {
           `${process.env.NEXT_PUBLIC_URL}/api/notify-doctor`,
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ doctorId: roomID, patientId }),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ doctorId, patientId }),
           }
         );
 
@@ -59,7 +55,7 @@ const MeetingRoom = () => {
     };
 
     notifyAndFetchPatient();
-  }, [roomID, patientId, loading]);
+  }, [doctorId, patientId, loading]);
 
   // Join Zego meeting room
   useEffect(() => {
@@ -79,21 +75,12 @@ const MeetingRoom = () => {
     const appID = parseInt(process.env.NEXT_PUBLIC_ZEGO_APP_ID);
     const serverSecret = process.env.NEXT_PUBLIC_ZEGO_SERVER_SECRET;
 
-    const fullName = currentUser.displayName;
-
-    console.log("Joining room with:", {
-      appID,
-      roomID,
-      patientId,
-      fullName,
-    });
-
     const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
       appID,
       serverSecret,
-      roomID,
+      doctorId,
       patientId,
-      fullName,
+      currentUser.displayName,
       1800
     );
 
@@ -113,61 +100,16 @@ const MeetingRoom = () => {
             window.location.host +
             window.location.pathname +
             "?roomID=" +
-            roomID,
+            doctorId,
         },
       ],
       onJoinRoom: () => {
         setIsJoining(false);
       },
     });
-  }, [roomID, currentUser, loading, patientId]);
+  }, [doctorId, patientId, currentUser?.displayName, loading]);
 
-  const isDoctor = currentUser?.userId === roomID;
-
-  const handleSaveNotes = async () => {
-    const trimmedNote = currentNote.trim();
-    if (!trimmedNote) return alert("Note cannot be empty");
-
-    const newNote = {
-      doctorName,
-      notes: trimmedNote,
-      createdAt: new Date().toISOString(),
-    };
-
-    const updatedHistory = [...(patientData.medicalHistory || []), newNote];
-
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/patients/update-history`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            patientId: patientData.id,
-            medicalHistory: updatedHistory,
-          }),
-        }
-      );
-
-      if (!res.ok) {
-        alert("Failed to save note");
-        return;
-      }
-
-      setPatientData((prev) => ({
-        ...prev,
-        medicalHistory: updatedHistory,
-      }));
-      setCurrentNote("");
-    } catch (err) {
-      console.error("Error saving note:", err);
-      alert("Something went wrong");
-    }
-  };
-
-  console.log({ patientData, patientId }, "PATIENT");
+  console.log(participants, "PARTICIPANTS");
 
   return (
     <div className="w-full h-screen flex flex-col bg-gray-900 text-white">
@@ -186,45 +128,6 @@ const MeetingRoom = () => {
       )}
 
       <div className="flex-grow" ref={containerRef}></div>
-
-      {patientData && (
-        <div className="p-4 bg-gray-800 max-h-60 overflow-auto rounded-md">
-          <h2 className="font-bold mb-2 text-white">Patient Info</h2>
-
-          <p>
-            <strong>Name:</strong> {patientData.fullName || "Unknown"}
-          </p>
-          <p>
-            <strong>Email:</strong> {patientData.email || "Unknown"}
-          </p>
-          <p>
-            <strong>Phone:</strong> {patientData.phoneNumber || "Unknown"}
-          </p>
-          {/** TODO: TEXT EDITOR GOES HERE */}
-          {isDoctor && (
-            <div className="mt-4">
-              <h3 className="font-semibold mb-1 text-white">
-                Medical History / Notes
-              </h3>
-
-              <textarea
-                className="w-full p-2 rounded bg-gray-700 text-white"
-                value={currentNote}
-                onChange={(e) => setCurrentNote(e.target.value)}
-                placeholder="Add notes here..."
-                rows={4}
-              />
-
-              <button
-                onClick={handleSaveNotes}
-                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-              >
-                Save Note
-              </button>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 };

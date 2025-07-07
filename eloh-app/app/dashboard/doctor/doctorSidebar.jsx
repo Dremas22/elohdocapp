@@ -166,9 +166,20 @@ const SidebarMenu = ({ practiceNumber, isVerified }) => {
           </div>
 
           {/* Verification alert */}
-          {!isVerified && (
-            <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-sm p-2 rounded">
-              Your account is pending verification.
+          {isVerified === false && (
+            <div className="max-w-xl mx-auto mb-4">
+              <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-sm p-2 rounded">
+                Your account is pending verification.
+              </div>
+            </div>
+          )}
+
+          {isVerified === null && (
+            <div className="max-w-xl mx-auto mb-4">
+              <div className="bg-red-100 text-red-800 border border-red-800 text-sm p-2 rounded">
+                Your account verification was declined. Please check your
+                practice number or contact support.
+              </div>
             </div>
           )}
 
