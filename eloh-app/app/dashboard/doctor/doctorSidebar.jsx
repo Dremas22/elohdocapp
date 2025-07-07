@@ -192,7 +192,34 @@ const SidebarMenu = ({ practiceNumber, isVerified }) => {
                         </div>
                     )}
                 </div>
-            </div>
+            </aside>
+
+            <section className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-96 bg-[#f8f9fa] shadow-lg z-50 p-6 transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"}`}>
+                <h2 className="text-xl font-bold mb-4 text-[#03045e]">Schedule Your Availability</h2>
+                <DayPicker
+                    mode="multiple"
+                    selected={selectedDays}
+                    onSelect={setSelectedDays}
+                    styles={{
+                        day: { color: "#000" },
+                        day_selected: { backgroundColor: "#2a5599", color: "#f8f9fa", borderRadius: "9999px" },
+                        day_today: { backgroundColor: "#90e0ef", color: "#03045e", borderRadius: "9999px", fontWeight: "700" },
+                        day_hover: { backgroundColor: "#90e0ef", color: "#000", cursor: "pointer" },
+                    }}
+                    dayContent={(day) => <span className="text-[#000] font-medium">{day.getDate()}</span>}
+                />
+                {selectedDays.length > 0 && (
+                    <p className="mt-4 text-[#03045e]">
+                        Selected <strong>{selectedDays.length}</strong> day(s).
+                    </p>
+                )}
+                <button
+                    onClick={handleSave}
+                    className="mt-6 bg-[#03045e] hover:bg-[#023e8a] text-[#f8f9fa] px-6 py-2 rounded shadow transition-all"
+                >
+                    Save
+                </button>
+            </section>
         </>
     );
 };
