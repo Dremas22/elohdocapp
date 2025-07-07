@@ -194,6 +194,7 @@ const SidebarMenu = ({ practiceNumber, isVerified }) => {
                 </div>
             </aside>
 
+            {/* Calendar Drawer */}
             <section className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-96 bg-[#f8f9fa] shadow-lg z-50 p-6 transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"}`}>
                 <h2 className="text-xl font-bold mb-4 text-[#03045e]">Schedule Your Availability</h2>
                 <DayPicker
