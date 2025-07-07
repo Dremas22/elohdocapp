@@ -34,7 +34,7 @@ const ChooseDesignation = () => {
           <button
             key={designation.id}
             onClick={() => handleSelect(designation.role)}
-            className=" bg-[#03045e] text-white py-3 px-5 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
+            className=" bg-[#03045e] text-white py-3 px-5 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
             {designation.title}
           </button>

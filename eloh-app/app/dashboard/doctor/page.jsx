@@ -3,8 +3,35 @@ import { cookies } from "next/headers";
 import DoctorsCollectionViewer from "./DoctorsCollectionViewer";
 import Link from "next/link";
 
+// 🔁 Convert Firestore Timestamps, Dates, or nested timestamp-like objects
+function serializeData(obj) {
+  if (obj === null || obj === undefined) return obj;
+
+  if (typeof obj?.toDate === "function") {
+    return obj.toDate().toISOString();
+  }
+
+  if (obj instanceof Date) {
+    return obj.toISOString();
+  }
+
+  if (typeof obj === "object") {
+    if (obj._seconds !== undefined && obj._nanoseconds !== undefined) {
+      return new Date(obj._seconds * 1000).toISOString();
+    }
+
+    const result = {};
+    for (const key in obj) {
+      result[key] = serializeData(obj[key]);
+    }
+    return result;
+  }
+
+  return obj;
+}
+
 const DoctorsDashboard = async () => {
-  const cookieStore = await cookies();
+  const cookieStore = await cookies(); // ✅ await added
   const session = cookieStore?.get("session")?.value;
 
   if (!session) {
@@ -31,41 +58,16 @@ const DoctorsDashboard = async () => {
       );
     }
 
-    const doctorDataRaw = doctorSnap.data();
-
-    // ✅ Convert Firestore Timestamps to plain JS values
-    const convertTimestamp = (timestamp) => {
-      if (!timestamp) return null;
-      if (typeof timestamp.toDate === "function") {
-        return timestamp.toDate().toISOString();
-      }
-      if (timestamp instanceof Date) {
-        return timestamp.toISOString();
-      }
-      // If it's a string or unknown format, try new Date conversion
-      try {
-        return new Date(timestamp).toISOString();
-      } catch {
-        return null;
-      }
-    };
-
-    const doctorData = {
-      ...doctorDataRaw,
-      createdAt: convertTimestamp(doctorDataRaw.createdAt),
-      updatedAt: convertTimestamp(doctorDataRaw.updatedAt),
-    };
+    const rawDoctorData = doctorSnap.data();
+    const doctorData = serializeData(rawDoctorData);
 
     let patients = [];
     if (doctorData.isVerified) {
       const patientsSnap = await db.collection("patients").get();
       patients = patientsSnap.docs.map((doc) => {
-        const data = doc.data();
         return {
-          ...data,
-          createdAt: data.createdAt?.toDate().toISOString() || null,
-          updatedAt: data.updatedAt?.toDate().toISOString() || null,
           id: doc.id,
+          ...serializeData(doc.data()),
         };
       });
     }

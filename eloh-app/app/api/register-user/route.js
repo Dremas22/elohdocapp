@@ -1,84 +1,97 @@
-import { cookies } from "next/headers";
+import { db, auth } from "@/db/server";
 import { NextResponse } from "next/server";
-import { auth, db } from "@/db/client";
 
-export async function POST(req) {
-  const { token, fcmToken } = await req.json();
-
+export async function POST(request) {
   try {
-    // Decode and verify token
-    const decodedToken = await auth?.verifyIdToken(token);
+    // Extract token from cookie or header
+    const cookieToken = request.cookies.get("session")?.value;
+    const headerToken = request.headers
+      .get("authorization")
+      ?.split("Bearer ")[1];
+    const token = cookieToken || headerToken;
 
-    if (!decodedToken || !decodedToken.exp) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Calculate expiration
-    const expirationTimeMs = decodedToken.exp * 1000;
-    const nowMs = Date.now();
-    const expiresIn = expirationTimeMs - nowMs;
+    // Verify token with Firebase Admin SDK (using verifySessionCookie)
+    const decodedToken = await auth?.verifySessionCookie(token, true);
 
-    if (expiresIn <= 0) {
+    const data = await request.json();
+    const { userId, role } = data;
+
+    if (!userId || decodedToken.uid !== userId || !role) {
       return NextResponse.json(
-        { error: "Token has already expired" },
-        { status: 401 }
+        { error: "Invalid or missing fields" },
+        { status: 400 }
       );
     }
 
-    // Create session cookie
-    const sessionCookie = await auth?.createSessionCookie(token, {
-      expiresIn,
-    });
-
-    if (sessionCookie) {
-      (await cookies()).set("session", sessionCookie, {
-        httpOnly: true,
-        secure: true,
-        path: "/",
-        maxAge: expiresIn / 1000,
-      });
+    const validRoles = ["doctor", "nurse", "patient"];
+    if (!validRoles.includes(role)) {
+      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
-    // Update Firestore user document if fcmToken provided
-    if (fcmToken) {
-      const uid = decodedToken.uid;
-      const role = decodedToken.role || "doctor";
-      const collectionName = role + "s"; // doctors, nurses, patients
+    const collectionName = role + "s";
+    const userDocRef = db.collection(collectionName).doc(userId);
+    const docSnapshot = await userDocRef.get();
 
-      const userRef = db.collection(collectionName).doc(uid);
-      const userSnap = await userRef.get();
-
-      if (!userSnap.exists) {
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
-      }
-
-      const existingData = userSnap.data();
-
-      const updatedData = {
-        ...existingData,
-        fcmToken,
-        online: true,
-        lastLogin: new Date(),
-        updatedAt: new Date(),
-      };
-
-      await userRef.set(updatedData, { merge: true });
+    if (docSnapshot.exists) {
+      return NextResponse.json(
+        { message: "User already exists" },
+        { status: 200 }
+      );
     }
 
-    return NextResponse.json({ success: true });
+    const now = new Date();
+    let userDoc = {
+      ...data,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    if (role === "doctor" || role === "nurse") {
+      userDoc.isVerified = false;
+    } else if (role === "patient") {
+      userDoc.isActive = true;
+    }
+
+    await userDocRef.set(userDoc);
+
+    if (role === "doctor" || role === "nurse") {
+      await auth.setCustomUserClaims(userId, { role }); // use role from data
+    }
+
+    return NextResponse.json(
+      { message: "User successfully created" },
+      { status: 201 }
+    );
   } catch (error) {
-    console.error("Auth error:", error);
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    console.error("API Error:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function DELETE() {
-  (await cookies()).set("session", "", {
-    httpOnly: true,
-    secure: true,
-    path: "/",
-    maxAge: 0,
-  });
+export async function PATCH(request) {
+  try {
+    const data = await request.json();
+    const { userId, fcmToken } = data;
+    if (!userId || !fcmToken) {
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
 
-  return NextResponse.json({ message: "Logged out successfully" });
+    const userDocRef = db.collection("doctors").doc(userId);
+    await userDocRef.update({ fcmToken, updatedAt: new Date() });
+
+    return NextResponse.json({ message: "FCM token updated" }, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Failed to update FCM token" },
+      { status: 500 }
+    );
+  }
 }
