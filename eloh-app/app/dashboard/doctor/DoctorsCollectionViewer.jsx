@@ -35,18 +35,30 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
 
         {/* Main Content */}
         <main className="flex-1 p-6 bg-gray-50">
-          {isVerified ? (
+          {isVerified === true ? (
             <div>
               <h1 className="text-xl font-semibold mb-4">Patient Info</h1>
               <p>This is where sensitive patient information would be shown.</p>
               <PatientDisplay patients={patients} />
             </div>
-          ) : (
+          ) : isVerified === false ? (
             <div className="text-center mt-12 text-gray-600">
-              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                Verification Pending
+              </h2>
               <p>
                 Once your account is verified, you'll be able to access
                 sensitive patient information here.
+              </p>
+            </div>
+          ) : (
+            <div className="text-center mt-12 text-red-600">
+              <h2 className="text-lg font-semibold mb-2">
+                Verification Declined
+              </h2>
+              <p>
+                We could not verify your account. Please ensure your practice
+                number is registered or contact support for help.
               </p>
             </div>
           )}

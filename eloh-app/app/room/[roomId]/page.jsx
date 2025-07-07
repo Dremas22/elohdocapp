@@ -1,25 +1,52 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import RichTextEditor from "@/components/editor/TextEditor";
 import MeetingRoom from "@/components/video-conferencing/MeetingRoom";
 
 const Room = () => {
+  const { currentUser, loading } = useCurrentUser();
+  const params = useParams();
+
+  const roomID = params.roomId;
+  const doctorId = roomID;
+  const userId = currentUser?.userId || currentUser?.uid || null;
+  const isDoctor = userId === doctorId;
+  const patientId = isDoctor ? null : userId;
+
+  const [patientData, setPatientData] = useState(null);
+  const [currentNote, setCurrentNote] = useState("");
+
+  console.log({ patientData, patientId }, "PATIENT");
+  console.log({ isDoctor, currentNote }, "DOCTOR");
+
   return (
     <div className="flex h-screen">
       {/* Video Meeting Section */}
       <div className="flex-1 relative">
-        <MeetingRoom />
+        <MeetingRoom
+          doctorId={doctorId}
+          patientId={patientId}
+          isDoctor={isDoctor}
+          userId={userId}
+          currentUser={currentUser}
+          loading={loading}
+          patientData={patientData}
+          setPatientData={setPatientData}
+        />
       </div>
 
-      {/* Placeholder for Text Editor */}
-      <aside className="w-full max-w-md bg-white border-l px-6 py-4 overflow-auto">
-        <h2 className="text-xl font-semibold mb-4">Doctor's Notes</h2>
-        <div className="w-full h-[calc(100vh-100px)] border rounded-md p-4 text-gray-500 bg-gray-50">
-          <p className="text-center text-sm italic text-gray-400">
-            Text editor goes here. Doctors can write consultation notes during
-            the meeting.
-          </p>
-        </div>
-      </aside>
+      <RichTextEditor
+        doctorId={doctorId}
+        isDoctor={isDoctor}
+        patientData={patientData}
+        currentNote={currentNote}
+        setCurrentNote={setCurrentNote}
+        setPatientData={setPatientData}
+        currentUser={currentUser}
+      />
     </div>
   );
 };
