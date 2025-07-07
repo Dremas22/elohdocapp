@@ -3,11 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-/**
- * Renders a list of sidebar action buttons.
- * @param {Object} props
- * @param {string[]} props.buttons - Array of button labels.
- */
+/* Action Buttons with optional links */
 const ActionButtons = ({ buttons }) => (
   <>
     {buttons.map((label) => (
@@ -21,12 +17,7 @@ const ActionButtons = ({ buttons }) => (
   </>
 );
 
-/**
- * Dropdown menu for patient categories.
- * @param {Object} props
- * @param {boolean} props.isOpen - Indicates if dropdown is open.
- * @param {function} props.toggleDropdown - Function to toggle dropdown state.
- */
+/* Dropdown for Patients */
 const PatientsDropdown = ({ isOpen, toggleDropdown }) => {
   const links = ["Chronic Patients", "Acute Patients", "Routine Checkups"];
 
@@ -71,13 +62,7 @@ const PatientsDropdown = ({ isOpen, toggleDropdown }) => {
   );
 };
 
-/**
- * Floating sidebar toggle button.
- * @param {Object} props
- * @param {boolean} props.isOpen - Sidebar open state.
- * @param {function} props.toggle - Function to toggle sidebar state.
- * @param {string} props.leftPosition - Dynamic left offset class.
- */
+/* Toggle Button */
 const SidebarToggleBtn = ({ isOpen, toggle, leftPosition }) => (
   <button
     onClick={toggle}
@@ -143,12 +128,7 @@ const SidebarToggleBtn = ({ isOpen, toggle, leftPosition }) => (
   </button>
 );
 
-/**
- * SidebarMenu main component.
- * @param {Object} props
- * @param {string} props.practiceNumber - Practice number to display.
- * @param {boolean} props.isVerified - Whether the user's account is verified.
- */
+/* Sidebar Component */
 const SidebarMenu = ({ practiceNumber, isVerified }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
