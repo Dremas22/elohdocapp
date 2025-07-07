@@ -128,7 +128,7 @@ const DoctorDashboardNavbar = () => {
                 </button>
             </div>
 
-            {/* CSS for tooltip */}
+            {/* tooltip styling*/}
             <style jsx>{`
                 button:hover span#tooltip {
                     display: block;

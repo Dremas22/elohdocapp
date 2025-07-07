@@ -163,7 +163,7 @@ const SidebarMenu = ({ practiceNumber, isVerified, isOpen, setIsOpen }) => {
                     onClick={handleSave}
                     className="mt-6 bg-[#03045e] hover:bg-[#023e8a] text-[#f8f9fa] px-6 py-2 rounded shadow transition-all"
                 >
-                    Save Availability
+                    Save
                 </button>
             </section>
         </>

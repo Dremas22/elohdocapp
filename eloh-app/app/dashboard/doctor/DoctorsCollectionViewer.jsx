@@ -63,7 +63,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
             <div className="text-center mt-12 text-red-600">
               <h2 className="text-lg font-semibold mb-2">Verification Declined</h2>
               <p>
-                We could not verify your account. Please ensure your practice
+                Account not verified. Please ensure your practice
                 number is registered or contact support for help.
               </p>
             </div>
