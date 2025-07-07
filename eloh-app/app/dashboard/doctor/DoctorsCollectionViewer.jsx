@@ -1,6 +1,6 @@
 "use client";
 
-import DoctorDashboardNavbar from "@/components/navbar/doctorNav";
+import DoctorDashboardNavbar from "@/app/dashboard/doctor/doctorNav";
 import PatientDisplay from "@/components/patients/PatientDisplay";
 import SidebarMenu from "./doctorSidebar";
 
