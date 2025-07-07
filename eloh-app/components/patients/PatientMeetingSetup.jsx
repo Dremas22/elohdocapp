@@ -115,11 +115,10 @@ const PatientMeetingSetup = () => {
                       router.push(`/room/${doc.userId}`);
                     }
                   }}
-                  className={`rounded-lg p-5 shadow-md transition duration-200 flex justify-between items-center gap-4 ${
-                    loading || isLoading
+                  className={`rounded-lg p-5 shadow-md transition duration-200 flex justify-between items-center gap-4 ${loading || isLoading
                       ? "cursor-not-allowed bg-gray-700 opacity-60"
                       : "cursor-pointer bg-gray-800 hover:bg-gray-700"
-                  }`}
+                    }`}
                 >
                   {/* Left - Text Info */}
                   <div className="space-y-2">
