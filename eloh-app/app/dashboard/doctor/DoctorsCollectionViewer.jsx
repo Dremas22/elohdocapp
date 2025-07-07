@@ -29,12 +29,12 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
       <DoctorDashboardNavbar />
 
       {/* Sidebar + Main Content Layout */}
-      <div className="flex flex-1">
-        {/* SidebarMenu here */}
+      <div className="flex flex-1 h-[calc(100vh-5rem)]">
+        {/* SidebarMenu */}
         <SidebarMenu practiceNumber={practiceNumber} isVerified={isVerified} />
 
         {/* Main Content */}
-        <main className="flex-1 p-6 bg-gray-50">
+        <main className="flex-1 p-6 bg-gray-50 overflow-auto transition-all duration-300 ease-in-out">
           {isVerified === true ? (
             <div>
               <h1 className="text-xl font-semibold mb-4">Patient Info</h1>
