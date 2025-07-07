@@ -1,8 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { DayPicker } from "react-day-picker";
+import dynamic from "next/dynamic";
 import "react-day-picker/dist/style.css";
+
+// Fix SSR error by dynamically importing DayPicker
+const DayPicker = dynamic(() =>
+    import("react-day-picker").then((mod) => mod.DayPicker),
+    { ssr: false }
+);
 
 const SidebarMenu = ({ practiceNumber, isVerified, isOpen, setIsOpen }) => {
     const [calendarOpen, setCalendarOpen] = useState(false);
@@ -86,6 +92,7 @@ const SidebarMenu = ({ practiceNumber, isVerified, isOpen, setIsOpen }) => {
 
     return (
         <>
+            {/* Sidebar Toggle Button */}
             <button
                 onClick={toggleSidebar}
                 className={`fixed top-27 left-1 z-50 bg-[#123158] p-2 rounded text-white shadow transition-all duration-300 ${isOpen ? "left-28.5" : "left-1"}`}
@@ -104,12 +111,13 @@ const SidebarMenu = ({ practiceNumber, isVerified, isOpen, setIsOpen }) => {
                 )}
             </button>
 
+            {/* Sidebar */}
             <aside className={`fixed top-24 left-0 h-[calc(100vh-6rem)] w-40 bg-white dark:bg-[#123158] shadow z-40 transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
                 <div className="flex flex-col px-4 pt-2.5 pb-6 space-y-4 h-full">
                     <div className="text-white text-sm font-medium pl-2 mt-2">Practice No: {practiceNumber || "N/A"}</div>
 
                     {!isVerified && (
-                        <div className="flex items-center bg-yellow-100 text-yellow-800 border border-yellow-800 py-2 rounded text-sm whitespace-nowrap px-2 justify-center">
+                        <div className="flex items-center bg-yellow-100 text-yellow-800 border border-yellow-800 py-2 rounded text-sm px-2 justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 1010 10A10 10 0 0012 2z" />
                             </svg>
@@ -117,6 +125,7 @@ const SidebarMenu = ({ practiceNumber, isVerified, isOpen, setIsOpen }) => {
                         </div>
                     )}
 
+                    {/* Availability Toggle */}
                     <div className="flex items-center gap-3 pl-2 text-white text-sm font-medium">
                         <span>Available</span>
                         <label className="relative inline-flex items-center cursor-pointer">
@@ -125,6 +134,7 @@ const SidebarMenu = ({ practiceNumber, isVerified, isOpen, setIsOpen }) => {
                         </label>
                     </div>
 
+                    {/* Action Buttons */}
                     <div className="flex flex-col gap-4 flex-grow items-center">
                         {actionButtons.map(({ title, icon, onClick }, i) => (
                             <button
@@ -140,6 +150,7 @@ const SidebarMenu = ({ practiceNumber, isVerified, isOpen, setIsOpen }) => {
                 </div>
             </aside>
 
+            {/* Calendar Drawer */}
             <section className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-96 bg-[#f8f9fa] shadow-lg z-50 p-6 transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"}`}>
                 <h2 className="text-xl font-bold mb-4 text-[#03045e]">Schedule Your Availability</h2>
                 <DayPicker
