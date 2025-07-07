@@ -1,198 +1,256 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 
-/* Action Buttons with optional links */
 const ActionButtons = ({ buttons }) => (
   <>
-    {buttons.map((label) => (
+    {buttons.map(({ icon, title, onClick }) => (
       <button
-        key={label}
-        className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+        key={title}
+        title={title}
+        onClick={onClick}
+        className="bg-[#03045e] text-white w-20 h-9 flex items-center justify-center rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+        aria-label={title}
+        type="button"
       >
-        {label}
+        {icon}
       </button>
     ))}
   </>
 );
 
-/* Dropdown for Patients */
-const PatientsDropdown = ({ isOpen, toggleDropdown }) => {
-  const links = ["Chronic Patients", "Acute Patients", "Routine Checkups"];
+const SidebarToggleBtn = ({ isOpen, toggle }) => {
+  const toggleBtnSize = 40; // button size in px
+  const closedLeft = 8; // when sidebar closed
+  const openLeft = 130; // move left when sidebar opens 
 
   return (
-    <nav className="mt-2">
-      <div className="relative">
-        <button
-          onClick={toggleDropdown}
-          className="flex items-center w-full px-4 py-2 text-sm font-semibold text-left bg-transparent rounded-lg hover:bg-gray-200 focus:outline-none focus:shadow-outline dark:text-gray-200 dark:hover:bg-[#023e8a] cursor-pointer"
-        >
-          <span>Patients</span>
-          <svg
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            className={`inline w-4 h-4 ml-1 transition-transform ${
-              isOpen ? "rotate-180" : "rotate-0"
-            }`}
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
-
-        {isOpen && (
-          <div className="mt-2 rounded-md shadow-lg bg-white dark:bg-[#123158] z-10 max-h-40 overflow-auto">
-            {links.map((link, idx) => (
-              <Link
-                key={idx}
-                href="#"
-                className="block px-4 py-2 text-sm font-semibold rounded-lg hover:bg-[#023e8a] dark:text-gray-200 dark:hover:bg-[#023e8a] cursor-pointer"
-              >
-                {link}
-              </Link>
-            ))}
-          </div>
+    <button
+      onClick={toggle}
+      aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
+      className="fixed top-26.5 bg-[#123158] p-2 rounded text-white cursor-pointer z-50"
+      style={{
+        width: toggleBtnSize,
+        height: toggleBtnSize,
+        left: isOpen ? openLeft : closedLeft,
+        transition: "left 0.3s ease",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+      type="button"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        viewBox="0 0 24 24"
+        className="w-6 h-6"
+      >
+        {isOpen ? (
+          <>
+            <line x1="18" y1="6" x2="6" y2="18" strokeLinecap="round" />
+            <line x1="6" y1="6" x2="18" y2="18" strokeLinecap="round" />
+          </>
+        ) : (
+          <>
+            <line x1="4" y1="6" x2="20" y2="6" strokeLinecap="round" />
+            <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round" />
+            <line x1="4" y1="18" x2="20" y2="18" strokeLinecap="round" />
+          </>
         )}
-      </div>
-    </nav>
+      </svg>
+    </button>
   );
 };
 
-/* Toggle Button */
-const SidebarToggleBtn = ({ isOpen, toggle, leftPosition }) => (
-  <button
-    onClick={toggle}
-    aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
-    className={`fixed active:translate-y-1 top-27 left-1 z-50 bg-[#123158] shadow p-2 rounded text-white transition-left duration-300 ease-in-out ${leftPosition} cursor-pointer`}
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      viewBox="0 0 24 24"
-      className="w-6 h-6"
-    >
-      {isOpen ? (
-        <>
-          <line
-            x1="18"
-            y1="6"
-            x2="6"
-            y2="18"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <line
-            x1="6"
-            y1="6"
-            x2="18"
-            y2="18"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </>
-      ) : (
-        <>
-          <line
-            x1="4"
-            y1="6"
-            x2="20"
-            y2="6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <line
-            x1="4"
-            y1="12"
-            x2="20"
-            y2="12"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <line
-            x1="4"
-            y1="18"
-            x2="20"
-            y2="18"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </>
-      )}
-    </svg>
-  </button>
-);
-
-/* Sidebar Component */
 const SidebarMenu = ({ practiceNumber, isVerified }) => {
   const [isOpen, setIsOpen] = useState(true);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [writeNotesOn, setWriteNotesOn] = useState(false);
+  const [isAvailable, setIsAvailable] = useState(false);
 
-  // Main navigation buttons
   const actionButtons = [
-    "Start Consultation",
-    "Create Prescription",
-    "Create Sick Note",
-    "View Patient History",
+    {
+      title: "View Notifications",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a7 7 0 00-14 0v3.159c0 .538-.214 1.055-.595 1.436L2 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+          />
+        </svg>
+      ),
+      onClick: () => alert("View Notifications clicked!"),
+    },
+    {
+      title: "Create Prescription",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 12h6m-3-3v6m7-13H5a2 2 0 00-2 2v16l4-4h10a2 2 0 002-2V5a2 2 0 00-2-2z"
+          />
+        </svg>
+      ),
+      onClick: () => alert("Create Prescription clicked!"),
+    },
+    {
+      title: "Create Sick Note",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 12h6m2 0a9 9 0 10-18 0 9 9 0 0018 0zm-9 4h.01"
+          />
+        </svg>
+      ),
+      onClick: () => alert("Create Sick Note clicked!"),
+    },
+    {
+      title: "View Patient History",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 7v10c0 1.1.9 2 2 2h6v-2H5V7h6V5H5a2 2 0 00-2 2zm13-2h4a2 2 0 012 2v10a2 2 0 01-2 2h-4v-2h4V7h-4V5z"
+          />
+        </svg>
+      ),
+      onClick: () => alert("View Patient History clicked!"),
+    },
+    {
+      title: "Write Notes",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 20h9M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z"
+          />
+        </svg>
+      ),
+      onClick: () => setWriteNotesOn(!writeNotesOn),
+    },
+    {
+      title: "Schedule Availability",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+      ),
+      onClick: () => setCalendarOpen(!calendarOpen),
+    },
   ];
-
-  // Button positioning changes depending on sidebar state
-  const toggleBtnLeft = isOpen ? "left-[200px]" : "left-1";
 
   return (
     <>
-      {/* Sidebar toggle (hamburger) */}
-      <SidebarToggleBtn
-        isOpen={isOpen}
-        toggle={() => setIsOpen(!isOpen)}
-        leftPosition={toggleBtnLeft}
-      />
+      {/* Toggle Button */}
+      <SidebarToggleBtn isOpen={isOpen} toggle={() => setIsOpen(!isOpen)} />
 
-      {/* Sidebar container */}
+      {/* Sidebar */}
       <div
-        className={`fixed top-24 left-0 h-[calc(100vh-6rem)] w-64 bg-white dark:bg-[#123158] text-gray-700 dark:text-gray-200 z-40 shadow transform transition-transform duration-300 ease-in-out ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`flex flex-col h-[calc(100vh-6rem)] bg-white dark:bg-[#123158] text-gray-700 dark:text-gray-200 shadow transition-all duration-300 ease-in-out ${isOpen ? "w-44" : "w-0 overflow-hidden"
+          }`}
+        style={{ minWidth: isOpen ? 176 : 0 }}
       >
-        <div className="px-4 pb-6 pt-2.5 space-y-4 h-full flex flex-col">
-          {/* Practice number display */}
-          <div className="text-left pl-2 mt-2 text-sm text-white font-medium">
-            Practice No: {practiceNumber || "N/A"}
+        <div className="px-2 pb-6 pt-2.5 space-y-4 h-full flex flex-col items-center">
+          <div className="text-left mt-3 text-white font-small text-sm w-full px-2">
+            <div>Practice Number:</div>
+            <div className="break-words">{practiceNumber || "N/A"}</div>
           </div>
 
-          {/* Verification alert */}
+          {/* Verification Alerts */}
           {isVerified === false && (
-            <div className="max-w-xl mx-auto mb-4">
-              <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-sm p-2 rounded">
-                Your account is pending verification.
+            <div className="max-w-xl mx-auto mb-3 px-2">
+              <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-s p-2 rounded text-center">
+                Verification Pending.
               </div>
             </div>
           )}
-
           {isVerified === null && (
-            <div className="max-w-xl mx-auto mb-4">
-              <div className="bg-red-100 text-red-800 border border-red-800 text-sm p-2 rounded">
-                Your account verification was declined. Please check your
-                practice number or contact support.
+            <div className="max-w-xl mx-auto mb-4 px-2">
+              <div className="bg-red-100 text-red-800 border border-red-800 text-xs p-2 rounded text-center">
+                Verification declined. Check practice no or support.
               </div>
             </div>
           )}
 
-          {/* Main button and dropdown area */}
-          {isVerified && (
-            <div className="flex flex-col gap-4 flex-grow overflow-auto">
-              <ActionButtons buttons={actionButtons} />
-              <PatientsDropdown
-                isOpen={dropdownOpen}
-                toggleDropdown={() => setDropdownOpen(!dropdownOpen)}
+          {/* Availability toggle */}
+          <div className="flex items-center gap-3 mt-2">
+            <label className="relative inline-block w-12 h-7 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isAvailable}
+                onChange={() => setIsAvailable(!isAvailable)}
+                className="sr-only peer"
               />
-            </div>
-          )}
+              <span className="block bg-gray-300 peer-checked:bg-green-500 rounded-full h-7 w-12 transition-colors duration-300"></span>
+              <span className="absolute left-1 top-1 bg-white w-5 h-5 rounded-full shadow-md transition-transform duration-300 peer-checked:translate-x-5"></span>
+            </label>
+            <span
+              className={`text-sm font-semibold ${isAvailable ? "text-green-400" : "text-gray-400"
+                }`}
+            >
+              {isAvailable ? "Online" : "Offline"}
+            </span>
+          </div>
+
+          {/* Sidebar Actions */}
+          <div className="flex flex-col gap-3 flex-grow overflow-auto items-center">
+            <ActionButtons buttons={actionButtons} />
+          </div>
         </div>
       </div>
     </>
