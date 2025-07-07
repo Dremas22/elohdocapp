@@ -1,60 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "@/db/client";
 import DoctorDashboardNavbar from "@/components/navbar/doctorNav";
 import PatientDisplay from "@/components/patients/PatientDisplay";
-import SidebarMenu from "./doctorSidebar"; 
+import SidebarMenu from "./doctorSidebar";
 
-const DoctorsCollectionViewer = ({ patients }) => {
-  const [userDoc, setUserDoc] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const user = auth.currentUser;
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      const userId = user.uid;
-      const collectionName = `doctors`;
-
-      try {
-        const userRef = doc(db, collectionName, userId);
-        const docSnap = await getDoc(userRef);
-        if (docSnap.exists()) {
-          setUserDoc(docSnap.data());
-        } else {
-          console.warn("User document not found.");
-        }
-      } catch (error) {
-        console.error("Error fetching user document:", error);
-      }
-
-      setLoading(false);
-    };
-
-    const unsubscribe = auth.onAuthStateChanged(() => {
-      fetchUserData();
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="flex flex-col items-center">
-          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-gray-700 text-sm">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
+const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   if (!userDoc) {
     return (
       <div className="min-h-screen bg-gray-50 pt-20">
