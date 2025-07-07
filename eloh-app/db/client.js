@@ -30,4 +30,5 @@ if (typeof window !== undefined) {
 const db = getFirestore(app);
 const auth = getAuth();
 const googleAuth = new GoogleAuthProvider();
+
 export { db, auth, googleAuth, analytics };
