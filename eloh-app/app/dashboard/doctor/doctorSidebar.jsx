@@ -199,58 +199,76 @@ const SidebarMenu = ({ practiceNumber, isVerified }) => {
       {/* Toggle Button */}
       <SidebarToggleBtn isOpen={isOpen} toggle={() => setIsOpen(!isOpen)} />
 
-      {/* Sidebar */}
-      <div
-        className={`flex flex-col h-[calc(100vh-6rem)] bg-white dark:bg-[#123158] text-gray-700 dark:text-gray-200 shadow transition-all duration-300 ease-in-out ${isOpen ? "w-44" : "w-0 overflow-hidden"
-          }`}
-        style={{ minWidth: isOpen ? 176 : 0 }}
-      >
-        <div className="px-2 pb-6 pt-2.5 space-y-4 h-full flex flex-col items-center">
-          <div className="text-left mt-3 text-white font-small text-sm w-full px-2">
-            <div>Practice Number:</div>
-            <div className="break-words">{practiceNumber || "N/A"}</div>
-          </div>
-
-          {/* Verification Alerts */}
+      {/* Verification Warning below toggle button, only when sidebar is open */}
+      {isOpen && (isVerified === false || isVerified === null) && (
+        <div
+          className="fixed z-50 left-0"
+          style={{
+            top: 150,
+            width: 176, // match sidebar open width for alignment
+            padding: "0 8px",
+          }}
+        >
           {isVerified === false && (
-            <div className="max-w-xl mx-auto mb-3 px-2">
-              <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-s p-2 rounded text-center">
-                Verification Pending.
-              </div>
+            <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-sm p-2 rounded text-center">
+              Verification Pending.
             </div>
           )}
           {isVerified === null && (
-            <div className="max-w-xl mx-auto mb-4 px-2">
-              <div className="bg-red-100 text-red-800 border border-red-800 text-xs p-2 rounded text-center">
-                Verification declined. Check practice no or support.
-              </div>
+            <div className="bg-red-100 text-red-800 border border-red-800 text-xs p-2 rounded text-center">
+              Verification declined. Check practice no or support.
             </div>
           )}
+        </div>
+      )}
 
-          {/* Availability toggle */}
-          <div className="flex items-center gap-3 mt-2">
-            <label className="relative inline-block w-12 h-7 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isAvailable}
-                onChange={() => setIsAvailable(!isAvailable)}
-                className="sr-only peer"
-              />
-              <span className="block bg-gray-300 peer-checked:bg-green-500 rounded-full h-7 w-12 transition-colors duration-300"></span>
-              <span className="absolute left-1 top-1 bg-white w-5 h-5 rounded-full shadow-md transition-transform duration-300 peer-checked:translate-x-5"></span>
-            </label>
-            <span
-              className={`text-sm font-semibold ${isAvailable ? "text-green-400" : "text-gray-400"
-                }`}
-            >
-              {isAvailable ? "Online" : "Offline"}
-            </span>
-          </div>
+      {/* Sidebar container */}
+      <div
+        className={`flex flex-col h-[calc(100vh-6rem)] bg-white dark:bg-[#123158] text-gray-700 dark:text-gray-200 shadow transition-all duration-300 ease-in-out
+          ${isOpen ? "w-44" : "w-0 overflow-hidden"}
+        `}
+        style={{ minWidth: isOpen ? 176 : 0 }}
+      >
+        {/* Sidebar main content */}
+        <div
+          className={`px-2 pt-10 pb-6 space-y-4 h-full flex flex-col items-center
+            transition-opacity duration-300 ease-in-out
+            ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
+          `}
+        >
+          {isVerified === true && (
+            <>
+              <div className="text-left mt-3 text-white font-small text-sm w-full px-2">
+                <div>Practice Number:</div>
+                <div className="break-words">{practiceNumber || "N/A"}</div>
+              </div>
 
-          {/* Sidebar Actions */}
-          <div className="flex flex-col gap-3 flex-grow overflow-auto items-center">
-            <ActionButtons buttons={actionButtons} />
-          </div>
+              {/* Availability toggle */}
+              <div className="flex items-center gap-3 mt-2">
+                <label className="relative inline-block w-12 h-7 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isAvailable}
+                    onChange={() => setIsAvailable(!isAvailable)}
+                    className="sr-only peer"
+                  />
+                  <span className="block bg-gray-300 peer-checked:bg-green-500 rounded-full h-7 w-12 transition-colors duration-300"></span>
+                  <span className="absolute left-1 top-1 bg-white w-5 h-5 rounded-full shadow-md transition-transform duration-300 peer-checked:translate-x-5"></span>
+                </label>
+                <span
+                  className={`text-sm font-semibold ${isAvailable ? "text-green-400" : "text-gray-400"
+                    }`}
+                >
+                  {isAvailable ? "Online" : "Offline"}
+                </span>
+              </div>
+
+              {/* Sidebar Actions */}
+              <div className="flex flex-col gap-3 flex-grow overflow-auto items-center">
+                <ActionButtons buttons={actionButtons} />
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>
