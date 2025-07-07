@@ -2,6 +2,7 @@
 
 import { signInWithPopup } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
+import { getMessaging, getToken } from "firebase/messaging";
 import { useRouter } from "next/navigation";
 import { auth, googleAuth } from "@/db/client";
 import { useState } from "react";
@@ -11,17 +12,17 @@ const GoogleSignInButton = ({ role }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   /**
-  * Handles the Google sign-in process using Firebase authentication.
-  *
-  * 1. Initiates sign-in with a popup using the configured Google provider.
-  * 2. Retrieves the user's ID token upon successful authentication.
-  * 3. Sends the ID token to the backend to create a secure session cookie.
-  * 4. Redirects the user to the onboarding page based on their selected role.
-  *
-  * If any step fails, handles specific Firebase errors and shows appropriate feedback.
-  *
-  * @returns {Promise<void>}
-  */
+   * Handles the Google sign-in process using Firebase authentication.
+   *
+   * 1. Initiates sign-in with a popup using the configured Google provider.
+   * 2. Retrieves the user's ID token upon successful authentication.
+   * 3. Sends the ID token to the backend to create a secure session cookie.
+   * 4. Redirects the user to the onboarding page based on their selected role.
+   *
+   * If any step fails, handles specific Firebase errors and shows appropriate feedback.
+   *
+   * @returns {Promise<void>}
+   */
   const handleSignIn = async () => {
     setIsLoading(true);
     try {
@@ -30,12 +31,23 @@ const GoogleSignInButton = ({ role }) => {
 
       const token = await user.getIdToken();
 
+      // Get FCM token for this user/device
+      const messaging = getMessaging();
+      let fcmToken = null;
+      try {
+        fcmToken = await getToken(messaging, {
+          vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+        });
+      } catch (err) {
+        console.warn("Unable to get FCM token:", err);
+      }
+
+      // Send ID token and FCM token to your backend
       await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ token, fcmToken }),
       });
-      // Optionally you can add a toast
       alert("LoggedIn successfully");
 
       router.push(`/onboarding/${role}`); // for doctors and nurses
@@ -59,8 +71,7 @@ const GoogleSignInButton = ({ role }) => {
             break;
           case "auth/user-disabled":
             message = "Account Disabled";
-            description =
-              "This account has been disabled. Contact support.";
+            description = "This account has been disabled. Contact support.";
             break;
           default:
             description = error.message;
@@ -85,17 +96,7 @@ const GoogleSignInButton = ({ role }) => {
       <button
         onClick={handleSignIn}
         disabled={isLoading}
-        className="
-          w-full max-w-xs px-6 py-3 
-          bg-[#00b4d8]                 
-          text-white font-semibold 
-          rounded-lg shadow-md 
-          hover:bg-[#009ec0]           /* Darker blue on hover */
-          cursor-pointer              /* Pointer cursor on hover */
-          transition duration-300     /* Smooth transition when hover */
-          disabled:opacity-60        /* Reduce opacity when disabled */
-          disabled:cursor-not-allowed  
-        "
+        className="bg-[#03045e] text-white py-3 px-5 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
       >
         {isLoading
           ? `${capitalizedRole} signing in...`

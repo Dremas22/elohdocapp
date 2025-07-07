@@ -1,57 +1,107 @@
 "use client";
 
-const DoctorsCollectionViewer = ({ userDoc, patients = [] }) => {
-  const { fullName, email, isVerified, photoUrl, practiceNumber } =
-    userDoc || {};
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/db/client";
+import DoctorDashboardNavbar from "@/components/navbar/doctorNav";
+import PatientDisplay from "@/components/patients/PatientDisplay";
+import SidebarMenu from "./doctorSidebar"; 
 
-  return (
-    <div className="flex min-h-screen">
-      <aside className="w-64 bg-white border-r shadow p-4">
-        {/* Avatar & Info */}
-        {photoUrl ? (
-          <img
-            src={photoUrl}
-            alt="User Avatar"
-            className="w-24 h-24 rounded-full mx-auto"
-          />
-        ) : (
-          <div className="w-24 h-24 bg-gray-300 rounded-full mx-auto" />
-        )}
-        <div className="text-center mt-4">
-          <p className="font-semibold">{fullName || email}</p>
-          <p className="text-sm text-gray-500">
-            Practice No: {practiceNumber || "N/A"}
-          </p>
+const DoctorsCollectionViewer = ({ patients }) => {
+  const [userDoc, setUserDoc] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      const userId = user.uid;
+      const collectionName = `doctors`;
+
+      try {
+        const userRef = doc(db, collectionName, userId);
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          setUserDoc(docSnap.data());
+        } else {
+          console.warn("User document not found.");
+        }
+      } catch (error) {
+        console.error("Error fetching user document:", error);
+      }
+
+      setLoading(false);
+    };
+
+    const unsubscribe = auth.onAuthStateChanged(() => {
+      fetchUserData();
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-gray-700 text-sm">Loading dashboard...</p>
         </div>
+      </div>
+    );
+  }
 
-        {!isVerified && (
-          <p className="mt-4 text-yellow-700 text-sm bg-yellow-100 border border-yellow-400 rounded p-2 text-center">
-            Your account is pending verification.
-          </p>
-        )}
-      </aside>
-
-      <main className="flex-1 p-6">
-        {isVerified ? (
-          <>
-            <h1 className="text-xl font-semibold mb-4">Patients</h1>
-            <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto max-h-96">
-              {/** TODO: Add patient data here */}
-              {JSON.stringify(patients, null, 2)}
-            </pre>
-          </>
-        ) : (
-          <div className="text-center mt-12 text-gray-600">
-            <h2 className="text-lg font-semibold mb-2">
-              Verification Required
-            </h2>
-            <p>
-              You will gain access to patient information once your account is
-              verified.
+  if (!userDoc) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-20">
+        <DoctorDashboardNavbar />
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center text-gray-600">
+            <p className="text-lg font-medium">No user data found.</p>
+            <p className="text-sm mt-1">
+              Please make sure your account is registered correctly.
             </p>
           </div>
-        )}
-      </main>
+        </div>
+      </div>
+    );
+  }
+
+  const { practiceNumber, isVerified } = userDoc;
+
+  return (
+    <div className="min-h-screen flex flex-col pt-20">
+      {/* Top Navbar */}
+      <DoctorDashboardNavbar />
+
+      {/* Sidebar + Main Content Layout */}
+      <div className="flex flex-1">
+        {/* SidebarMenu here */}
+        <SidebarMenu practiceNumber={practiceNumber} isVerified={isVerified} />
+
+        {/* Main Content */}
+        <main className="flex-1 p-6 bg-gray-50">
+          {isVerified ? (
+            <div>
+              <h1 className="text-xl font-semibold mb-4">Patient Info</h1>
+              <p>This is where sensitive patient information would be shown.</p>
+              <PatientDisplay patients={patients} />
+            </div>
+          ) : (
+            <div className="text-center mt-12 text-gray-600">
+              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
+              <p>
+                Once your account is verified, you'll be able to access
+                sensitive patient information here.
+              </p>
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 };
