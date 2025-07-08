@@ -9,12 +9,9 @@ const LandingPage = () => {
   return (
     <div className="flex flex-col min-h-screen relative">
       <Navbar />
-      <div className>
+      <div>
         <Video />
-        {/* Overlap ChooseDesignation over bottom of video */}
-        <div className="-mt-16 bg-white">
-          <ChooseDesignation />
-        </div>
+        <ChooseDesignation />
       </div>
     </div>
   );
