@@ -11,28 +11,39 @@ export async function POST(request) {
     const decoded = await auth?.verifySessionCookie(sessionCookie, true);
     const uid = decoded.uid;
 
-    // 🔍 Check if the user is a doctor
-    const doctorRef = db?.collection("doctors").doc(uid);
-    const doctorSnap = await doctorRef.get();
-
-    if (!doctorSnap.exists) {
-      return NextResponse.json(
-        { error: "Forbidden: Only doctors can update patient history" },
-        { status: 403 }
-      );
-    }
-
-    // 📦 Get and validate body
+    // 📨 Get request data
     const body = await request.json();
-    const { patientId, medicalHistory } = body;
+    const { patientId, roomID, notes } = body;
 
-    if (!patientId || typeof medicalHistory !== "string") {
+    if (!patientId || !roomID || typeof notes !== "string") {
       return NextResponse.json(
         { error: "Missing or invalid fields" },
         { status: 400 }
       );
     }
 
+    // 🧠 Load doctor using roomID
+    const doctorRef = db?.collection("doctors").doc(roomID);
+    const doctorSnap = await doctorRef.get();
+
+    if (!doctorSnap.exists) {
+      return NextResponse.json(
+        { error: "Doctor not found (invalid roomID)" },
+        { status: 404 }
+      );
+    }
+
+    const doctorData = doctorSnap.data();
+
+    // ✅ Match roomID with authenticated UID
+    if (doctorData.userId !== uid) {
+      return NextResponse.json(
+        { error: "Forbidden: Doctor authentication mismatch" },
+        { status: 403 }
+      );
+    }
+
+    // 📁 Get patient
     const patientRef = db?.collection("patients").doc(patientId);
     const patientSnap = await patientRef.get();
 
@@ -40,18 +51,34 @@ export async function POST(request) {
       return NextResponse.json({ error: "Patient not found" }, { status: 404 });
     }
 
-    // 📝 Update patient
+    const patientData = patientSnap.data();
+    const history = Array.isArray(patientData.medicalHistory)
+      ? patientData.medicalHistory
+      : [];
+
+    // 📝 Create and append new note
+    const newNote = {
+      doctorName: doctorData.fullName || "Doctor",
+      notes,
+      createdAt: new Date(),
+    };
+
+    const updatedHistory = [...history, newNote];
+
     await patientRef.update({
-      medicalHistory,
+      medicalHistory: updatedHistory,
       updatedAt: new Date(),
     });
 
     return NextResponse.json(
-      { message: "Medical history updated successfully" },
+      {
+        message: "Note saved successfully",
+        updatedHistory,
+      },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error updating history:", error);
+    console.error("Error saving note:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

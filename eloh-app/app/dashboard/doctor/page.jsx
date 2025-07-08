@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import DoctorsCollectionViewer from "./DoctorsCollectionViewer";
 import Link from "next/link";
 
-// 🔁 Convert Firestore Timestamps, Dates, or nested timestamp-like objects
+// Convert Firestore Timestamps, Dates, or nested timestamp-like objects
 function serializeData(obj) {
   if (obj === null || obj === undefined) return obj;
 
@@ -31,7 +31,7 @@ function serializeData(obj) {
 }
 
 const DoctorsDashboard = async () => {
-  const cookieStore = await cookies(); // ✅ await added
+  const cookieStore = await cookies();
   const session = cookieStore?.get("session")?.value;
 
   if (!session) {
