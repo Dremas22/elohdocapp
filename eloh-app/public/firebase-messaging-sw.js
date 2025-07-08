@@ -30,10 +30,10 @@ messaging.onBackgroundMessage(function (payload) {
 
   const notificationOptions = {
     body: notificationBody,
-    icon: "/images/elohdoc.png", // optional: replace with your app logo
-    requireInteraction: true, // 👈 Keeps the notification on screen
+    icon: "/images/elohdoc.png",
+    requireInteraction: true,
     data: {
-      link: link, // 👈 Used to open meeting room on click
+      link: link,
     },
   };
 

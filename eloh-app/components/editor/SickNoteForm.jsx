@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import SignaturePad from "./SignaturePad"; // your reusable signature component
+import SignaturePad from "./SignaturePad";
 
 const SickNoteForm = () => {
   const [startDate, setStartDate] = useState("");
