@@ -4,7 +4,7 @@ import { useState } from "react";
 import Calendar from "@/app/dashboard/doctor/calendar";
 
 /**
- * Renders a group of sidebar action buttons (prescriptions, notes, etc.)
+ * Rendering a group of sidebar action buttons 
  */
 const ActionButtons = ({ buttons }) => (
   <>
@@ -57,6 +57,11 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [isAvailable, setIsAvailable] = useState(false);
   const [writeNotesOn, setWriteNotesOn] = useState(false);
+
+
+  /**
+ * Sidebar Action Buttons 
+ */
 
   const actionButtons = [
     {
