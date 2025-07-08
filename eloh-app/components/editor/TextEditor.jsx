@@ -1,12 +1,16 @@
 "use client";
 
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const RichTextEditor = ({ roomID, patientId }) => {
+const RichTextEditor = ({ roomID }) => {
   const { loading, currentUser } = useCurrentUser();
   const [currentNote, setCurrentNote] = useState("");
   const [patientData, setPatientData] = useState(null);
+  const searchParams = useSearchParams();
+  const patientIdFromQuery = searchParams.get("patientId");
+  const patientId = patientIdFromQuery;
 
   const isDoctor = roomID === currentUser?.uid;
 
@@ -34,14 +38,6 @@ const RichTextEditor = ({ roomID, patientId }) => {
     const trimmedNote = currentNote.trim();
     if (!trimmedNote) return alert("Note cannot be empty");
 
-    const newNote = {
-      doctorName: currentUser?.displayName || "Doctor",
-      notes: trimmedNote,
-      createdAt: new Date().toISOString(),
-    };
-
-    const updatedHistory = [...(patientData?.medicalHistory || []), newNote];
-
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/patients/update-history`,
@@ -52,7 +48,8 @@ const RichTextEditor = ({ roomID, patientId }) => {
           },
           body: JSON.stringify({
             patientId,
-            medicalHistory: updatedHistory,
+            roomID,
+            notes: trimmedNote,
           }),
         }
       );
@@ -62,10 +59,7 @@ const RichTextEditor = ({ roomID, patientId }) => {
         return;
       }
 
-      setPatientData((prev) => ({
-        ...prev,
-        medicalHistory: updatedHistory,
-      }));
+      // ✅ Optionally refetch patient data or just clear the note
       setCurrentNote("");
     } catch (err) {
       console.error("Error saving note:", err);
@@ -75,29 +69,19 @@ const RichTextEditor = ({ roomID, patientId }) => {
 
   if (loading || !currentUser) return <p>Loading...</p>;
 
-  console.log(patientId, "PATIENT_ID", isDoctor);
-  console.log(roomID, "DOCTOR_ID");
-  console.log(patientData, "PATIENTS_DATA");
-
   return (
-    <div className="w-[400px] p-4 bg-gray-800 text-white border-l border-gray-700 flex flex-col justify-between">
-      <div>
-        <h2 className="text-xl font-semibold mb-2">Patient Info</h2>
-        {patientData ? (
-          <>
+    <>
+      {isDoctor && patientData ? (
+        <div className="w-[400px] p-4 bg-gray-800 text-white border-l border-gray-700 flex flex-col justify-between">
+          <div>
+            <h2 className="text-xl font-semibold mb-2">Patient Info</h2>
             <p>
               <strong>Name:</strong> {patientData.fullName || "Unknown"}
             </p>
             <p>
               <strong>Patient ID:</strong> {patientData.id || patientId}
             </p>
-          </>
-        ) : (
-          <p className="text-gray-400">Loading patient details...</p>
-        )}
 
-        {isDoctor && (
-          <>
             <h3 className="mt-4 font-semibold">Add Notes</h3>
             <textarea
               value={currentNote}
@@ -113,10 +97,10 @@ const RichTextEditor = ({ roomID, patientId }) => {
             >
               Save Note
             </button>
-          </>
-        )}
-      </div>
-    </div>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 };
 

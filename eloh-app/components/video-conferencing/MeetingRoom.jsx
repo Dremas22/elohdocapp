@@ -109,8 +109,6 @@ const MeetingRoom = ({
     });
   }, [doctorId, patientId, currentUser?.displayName, loading]);
 
-  console.log(participants, "PARTICIPANTS");
-
   return (
     <div className="w-full h-screen flex flex-col bg-gray-900 text-white">
       {notifyError && (

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { auth, db } from "@/db/client";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import Image from "next/image";
+import { convertTimestamp } from "@/lib/convertFirebaseDate";
 import NurseDashboardNavbar from "@/components/navbar/nurseNav";
 
 const NurseCollectionViewer = () => {
@@ -26,16 +27,29 @@ const NurseCollectionViewer = () => {
         const nurseSnap = await getDoc(nurseRef);
 
         if (nurseSnap.exists()) {
-          setUserDoc(nurseSnap.data());
+          const userDataRaw = docSnap.data();
+          const userData = {
+            ...userDataRaw,
+            createdAt: convertTimestamp(userDataRaw.createdAt),
+            updatedAt: convertTimestamp(userDataRaw.updatedAt),
+          };
+          setUserDoc(userData);
         } else {
           console.warn("Nurse document not found.");
         }
 
         const patientsSnap = await getDocs(collection(db, "patients"));
-        const patientsList = patientsSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const patientsList = patientsSnap.docs.map((doc) => {
+          const data = doc.data();
+
+          return {
+            id: doc.id,
+            ...data,
+            createdAt: convertTimestamp(data.createdAt),
+            updatedAt: convertTimestamp(data.updatedAt),
+          };
+        });
+
         setPatients(patientsList);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -134,7 +148,9 @@ const NurseCollectionViewer = () => {
             </div>
           ) : (
             <div className="text-center mt-12 text-gray-600">
-              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                Verification Pending
+              </h2>
               <p>
                 Once your account is verified, you'll be able to access
                 sensitive patient information here.
