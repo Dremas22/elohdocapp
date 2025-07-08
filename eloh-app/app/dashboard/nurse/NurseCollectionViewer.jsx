@@ -5,6 +5,33 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/db/client";
 import Image from "next/image";
 import NurseDashboardNavbar from "@/app/dashboard/nurse/nurseNav";
+import { convertTimestamp } from "@/lib/convertFirebaseDate";
+
+function serializeData(obj) {
+  if (obj === null || obj === undefined) return obj;
+
+  if (typeof obj?.toDate === "function") {
+    return obj.toDate().toISOString();
+  }
+
+  if (obj instanceof Date) {
+    return obj.toISOString();
+  }
+
+  if (typeof obj === "object") {
+    if (obj._seconds !== undefined && obj._nanoseconds !== undefined) {
+      return new Date(obj._seconds * 1000).toISOString();
+    }
+
+    const result = {};
+    for (const key in obj) {
+      result[key] = serializeData(obj[key]);
+    }
+    return result;
+  }
+
+  return obj;
+}
 
 const NurseCollectionViewer = ({ patients }) => {
   const [userDoc, setUserDoc] = useState(null);
@@ -28,7 +55,13 @@ const NurseCollectionViewer = ({ patients }) => {
         const docSnap = await getDoc(userRef);
 
         if (docSnap.exists()) {
-          setUserDoc(docSnap.data());
+          const userDataRaw = docSnap.data();
+          const userData = {
+            ...userDataRaw,
+            createdAt: convertTimestamp(userDataRaw.createdAt),
+            updatedAt: convertTimestamp(userDataRaw.updatedAt),
+          };
+          setUserDoc(userData);
         } else {
           console.warn("User document not found.");
         }
@@ -125,7 +158,9 @@ const NurseCollectionViewer = ({ patients }) => {
             </div>
           ) : (
             <div className="text-center mt-12 text-gray-600">
-              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                Verification Pending
+              </h2>
               <p>
                 Once your account is verified, you&apos;ll be able to access
                 sensitive patient information here.

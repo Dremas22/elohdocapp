@@ -80,7 +80,7 @@ const Room = () => {
       </div>
 
       {/* Notes Section with only patientId and roomID passed */}
-      <RichTextEditor patientId={patientId} roomID={roomID} />
+      <RichTextEditor roomID={roomID} />
     </div>
   );
 };

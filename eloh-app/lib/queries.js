@@ -7,6 +7,7 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
+import { Timestamp } from "firebase-admin/firestore";
 
 /**
  * Fetches all documents from a specified Firestore collection.
@@ -36,6 +37,27 @@ export const fetchCollection = async (collectionName) => {
   }
 };
 
+/**
+ * Recursively converts Firestore Timestamps to ISO strings
+ */
+const convertTimestamps = (obj) => {
+  if (obj instanceof Timestamp) {
+    return obj.toDate().toISOString();
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(convertTimestamps);
+  }
+
+  if (obj !== null && typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [key, convertTimestamps(value)])
+    );
+  }
+
+  return obj;
+};
+
 export const fetchServerCollection = async (collectionName) => {
   if (!collectionName || typeof collectionName !== "string") {
     throw new Error("A valid collection name must be provided.");
@@ -45,13 +67,12 @@ export const fetchServerCollection = async (collectionName) => {
     const snapshot = await db.collection(collectionName).get();
 
     return snapshot.docs.map((doc) => {
-      const data = doc.data();
+      const rawData = doc.data();
+      const data = convertTimestamps(rawData);
 
       return {
         id: doc.id,
         ...data,
-        createdAt: data.createdAt?.toDate().toISOString() || null,
-        updatedAt: data.updatedAt?.toDate().toISOString() || null,
       };
     });
   } catch (error) {
