@@ -4,7 +4,9 @@ export const middleware = (req) => {
   const pathname = req.nextUrl.pathname;
 
   const isProtected =
-    pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding");
+    
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/onboarding");
 
   const token =
     req.cookies.get("session")?.value || req.headers.get("Authorization");
@@ -17,5 +19,5 @@ export const middleware = (req) => {
 };
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/onboarding/:path*"],
+  matcher: [ "/dashboard/:path*", "/onboarding/:path*"],
 };
