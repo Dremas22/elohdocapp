@@ -60,6 +60,8 @@ export async function POST(request) {
     const newNote = {
       doctorName: doctorData.fullName || "Doctor",
       notes,
+      email: doctorData.email,
+      phoneNumber: doctorData.phoneNumber,
       createdAt: new Date(),
     };
 

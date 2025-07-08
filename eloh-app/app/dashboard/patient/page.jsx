@@ -1,7 +1,7 @@
 "use client";
 
 import PatientMeetingSetup from "@/components/patients/PatientMeetingSetup";
-import PatientDashboardNavbar from "@/app/dashboard/patient/patientNav";
+import PatientDashboardNavbar from "@/components/navbar/patientNav";
 
 const PatientDashboard = () => {
   return (

@@ -156,8 +156,6 @@ const PatientsRegistrationForm = () => {
       } else {
         console.error(result.error || "Something went wrong");
       }
-
-      console.log("Form Submitted Successfully", payload);
     } catch (err) {
       console.error(err);
     } finally {

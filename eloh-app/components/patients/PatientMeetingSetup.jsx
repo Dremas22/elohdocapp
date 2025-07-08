@@ -42,6 +42,36 @@ const PatientMeetingSetup = () => {
 
   const fullName = currentUser?.displayName || `Unknown-user_${Date.now()}`;
 
+  // TODO: Test if the function is working correctly
+  const sendNotificationToDoctor = async (doctorId, patientId) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/notify-doctor`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ doctorId, patientId }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("Failed to send notification:", data.error);
+        alert(`Error: ${data.error}`);
+        return;
+      }
+
+      console.log("Notification sent successfully:", data.message);
+      // Optionally, show a toast or UI feedback
+    } catch (error) {
+      console.error("Error sending notification:", error);
+      alert("Something went wrong while sending the notification.");
+    }
+  };
+
   // ✅ Wait for currentUser before rendering UI
   if (loading || !currentUser) {
     return (
@@ -126,11 +156,19 @@ const PatientMeetingSetup = () => {
                 <div
                   key={doc.userId}
                   onClick={() => {
-                    router.push(
-                      `/room/${doc.userId}?patientId=${currentUser.uid}`
-                    );
+                    if (currentUser?.uid && doc.userId) {
+                      sendNotificationToDoctor(doc.userId, currentUser.uid);
+                      router.push(
+                        `/room/${doc.userId}?patientId=${currentUser.uid}`
+                      );
+                    }
                   }}
-                  className={`rounded-lg p-5 shadow-md transition duration-200 flex justify-between items-center gap-4 ${"cursor-pointer bg-gray-800 hover:bg-gray-700"}`}
+                  className={`rounded-lg p-5 shadow-md transition duration-200 flex justify-between items-center gap-4
+                  ${
+                    currentUser?.uid && doc.userId
+                      ? "cursor-pointer bg-gray-800 hover:bg-gray-700"
+                      : "cursor-not-allowed bg-gray-700 opacity-50"
+                  }`}
                 >
                   {/* Left - Text Info */}
                   <div className="space-y-2">

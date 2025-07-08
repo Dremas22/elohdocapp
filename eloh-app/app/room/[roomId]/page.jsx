@@ -70,7 +70,6 @@ const Room = () => {
     myMeeting();
   }, [roomID, userId, userName, currentUser, loading]);
 
-  console.log(patientId, "PATIENT_ID");
   return (
     <div className="flex h-screen">
       {/* Video Section */}
@@ -81,7 +80,7 @@ const Room = () => {
       </div>
 
       {/* Notes Section with only patientId and roomID passed */}
-      <RichTextEditor patientId={patientId} roomID={roomID} />
+      <RichTextEditor roomID={roomID} />
     </div>
   );
 };
