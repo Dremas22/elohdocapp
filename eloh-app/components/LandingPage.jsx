@@ -11,10 +11,7 @@ const LandingPage = () => {
       <Navbar />
       <div>
         <Video />
-        {/* Overlap ChooseDesignation over bottom of video */}
-        <div className="-mt-16 bg-white">
-          <ChooseDesignation />
-        </div>
+        <ChooseDesignation />
       </div>
     </div>
   );
