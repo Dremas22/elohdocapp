@@ -2,25 +2,26 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { signOut } from "firebase/auth";
-import { auth, db } from "@/db/client";
+import { db } from "@/db/client";
 import { useRouter } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 const PatientDashboardNavbar = () => {
     const router = useRouter();
     const [userDoc, setUserDoc] = useState(null);
     const [loading, setLoading] = useState(true);
+    const { currentUser, handleSignOut } = useCurrentUser(); // ✅ Reuse hook
+    const isLoggedIn = !!currentUser;
 
     useEffect(() => {
         const fetchUserDoc = async () => {
-            const user = auth.currentUser;
-            if (!user) {
+            if (!currentUser) {
                 setLoading(false);
                 return;
             }
             try {
-                const docSnap = await getDoc(doc(db, "patients", user.uid));
+                const docSnap = await getDoc(doc(db, "patients", currentUser.uid));
                 if (docSnap.exists()) setUserDoc(docSnap.data());
                 else console.warn("Patient document not found.");
             } catch (error) {
@@ -29,23 +30,12 @@ const PatientDashboardNavbar = () => {
             setLoading(false);
         };
 
-        const unsubscribe = auth.onAuthStateChanged(fetchUserDoc);
-        return () => unsubscribe();
-    }, []);
-
-    const handleSignOut = async () => {
-        try {
-            await signOut(auth);
-            window.location.href = "/";
-        } catch (error) {
-            console.error("Sign out failed:", error);
-        }
-    };
+        fetchUserDoc();
+    }, [currentUser]);
 
     const handleSignIn = () => router.push("/sign-in?role=patient");
 
     const { photoUrl, fullName, email } = userDoc || {};
-    const isLoggedIn = !!auth.currentUser;
 
     const buttonStyle =
         "bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center";
@@ -83,9 +73,6 @@ const PatientDashboardNavbar = () => {
 
             {/* Right-side Buttons */}
             <div className="flex items-center gap-3">
-                {/* Future buttons can be added here */}
-
-                {/* Sign In/Out */}
                 <button
                     onClick={isLoggedIn ? handleSignOut : handleSignIn}
                     aria-label={isLoggedIn ? "Sign Out" : "Sign In"}
