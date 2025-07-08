@@ -70,7 +70,6 @@ const Room = () => {
     myMeeting();
   }, [roomID, userId, userName, currentUser, loading]);
 
-  console.log(patientId, "PATIENT_ID");
   return (
     <div className="flex h-screen">
       {/* Video Section */}
