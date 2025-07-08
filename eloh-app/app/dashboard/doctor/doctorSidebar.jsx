@@ -51,9 +51,7 @@ const SidebarToggleBtn = ({ isOpen, toggle }) => (
   </button>
 );
 
-/**
- * Main SidebarMenu component
- */
+
 const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [calendarOpen, setCalendarOpen] = useState(false);
