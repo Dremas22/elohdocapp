@@ -1,13 +1,9 @@
-import { fetchServerCollection } from "@/lib/queries";
+"use client";
+
 import NurseCollectionViewer from "./NurseCollectionViewer";
 
-const NurseDashboard = async () => {
-  const patients = await fetchServerCollection("patients");
-  return (
-    <div>
-      <NurseCollectionViewer patients={patients} />
-    </div>
-  );
+const NurseDashboardPage = () => {
+  return <NurseCollectionViewer />;
 };
 
-export default NurseDashboard;
+export default NurseDashboardPage;
