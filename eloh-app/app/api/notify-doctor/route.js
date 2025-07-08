@@ -44,7 +44,7 @@ export async function POST(req) {
       token: fcmToken,
       notification: {
         title: "New Consultation Request",
-        body: `${patientName} wants to start a video consultation.\nJoin here:${process.env.NEXT_PUBLIC_URL}/room/${doctorId}?roomID=${doctorId}`,
+        body: `${patientName} wants to start a video consultation.\nJoin here: ${process.env.NEXT_PUBLIC_URL}/${doctorId}?patientId=${patientId}`,
       },
       data: {
         roomId: doctorId,
@@ -52,7 +52,7 @@ export async function POST(req) {
       },
       webpush: {
         fcmOptions: {
-          link: `${process.env.NEXT_PUBLIC_URL}/room/${doctorId}`,
+          link: `${process.env.NEXT_PUBLIC_URL}/${doctorId}?patientId=${patientId}`,
         },
       },
     });

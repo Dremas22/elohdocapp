@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import RichTextEditor from "@/components/editor/TextEditor";
-import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 
 const Room = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -27,7 +26,11 @@ const Room = () => {
       if (!containerRef.current || hasJoined.current || !currentUser || loading)
         return;
 
-      hasJoined.current = true; // mark before join to prevent race conditions
+      hasJoined.current = true;
+
+      const { ZegoUIKitPrebuilt } = await import(
+        "@zegocloud/zego-uikit-prebuilt"
+      );
 
       const appID = parseInt(process.env.NEXT_PUBLIC_ZEGO_APP_ID);
       const serverSecret = process.env.NEXT_PUBLIC_ZEGO_SERVER_SECRET;
@@ -43,28 +46,18 @@ const Room = () => {
 
       const zp = ZegoUIKitPrebuilt.create(kitToken);
 
-      // defer to next JS tick to avoid hydration-related duplication
-      setTimeout(() => {
-        zp.joinRoom({
-          container: containerRef.current,
-          sharedLinks: [
-            {
-              name: "Copy Link",
-              url:
-                window.location.protocol +
-                "//" +
-                window.location.host +
-                "/room/" +
-                roomID +
-                `?patientId=${patientId}`,
-            },
-          ],
-
-          scenario: {
-            mode: ZegoUIKitPrebuilt.VideoConference,
+      zp.joinRoom({
+        container: containerRef.current,
+        sharedLinks: [
+          {
+            name: "Copy Link",
+            url: `${window.location.origin}/room/${roomID}?patientId=${patientId}`,
           },
-        });
-      }, 0);
+        ],
+        scenario: {
+          mode: ZegoUIKitPrebuilt.VideoConference,
+        },
+      });
     };
 
     myMeeting();
@@ -72,14 +65,12 @@ const Room = () => {
 
   return (
     <div className="flex h-screen">
-      {/* Video Section */}
       <div className="flex-1 bg-black text-white">
         <div className="w-full h-screen flex flex-col bg-gray-900 text-white">
           <div className="flex-grow" ref={containerRef}></div>
         </div>
       </div>
 
-      {/* Notes Section with only patientId and roomID passed */}
       <RichTextEditor roomID={roomID} />
     </div>
   );

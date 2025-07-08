@@ -4,6 +4,8 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import MeetingRoomNavbar from "./MeetingRoomNavbar";
+import PrescriptionForm from "./PrescriptionForm";
+import SickNoteForm from "./SickNoteForm";
 
 const RichTextEditor = ({ roomID }) => {
   const { loading, currentUser } = useCurrentUser();
@@ -103,9 +105,9 @@ const RichTextEditor = ({ roomID }) => {
               </>
             )}
 
-            {mode === "prescription" && <div>Prescription form goes here.</div>}
+            {mode === "prescription" && <PrescriptionForm />}
 
-            {mode === "sick-note" && <div>Sick note form goes here.</div>}
+            {mode === "sick-note" && <SickNoteForm />}
           </div>
         </div>
       ) : null}
