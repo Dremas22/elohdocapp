@@ -49,7 +49,7 @@ const RichTextEditor = ({ roomID }) => {
           body: JSON.stringify({
             patientId,
             roomID,
-            notes: currentNote,
+            notes: trimmedNote,
           }),
         }
       );
@@ -59,10 +59,7 @@ const RichTextEditor = ({ roomID }) => {
         return;
       }
 
-      setPatientData((prev) => ({
-        ...prev,
-        medicalHistory: updatedHistory,
-      }));
+      // ✅ Optionally refetch patient data or just clear the note
       setCurrentNote("");
     } catch (err) {
       console.error("Error saving note:", err);

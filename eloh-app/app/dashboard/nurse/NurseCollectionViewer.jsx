@@ -4,34 +4,8 @@ import { useEffect, useState } from "react";
 import { auth, db } from "@/db/client";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import Image from "next/image";
-import NurseDashboardNavbar from "@/app/dashboard/nurse/nurseNav";
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
-
-function serializeData(obj) {
-  if (obj === null || obj === undefined) return obj;
-
-  if (typeof obj?.toDate === "function") {
-    return obj.toDate().toISOString();
-  }
-
-  if (obj instanceof Date) {
-    return obj.toISOString();
-  }
-
-  if (typeof obj === "object") {
-    if (obj._seconds !== undefined && obj._nanoseconds !== undefined) {
-      return new Date(obj._seconds * 1000).toISOString();
-    }
-
-    const result = {};
-    for (const key in obj) {
-      result[key] = serializeData(obj[key]);
-    }
-    return result;
-  }
-
-  return obj;
-}
+import NurseDashboardNavbar from "@/components/navbar/nurseNav";
 
 const NurseCollectionViewer = () => {
   const [userDoc, setUserDoc] = useState(null);
@@ -52,7 +26,7 @@ const NurseCollectionViewer = () => {
         const nurseRef = doc(db, "nurses", userId);
         const nurseSnap = await getDoc(nurseRef);
 
-        if (docSnap.exists()) {
+        if (nurseSnap.exists()) {
           const userDataRaw = docSnap.data();
           const userData = {
             ...userDataRaw,
@@ -65,10 +39,17 @@ const NurseCollectionViewer = () => {
         }
 
         const patientsSnap = await getDocs(collection(db, "patients"));
-        const patientsList = patientsSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const patientsList = patientsSnap.docs.map((doc) => {
+          const data = doc.data();
+
+          return {
+            id: doc.id,
+            ...data,
+            createdAt: convertTimestamp(data.createdAt),
+            updatedAt: convertTimestamp(data.updatedAt),
+          };
+        });
+
         setPatients(patientsList);
       } catch (error) {
         console.error("Error fetching data:", error);

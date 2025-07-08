@@ -15,8 +15,6 @@ export async function POST(request) {
     const body = await request.json();
     const { patientId, roomID, notes } = body;
 
-    console.log(body, "BODY");
-
     if (!patientId || !roomID || typeof notes !== "string") {
       return NextResponse.json(
         { error: "Missing or invalid fields" },
