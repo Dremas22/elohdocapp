@@ -29,12 +29,12 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
       <DoctorDashboardNavbar />
 
       {/* Sidebar + Main Content Layout */}
-      <div className="flex flex-1 h-[calc(100vh-5rem)]">
-        {/* SidebarMenu */}
+      <div className="flex flex-1">
+        {/* SidebarMenu here */}
         <SidebarMenu practiceNumber={practiceNumber} isVerified={isVerified} />
 
         {/* Main Content */}
-        <main className="flex-1 p-6 bg-gray-50 overflow-auto transition-all duration-300 ease-in-out">
+        <main className="flex-1 p-6 bg-gray-50">
           {isVerified === true ? (
             <div>
               <h1 className="text-xl font-semibold mb-4">Patient Info</h1>
@@ -68,4 +68,4 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   );
 };
 
-export default DoctorsCollectionViewer;
+export default DoctorsCollectionViewer; 

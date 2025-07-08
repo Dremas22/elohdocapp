@@ -7,11 +7,15 @@ import Navbar from "./navbar";
 
 const LandingPage = () => {
   return (
-    <div
-      className="flex flex-col min-h-screen relative">
+    <div className="flex flex-col min-h-screen relative">
       <Navbar />
-      <Video />
-      <ChooseDesignation />
+      <div className>
+        <Video />
+        {/* Overlap ChooseDesignation over bottom of video */}
+        <div className="-mt-16 bg-white">
+          <ChooseDesignation />
+        </div>
+      </div>
     </div>
   );
 };
