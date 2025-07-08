@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/db/client";
 import Image from "next/image";
-import NurseDashboardNavbar from "@/app/dashboard/nurse/nurseNav";
+import NurseDashboardNavbar from "@/components/navbar/nurseNav";
 
 const NurseCollectionViewer = ({ patients }) => {
   const [userDoc, setUserDoc] = useState(null);
