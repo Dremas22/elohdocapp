@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { FiUser, FiEdit2, FiBell, FiFileText, FiClock, FiFile, FiCalendar, FiFolder } from "react-icons/fi";
 import Calendar from "@/app/dashboard/doctor/calendar";
 import { messaging } from "@/db/client";
-import { getMessaging, onMessage } from "firebase/messaging";
+import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 
 /**
@@ -47,34 +48,19 @@ const SidebarToggleBtn = ({ isOpen, toggle }) => (
     style={{ left: isOpen ? "125px" : "10px", width: 40, height: 40 }}
     type="button"
   >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      viewBox="0 0 24 24"
-      className="w-6 h-6"
-    >
-      {isOpen ? (
-        <>
-          <line x1="18" y1="6" x2="6" y2="18" strokeLinecap="round" />
-          <line x1="6" y1="6" x2="18" y2="18" strokeLinecap="round" />
-        </>
-      ) : (
-        <>
-          <line x1="4" y1="6" x2="20" y2="6" strokeLinecap="round" />
-          <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round" />
-          <line x1="4" y1="18" x2="20" y2="18" strokeLinecap="round" />
-        </>
-      )}
-    </svg>
+    {isOpen ? (
+      <FiX className="w-6 h-6" />
+    ) : (
+      <FiMenu className="w-6 h-6" />
+    )}
   </button>
 );
+
+import { FiX, FiMenu } from "react-icons/fi";
 
 const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [isAvailable, setIsAvailable] = useState(false);
   const [writeNotesOn, setWriteNotesOn] = useState(false);
   const [hasNotification, setHasNotification] = useState(false);
   const [notificationPayload, setNotificationPayload] = useState(null);
@@ -101,124 +87,39 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
   /**
    * Sidebar Action Buttons
    */
-
   const actionButtons = [
     {
-      title: "Edit Profile",
-      icon: (
-        <svg
-          className="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 4v1m0 10v1m-6 0a6 6 0 1112 0v1a2 2 0 01-2 2H8a2 2 0 01-2-2v-1z"
-          />
-        </svg>
-      ),
+      title: "Profile",
+      icon: <FiUser className="h-5 w-5" />,
+      onClick: () => alert("Create Sick Note clicked!"),
+    },
+    {
+      title: "Patient Medical Records",
+      icon: <FiFolder className="h-5 w-5" />,
       onClick: () => alert("Edit Profile clicked!"),
     },
     {
-      title: "View Notifications",
+      title: "Meeting Notifications",
       hasNotification,
-      icon: (
-        <svg
-          className="h-5 w-5 relative"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a7 7 0 00-14 0v3.2c0 .5-.2 1.1-.6 1.4L2 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-          />
-        </svg>
-      ),
+      icon: <FiBell className="h-5 w-5 relative" />,
       onClick: () => {
         handleNotification();
         setHasNotification(false);
       },
     },
     {
-      title: "Create Prescription",
-      icon: (
-        <svg
-          className="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M9 12h6m-3-3v6m7-13H5a2 2 0 00-2 2v16l4-4h10a2 2 0 002-2V5a2 2 0 00-2-2z"
-          />
-        </svg>
-      ),
+      title: "Prescription",
+      icon: <FiFileText className="h-5 w-5" />,
       onClick: () => alert("Create Prescription clicked!"),
     },
     {
-      title: "Create Sick Note",
-      icon: (
-        <svg
-          className="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M9 12h6m2 0a9 9 0 10-18 0 9 9 0 0018 0zm-9 4h.01"
-          />
-        </svg>
-      ),
-      onClick: () => alert("Create Sick Note clicked!"),
-    },
-    {
-      title: "Write Notes",
-      icon: (
-        <svg
-          className="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 20h9M16.5 3.5a2.1 2.1 0 113 3L7 19l-4 1 1-4L16.5 3.5z"
-          />
-        </svg>
-      ),
+      title: "Sick Note",
+      icon: <FiFile className="h-5 w-5" />,
       onClick: () => setWriteNotesOn(!writeNotesOn),
     },
     {
       title: "Schedule Availability",
-      icon: (
-        <svg
-          className="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-          />
-        </svg>
-      ),
+      icon: <FiCalendar className="h-5 w-5" />,
       onClick: () => setCalendarOpen(true),
     },
   ];
@@ -234,9 +135,8 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
       <SidebarToggleBtn isOpen={isOpen} toggle={() => setIsOpen(!isOpen)} />
 
       <div
-        className={`fixed top-24 left-0 h-[calc(100vh-6rem)] bg-white dark:bg-[#123158] text-gray-800 dark:text-gray-100 shadow-lg z-40 transition-all duration-300 ease-in-out ${
-          isOpen ? "w-44" : "w-0 overflow-hidden"
-        }`}
+        className={`fixed top-24 left-0 h-[calc(100vh-6rem)] bg-[#123158] dark:bg-[#123158] text-gray-800 dark:text-gray-100 shadow-lg z-40 transition-all duration-300 ease-in-out ${isOpen ? "w-44" : "w-0 overflow-hidden"
+          }`}
         style={{ minWidth: isOpen ? 176 : 0 }}
       >
         <div className="flex flex-col items-center px-2 pb-6 pt-16 space-y-4 h-full">
@@ -261,36 +161,15 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
                 <div className="break-words">{practiceNumber || "N/A"}</div>
               </div>
 
-              {/* Availability Toggle */}
-              <div className="flex items-center gap-3">
-                <label className="relative inline-block w-12 h-7">
-                  <input
-                    type="checkbox"
-                    checked={isAvailable}
-                    onChange={() => setIsAvailable(!isAvailable)}
-                    className="sr-only peer"
-                  />
-                  <span className="block bg-gray-300 peer-checked:bg-green-500 rounded-full h-7 w-12 transition-colors"></span>
-                  <span className="absolute left-1 top-1 bg-white w-5 h-5 rounded-full shadow-md transition-transform peer-checked:translate-x-5" />
-                </label>
-                <span
-                  className={`text-sm font-semibold ${
-                    isAvailable ? "text-green-400" : "text-gray-400"
-                  }`}
-                >
-                  {isAvailable ? "Online" : "Offline"}
-                </span>
-              </div>
+              {/* Removed Online/Offline Toggle */}
 
               {/* Action Buttons */}
-              {isVerified === true && (
-                <div className="flex flex-col gap-3 overflow-auto items-center flex-grow">
-                  <ActionButtons
-                    buttons={actionButtons}
-                    notificationCount={notificationCount}
-                  />
-                </div>
-              )}
+              <div className="flex flex-col gap-3 overflow-auto items-center flex-grow">
+                <ActionButtons
+                  buttons={actionButtons}
+                  notificationCount={notificationCount}
+                />
+              </div>
             </>
           )}
         </div>
@@ -298,9 +177,8 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
 
       {/* Calendar Drawer */}
       <div
-        className={`fixed top-26 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
-          calendarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-26 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <button
           onClick={() => setCalendarOpen(false)}
@@ -312,11 +190,7 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
       </div>
 
       {/* Main content */}
-      <div
-        className={`transition-all duration-300 ease-in-out ${
-          isOpen ? "ml-44" : "ml-0"
-        }`}
-      >
+      <div className={`transition-all duration-300 ease-in-out ${isOpen ? "ml-44" : "ml-0"}`}>
         {children}
       </div>
     </>
