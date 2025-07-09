@@ -130,7 +130,7 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
       <SidebarToggleBtn isOpen={isOpen} toggle={() => setIsOpen(!isOpen)} />
 
       <div
-        className={`fixed top-24 left-0 h-[calc(100vh-6rem)] bg-white dark:bg-[#123158] text-gray-800 dark:text-gray-100 shadow-lg z-40 transition-all duration-300 ease-in-out ${isOpen ? "w-44" : "w-0 overflow-hidden"}`}
+        className={`fixed top-24 left-0 h-[calc(100vh-6rem)] bg-[#123158] dark:bg-[#123158] text-gray-800 dark:text-gray-100 shadow-lg z-40 transition-all duration-300 ease-in-out ${isOpen ? "w-44" : "w-0 overflow-hidden"}`}
         style={{ minWidth: isOpen ? 176 : 0 }}
       >
         <div className="flex flex-col items-center px-2 pb-6 pt-16 space-y-4 h-full">
