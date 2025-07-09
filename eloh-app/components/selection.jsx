@@ -21,7 +21,7 @@ const ChooseDesignation = () => {
     { id: 1, title: "DOCTOR", role: "doctor" },
     { id: 2, title: "NURSE", role: "nurse" },
     { id: 3, title: "PATIENT", role: "patient" },
-    { id: 4, title: "AMBULANCE", role: "ambulance" },
+    { id: 4, title: "AMBULANCE", role: "driver" },
   ];
 
   // Navigate to the sign-in page with the selected role
