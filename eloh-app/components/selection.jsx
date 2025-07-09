@@ -18,9 +18,10 @@ const ChooseDesignation = () => {
 
   // Define user roles with titles and routes
   const designations = [
-    { id: 1, title: "I AM DOCTOR", role: "doctor" },
-    { id: 2, title: "I AM NURSE", role: "nurse" },
-    { id: 3, title: "I AM PATIENT", role: "patient" },
+    { id: 1, title: "DOCTOR", role: "doctor" },
+    { id: 2, title: "NURSE", role: "nurse" },
+    { id: 3, title: "PATIENT", role: "patient" },
+    { id: 4, title: "AMBULANCE", role: "driver" },
   ];
 
   // Navigate to the sign-in page with the selected role
@@ -39,16 +40,16 @@ const ChooseDesignation = () => {
 
       {/* Section heading */}
       <h2 className="text-xl sm:text-3xl md:text-4xl font-bold text-[#03045e] text-center mb-4 sm:mb-6 z-10">
-        Select Your Designation
+        Sign Up / Sign In as...
       </h2>
 
       {/* Responsive button group */}
-      <div className="grid gap-3 sm:gap-4 w-full max-w-xs sm:max-w-md z-10">
+      <div className="grid gap-3 sm:gap-4 w-[25vh] max-w-xs sm:max-w-md z-10">
         {designations.map((designation) => (
           <button
             key={designation.id}
             onClick={() => handleSelect(designation.role)}
-            className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            className="bg-[#03045e] text-white py-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
             {designation.title}
           </button>
