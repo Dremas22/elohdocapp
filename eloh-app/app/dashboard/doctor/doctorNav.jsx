@@ -6,6 +6,7 @@ import { signOut } from "firebase/auth";
 import { auth, db } from "@/db/client";
 import { useRouter } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
+import { FiLogOut } from "react-icons/fi";
 
 const DoctorDashboardNavbar = () => {
   const router = useRouter();
@@ -33,22 +34,22 @@ const DoctorDashboardNavbar = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleSignOut = async () => {
+  const handleAuthAction = async () => {
     try {
       await signOut(auth);
-      window.location.href = "/";
+      await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
+        method: "DELETE",
+      });
+      router.push("/sign-in?role=doctor"); // Redirect after logout
     } catch (error) {
-      console.error("Sign out failed:", error);
+      console.error("Error signing out:", error);
     }
   };
 
-  const handleSignIn = () => router.push("/sign-in?role=doctor");
-
   const { photoUrl, fullName, email } = userDoc || {};
-  const isLoggedIn = !!auth.currentUser;
 
   const buttonStyle =
-    "bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center";
+    "bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center gap-2";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#123158] py-3 px-6 flex justify-between items-center">
@@ -81,45 +82,15 @@ const DoctorDashboardNavbar = () => {
         />
       </div>
 
-      {/* Right-side Sign In/Out Button Only */}
+      {/* Right-side Button */}
       <div className="flex items-center gap-3 relative">
         <button
-          onClick={isLoggedIn ? handleSignOut : handleSignIn}
-          aria-label={isLoggedIn ? "Sign Out" : "Sign In"}
-          title={isLoggedIn ? "Sign Out" : "Sign In"}
+          onClick={handleAuthAction}
+          aria-label="Sign Out"
+          title="Sign Out"
           className={buttonStyle}
         >
-          {isLoggedIn ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1"
-              />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 16l-4-4m0 0l4-4m-4 4h14m-6 4v1a2 2 0 002 2h4a2 2 0 002-2V7a2 2 0 00-2-2h-4a2 2 0 00-2 2v1"
-              />
-            </svg>
-          )}
+          <FiLogOut className="w-5 h-5" />
         </button>
       </div>
     </header>
