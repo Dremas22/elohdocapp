@@ -21,7 +21,6 @@ const DoctorOnboarding = () => {
 
         if (!data.authenticated) {
           router.push("/sign-in?role=doctor");
-
           return;
         }
 
@@ -42,8 +41,19 @@ const DoctorOnboarding = () => {
     checkUser();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-  if (!showForm) return null;
+  // Custom Loading State
+  if (loading || !showForm) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-[#90e0ef] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-[#03045e] text-lg font-semibold">
+            Checking your account...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] px-6 py-12 flex items-center justify-center">
