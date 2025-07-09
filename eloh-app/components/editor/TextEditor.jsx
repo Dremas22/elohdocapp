@@ -77,7 +77,7 @@ const RichTextEditor = ({ roomID }) => {
     <>
       {isDoctor && patientData ? (
         <div className="w-[400px] p-4 bg-gray-800 text-white border-l border-gray-700 flex flex-col justify-between">
-          {/* Pass patientData, mode, and setMode to Navbar */}
+          {/* Pass patientData, mode, and setMode to Navbar - Dont forget to fetch doctor's Info */}
           <MeetingRoomNavbar
             patientData={patientData}
             mode={mode}
