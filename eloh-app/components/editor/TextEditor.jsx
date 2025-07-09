@@ -76,7 +76,7 @@ const RichTextEditor = ({ roomID }) => {
   return (
     <>
       {isDoctor && patientData ? (
-        <div className="w-[400px] p-4 bg-gray-800 text-white border-l border-gray-700 flex flex-col justify-between">
+        <div className="w-full p-4 bg-white text-black border-l border-gray-700 flex flex-col justify-between">
           {/* Pass patientData, mode, and setMode to Navbar - Dont forget to fetch doctor's Info */}
           <MeetingRoomNavbar
             patientData={patientData}
@@ -85,7 +85,7 @@ const RichTextEditor = ({ roomID }) => {
           />
 
           {/* Render content based on selected mode */}
-          <div className="mt-4 flex-grow">
+          <div className="mt-4 flex-grow bg-white">
             {mode === "note" && (
               <>
                 <h3 className="font-semibold mb-2">Add Notes</h3>
@@ -94,7 +94,7 @@ const RichTextEditor = ({ roomID }) => {
                   onChange={(e) => setCurrentNote(e.target.value)}
                   placeholder="Write notes here..."
                   rows={5}
-                  className="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white resize-none focus:outline-none focus:ring focus:ring-blue-500"
+                  className="w-full p-2 rounded bg-white border border-gray-600 text-black resize-none focus:outline-none focus:ring focus:ring-blue-500"
                 />
                 <button
                   onClick={handleSaveNotes}

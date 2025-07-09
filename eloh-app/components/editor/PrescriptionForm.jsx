@@ -30,7 +30,7 @@ const PrescriptionForm = () => {
   };
 
   return (
-    <div className="p-4 bg-gray-700 rounded text-white space-y-4">
+    <div className="p-4 bg-white rounded text-black space-y-4">
       <h2 className="text-lg font-semibold">Prescription</h2>
 
       <input
@@ -47,26 +47,7 @@ const PrescriptionForm = () => {
         className="w-full px-2 py-1 text-black rounded"
       />
 
-      {medications.map((med, i) => (
-        <input
-          key={i}
-          value={med}
-          onChange={(e) => {
-            const newMeds = [...medications];
-            newMeds[i] = e.target.value;
-            setMedications(newMeds);
-          }}
-          className="w-full px-2 py-1 text-black rounded mb-2"
-        />
-      ))}
 
-      <button
-        type="button"
-        onClick={() => setMedications([...medications, ""])}
-        className="bg-green-600 px-3 py-1 rounded"
-      >
-        Add Medication
-      </button>
 
       <div>
         <p className="font-semibold mb-2">Doctor’s Signature</p>

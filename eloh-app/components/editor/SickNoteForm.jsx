@@ -26,7 +26,7 @@ const SickNoteForm = () => {
   };
 
   return (
-    <div className="p-4 bg-gray-700 rounded text-white space-y-4">
+    <div className="p-4 bg-white rounded text-white space-y-4">
       <h2 className="text-lg font-semibold mb-4">Sick Note</h2>
       <p>
         <strong>Patient Name:</strong> John Doe

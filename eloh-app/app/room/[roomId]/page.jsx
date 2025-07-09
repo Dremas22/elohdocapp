@@ -64,15 +64,19 @@ const Room = () => {
   }, [roomID, userId, userName, currentUser, loading]);
 
   return (
-    <div className="flex h-screen">
-      <div className="flex-1 bg-black text-white">
-        <div className="w-full h-screen flex flex-col bg-gray-900 text-white">
-          <div className="flex-grow" ref={containerRef}></div>
-        </div>
+     <div className="flex h-screen">
+    {/* Video Area */}
+    <div className="w-2/3 bg-black text-white">
+      <div className="w-full h-full flex flex-col bg-gray-900 text-white">
+        <div className="flex-grow" ref={containerRef}></div>
       </div>
+    </div>
 
+    {/* Rich Text Editor */}
+    <div className="w-2/3 bg-white p-4 overflow-auto">
       <RichTextEditor roomID={roomID} />
     </div>
+  </div>
   );
 };
 
