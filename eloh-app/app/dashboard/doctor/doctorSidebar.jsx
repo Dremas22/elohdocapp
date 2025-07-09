@@ -1,27 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Calendar from "@/app/dashboard/doctor/calendar";
+import { messaging } from "@/db/client";
+import { getMessaging, onMessage } from "firebase/messaging";
+import NotificationModal from "@/components/NotificationModal";
 
 /**
- * Rendering a group of sidebar action buttons 
+ * Rendering a group of sidebar action buttons
  */
-const ActionButtons = ({ buttons }) => (
-  <>
-    {buttons.map(({ icon, title, onClick }) => (
-      <button
-        key={title}
-        title={title}
-        onClick={onClick}
-        className="bg-[#03045e] text-white w-20 h-9 flex items-center justify-center rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-        aria-label={title}
-        type="button"
-      >
-        {icon}
-      </button>
-    ))}
-  </>
-);
+const ActionButtons = ({ buttons, notificationCount }) => {
+  return (
+    <>
+      {buttons.map(({ icon, title, onClick, hasNotification }) => (
+        <button
+          key={title}
+          title={title}
+          onClick={onClick}
+          className="relative bg-[#03045e] text-white w-20 h-9 flex items-center justify-center rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+          aria-label={title}
+          type="button"
+        >
+          {/* Icon */}
+          {icon}
+
+          {/* Static notification dot & count */}
+          {hasNotification && notificationCount > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white">
+              {notificationCount}
+            </span>
+          )}
+        </button>
+      ))}
+    </>
+  );
+};
 
 /**
  * Sidebar toggle button that switches between open and collapsed states.
@@ -34,7 +47,14 @@ const SidebarToggleBtn = ({ isOpen, toggle }) => (
     style={{ left: isOpen ? "125px" : "10px", width: 40, height: 40 }}
     type="button"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" className="w-6 h-6">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+      className="w-6 h-6"
+    >
       {isOpen ? (
         <>
           <line x1="18" y1="6" x2="6" y2="18" strokeLinecap="round" />
@@ -51,44 +71,95 @@ const SidebarToggleBtn = ({ isOpen, toggle }) => (
   </button>
 );
 
-
 const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [isAvailable, setIsAvailable] = useState(false);
   const [writeNotesOn, setWriteNotesOn] = useState(false);
+  const [hasNotification, setHasNotification] = useState(false);
+  const [notificationPayload, setNotificationPayload] = useState(null);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
 
+  useEffect(() => {
+    const unsubscribe = onMessage(messaging, (payload) => {
+      console.log("Push notification received:", payload);
+      setNotificationPayload(payload);
+      setHasNotification(true);
+      setNotificationCount((prev) => prev + 1);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleNotification = () => {
+    setShowNotificationModal(true); // Open modal
+    setHasNotification(false); // Clear red dot
+    setNotificationCount(0); // Reset count
+  };
 
   /**
- * Sidebar Action Buttons 
- */
+   * Sidebar Action Buttons
+   */
 
   const actionButtons = [
     {
       title: "Edit Profile",
       icon: (
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m0 10v1m-6 0a6 6 0 1112 0v1a2 2 0 01-2 2H8a2 2 0 01-2-2v-1z" />
+        <svg
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 4v1m0 10v1m-6 0a6 6 0 1112 0v1a2 2 0 01-2 2H8a2 2 0 01-2-2v-1z"
+          />
         </svg>
       ),
       onClick: () => alert("Edit Profile clicked!"),
     },
     {
       title: "View Notifications",
+      hasNotification,
       icon: (
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round"
-            d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a7 7 0 00-14 0v3.2c0 .5-.2 1.1-.6 1.4L2 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        <svg
+          className="h-5 w-5 relative"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a7 7 0 00-14 0v3.2c0 .5-.2 1.1-.6 1.4L2 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+          />
         </svg>
       ),
-      onClick: () => alert("View Notifications clicked!"),
+      onClick: () => {
+        handleNotification();
+        setHasNotification(false);
+      },
     },
     {
       title: "Create Prescription",
       icon: (
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round"
-            d="M9 12h6m-3-3v6m7-13H5a2 2 0 00-2 2v16l4-4h10a2 2 0 002-2V5a2 2 0 00-2-2z" />
+        <svg
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9 12h6m-3-3v6m7-13H5a2 2 0 00-2 2v16l4-4h10a2 2 0 002-2V5a2 2 0 00-2-2z"
+          />
         </svg>
       ),
       onClick: () => alert("Create Prescription clicked!"),
@@ -96,9 +167,18 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
     {
       title: "Create Sick Note",
       icon: (
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round"
-            d="M9 12h6m2 0a9 9 0 10-18 0 9 9 0 0018 0zm-9 4h.01" />
+        <svg
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9 12h6m2 0a9 9 0 10-18 0 9 9 0 0018 0zm-9 4h.01"
+          />
         </svg>
       ),
       onClick: () => alert("Create Sick Note clicked!"),
@@ -106,9 +186,18 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
     {
       title: "Write Notes",
       icon: (
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round"
-            d="M12 20h9M16.5 3.5a2.1 2.1 0 113 3L7 19l-4 1 1-4L16.5 3.5z" />
+        <svg
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 20h9M16.5 3.5a2.1 2.1 0 113 3L7 19l-4 1 1-4L16.5 3.5z"
+          />
         </svg>
       ),
       onClick: () => setWriteNotesOn(!writeNotesOn),
@@ -116,9 +205,18 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
     {
       title: "Schedule Availability",
       icon: (
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round"
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <svg
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
         </svg>
       ),
       onClick: () => setCalendarOpen(true),
@@ -127,10 +225,18 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
 
   return (
     <>
+      {showNotificationModal && (
+        <NotificationModal
+          payload={notificationPayload}
+          onClose={() => setShowNotificationModal(false)}
+        />
+      )}
       <SidebarToggleBtn isOpen={isOpen} toggle={() => setIsOpen(!isOpen)} />
 
       <div
-        className={`fixed top-24 left-0 h-[calc(100vh-6rem)] bg-white dark:bg-[#123158] text-gray-800 dark:text-gray-100 shadow-lg z-40 transition-all duration-300 ease-in-out ${isOpen ? "w-44" : "w-0 overflow-hidden"}`}
+        className={`fixed top-24 left-0 h-[calc(100vh-6rem)] bg-white dark:bg-[#123158] text-gray-800 dark:text-gray-100 shadow-lg z-40 transition-all duration-300 ease-in-out ${
+          isOpen ? "w-44" : "w-0 overflow-hidden"
+        }`}
         style={{ minWidth: isOpen ? 176 : 0 }}
       >
         <div className="flex flex-col items-center px-2 pb-6 pt-16 space-y-4 h-full">
@@ -167,15 +273,24 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
                   <span className="block bg-gray-300 peer-checked:bg-green-500 rounded-full h-7 w-12 transition-colors"></span>
                   <span className="absolute left-1 top-1 bg-white w-5 h-5 rounded-full shadow-md transition-transform peer-checked:translate-x-5" />
                 </label>
-                <span className={`text-sm font-semibold ${isAvailable ? "text-green-400" : "text-gray-400"}`}>
+                <span
+                  className={`text-sm font-semibold ${
+                    isAvailable ? "text-green-400" : "text-gray-400"
+                  }`}
+                >
                   {isAvailable ? "Online" : "Offline"}
                 </span>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col gap-3 overflow-auto items-center flex-grow">
-                <ActionButtons buttons={actionButtons} />
-              </div>
+              {isVerified === true && (
+                <div className="flex flex-col gap-3 overflow-auto items-center flex-grow">
+                  <ActionButtons
+                    buttons={actionButtons}
+                    notificationCount={notificationCount}
+                  />
+                </div>
+              )}
             </>
           )}
         </div>
@@ -183,7 +298,9 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
 
       {/* Calendar Drawer */}
       <div
-        className={`fixed top-26 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"}`}
+        className={`fixed top-26 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
+          calendarOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <button
           onClick={() => setCalendarOpen(false)}
@@ -195,7 +312,11 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
       </div>
 
       {/* Main content */}
-      <div className={`transition-all duration-300 ease-in-out ${isOpen ? "ml-44" : "ml-0"}`}>
+      <div
+        className={`transition-all duration-300 ease-in-out ${
+          isOpen ? "ml-44" : "ml-0"
+        }`}
+      >
         {children}
       </div>
     </>
