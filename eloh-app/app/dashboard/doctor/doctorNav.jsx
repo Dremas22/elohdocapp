@@ -72,7 +72,7 @@ const DoctorDashboardNavbar = () => {
       </div>
 
       {/* Centered Logo */}
-      <div className="transform scale-150">
+      <div className="transform scale-300">
         <Image
           src="/images/elohdoc.png"
           alt="Eloh Logo"

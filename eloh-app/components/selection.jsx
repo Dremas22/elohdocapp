@@ -31,7 +31,7 @@ const ChooseDesignation = () => {
 
   return (
     // Main container for the section
-    <div className="-mt-46 sm:-mt-35 mb-4 w-full bg-white py-25 sm:py-10 px-4 z-10 relative flex flex-col items-center overflow-hidden">
+    <div className="-mt-50 sm:-mt-36 mb-4 w-full bg-white py-25 sm:py-10 px-4 z-10 relative flex flex-col items-center overflow-hidden">
 
       {/* Animated glowing background blobs */}
       <div className="absolute w-52 h-52 sm:w-72 sm:h-72 bg-blue-500 rounded-full blur-[70px] sm:blur-[100px] top-0 left-6 opacity-20 animate-pulse z-0" />
@@ -44,7 +44,7 @@ const ChooseDesignation = () => {
       </h2>
 
       {/* Responsive button group */}
-      <div className="grid gap-3 sm:gap-4 w-[25vh] max-w-xs sm:max-w-md z-10">
+      <div className="grid gap-3 sm:gap-4 w-[30vh] max-w-xs sm:max-w-md z-10">
         {designations.map((designation) => (
           <button
             key={designation.id}
