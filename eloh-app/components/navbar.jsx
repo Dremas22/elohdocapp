@@ -12,7 +12,7 @@ const Navbar = () => {
           <img
             src="/images/elohdoc.png"
             alt="Eloh Logo"
-            className="h-8 sm:h-10 w-auto object-contain px-2 cursor-pointer transform scale-350"
+            className="h-8 sm:h-10 w-auto object-contain px-2 cursor-pointer transform scale-400"
           />
         </div>
 
