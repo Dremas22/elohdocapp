@@ -13,7 +13,7 @@ const Room = () => {
 
   const roomID = params.roomId;
   const doctorId = roomID;
-  const userId = currentUser?.userId || currentUser?.uid || null;
+  const userId = currentUser?.uid || currentUser?.userId || null;
   const userName = currentUser?.displayName || `Guest-${Date.now()}`;
   const isDoctor = userId === doctorId;
   const patientId = patientIdFromQuery || (isDoctor ? null : userId);
@@ -28,7 +28,9 @@ const Room = () => {
 
       hasJoined.current = true;
 
-      const { ZegoUIKitPrebuilt } = await import("@zegocloud/zego-uikit-prebuilt");
+      const { ZegoUIKitPrebuilt } = await import(
+        "@zegocloud/zego-uikit-prebuilt"
+      );
 
       const appID = parseInt(process.env.NEXT_PUBLIC_ZEGO_APP_ID);
       const serverSecret = process.env.NEXT_PUBLIC_ZEGO_SERVER_SECRET;

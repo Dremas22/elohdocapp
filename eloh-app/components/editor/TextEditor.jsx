@@ -78,11 +78,7 @@ const RichTextEditor = ({ roomID }) => {
       {isDoctor && patientData ? (
         <div className="w-full p-4 bg-white text-black border-l border-gray-700 flex flex-col justify-between">
           {/* Pass patientData, mode, and setMode to Navbar - Dont forget to fetch doctor's Info */}
-          <MeetingRoomNavbar
-            patientData={patientData}
-            mode={mode}
-            setMode={setMode}
-          />
+          <MeetingRoomNavbar mode={mode} setMode={setMode} doctorId={roomID} />
 
           {/* Render content based on selected mode */}
           <div className="mt-4 flex-grow bg-white">
@@ -105,9 +101,11 @@ const RichTextEditor = ({ roomID }) => {
               </>
             )}
 
-            {mode === "prescription" && <PrescriptionForm />}
+            {mode === "prescription" && (
+              <PrescriptionForm patientData={patientData} />
+            )}
 
-            {mode === "sick-note" && <SickNoteForm />}
+            {mode === "sick-note" && <SickNoteForm patientData={patientData} />}
           </div>
         </div>
       ) : null}

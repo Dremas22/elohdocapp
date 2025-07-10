@@ -3,7 +3,7 @@
 import { useState } from "react";
 import SignaturePad from "./SignaturePad";
 
-const PrescriptionForm = () => {
+const PrescriptionForm = ({ patientData }) => {
   const [signature, setSignature] = useState(null);
   const [showSignaturePad, setShowSignaturePad] = useState(false);
 
@@ -33,7 +33,7 @@ const PrescriptionForm = () => {
     <div className="p-6 bg-white rounded-lg text-black space-y-6 shadow-md">
       <h2 className="text-xl font-semibold text-[#03045e]">Prescription</h2>
       <p>
-        <strong>Patient Name:</strong> Jane Doe
+        <strong>Patient Name:</strong> {patientData?.fullName}
       </p>
       {/* Container around date and instructions */}
       <div className="bg-gray-100 p-4 rounded-md space-y-4 border border-gray-300">
@@ -104,9 +104,7 @@ const PrescriptionForm = () => {
           Submit
         </button>
 
-        <button
-          className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-        >
+        <button className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer">
           Preview
         </button>
       </div>
