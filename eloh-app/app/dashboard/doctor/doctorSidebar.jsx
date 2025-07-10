@@ -17,30 +17,43 @@ import Calendar from "@/app/dashboard/doctor/calendar";
 import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
+import ProfileModal from "@/components/ProfileModal";
 
 /**
  * Renders a group of sidebar action buttons
  */
-const ActionButtons = ({ buttons, notificationCount }) => {
+const ActionButtons = ({ buttons, notificationCount, payload }) => {
   return (
     <>
-      {buttons.map(({ icon, title, onClick, hasNotification }) => (
-        <button
-          key={title}
-          title={title}
-          onClick={onClick}
-          className="relative bg-[#03045e] text-white w-20 h-9 flex items-center justify-center rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-          aria-label={title}
-          type="button"
-        >
-          {icon}
-          {hasNotification && notificationCount > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white">
-              {notificationCount}
-            </span>
-          )}
-        </button>
-      ))}
+      {buttons.map(({ icon, title, onClick, hasNotification }) => {
+        const isMeetingNotifications = title === "Meeting Notifications";
+        const isDisabled = isMeetingNotifications && !payload;
+
+        return (
+          <button
+            key={title}
+            title={title}
+            onClick={onClick}
+            disabled={isDisabled}
+            className={`relative w-20 h-9 flex items-center justify-center rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out
+              ${
+                isDisabled
+                  ? "bg-gray-400 !cursor-not-allowed text-white"
+                  : "bg-[#03045e] hover:bg-[#023e8a] cursor-pointer text-white"
+              }
+            `}
+            aria-label={title}
+            type="button"
+          >
+            {icon}
+            {hasNotification && notificationCount > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white">
+                {notificationCount}
+              </span>
+            )}
+          </button>
+        );
+      })}
     </>
   );
 };
@@ -57,7 +70,7 @@ const SidebarToggleBtn = ({ isOpen, toggle }) => (
   </button>
 );
 
-const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
+const SidebarMenu = ({ practiceNumber, isVerified, userDoc, children }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [writeNotesOn, setWriteNotesOn] = useState(false);
@@ -65,10 +78,11 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
   const [notificationPayload, setNotificationPayload] = useState(null);
   const [notificationCount, setNotificationCount] = useState(0);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onMessage(messaging, (payload) => {
-      console.log("Push notification received:", payload);
       setNotificationPayload(payload);
       setHasNotification(true);
       setNotificationCount((prev) => prev + 1);
@@ -87,7 +101,7 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
     {
       title: "Profile",
       icon: <FiUser className="h-7 w-7" />,
-      onClick: () => alert("Opening your profile..."),
+      onClick: () => setProfileOpen((prev) => !prev),
     },
     {
       title: "Patient Medical Records",
@@ -122,6 +136,33 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
     },
   ];
 
+  const handleProfileSave = async (updatedData) => {
+    // console.log("✅ Received updated profile data:", updatedData);
+    setProfileLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/users/update`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            role: userDoc.role,
+            data: updatedData,
+          }),
+        }
+      );
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Update failed");
+
+      console.log("✅ User updated:", result);
+    } catch (err) {
+      console.error("❌ Update error:", err.message);
+    } finally {
+      setProfileOpen(false);
+    }
+  };
+
   return (
     <>
       {showNotificationModal && (
@@ -130,11 +171,21 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
           onClose={() => setShowNotificationModal(false)}
         />
       )}
+
+      {profileOpen && (
+        <ProfileModal
+          userDoc={userDoc}
+          onSave={handleProfileSave}
+          onClose={() => setProfileOpen(false)}
+          loading={profileLoading}
+        />
+      )}
       <SidebarToggleBtn isOpen={isOpen} toggle={() => setIsOpen(!isOpen)} />
 
       <div
-        className={`fixed top-24 left-0 h-[calc(100vh-6rem)] bg-[#123158] text-white shadow-lg z-40 transition-all duration-300 ease-in-out ${isOpen ? "w-44" : "w-0 overflow-hidden"
-          }`}
+        className={`fixed top-24 left-0 h-[calc(100vh-6rem)] bg-[#123158] text-white shadow-lg z-40 transition-all duration-300 ease-in-out ${
+          isOpen ? "w-44" : "w-0 overflow-hidden"
+        }`}
         style={{ minWidth: isOpen ? 176 : 0 }}
       >
         <div className="flex flex-col items-center px-2 pb-6 pt-16 space-y-4 h-full">
@@ -164,6 +215,7 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
                 <ActionButtons
                   buttons={actionButtons}
                   notificationCount={notificationCount}
+                  payload={notificationPayload}
                 />
               </div>
             </>
@@ -173,8 +225,9 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
 
       {/* Sliding Calendar Drawer */}
       <div
-        className={`fixed top-26 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed top-26 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
+          calendarOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <button
           onClick={() => setCalendarOpen(false)}
@@ -187,8 +240,9 @@ const SidebarMenu = ({ practiceNumber, isVerified, children }) => {
 
       {/* Main content area */}
       <div
-        className={`transition-all duration-300 ease-in-out ${isOpen ? "ml-44" : "ml-0"
-          }`}
+        className={`transition-all duration-300 ease-in-out ${
+          isOpen ? "ml-44" : "ml-0"
+        }`}
       >
         {children}
       </div>

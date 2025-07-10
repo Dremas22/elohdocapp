@@ -6,12 +6,12 @@ importScripts(
 );
 
 firebase.initializeApp({
-  apiKey: ".....",
+  apiKey: "AIzaSyCJ-x8rCIOsVpAdFqhFn1fIW5Bh0FyeVto",
   authDomain: "elohdoc.firebaseapp.com",
   projectId: "elohdoc",
   storageBucket: "elohdoc.firebasestorage.app",
-  messagingSenderId: "...",
-  appId: "1:58822154865659...",
+  messagingSenderId: "964235613183",
+  appId: "1:964235613183:web:913aba164e73bcc1f20dca",
   measurementId: "G-T6N8P20CF8",
 });
 
