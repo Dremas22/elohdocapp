@@ -28,9 +28,7 @@ const Room = () => {
 
       hasJoined.current = true;
 
-      const { ZegoUIKitPrebuilt } = await import(
-        "@zegocloud/zego-uikit-prebuilt"
-      );
+      const { ZegoUIKitPrebuilt } = await import("@zegocloud/zego-uikit-prebuilt");
 
       const appID = parseInt(process.env.NEXT_PUBLIC_ZEGO_APP_ID);
       const serverSecret = process.env.NEXT_PUBLIC_ZEGO_SERVER_SECRET;
@@ -64,19 +62,19 @@ const Room = () => {
   }, [roomID, userId, userName, currentUser, loading]);
 
   return (
-     <div className="flex h-screen">
-    {/* Video Area */}
-    <div className="w-2/3 bg-black text-white">
-      <div className="w-full h-full flex flex-col bg-gray-900 text-white">
-        <div className="flex-grow" ref={containerRef}></div>
+    <div className="flex flex-col lg:flex-row h-screen">
+      {/* Video Area */}
+      <div className="w-full lg:w-1/2 h-1/2 lg:h-full bg-black">
+        <div className="w-full h-full flex flex-col bg-gray-900 text-white">
+          <div className="flex-grow" ref={containerRef}></div>
+        </div>
+      </div>
+
+      {/* Rich Text Editor */}
+      <div className="w-full lg:w-1/2 h-1/2 lg:h-full pd-5 bg-white p-4 overflow-auto">
+        <RichTextEditor roomID={roomID} />
       </div>
     </div>
-
-    {/* Rich Text Editor */}
-    <div className="w-2/3 bg-white p-4 overflow-auto">
-      <RichTextEditor roomID={roomID} />
-    </div>
-  </div>
   );
 };
 

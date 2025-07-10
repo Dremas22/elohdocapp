@@ -35,19 +35,19 @@ const SignaturePad = ({ onSave, onCancel }) => {
       <div className="flex gap-4">
         <button
           onClick={handleClear}
-          className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded"
+          className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center gap-2"
         >
           Clear
         </button>
         <button
           onClick={handleSave}
-          className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
+          className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center gap-2"
         >
           Save
         </button>
         <button
           onClick={onCancel}
-          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded"
+          className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center gap-2"
         >
           Cancel
         </button>

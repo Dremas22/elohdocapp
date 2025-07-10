@@ -18,7 +18,7 @@ const RichTextEditor = ({ roomID }) => {
 
   const isDoctor = roomID === currentUser?.uid;
 
-  // 🔁 Fetch patient data on mount
+  //  Fetch patient data on mount
   useEffect(() => {
     const fetchPatientData = async () => {
       if (!patientId) return;
@@ -98,7 +98,7 @@ const RichTextEditor = ({ roomID }) => {
                 />
                 <button
                   onClick={handleSaveNotes}
-                  className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded transition text-white"
+                  className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center gap-2"
                 >
                   Save Note
                 </button>
