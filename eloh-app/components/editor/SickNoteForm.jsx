@@ -3,7 +3,7 @@
 import { useState } from "react";
 import SignaturePad from "./SignaturePad";
 
-const SickNoteForm = () => {
+const SickNoteForm = ({ patientData }) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [reason, setReason] = useState("");
@@ -13,6 +13,8 @@ const SickNoteForm = () => {
   const handleSignatureSave = (dataUrl) => {
     setSignature(dataUrl);
     setShowSignaturePad(false);
+
+    // TODO: Save the signature to the backend
     console.log("Saved signature:", dataUrl);
   };
 
@@ -30,7 +32,7 @@ const SickNoteForm = () => {
       <h2 className="text-xl font-semibold text-[#03045e]">Sick Note</h2>
 
       <p>
-        <strong>Patient Name:</strong> John Doe
+        <strong>Patient Name:</strong> {patientData?.fullName}
       </p>
 
       {/* Grouped Date Fields */}
@@ -77,8 +79,8 @@ const SickNoteForm = () => {
       </div>
 
       <p>
-        <strong>Recommended Rest Period:</strong>{" "}
-        {startDate || "---"} to {endDate || "---"}
+        <strong>Recommended Rest Period:</strong> {startDate || "---"} to{" "}
+        {endDate || "---"}
       </p>
 
       {/* Signature Section */}
@@ -123,9 +125,7 @@ const SickNoteForm = () => {
           Submit
         </button>
 
-        <button
-          className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-        >
+        <button className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer">
           Preview
         </button>
       </div>
