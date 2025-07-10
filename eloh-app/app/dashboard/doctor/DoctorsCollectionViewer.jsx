@@ -1,7 +1,6 @@
 "use client";
 
 import DoctorDashboardNavbar from "@/app/dashboard/doctor/doctorNav";
-import PatientDisplay from "@/components/patients/PatientDisplay";
 import SidebarMenu from "./doctorSidebar";
 
 const DoctorsCollectionViewer = ({ userDoc, patients }) => {
@@ -24,29 +23,30 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   const { practiceNumber, isVerified } = userDoc;
 
   return (
-    <div className="min-h-screen flex flex-col pt-20">
+    <div className="min-h-screen flex flex-col pt-20 relative overflow-hidden">
       {/* Top Navbar */}
       <DoctorDashboardNavbar />
 
-      {/* Sidebar + Main Content Layout */}
-      <div className="flex flex-1">
-        {/* SidebarMenu here */}
+      {/* Animated glowing blobs */}
+      <div className="absolute w-80 h-80 bg-blue-200 rounded-full blur-[100px] top-10 left-10 opacity-30 animate-pulse z-0" />
+      <div className="absolute w-[420px] h-[420px] bg-blue-400 rounded-full blur-[140px] bottom-20 right-10 opacity-20 animate-pulse z-0" />
+      <div className="absolute w-72 h-72 bg-blue-300 rounded-full blur-[120px] top-1/2 left-[10%] opacity-20 animate-pulse z-0" />
+
+      {/* Sidebar + Main Content */}
+      <div className="flex flex-1 relative z-10">
         <SidebarMenu
           practiceNumber={practiceNumber}
           isVerified={isVerified}
           userDoc={userDoc}
         />
 
-        {/* Main Content */}
-        <main className="flex-1 p-6 bg-gray-50">
+        <main className="flex-1 p-6 bg-transparent flex items-center justify-center">
           {isVerified === true ? (
-            <div>
-              <h1 className="text-xl font-semibold mb-4">Patient Info</h1>
-              <p>This is where sensitive patient information would be shown.</p>
-              <PatientDisplay patients={patients} />
-            </div>
+            <h1 className="text-center bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-transparent font-extrabold text-5xl md:text-6xl leading-tight">
+              Welcome to your virtual consultation
+            </h1>
           ) : isVerified === false ? (
-            <div className="text-center mt-12 text-gray-600">
+            <div className="text-center text-gray-600">
               <h2 className="text-lg font-semibold mb-2">
                 Verification Pending
               </h2>
@@ -56,7 +56,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
               </p>
             </div>
           ) : (
-            <div className="text-center mt-12 text-red-600">
+            <div className="text-center text-red-600">
               <h2 className="text-lg font-semibold mb-2">
                 Verification Declined
               </h2>
