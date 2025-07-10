@@ -31,7 +31,11 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
       {/* Sidebar + Main Content Layout */}
       <div className="flex flex-1">
         {/* SidebarMenu here */}
-        <SidebarMenu practiceNumber={practiceNumber} isVerified={isVerified} />
+        <SidebarMenu
+          practiceNumber={practiceNumber}
+          isVerified={isVerified}
+          userDoc={userDoc}
+        />
 
         {/* Main Content */}
         <main className="flex-1 p-6 bg-gray-50">
@@ -68,4 +72,4 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   );
 };
 
-export default DoctorsCollectionViewer; 
+export default DoctorsCollectionViewer;
