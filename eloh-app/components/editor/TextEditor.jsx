@@ -6,9 +6,11 @@ import { useEffect, useState } from "react";
 import MeetingRoomNavbar from "./MeetingRoomNavbar";
 import PrescriptionForm from "./PrescriptionForm";
 import SickNoteForm from "./SickNoteForm";
-
+import useSaveMedicalHistory from "@/hooks/useSaveMedicalHistory";
 const RichTextEditor = ({ roomID }) => {
   const { loading, currentUser } = useCurrentUser();
+  const { handleSaveNote, error, submitting, successMessage } =
+    useSaveMedicalHistory();
   const [currentNote, setCurrentNote] = useState("");
   const [patientData, setPatientData] = useState(null);
   const [mode, setMode] = useState("note"); // "note", "prescription", "sick-note"
@@ -38,45 +40,16 @@ const RichTextEditor = ({ roomID }) => {
     fetchPatientData();
   }, [patientId]);
 
-  const handleSaveNotes = async () => {
-    const trimmedNote = currentNote.trim();
-    if (!trimmedNote) return alert("Note cannot be empty");
-
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/patients/update-history`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            patientId,
-            roomID,
-            notes: trimmedNote,
-          }),
-        }
-      );
-
-      if (!res.ok) {
-        alert("Failed to save note");
-        return;
-      }
-
-      // ✅ Optionally refetch patient data or just clear the note
-      setCurrentNote("");
-    } catch (err) {
-      console.error("Error saving note:", err);
-      alert("Something went wrong");
-    }
-  };
-
   if (loading || !currentUser) return <p>Loading...</p>;
 
   return (
     <>
       {isDoctor && patientData ? (
         <div className="w-full p-4 bg-white text-black border-l border-gray-700 flex flex-col justify-between">
+          {/** Error */}
+          {error && <p className="text-red-500">{error}</p>}
+          {/** Success message */}
+          {successMessage && <p className="text-green-500">{successMessage}</p>}
           {/* Pass patientData, mode, and setMode to Navbar - Dont forget to fetch doctor's Info */}
           <MeetingRoomNavbar mode={mode} setMode={setMode} doctorId={roomID} />
 
@@ -93,19 +66,45 @@ const RichTextEditor = ({ roomID }) => {
                   className="w-full p-2 rounded bg-white border border-gray-600 text-black resize-none focus:outline-none focus:ring focus:ring-blue-500"
                 />
                 <button
-                  onClick={handleSaveNotes}
+                  onClick={async () =>
+                    await handleSaveNote({
+                      mode,
+                      noteContent: currentNote,
+                      patientId,
+                      roomID,
+                    })
+                  }
+                  disabled={submitting}
                   className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center gap-2"
                 >
-                  Save Note
+                  {submitting ? "Saving..." : "Save Note"}
                 </button>
               </>
             )}
 
             {mode === "prescription" && (
-              <PrescriptionForm patientData={patientData} />
+              <PrescriptionForm
+                patientData={patientData}
+                doctorId={roomID}
+                patientId={patientId}
+                mode={mode}
+                error={error}
+                success={successMessage}
+                submitting={submitting}
+              />
             )}
 
-            {mode === "sick-note" && <SickNoteForm patientData={patientData} />}
+            {mode === "sick-note" && (
+              <SickNoteForm
+                patientData={patientData}
+                doctorId={roomID}
+                patientId={patientId}
+                mode={mode}
+                error={error}
+                success={successMessage}
+                submitting={submitting}
+              />
+            )}
           </div>
         </div>
       ) : null}
