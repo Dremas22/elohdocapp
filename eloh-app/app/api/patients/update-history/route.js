@@ -11,18 +11,32 @@ export async function POST(request) {
     const decoded = await auth?.verifySessionCookie(sessionCookie, true);
     const uid = decoded.uid;
 
-    // 📨 Get request data
     const body = await request.json();
-    const { patientId, roomID, notes } = body;
+    const { patientId, roomID, noteType, noteContent } = body;
 
-    if (!patientId || !roomID || typeof notes !== "string") {
+    // ✅ Basic field validation
+    if (!patientId || !roomID || !noteType || !noteContent) {
       return NextResponse.json(
-        { error: "Missing or invalid fields" },
+        { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    // 🧠 Load doctor using roomID
+    // Optional: Validate type
+    const isValidContent =
+      typeof noteContent === "string"
+        ? noteContent.trim() !== ""
+        : typeof noteContent === "object" &&
+          Object.keys(noteContent).length > 0;
+
+    if (!isValidContent) {
+      return NextResponse.json(
+        { error: "Invalid or empty note content" },
+        { status: 400 }
+      );
+    }
+
+    // 🔍 Verify doctor
     const doctorRef = db?.collection("doctors").doc(roomID);
     const doctorSnap = await doctorRef.get();
 
@@ -35,7 +49,6 @@ export async function POST(request) {
 
     const doctorData = doctorSnap.data();
 
-    // ✅ Match roomID with authenticated UID
     if (doctorData.userId !== uid) {
       return NextResponse.json(
         { error: "Forbidden: Doctor authentication mismatch" },
@@ -43,7 +56,7 @@ export async function POST(request) {
       );
     }
 
-    // 📁 Get patient
+    // 🔍 Verify patient
     const patientRef = db?.collection("patients").doc(patientId);
     const patientSnap = await patientRef.get();
 
@@ -52,21 +65,32 @@ export async function POST(request) {
     }
 
     const patientData = patientSnap.data();
-    const history = Array.isArray(patientData.medicalHistory)
-      ? patientData.medicalHistory
-      : [];
+    const history =
+      typeof patientData.medicalHistory === "object" &&
+      patientData.medicalHistory !== null
+        ? patientData.medicalHistory
+        : {};
 
-    // 📝 Create and append new note
+    // 📝 Build new note (string or object)
     const newNote = {
-      doctorName: doctorData.fullName || "Doctor",
-      notes,
-      email: doctorData.email,
+      doctorName: doctorData.fullName,
+      doctorEmail: doctorData.email,
       phoneNumber: doctorData.phoneNumber,
+      content: noteContent,
       createdAt: new Date(),
     };
 
-    const updatedHistory = [...history, newNote];
+    // 📁 Append note to proper category
+    const category = Array.isArray(history[noteType]) ? history[noteType] : [];
 
+    const updatedCategory = [...category, newNote];
+
+    const updatedHistory = {
+      ...history,
+      [noteType]: updatedCategory,
+    };
+
+    // 🔄 Save update
     await patientRef.update({
       medicalHistory: updatedHistory,
       updatedAt: new Date(),

@@ -2,29 +2,63 @@
 
 import { useState } from "react";
 import SignaturePad from "./SignaturePad";
+import useSaveMedicalHistory from "@/hooks/useSaveMedicalHistory";
 
-const SickNoteForm = ({ patientData }) => {
-  const [startDate, setStartDate] = useState("");
+const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
+  const {
+    handleSaveNote,
+    error,
+    resetError,
+    resetSuccess,
+    submitting,
+    successMessage,
+  } = useSaveMedicalHistory();
+
+  const [startDate, setStartDate] = useState(new Date().toDateString());
   const [endDate, setEndDate] = useState("");
   const [reason, setReason] = useState("");
   const [signature, setSignature] = useState(null);
   const [showSignaturePad, setShowSignaturePad] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const handleSignatureSave = (dataUrl) => {
     setSignature(dataUrl);
     setShowSignaturePad(false);
-
-    // TODO: Save the signature to the backend
-    console.log("Saved signature:", dataUrl);
   };
 
-  const handleSubmit = () => {
-    console.log({
+  const handleSubmit = async () => {
+    resetError();
+    resetSuccess();
+
+    const errors = {};
+
+    // Field-level validation
+    if (!startDate) errors.startDate = "Start date is required.";
+    if (!endDate) errors.endDate = "End date is required.";
+    if (!reason.trim()) errors.reason = "Reason is required.";
+    if (!signature) errors.signature = "Doctor's signature is required.";
+
+    // Stop if any errors
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+
+    const noteContent = {
       startDate,
       endDate,
-      reason,
-      signature,
+      reason: reason.trim(),
+    };
+
+    const { success } = await handleSaveNote({
+      mode,
+      noteContent,
+      patientId,
+      roomID: doctorId,
     });
+
+    if (success) setShowPreview(true);
   };
 
   return (
@@ -35,7 +69,7 @@ const SickNoteForm = ({ patientData }) => {
         <strong>Patient Name:</strong> {patientData?.fullName}
       </p>
 
-      {/* Grouped Date Fields */}
+      {/* Date Fields */}
       <div className="bg-gray-100 p-4 rounded-md border border-gray-300 space-y-4">
         <div>
           <label className="block mb-1 font-semibold" htmlFor="start-date">
@@ -48,6 +82,9 @@ const SickNoteForm = ({ patientData }) => {
             onChange={(e) => setStartDate(e.target.value)}
             className="rounded-md px-3 py-2 text-black w-full border border-gray-300"
           />
+          {fieldErrors.startDate && (
+            <p className="text-sm text-red-600 mt-1">{fieldErrors.startDate}</p>
+          )}
         </div>
 
         <div>
@@ -61,9 +98,13 @@ const SickNoteForm = ({ patientData }) => {
             onChange={(e) => setEndDate(e.target.value)}
             className="rounded-md px-3 py-2 text-black w-full border border-gray-300"
           />
+          {fieldErrors.endDate && (
+            <p className="text-sm text-red-600 mt-1">{fieldErrors.endDate}</p>
+          )}
         </div>
       </div>
 
+      {/* Reason Field */}
       <div>
         <label className="block mb-1 font-semibold" htmlFor="reason">
           Reason for Absence:
@@ -76,6 +117,9 @@ const SickNoteForm = ({ patientData }) => {
           className="w-full rounded-md px-3 py-2 text-black resize-none border border-gray-300"
           placeholder="Enter reason for absence"
         />
+        {fieldErrors.reason && (
+          <p className="text-sm text-red-600 mt-1">{fieldErrors.reason}</p>
+        )}
       </div>
 
       <p>
@@ -92,11 +136,11 @@ const SickNoteForm = ({ patientData }) => {
             <img
               src={signature}
               alt="Doctor signature"
-              className="mb-2 border"
+              className="mb-2 border max-w-xs"
             />
             <button
               onClick={() => setSignature(null)}
-              className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+              className="bg-red-600 text-white py-2 px-4 text-sm rounded shadow hover:bg-red-700 transition"
             >
               Remove Signature
             </button>
@@ -106,7 +150,7 @@ const SickNoteForm = ({ patientData }) => {
             {!showSignaturePad && (
               <button
                 onClick={() => setShowSignaturePad(true)}
-                className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+                className="bg-[#03045e] text-white py-2 px-4 text-sm rounded shadow hover:bg-[#023e8a]"
               >
                 Sign Here
               </button>
@@ -114,20 +158,33 @@ const SickNoteForm = ({ patientData }) => {
             {showSignaturePad && <SignaturePad onSave={handleSignatureSave} />}
           </>
         )}
+
+        {fieldErrors.signature && (
+          <p className="text-sm text-red-600 mt-2">{fieldErrors.signature}</p>
+        )}
       </div>
 
-      {/* Submit and Preview Buttons Centered */}
+      {/* Feedback Messages */}
+      {error && <p className="text-sm text-red-600 font-semibold">{error}</p>}
+      {successMessage && (
+        <p className="text-sm text-green-700 font-semibold">{successMessage}</p>
+      )}
+
+      {/* Actions */}
       <div className="flex justify-center gap-4">
         <button
           onClick={handleSubmit}
-          className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+          disabled={submitting}
+          className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow active:shadow-md active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
         >
-          Submit
+          {submitting ? "Submitting..." : "Submit"}
         </button>
 
-        <button className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer">
-          Preview
-        </button>
+        {showPreview && (
+          <button className="bg-gray-600 text-white py-3 px-5 text-sm font-semibold rounded-xl shadow hover:bg-gray-700 transition">
+            Preview
+          </button>
+        )}
       </div>
     </div>
   );

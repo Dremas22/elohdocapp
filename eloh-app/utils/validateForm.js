@@ -29,29 +29,29 @@ export const validateStep = (step, formData, isFinal = false) => {
 
   if (step === 2 || isFinal) {
     const {
-      smoking,
-      alcohol,
-      drugs,
-      diet,
-      exercise,
-      hobbies,
-      livingSituation,
-    } = socialHistory;
-    if (!smoking.status) errors.smokingStatus = "Smoking status required.";
-    if (smoking.status !== "never" && !smoking.packYears) {
-      errors.packYears = "Pack years required for smokers.";
-    }
-    if (!alcohol.type) errors.alcoholType = "Alcohol type required.";
-    if (!alcohol.frequency)
-      errors.alcoholFrequency = "Alcohol frequency required.";
-    if (!alcohol.amount) errors.alcoholAmount = "Alcohol amount required.";
-    if (!drugs.type) errors.drugType = "Drug type required.";
-    if (!drugs.frequency) errors.drugFrequency = "Drug frequency required.";
-    if (!drugs.route) errors.drugRoute = "Drug route required.";
-    if (!diet) errors.diet = "Diet is required.";
-    if (!exercise) errors.exercise = "Exercise is required.";
-    if (!hobbies) errors.hobbies = "Hobbies required.";
-    if (!livingSituation) errors.livingSituation = "Living situation required.";
+      isSmoker = false,
+      smoking = { status: "never", packYears: "" },
+      usesAlcohol = false,
+      alcohol = { type: "None", frequency: "", amount: "" },
+      usesDrugs = false,
+      drugs = { type: "None", frequency: "", route: "" },
+      diet = "",
+      exercise = "",
+      hobbies = "",
+      livingSituation = "",
+    } = formData.socialHistory;
+
+    // Optional: Normalize data to avoid undefined issues later
+    socialHistory.smoking = smoking;
+    socialHistory.alcohol = alcohol;
+    socialHistory.drugs = drugs;
+    socialHistory.diet = diet || "";
+    socialHistory.exercise = exercise || "";
+    socialHistory.hobbies = hobbies || "";
+    socialHistory.livingSituation = livingSituation || "";
+    socialHistory.isSmoker = isSmoker;
+    socialHistory.usesAlcohol = usesAlcohol;
+    socialHistory.usesDrugs = usesDrugs;
   }
 
   if (step === 3 || isFinal) {

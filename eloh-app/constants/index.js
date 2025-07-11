@@ -132,3 +132,9 @@ export const africanCountries = [
   { id: "ZM_kd84skdj", title: "Zambia" },
   { id: "ZW_jd83kdls", title: "Zimbabwe" },
 ];
+
+export const noteTypeMap = {
+  note: "generalNotes",
+  "sick-note": "sickNotes",
+  prescription: "prescriptions",
+};
