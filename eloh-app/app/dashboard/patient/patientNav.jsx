@@ -2,47 +2,59 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { db } from "@/db/client";
+import { auth, db } from "@/db/client";
 import { useRouter } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
-import useCurrentUser from "@/hooks/useCurrentUser";
+import { signOut } from "firebase/auth";
+import { FiLogOut } from "react-icons/fi";
 
 const PatientDashboardNavbar = () => {
     const router = useRouter();
     const [userDoc, setUserDoc] = useState(null);
     const [loading, setLoading] = useState(true);
-    const { currentUser, handleSignOut } = useCurrentUser(); // ✅ Reuse hook
-    const isLoggedIn = !!currentUser;
 
     useEffect(() => {
         const fetchUserDoc = async () => {
-            if (!currentUser) {
+            const user = auth.currentUser;
+            if (!user) {
                 setLoading(false);
                 return;
             }
             try {
-                const docSnap = await getDoc(doc(db, "patients", currentUser.uid));
-                if (docSnap.exists()) setUserDoc(docSnap.data());
-                else console.warn("Patient document not found.");
+                const docSnap = await getDoc(doc(db, "patients", user.uid));
+                if (docSnap.exists()) {
+                    setUserDoc(docSnap.data());
+                } else {
+                    console.warn("Patient document not found.");
+                }
             } catch (error) {
                 console.error("Error fetching patient document:", error);
             }
             setLoading(false);
         };
 
-        fetchUserDoc();
-    }, [currentUser]);
+        const unsubscribe = auth.onAuthStateChanged(fetchUserDoc);
+        return () => unsubscribe();
+    }, []);
 
-    const handleSignIn = () => router.push("/sign-in?role=patient");
+    const handleSignOut = async () => {
+        try {
+            await signOut(auth);
+            await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
+                method: "DELETE",
+            });
+            router.push("/sign-in?role=patient");
+        } catch (error) {
+            console.error("Error signing out:", error);
+        }
+    };
 
-    const { photoUrl, fullName, email } = userDoc || {};
-
-    const buttonStyle =
-        "bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center";
+    const { photoUrl, fullName } = userDoc || {};
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-[#123158] py-3 px-6 flex justify-between items-center">
-            {/* User Info */}
+        <header className="fixed top-0 left-0 right-0 z-50 bg-[#123158] py-6 px-6 flex justify-between items-center">
+
+            {/* Left side: Avatar + Name on md+ only */}
             <div className="flex items-center gap-4">
                 {photoUrl ? (
                     <Image
@@ -55,60 +67,31 @@ const PatientDashboardNavbar = () => {
                 ) : (
                     <div className="w-12 h-12 rounded-full bg-gray-300" />
                 )}
-                <div className="leading-tight text-sm text-[#E4E9EE]">
-                    <p className="font-semibold">{fullName || email || "Patient"}</p>
+                {/* Name only visible on md+ screens */}
+                <div className="leading-tight text-sm text-[#E4E9EE] hidden md:block">
+                    <p className="font-semibold">{fullName || "Patient"}</p>
                 </div>
             </div>
 
             {/* Centered Logo */}
-            <div className="transform scale-300">
+            <div className="absolute left-1/2 transform -translate-x-1/2 scale-250 md:scale-350">
                 <Image
                     src="/images/elohdoc.png"
                     alt="Eloh Logo"
                     width={80}
-                    height={30}
-                    className="object-contain"
+                    height={80}
                 />
             </div>
 
-            {/* Right-side Buttons */}
+            {/* Right side: Sign Out button */}
             <div className="flex items-center gap-3">
                 <button
-                    onClick={isLoggedIn ? handleSignOut : handleSignIn}
-                    aria-label={isLoggedIn ? "Sign Out" : "Sign In"}
-                    className={buttonStyle}
+                    onClick={handleSignOut}
+                    aria-label="Sign Out"
+                    title="Sign Out"
+                    className="bg-[#03045e] text-white py-2 px-3 text-xs md:text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex items-center justify-center gap-2 cursor-pointer"
                 >
-                    {isLoggedIn ? (
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1"
-                            />
-                        </svg>
-                    ) : (
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M7 16l-4-4m0 0l4-4m-4 4h14m-6 4v1a2 2 0 002 2h4a2 2 0 002-2V7a2 2 0 00-2-2h-4a2 2 0 00-2 2v1"
-                            />
-                        </svg>
-                    )}
+                    <FiLogOut className="w-7 h-5 md:w-10 md:h-6" />
                 </button>
             </div>
         </header>
