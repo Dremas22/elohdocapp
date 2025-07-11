@@ -55,59 +55,41 @@ const PatientOnboarding = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] px-6 py-12 flex items-center justify-center">
-      <div className="w-full max-w-6xl bg-white rounded-3xl shadow-2xl p-10 md:p-16 flex flex-col md:flex-row gap-12 border border-[#90e0ef]">
+    <div className="min-h-screen bg-[#f8f9fa] px-4 py-8 sm:px-6 md:px-12 lg:px-16 flex items-center justify-center">
+      <div className="w-full max-w-6xl bg-white rounded-3xl shadow-2xl p-8 md:p-16 flex flex-col md:flex-row gap-10 md:gap-12 border border-[#90e0ef]">
         {/* Left Section */}
-        <div className="md:w-1/2 text-center md:text-left flex flex-col justify-center">
-          <h1 className="text-5xl font-extrabold text-[#03045e] mb-6">
+        <div className="w-full md:w-1/2 text-center md:text-left flex flex-col justify-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#03045e] mb-6">
             Welcome! 👋
           </h1>
-          <p className="text-[#000000] text-lg mb-6">
+          <p className="text-[#000000] text-base sm:text-lg mb-6">
             Let&apos;s get you set up to access quality healthcare and connect
             with trusted medical professionals.
           </p>
 
-          <div className="space-y-4 text-[#000000] text-base">
-            <div className="flex items-start gap-2">
-              <span className="text-[#90e0ef] text-lg font-bold">✔</span>
-              <span>
-                Provide your <strong>personal details</strong> to create your
-                secure profile.
-              </span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-[#90e0ef] text-lg font-bold">✔</span>
-              <span>
-                Share your <strong>contact information</strong> for appointment
-                notifications and communications.
-              </span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-[#90e0ef] text-lg font-bold">✔</span>
-              <span>
-                Our doctors will provide{" "}
-                <strong>excellent care and services</strong> tailored to your
-                needs.
-              </span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="text-[#90e0ef] text-lg font-bold">✔</span>
-              <span>
-                Manage appointments, e-consults, and prescriptions all in one
-                secure platform.
-              </span>
-            </div>
+          <div className="space-y-3 text-[#000000] text-sm sm:text-base">
+            {[
+              "Provide your personal details to create your secure profile.",
+              "Share your contact information for appointment notifications and communications.",
+              "Our doctors will provide excellent care and services tailored to your needs.",
+              "Manage appointments, e-consults, and prescriptions all in one secure platform.",
+            ].map((text, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <span className="text-[#90e0ef] text-lg font-bold">✔</span>
+                <span>{text}</span>
+              </div>
+            ))}
           </div>
 
-          <p className="mt-6 text-sm text-[#000000] font-medium">
+          <p className="mt-6 text-xs sm:text-sm text-[#000000] font-medium max-w-md mx-auto md:mx-0">
             Your privacy is our priority. All information is handled securely
             and in compliance with POPIA regulations.
           </p>
         </div>
 
         {/* Right Section - Form */}
-        <div className="md:w-1/2 w-full">
-          <div className="bg-[#f8f9fa] border border-[#90e0ef] p-8 rounded-2xl shadow-lg">
+        <div className="w-full md:w-1/2 mt-10 md:mt-0">
+          <div className="bg-[#f8f9fa] border border-[#90e0ef] p-6 sm:p-8 rounded-2xl shadow-lg max-w-md mx-auto md:mx-0">
             <PatientsRegistrationForm />
           </div>
         </div>
