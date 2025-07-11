@@ -1,20 +1,60 @@
 "use client";
 
-import PatientMeetingSetup from "@/components/patients/PatientMeetingSetup";
-import PatientDashboardNavbar from "@/app/dashboard/patient/patientNav";
 import { useState } from "react";
 import Chat from "@/components/Chat";
+import PatientMeetingSetup from "@/components/patients/PatientMeetingSetup";
+import PatientDashboardNavbar from "@/app/dashboard/patient/patientNav";
+import PatientSidebarMenu from "./patientSidebar";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 const PatientDashboard = () => {
-  const [showChat, setShowChat] = useState(true);
+  const { currentUser: userDoc, loading } = useCurrentUser();
+  const [showChat, setShowChat] = useState(false);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+        <p>Loading your dashboard...</p>
+      </div>
+    );
+  }
+
+  if (!userDoc) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-20">
+        <PatientDashboardNavbar />
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center text-gray-600">
+            <p className="text-lg font-medium">No user data found.</p>
+            <p className="text-sm mt-1">
+              Please make sure your account is registered correctly.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-gray-950 text-white min-h-screen relative">
+    <div className="min-h-screen flex flex-col pt-20 relative overflow-hidden bg-gray-950 text-white">
       <PatientDashboardNavbar />
-      <div className="pt-20">
-        <PatientMeetingSetup />
+
+      <div className="relative z-10 flex flex-col lg:flex-row w-full flex-grow">
+        <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(100vh-5rem)]">
+          <PatientSidebarMenu userDoc={userDoc} />
+        </aside>
+
+        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
+
+          <div className="w-full mt-8">
+            <PatientMeetingSetup />
+          </div>
+        </main>
+      </div>
+      <div className="block lg:hidden w-80 pl-7 mt-4">
+        <PatientSidebarMenu userDoc={userDoc} compact />
       </div>
 
-      {/* Chat overlay */}
       {showChat && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
           <div className="w-full max-w-2xl mx-auto p-4">
