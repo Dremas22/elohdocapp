@@ -31,7 +31,7 @@ const ChooseDesignation = () => {
 
   return (
     // Main container for the section
-    <div className="-mt-50 sm:-mt-36 mb-4 w-full bg-white py-25 sm:py-10 px-4 z-10 relative flex flex-col items-center overflow-hidden">
+    <div className="-mt-50 sm:-mt-36 mb-5 w-full h-[60vh] bg-white py-25 sm:py-10 px-4 z-10 relative flex flex-col items-center overflow-hidden">
 
       {/* Animated glowing background blobs */}
       <div className="absolute w-52 h-52 sm:w-72 sm:h-72 bg-blue-500 rounded-full blur-[70px] sm:blur-[100px] top-0 left-6 opacity-20 animate-pulse z-0" />
