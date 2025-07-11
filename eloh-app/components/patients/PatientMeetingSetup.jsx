@@ -15,7 +15,7 @@ const PatientMeetingSetup = () => {
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  // 🧠 Fetch all doctors
+  // Fetch all doctors
   useEffect(() => {
     const fetchDoctors = async () => {
       setIsLoading(true);
@@ -42,7 +42,7 @@ const PatientMeetingSetup = () => {
 
   const fullName = currentUser?.displayName || `Unknown-user_${Date.now()}`;
 
-  // TODO: Test if the function is working correctly
+  // Send notification to doctor API call
   const sendNotificationToDoctor = async (doctorId, patientId) => {
     try {
       const res = await fetch(
@@ -65,14 +65,12 @@ const PatientMeetingSetup = () => {
       }
 
       console.log("Notification sent successfully:", data.message);
-      // Optionally, show a toast or UI feedback
     } catch (error) {
       console.error("Error sending notification:", error);
       alert("Something went wrong while sending the notification.");
     }
   };
 
-  // ✅ Wait for currentUser before rendering UI
   if (loading || !currentUser) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white bg-gray-900">
@@ -97,14 +95,16 @@ const PatientMeetingSetup = () => {
           </p>
 
           <div className="flex items-center justify-center gap-4 mt-8">
-            <input
-              type="text"
-              id="name"
-              readOnly
-              value={fullName}
-              className="border rounded-md px-4 py-2 w-full max-w-sm text-black bg-gray-100 cursor-not-allowed"
-              placeholder="Enter your name"
-            />
+            <div className="opacity-0 h-0 overflow-hidden">
+              <input
+                type="text"
+                id="name"
+                readOnly
+                value={fullName}
+                className="border rounded-md px-4 py-2 w-full max-w-sm text-black bg-gray-100 cursor-not-allowed"
+                placeholder="Enter your name"
+              />
+            </div>
           </div>
 
           <div className="flex items-center justify-center gap-4 mt-6">
@@ -134,75 +134,66 @@ const PatientMeetingSetup = () => {
           </div>
         </div>
 
-        <div className="mt-16">
-          <h2 className="text-2xl font-semibold text-center mb-6">
-            Available Doctors
-          </h2>
-          {isLoading ? (
-            <p className="text-center text-gray-500 mt-20">
-              Loading doctors...
-            </p>
-          ) : error ? (
-            <p className="text-red-600 text-center mt-20 font-semibold">
-              {error}
-            </p>
-          ) : doctors.length === 0 ? (
-            <p className="text-gray-600 text-center mt-20 italic">
-              No doctors available
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {doctors.map((doc) => (
-                <div
-                  key={doc.userId}
-                  onClick={() => {
-                    if (currentUser?.uid && doc.userId) {
-                      sendNotificationToDoctor(doc.userId, currentUser.uid);
-                      router.push(
-                        `/room/${doc.userId}?patientId=${currentUser.uid}`
-                      );
-                    }
-                  }}
-                  className={`rounded-lg p-5 shadow-md transition duration-200 flex justify-between items-center gap-4
-                  ${
-                    currentUser?.uid && doc.userId
-                      ? "cursor-pointer bg-gray-800 hover:bg-gray-700"
-                      : "cursor-not-allowed bg-gray-700 opacity-50"
-                  }`}
-                >
-                  {/* Left - Text Info */}
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-white">
-                      {doc.fullName}
-                    </h3>
-                    <p className="text-sm text-gray-300">
-                      Practice No:{" "}
-                      <span className="font-medium">{doc.practiceNumber}</span>
-                    </p>
-                    <p className="text-sm text-gray-300">Email: {doc.email}</p>
-                    <p className="text-sm text-gray-300">
-                      Phone: {doc.phoneNumber}
-                    </p>
-                    <p className="text-sm text-blue-400 mt-2 hover:underline">
-                      Click to join meeting
-                    </p>
-                  </div>
 
-                  {/* Right - Image */}
-                  <div className="flex-shrink-0">
-                    <Image
-                      src={doc.photoUrl}
-                      alt={doc.fullName}
-                      width={64}
-                      height={64}
-                      className="w-16 h-16 rounded-full object-cover border-2 border-gray-600"
-                    />
-                  </div>
+        <h2 className="text-2xl font-semibold text-center mb-6">
+          Available Doctors
+        </h2>
+        {isLoading ? (
+          <p className="text-center text-gray-500 mt-20">Loading doctors...</p>
+        ) : error ? (
+          <p className="text-red-600 text-center mt-20 font-semibold">{error}</p>
+        ) : doctors.length === 0 ? (
+          <p className="text-gray-600 text-center mt-20 italic">
+            No doctors available
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center">
+            {doctors.map((doc) => (
+              <div
+                key={doc.userId}
+                onClick={() => {
+                  if (currentUser?.uid && doc.userId) {
+                    sendNotificationToDoctor(doc.userId, currentUser.uid);
+                    router.push(
+                      `/room/${doc.userId}?patientId=${currentUser.uid}`
+                    );
+                  }
+                }}
+                className={`rounded-lg p-4 max-w-xs shadow-md transition duration-200 flex flex-col justify-between items-center gap-4
+                  ${currentUser?.uid && doc.userId
+                    ? "cursor-pointer bg-gray-800 hover:bg-gray-700"
+                    : "cursor-not-allowed bg-gray-700 opacity-50"
+                  }
+                  `}
+              >
+                {/* Left - Text Info */}
+                <div className="space-y-2 text-center">
+                  <h3 className="text-lg font-bold text-white">{doc.fullName}</h3>
+                  <p className="text-sm text-gray-300">
+                    Practice No: <span className="font-medium">{doc.practiceNumber}</span>
+                  </p>
+                  <p className="text-sm text-gray-300">Email: {doc.email}</p>
+                  <p className="text-sm text-gray-300">Phone: {doc.phoneNumber}</p>
+                  <p className="text-sm text-blue-400 mt-2 hover:underline cursor-pointer">
+                    Click to join meeting
+                  </p>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+
+                {/* Right - Image */}
+                <div className="flex-shrink-0">
+                  <Image
+                    src={doc.photoUrl}
+                    alt={doc.fullName}
+                    width={64}
+                    height={64}
+                    className="w-16 h-16 rounded-full object-cover border-2 border-gray-600"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
       </section>
     </div>
   );
