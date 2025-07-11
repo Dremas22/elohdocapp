@@ -3,7 +3,20 @@
 import DoctorDashboardNavbar from "@/app/dashboard/doctor/doctorNav";
 import SidebarMenu from "./doctorSidebar";
 
+/**
+ * DoctorsCollectionViewer
+ * Displays the doctor's dashboard, including:
+ * - Navbar
+ * - Sidebar with action buttons
+ * - Welcome message or verification status
+ * - Conditional mobile/desktop layouts
+ *
+ * @param {Object} props
+ * @param {Object} props.userDoc - The authenticated doctor's user document.
+ * @param {Array} props.patients - (Optional) A list of assigned patients (currently unused).
+ */
 const DoctorsCollectionViewer = ({ userDoc, patients }) => {
+  // Handles a case where userDoc is missing
   if (!userDoc) {
     return (
       <div className="min-h-screen bg-gray-50 pt-20">
@@ -20,49 +33,60 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
     );
   }
 
+  // Destructuring  verification and practice number from user profile
   const { practiceNumber, isVerified } = userDoc;
 
   return (
     <div className="min-h-screen flex flex-col pt-20 relative overflow-hidden">
-      {/* Top Navbar */}
+      {/* Top fixed navbar */}
       <DoctorDashboardNavbar />
 
-      {/* Animated glowing blobs */}
-      <div className="absolute w-80 h-80 bg-blue-200 rounded-full blur-[100px] top-10 left-10 opacity-30 animate-pulse z-0" />
-      <div className="absolute w-[420px] h-[420px] bg-blue-400 rounded-full blur-[140px] bottom-20 right-10 opacity-20 animate-pulse z-0" />
-      <div className="absolute w-72 h-72 bg-blue-300 rounded-full blur-[120px] top-1/2 left-[10%] opacity-20 animate-pulse z-0" />
+      {/* Main layout section */}
+      <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
 
-      {/* Sidebar + Main Content */}
-      <div className="flex flex-1 relative z-10">
-        <SidebarMenu
-          practiceNumber={practiceNumber}
-          isVerified={isVerified}
-          userDoc={userDoc}
-        />
+        {/* Desktop Navigation: displayed on the left side of the screen*/}
+        <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(100vh-5rem)]">
+          <SidebarMenu
+            practiceNumber={practiceNumber}
+            isVerified={isVerified}
+            userDoc={userDoc}
+          />
+        </aside>
 
-        <main className="flex-1 p-6 bg-transparent flex items-center justify-center">
+        {/* Main content panel */}
+        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
+
           {isVerified === true ? (
-            <h1 className="text-center bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-transparent font-extrabold text-5xl md:text-6xl leading-tight">
-              Welcome to your virtual consultation
-            </h1>
+            <>
+              {/* Welcome banner for verified doctors */}
+              <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-transparent font-extrabold text-4xl sm:text-5xl md:text-6xl leading-tight mt-10 mb-10">
+                Welcome to your virtual surgery.
+              </h1>
+
+              {/* Mobile Navigation shown below welcome message on mobile */}
+              <div className="block lg:hidden w-80 mt-25">
+                <SidebarMenu
+                  practiceNumber={practiceNumber}
+                  isVerified={isVerified}
+                  userDoc={userDoc}
+                  compact
+                />
+              </div>
+            </>
           ) : isVerified === false ? (
-            <div className="text-center text-gray-600">
-              <h2 className="text-lg font-semibold mb-2">
-                Verification Pending
-              </h2>
+            // Message shown if account is still pending verification
+            <div className="text-gray-600">
+              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
               <p>
-                Once your account is verified, you'll be able to access
-                sensitive patient information here.
+                Once your account is verified, you'll be able to access sensitive patient information here.
               </p>
             </div>
           ) : (
-            <div className="text-center text-red-600">
-              <h2 className="text-lg font-semibold mb-2">
-                Verification Declined
-              </h2>
+            // Message shown if account was declined
+            <div className="text-red-600">
+              <h2 className="text-lg font-semibold mb-2">Verification Declined</h2>
               <p>
-                We could not verify your account. Please ensure your practice
-                number is registered or contact support for help.
+                We could not verify your account. Please ensure your practice number is registered or contact support for help.
               </p>
             </div>
           )}
