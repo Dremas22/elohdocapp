@@ -132,10 +132,13 @@ const NursesRegistrationForm = () => {
     );
 
   return (
-    <div className="w-full max-w-lg mx-auto px-4 py-8 bg-white rounded-3xl shadow-lg border border-gray-200">
-      <h2 className="text-2xl font-bold mb-6 text-gray-900 text-center">
-        Nurse Registration Form
+    <div className="w-full max-w-xl mx-auto px-6 py-10 bg-white rounded-3xl shadow-xl border border-blue-100">
+      <h2 className="text-3xl font-bold mb-2 text-center text-blue-700">
+        Nurse Registration
       </h2>
+      <p className="text-center text-gray-500 mb-6 text-sm">
+        Please complete the form below to register as a nurse.
+      </p>
 
       <form
         className="space-y-6"
@@ -178,9 +181,8 @@ const NursesRegistrationForm = () => {
               value={formData.practiceNumber}
               onChange={handleChange}
               placeholder="Practice Number"
-              className={`w-full px-4 py-3 rounded-lg border ${
-                errors.practiceNumber ? "border-red-500" : "border-gray-300"
-              } bg-white text-gray-900`}
+              className={`w-full px-4 py-3 rounded-lg border ${errors.practiceNumber ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-150`}
             />
             {errors.practiceNumber && (
               <p className="mt-1 text-sm text-red-600">
@@ -195,9 +197,8 @@ const NursesRegistrationForm = () => {
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-lg border ${
-                errors.category ? "border-red-500" : "border-gray-300"
-              } bg-white text-gray-900`}
+              className={`w-full px-4 py-3 rounded-lg border ${errors.category ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-150`}
             >
               <option value="" disabled>
                 Select Category
@@ -220,7 +221,7 @@ const NursesRegistrationForm = () => {
                 name="phoneCode"
                 value={formData.phoneCode}
                 onChange={handleChange}
-                className="w-full sm:w-24 px-3 py-3 rounded-lg border border-gray-300 bg-white text-gray-900"
+                className="w-full sm:w-28 px-3 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-150"
               >
                 {phoneCodes.map(({ code, label }) => (
                   <option key={label} value={code}>
@@ -235,10 +236,9 @@ const NursesRegistrationForm = () => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 placeholder="Phone Number"
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.phoneNumber ? "border-red-500" : "border-gray-300"
-                } bg-white text-gray-900`}
-                pattern="^[0-9]{6,10}$"
+                className={`w-full px-4 py-3 rounded-lg border ${errors.phoneNumber ? "border-red-500" : "border-gray-300"
+                  } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-150`}
+                pattern="^[0-9]{9}$"
               />
             </div>
             {errors.phoneNumber && (
@@ -252,8 +252,7 @@ const NursesRegistrationForm = () => {
           <button
             type="submit"
             disabled={loading || submitting}
-            className="w-full max-w-xs py-3 px-6 bg-blue-600 text-white rounded-lg font-semibold
-                hover:bg-blue-700 active:bg-blue-800 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="bg-[#03045e] hover:bg-[#0077b6] text-white flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer"
           >
             {submitting ? "Submitting..." : "Register"}
           </button>

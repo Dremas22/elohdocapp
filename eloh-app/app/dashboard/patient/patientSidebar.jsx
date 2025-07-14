@@ -6,7 +6,6 @@ import {
     FiFileText,
     FiFile,
     FiFolder,
-    FiPhone,
 } from "react-icons/fi";
 import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
@@ -23,7 +22,7 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
 
     return (
         <div className={`${layout} w-full`}>
-            {buttons.map(({ icon, title, onClick, hasNotification }) => {
+            {buttons.map(({ icon, title, onClick, hasNotification, customClass }) => {
                 const isDisabled = title === "Appointment Alerts" && !payload;
 
                 return (
@@ -36,6 +35,7 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               ${compact ? "h-15 w-18" : "w-24 h-12"}
               bg-[#03045e] hover:bg-[#023e8a] text-white
               ${isDisabled ? "!cursor-not-allowed" : ""}
+              ${customClass || ""}
             `}
                         aria-label={title}
                         type="button"
@@ -43,6 +43,7 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
                         <span className={`${isDisabled ? "text-gray-600" : "text-white"}`}>
                             {icon}
                         </span>
+
                         {hasNotification && notificationCount > 0 && (
                             <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white">
                                 {notificationCount}
@@ -93,6 +94,7 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
             console.error("❌ Update error:", err.message);
         } finally {
             setProfileOpen(false);
+            setProfileLoading(false);
         }
     };
 
@@ -100,7 +102,7 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
         {
             title: "Profile",
             icon: <FiUser className="h-6 w-6" />,
-            onClick: () => setProfileOpen(trtaue),
+            onClick: () => setProfileOpen(true),
         },
         {
             title: "View Prescriptions",
@@ -121,6 +123,7 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
             title: "Request Ambulance",
             icon: <span className={`${compact ? "text-3xl" : "text-2xl"}`}>🚑</span>,
             onClick: () => alert("Ambulance request initiated..."),
+            customClass: "sm:ml-0 ml-18",
         },
     ];
 
@@ -145,11 +148,11 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
             <div
                 className={`p-6 text-white z-10 ${compact
                     ? "bg-gray-950 pt-11 pr-25 pl-17 w-[45vh] h-[60vh]"
-                    : "bg-[#123158] pt-30 w-64 h-full "
+                    : "bg-[#123158] pt-30 w-64 h-full"
                     }`}
             >
-                <div className="text-center font-bold pr-5 text-[#66e4ff] text-lg mb-5">
-                    Welcome, {userDoc?.displayName?.split(" ")[0] || "Patient"}
+                <div className="flex text-center w-full pl-5 font-bold text-[#66e4ff] text-lg mb-5">
+                    Welcome, {userDoc?.displayName?.split(" ")[0] || "Patient"}!
                 </div>
 
                 <ActionButtons
