@@ -6,6 +6,7 @@ import {
     FiFileText,
     FiFile,
     FiFolder,
+    FiPhone,
 } from "react-icons/fi";
 import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
@@ -31,9 +32,9 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
                         title={title}
                         onClick={onClick}
                         disabled={isDisabled}
-                        className={`relative flex items-center justify-center rounded-xl font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
-              ${compact ? "h-20 w-24 text-base" : "w-24 h-12 text-sm"}
-              bg-[#0077b6] hover:bg-[#023e8a] text-white
+                        className={`relative flex items-center justify-center rounded-xl text-sm font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
+              ${compact ? "h-15 w-18" : "w-24 h-12"}
+              bg-[#03045e] hover:bg-[#023e8a] text-white
               ${isDisabled ? "!cursor-not-allowed" : ""}
             `}
                         aria-label={title}
@@ -98,28 +99,28 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
     const actionButtons = [
         {
             title: "Profile",
-            icon: <FiUser className={`${compact ? "h-7 w-7" : "h-6 w-6"}`} />,
-            onClick: () => setProfileOpen(true),
+            icon: <FiUser className="h-6 w-6" />,
+            onClick: () => setProfileOpen(trtaue),
+        },
+        {
+            title: "View Prescriptions",
+            icon: <FiFileText className="h-6 w-6" />,
+            onClick: () => alert("Viewing prescriptions..."),
+        },
+        {
+            title: "View Medical Records",
+            icon: <FiFolder className="h-6 w-6" />,
+            onClick: () => alert("Opening medical records..."),
+        },
+        {
+            title: "View Sick Notes",
+            icon: <FiFile className="h-6 w-6" />,
+            onClick: () => alert("Accessing sick notes..."),
         },
         {
             title: "Request Ambulance",
             icon: <span className={`${compact ? "text-3xl" : "text-2xl"}`}>🚑</span>,
             onClick: () => alert("Ambulance request initiated..."),
-        },
-        {
-            title: "View Prescriptions",
-            icon: <FiFileText className={`${compact ? "h-7 w-7" : "h-6 w-6"}`} />,
-            onClick: () => alert("Viewing prescriptions..."),
-        },
-        {
-            title: "View Medical Records",
-            icon: <FiFolder className={`${compact ? "h-7 w-7" : "h-6 w-6"}`} />,
-            onClick: () => alert("Opening medical records..."),
-        },
-        {
-            title: "View Sick Notes",
-            icon: <FiFile className={`${compact ? "h-7 w-7" : "h-6 w-6"}`} />,
-            onClick: () => alert("Accessing sick notes..."),
         },
     ];
 
@@ -144,7 +145,7 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
             <div
                 className={`p-6 text-white z-10 ${compact
                     ? "bg-gray-950 pt-11 pr-25 pl-17 w-[45vh] h-[60vh]"
-                    : "bg-[#1d3557] pt-30 w-64 h-full shadow-lg"
+                    : "bg-[#123158] pt-30 w-64 h-full "
                     }`}
             >
                 <div className="text-center font-bold pr-5 text-[#66e4ff] text-lg mb-5">

@@ -40,7 +40,7 @@ const PatientDashboard = () => {
       <PatientDashboardNavbar />
 
       <div className="relative z-10 flex flex-col lg:flex-row w-full flex-grow">
-        <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(100vh-5rem)]">
+        <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(50vh-5rem)]">
           <PatientSidebarMenu userDoc={userDoc} />
         </aside>
 
