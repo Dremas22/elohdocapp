@@ -123,7 +123,7 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
             title: "Request Ambulance",
             icon: <span className={`${compact ? "text-3xl" : "text-2xl"}`}>🚑</span>,
             onClick: () => alert("Ambulance request initiated..."),
-            customClass: "sm:ml-0 ml-18",
+            customClass: "sm:ml-0 ml-13.5",
         },
     ];
 

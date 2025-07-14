@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { auth, db } from "@/db/server"; // Make sure admin is initialized here
+import { auth, db } from "@/db/server";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {

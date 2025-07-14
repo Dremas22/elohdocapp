@@ -171,7 +171,7 @@ const SidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false }) =
       {/* Sidebar Container */}
       <div
         className={`p-6 text-white z-10 ${compact
-          ? "bg-gray-950 pt-11 pr-25 pl-20 w-[50vh] h-[60vh]"
+          ? "bg-gray-950 pt-11 pr-19 pl-18 w-[full] h-[65vh]"
           : "bg-[#123158] pt-30 w-64 h-full shadow-lg"
           }`}
       >
@@ -209,7 +209,7 @@ const SidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false }) =
 
       {/* Sliding Calendar Drawer */}
       <div
-        className={`fixed top-26 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
           }`}
       >
         <button
