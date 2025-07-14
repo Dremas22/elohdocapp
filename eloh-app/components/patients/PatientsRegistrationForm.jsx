@@ -162,7 +162,7 @@ const PatientsRegistrationForm = () => {
           <button
             type="button"
             onClick={handleBack}
-            className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400"
+            className="bg-[#03045e] hover:bg-[#0077b6] text-white flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer"
           >
             Back
           </button>
@@ -174,7 +174,7 @@ const PatientsRegistrationForm = () => {
           <button
             type="button"
             onClick={handleNext}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="bg-[#03045e] hover:bg-[#0077b6] text-white flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer"
           >
             Next
           </button>
@@ -183,7 +183,7 @@ const PatientsRegistrationForm = () => {
             type="button"
             onClick={handleSubmit}
             disabled={submitting}
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+            className="bg-[#03045e] hover:bg-[#0077b6] text-white flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer"
           >
             {submitting ? "Submitting..." : "Submit"}
           </button>

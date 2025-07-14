@@ -46,7 +46,7 @@ const PatientDashboard = () => {
 
         <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
 
-          <div className="w-full pr-60 mt-8">
+          <div className="w-full mt-8">
             <PatientMeetingSetup />
           </div>
         </main>

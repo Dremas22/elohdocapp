@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { doctorCategories, phoneCodes } from "@/constants";
@@ -7,6 +8,7 @@ import { useRouter } from "next/navigation";
 const DoctorsRegistrationForm = () => {
   const { loading, currentUser } = useCurrentUser();
   const router = useRouter();
+
   const [formData, setFormData] = useState({
     practiceNumber: "",
     phoneCode: "+27",
@@ -72,13 +74,11 @@ const DoctorsRegistrationForm = () => {
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length !== 0) return;
-
     setSubmitting(true);
 
     try {
       const { phoneCode, ...cleanFormData } = formData;
       const combinedPhoneNumber = `${phoneCode}${formData.phoneNumber}`;
-
       const payload = {
         ...cleanFormData,
         phoneNumber: combinedPhoneNumber,
@@ -125,20 +125,22 @@ const DoctorsRegistrationForm = () => {
 
   if (loading)
     return (
-      <p className="text-black text-center py-10 font-medium">Loading...</p>
+      <p className="text-[#03045e] text-center py-10 font-medium">
+        Loading...
+      </p>
     );
 
   return (
-    <div className="w-full max-w-lg mx-auto px-4 py-8 bg-white rounded-3xl shadow-lg border border-gray-200">
-      <h2 className="text-2xl font-bold mb-6 text-gray-900 text-center">
-        Doctor Registration Form
+    <div className="w-full px-4 py-6 sm:px-6 bg-white rounded-2xl shadow-lg border border-[#caf0f8]">
+      <h2 className="text-2xl font-bold text-[#03045e] mb-6 text-center">
+        Doctor Registration
       </h2>
 
       <form
         className="space-y-6"
+        onSubmit={handleSubmit}
         autoComplete="off"
         spellCheck="false"
-        onSubmit={handleSubmit}
         noValidate
       >
         {/* Form Grid */}
@@ -149,9 +151,9 @@ const DoctorsRegistrationForm = () => {
               type="text"
               name="fullName"
               value={currentUser?.displayName || ""}
-              placeholder="Full Name"
               disabled
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed"
+              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-300 text-gray-600 cursor-not-allowed"
+              placeholder="Full Name"
             />
           </div>
 
@@ -162,8 +164,8 @@ const DoctorsRegistrationForm = () => {
               name="email"
               value={formData.email}
               disabled
+              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-300 text-gray-600 cursor-not-allowed"
               placeholder="Email"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed"
             />
           </div>
 
@@ -175,11 +177,10 @@ const DoctorsRegistrationForm = () => {
               value={formData.practiceNumber}
               onChange={handleChange}
               placeholder="Practice Number"
-              className={`w-full px-4 py-3 rounded-lg border ${errors.practiceNumber ? "border-red-500" : "border-gray-300"
-                } bg-white text-gray-900`}
+              className={`w-full px-4 py-3 rounded-xl border ${errors.practiceNumber ? "border-red-500" : "border-gray-300"} bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
             />
             {errors.practiceNumber && (
-              <p className="mt-1 text-sm text-red-600">
+              <p className="text-sm text-red-600 mt-1">
                 {errors.practiceNumber}
               </p>
             )}
@@ -191,8 +192,7 @@ const DoctorsRegistrationForm = () => {
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-lg border ${errors.category ? "border-red-500" : "border-gray-300"
-                } bg-white text-gray-900`}
+              className={`w-full px-4 py-3 rounded-xl border ${errors.category ? "border-red-500" : "border-gray-300"} bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
             >
               <option value="" disabled>
                 Select Category
@@ -204,7 +204,7 @@ const DoctorsRegistrationForm = () => {
               ))}
             </select>
             {errors.category && (
-              <p className="mt-1 text-sm text-red-600">{errors.category}</p>
+              <p className="text-sm text-red-600 mt-1">{errors.category}</p>
             )}
           </div>
 
@@ -215,7 +215,7 @@ const DoctorsRegistrationForm = () => {
                 name="phoneCode"
                 value={formData.phoneCode}
                 onChange={handleChange}
-                className="w-full sm:w-24 px-3 py-3 rounded-lg border border-gray-300 bg-white text-gray-900"
+                className="w-full sm:w-24 px-3 py-3 rounded-xl border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]"
               >
                 {phoneCodes.map(({ code, label }) => (
                   <option key={label} value={code}>
@@ -230,19 +230,19 @@ const DoctorsRegistrationForm = () => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 placeholder="Phone Number"
-                className={`w-full px-4 py-3 rounded-lg border ${errors.phoneNumber ? "border-red-500" : "border-gray-300"
-                  } bg-white text-gray-900`}
-                pattern="^[0-9]{6,10}$"
+                className={`w-full px-4 py-3 rounded-xl border ${errors.phoneNumber ? "border-red-500" : "border-gray-300"} bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
               />
             </div>
             {errors.phoneNumber && (
-              <p className="text-sm text-red-600 mt-1">{errors.phoneNumber}</p>
+              <p className="text-sm text-red-600 mt-1">
+                {errors.phoneNumber}
+              </p>
             )}
           </div>
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-center mt-6">
+        <div className="flex justify-center pt-4">
           <button
             type="submit"
             disabled={loading || submitting}

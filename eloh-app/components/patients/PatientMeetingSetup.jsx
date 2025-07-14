@@ -7,7 +7,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-
 const PatientMeetingSetup = () => {
   const { currentUser, loading } = useCurrentUser();
   const [roomID, setRoomID] = useState("");
@@ -108,8 +107,8 @@ const PatientMeetingSetup = () => {
           </div>
         </div>
 
-        <div className="flex  gap-4 mt-6">
-          <div className=" items-center justify-center opacity-0 h-0 overflow-hidden">
+        <div className="flex gap-4 mt-6">
+          <div className="items-center justify-center opacity-0 h-0 overflow-hidden">
             <input
               type="text"
               id="roomid"
@@ -135,7 +134,7 @@ const PatientMeetingSetup = () => {
         </div>
 
         {/* Available Doctors Section */}
-        <h2 className="text-2xl font-semibold text-center mb-6 mt-16">
+        <h2 className="text-2xl font-semibold text-center mb-6 mt-16 text-white">
           Available Doctors
         </h2>
 
@@ -150,8 +149,8 @@ const PatientMeetingSetup = () => {
             No doctors available
           </p>
         ) : (
-          <div className="flex justify-center">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-[1300px]">
+          <div className="flex justify-center w-full">
+            <div className="grid w-full max-w-full px-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {doctors.map((doc) => (
                 <div
                   key={doc.userId}
@@ -163,7 +162,7 @@ const PatientMeetingSetup = () => {
                       );
                     }
                   }}
-                  className={`rounded-lg p-4 max-w-xs shadow-md transition duration-200 flex flex-col justify-between items-center gap-4
+                  className={`rounded-lg p-4 w-full shadow-md transition duration-200 flex flex-col justify-between items-center gap-4
                     ${currentUser?.uid && doc.userId
                       ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
                       : "cursor-not-allowed bg-gray-700 opacity-50"
@@ -171,14 +170,20 @@ const PatientMeetingSetup = () => {
                   `}
                 >
                   {/* Doctor Info */}
-
                   <div className="space-y-2 text-center">
-                    <h3 className="text-lg font-bold text-white">{doc.fullName}</h3>
+                    <h3 className="text-lg font-bold text-white">
+                      {doc.fullName}
+                    </h3>
                     <p className="text-sm text-gray-300">
-                      Practice No: <span className="font-medium">{doc.practiceNumber}</span>
+                      Practice No:{" "}
+                      <span className="font-medium">
+                        {doc.practiceNumber}
+                      </span>
                     </p>
                     <p className="text-sm text-gray-300">Email: {doc.email}</p>
-                    <p className="text-sm text-gray-300">Phone: {doc.phoneNumber}</p>
+                    <p className="text-sm text-gray-300">
+                      Phone: {doc.phoneNumber}
+                    </p>
                     <p className="text-sm text-blue-400 mt-2 hover:underline cursor-pointer">
                       Click to join meeting
                     </p>
@@ -191,7 +196,7 @@ const PatientMeetingSetup = () => {
                       alt={doc.fullName}
                       width={64}
                       height={64}
-                      className="w-16 h-16 rounded-full object-cover border-2 border-gray-600"
+                      className="w-16 h-16 rounded-full border border-amber-50 object-cover"
                     />
                   </div>
                 </div>
