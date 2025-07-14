@@ -27,7 +27,7 @@ const NurseCollectionViewer = () => {
         const nurseSnap = await getDoc(nurseRef);
 
         if (nurseSnap.exists()) {
-          const userDataRaw = docSnap.data();
+          const userDataRaw = nurseSnap.data();
           const userData = {
             ...userDataRaw,
             createdAt: convertTimestamp(userDataRaw.createdAt),
