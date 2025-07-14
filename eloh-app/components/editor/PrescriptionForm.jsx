@@ -117,8 +117,9 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
       {openPreview && (
         <NotePreview
           previewData={previewData}
-          noteType="sickNotes"
+          noteType="prescriptions"
           isLoading={isLoading}
+          onClose={() => setOpenPreview(false)}
         />
       )}
       <h2 className="text-xl font-semibold text-[#03045e]">Prescription</h2>

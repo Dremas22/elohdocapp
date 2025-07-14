@@ -96,6 +96,7 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
           previewData={previewData}
           noteType="sickNotes"
           isLoading={isLoading}
+          onClose={() => setOpenPreview(false)}
         />
       )}
       <h2 className="text-xl font-semibold text-[#03045e]">Sick Note</h2>
