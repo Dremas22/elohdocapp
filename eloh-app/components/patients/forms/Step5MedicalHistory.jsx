@@ -15,55 +15,45 @@ const Step5MedicalHistory = ({ formData, setFormData, errors }) => {
     });
   };
 
+  const fields = [
+    { key: "childhoodIllnesses", label: "Childhood Illnesses" },
+    { key: "adultIllnesses", label: "Adult Illnesses" },
+    { key: "surgeries", label: "Surgeries" },
+    { key: "hospitalizations", label: "Hospitalizations" },
+    { key: "majorInjuries", label: "Major Injuries" },
+  ];
+
   return (
-    <div className="grid grid-cols-1 gap-6">
-      <input
-        type="text"
-        placeholder="Childhood Illnesses"
-        value={medicalHistory.childhoodIllnesses.join(", ")}
-        onChange={(e) => updateHistory("childhoodIllnesses", e.target.value)}
-        className={`w-full px-4 py-3 rounded-md border ${
-          errors.medicalHistory ? "border-red-500" : "border-gray-300"
-        } bg-white text-gray-900`}
-      />
-      <input
-        type="text"
-        placeholder="Adult Illnesses"
-        value={medicalHistory.adultIllnesses.join(", ")}
-        onChange={(e) => updateHistory("adultIllnesses", e.target.value)}
-        className={`w-full px-4 py-3 rounded-md border ${
-          errors.medicalHistory ? "border-red-500" : "border-gray-300"
-        } bg-white text-gray-900`}
-      />
-      <input
-        type="text"
-        placeholder="Surgeries"
-        value={medicalHistory.surgeries.join(", ")}
-        onChange={(e) => updateHistory("surgeries", e.target.value)}
-        className={`w-full px-4 py-3 rounded-md border ${
-          errors.medicalHistory ? "border-red-500" : "border-gray-300"
-        } bg-white text-gray-900`}
-      />
-      <input
-        type="text"
-        placeholder="Hospitalizations"
-        value={medicalHistory.hospitalizations.join(", ")}
-        onChange={(e) => updateHistory("hospitalizations", e.target.value)}
-        className={`w-full px-4 py-3 rounded-md border ${
-          errors.medicalHistory ? "border-red-500" : "border-gray-300"
-        } bg-white text-gray-900`}
-      />
-      <input
-        type="text"
-        placeholder="Major Injuries"
-        value={medicalHistory.majorInjuries.join(", ")}
-        onChange={(e) => updateHistory("majorInjuries", e.target.value)}
-        className={`w-full px-4 py-3 rounded-md border ${
-          errors.medicalHistory ? "border-red-500" : "border-gray-300"
-        } bg-white text-gray-900`}
-      />
+    <div className="bg-blue-50 p-6 rounded-xl border border-blue-200 shadow-sm">
+      <h3 className="text-xl font-semibold text-blue-800 mb-4">Medical History</h3>
+      <p className="text-sm text-gray-600 mb-6">
+        Please list your medical history details. Separate multiple entries with commas.
+      </p>
+
+      <div className="grid grid-cols-1 gap-6">
+        {fields.map(({ key, label }) => (
+          <div key={key} className="flex flex-col">
+            <label
+              htmlFor={key}
+              className="mb-1 text-sm font-medium text-blue-700"
+            >
+              {label}
+            </label>
+            <input
+              id={key}
+              type="text"
+              placeholder={`${label} (comma-separated)`}
+              value={medicalHistory[key].join(", ")}
+              onChange={(e) => updateHistory(key, e.target.value)}
+              className={`w-full px-4 py-3 rounded-lg border ${errors.medicalHistory ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300`}
+            />
+          </div>
+        ))}
+      </div>
+
       {errors.medicalHistory && (
-        <p className="text-sm text-red-600 mt-1">{errors.medicalHistory}</p>
+        <p className="text-sm text-red-600 mt-4">{errors.medicalHistory}</p>
       )}
     </div>
   );

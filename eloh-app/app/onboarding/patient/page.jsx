@@ -89,9 +89,7 @@ const PatientOnboarding = () => {
 
         {/* Right Section - Form */}
         <div className="w-full md:w-1/2 mt-10 md:mt-0">
-          <div className="bg-[#f8f9fa] border border-[#90e0ef] p-6 sm:p-8 rounded-2xl shadow-lg max-w-md mx-auto md:mx-0">
-            <PatientsRegistrationForm />
-          </div>
+          <PatientsRegistrationForm />
         </div>
       </div>
     </div>
