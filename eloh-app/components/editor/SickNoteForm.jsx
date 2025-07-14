@@ -3,6 +3,7 @@
 import { useState } from "react";
 import SignaturePad from "./SignaturePad";
 import useSaveMedicalHistory from "@/hooks/useSaveMedicalHistory";
+import NotePreview from "./NotePreview";
 
 const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
   const {
@@ -20,7 +21,10 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
   const [signature, setSignature] = useState(null);
   const [showSignaturePad, setShowSignaturePad] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [openPreview, setOpenPreview] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [previewData, setPreviewData] = useState(null);
 
   const handleSignatureSave = (dataUrl) => {
     setSignature(dataUrl);
@@ -61,8 +65,39 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
     if (success) setShowPreview(true);
   };
 
+  const handlePreview = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/get-latest-note`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ patientId, noteType: "sickNotes" }),
+        }
+      );
+
+      const data = await response.json();
+      setPreviewData(data?.note);
+      setOpenPreview(true);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="p-6 bg-white rounded-lg text-black space-y-6 shadow-md">
+      {openPreview && (
+        <NotePreview
+          previewData={previewData}
+          noteType="sickNotes"
+          isLoading={isLoading}
+        />
+      )}
       <h2 className="text-xl font-semibold text-[#03045e]">Sick Note</h2>
 
       <p>
@@ -181,8 +216,11 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
         </button>
 
         {showPreview && (
-          <button className="bg-gray-600 text-white py-3 px-5 text-sm font-semibold rounded-xl shadow hover:bg-gray-700 transition">
-            Preview
+          <button
+            onClick={handlePreview}
+            className="bg-gray-600 text-white py-3 px-5 text-sm font-semibold rounded-xl shadow hover:bg-gray-700 transition"
+          >
+            {isLoading ? "Loading Preview..." : "Preview"}
           </button>
         )}
       </div>
