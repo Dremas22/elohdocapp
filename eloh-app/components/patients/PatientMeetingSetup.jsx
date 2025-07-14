@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+
 const PatientMeetingSetup = () => {
   const { currentUser, loading } = useCurrentUser();
   const [roomID, setRoomID] = useState("");
@@ -141,7 +142,9 @@ const PatientMeetingSetup = () => {
         {isLoading ? (
           <p className="text-center text-gray-500 mt-20">Loading doctors...</p>
         ) : error ? (
-          <p className="text-red-600 text-center mt-20 font-semibold">{error}</p>
+          <p className="text-red-600 text-center mt-20 font-semibold">
+            {error}
+          </p>
         ) : doctors.length === 0 ? (
           <p className="text-gray-600 text-center mt-20 italic">
             No doctors available

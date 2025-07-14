@@ -1,3 +1,5 @@
+'use Client';
+
 import React from "react";
 
 const DooctorEarnings = () => {
