@@ -2,9 +2,7 @@ import { useState } from "react";
 import PayToDoctor from "./payToDoctor";
 import PayToNurse from "./payToNurse";
 
-// Dummy components to simulate content
-
-const PayOptions = ({ setPaymentMethod, setShowPaymentOptions }) => {
+const PayOptions = ({ paymentMethod, setShowPaymentOptions }) => {
   const [selectedOption, setSelectedOption] = useState(null);
 
   const options = [
@@ -12,9 +10,8 @@ const PayOptions = ({ setPaymentMethod, setShowPaymentOptions }) => {
     { label: "Nurse", value: "nurse" },
   ];
 
-  const handleSelect = (option) => {
-    setSelectedOption(option);
-    if (setPaymentMethod) setPaymentMethod(option);
+  const handleSelect = (optionValue) => {
+    setSelectedOption(optionValue);
   };
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Chat from "@/components/Chat";
 import PatientMeetingSetup from "@/components/patients/PatientMeetingSetup";
 import PatientDashboardNavbar from "@/app/dashboard/patient/patientNav";
@@ -8,10 +8,40 @@ import PatientSidebarMenu from "./patientSidebar";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 const PatientDashboard = () => {
-  const { currentUser: userDoc, loading } = useCurrentUser();
+  const { currentUser, loading } = useCurrentUser();
+  const [userDoc, setUserDoc] = useState(null);
   const [showChat, setShowChat] = useState(false);
+  const [userLoading, setUserLoading] = useState(false);
 
-  if (loading) {
+  // Fetch patient userDoc when currentUser is available
+  useEffect(() => {
+    setUserLoading(true);
+    const fetchUserDoc = async () => {
+      if (!currentUser?.uid) return;
+
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/patients/${currentUser.uid}`
+        );
+        const data = await res.json();
+
+        if (!res.ok)
+          throw new Error(data.message || "Failed to load user data.");
+        console.log(data, "DATA");
+        setUserDoc(data);
+      } catch (error) {
+        console.error("Error fetching userDoc:", error);
+      } finally {
+        setUserLoading(false);
+      }
+    };
+
+    if (currentUser?.uid) {
+      fetchUserDoc();
+    }
+  }, [currentUser?.uid]);
+
+  if (loading || userLoading) {
     return (
       <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
         <p>Loading your dashboard...</p>
@@ -45,7 +75,6 @@ const PatientDashboard = () => {
         </aside>
 
         <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
-
           <div className="w-full mt-8">
             <PatientMeetingSetup />
           </div>
