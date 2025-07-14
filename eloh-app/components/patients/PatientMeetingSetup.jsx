@@ -108,8 +108,8 @@ const PatientMeetingSetup = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-4 mt-6">
-          <div className="opacity-0 h-0 overflow-hidden">
+        <div className="flex  gap-4 mt-6">
+          <div className=" items-center justify-center opacity-0 h-0 overflow-hidden">
             <input
               type="text"
               id="roomid"
@@ -165,12 +165,13 @@ const PatientMeetingSetup = () => {
                   }}
                   className={`rounded-lg p-4 max-w-xs shadow-md transition duration-200 flex flex-col justify-between items-center gap-4
                     ${currentUser?.uid && doc.userId
-                      ? "cursor-pointer bg-gray-800 hover:bg-gray-700"
+                      ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
                       : "cursor-not-allowed bg-gray-700 opacity-50"
                     }
                   `}
                 >
                   {/* Doctor Info */}
+
                   <div className="space-y-2 text-center">
                     <h3 className="text-lg font-bold text-white">{doc.fullName}</h3>
                     <p className="text-sm text-gray-300">

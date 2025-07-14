@@ -214,7 +214,7 @@ const SidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false }) =
       >
         <button
           onClick={() => setCalendarOpen(false)}
-          className="absolute right-2 top-2 text-red-600 text-sm hover:underline z-50"
+          className="absolute right-2 text-red-600 text-sm hover:underline z-50"
         >
           Close
         </button>

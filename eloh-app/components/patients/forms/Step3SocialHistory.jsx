@@ -26,18 +26,18 @@ const Step3SocialHistory = ({ formData, setFormData, errors }) => {
         ...(field === "isSmoker" && !isActive
           ? { smoking: { status: "former", packYears: "" } }
           : field === "isSmoker" && isActive
-          ? { smoking: { status: "", packYears: "" } }
-          : {}),
+            ? { smoking: { status: "", packYears: "" } }
+            : {}),
         ...(field === "usesAlcohol" && !isActive
           ? { alcohol: { type: "Beer", frequency: "", amount: "" } }
           : field === "usesAlcohol" && isActive
-          ? { alcohol: { type: "", frequency: "", amount: "" } }
-          : {}),
+            ? { alcohol: { type: "", frequency: "", amount: "" } }
+            : {}),
         ...(field === "usesDrugs" && !isActive
           ? { drugs: { type: "Cannabis", frequency: "", route: "" } }
           : field === "usesDrugs" && isActive
-          ? { drugs: { type: "", frequency: "", route: "" } }
-          : {}),
+            ? { drugs: { type: "", frequency: "", route: "" } }
+            : {}),
       },
     }));
   };
@@ -61,10 +61,20 @@ const Step3SocialHistory = ({ formData, setFormData, errors }) => {
   const amountOptions = ["1-2 units", "3-5 units", "6-10 units", "10+ units"];
 
   return (
-    <div className="grid grid-cols-1 gap-6">
+    <div className="grid grid-cols-1 gap-6 bg-white p-6 rounded-2xl shadow-md border border-blue-100">
+      <div className="col-span-full mb-2">
+        <h2 className="text-xl font-semibold text-blue-800">
+          Social History
+        </h2>
+        <p className="text-sm text-gray-500">
+          This information helps us provide holistic care tailored to your
+          lifestyle.
+        </p>
+      </div>
+
       {/* Smoking Section */}
-      <div className="p-4 border rounded-xl bg-gray-50">
-        <label className="inline-flex items-center gap-2 font-medium text-gray-700">
+      <div className="p-5 rounded-xl border border-gray-200 bg-blue-50">
+        <label className="inline-flex items-center gap-2 font-medium text-blue-800">
           <input
             type="checkbox"
             className="accent-blue-600"
@@ -80,7 +90,7 @@ const Step3SocialHistory = ({ formData, setFormData, errors }) => {
               onChange={(e) =>
                 updateSocialField("smoking", "status", e.target.value)
               }
-              className="w-full px-4 py-3 rounded-md border border-gray-300 bg-white text-gray-900"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900"
             >
               <option value="former">Former</option>
               <option value="current">Current</option>
@@ -90,9 +100,8 @@ const Step3SocialHistory = ({ formData, setFormData, errors }) => {
               onChange={(e) =>
                 updateSocialField("smoking", "packYears", e.target.value)
               }
-              className={`w-full px-4 py-3 rounded-md border ${
-                errors.packYears ? "border-red-500" : "border-gray-300"
-              } bg-white text-gray-900`}
+              className={`w-full px-4 py-3 rounded-lg border ${errors.packYears ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900`}
             >
               <option value="">Select Pack Years</option>
               {packYearRanges.map((range) => (
@@ -106,8 +115,8 @@ const Step3SocialHistory = ({ formData, setFormData, errors }) => {
       </div>
 
       {/* Alcohol Section */}
-      <div className="p-4 border rounded-xl bg-gray-50">
-        <label className="inline-flex items-center gap-2 font-medium text-gray-700">
+      <div className="p-5 rounded-xl border border-gray-200 bg-blue-50">
+        <label className="inline-flex items-center gap-2 font-medium text-blue-800">
           <input
             type="checkbox"
             className="accent-blue-600"
@@ -123,7 +132,7 @@ const Step3SocialHistory = ({ formData, setFormData, errors }) => {
               onChange={(e) =>
                 updateSocialField("alcohol", "type", e.target.value)
               }
-              className="w-full px-4 py-3 rounded-md border border-gray-300 bg-white text-gray-900"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900"
             >
               <option value="Beer">Beer</option>
               <option value="Wine">Wine</option>
@@ -135,9 +144,8 @@ const Step3SocialHistory = ({ formData, setFormData, errors }) => {
               onChange={(e) =>
                 updateSocialField("alcohol", "frequency", e.target.value)
               }
-              className={`w-full px-4 py-3 rounded-md border ${
-                errors.alcoholFrequency ? "border-red-500" : "border-gray-300"
-              } bg-white text-gray-900`}
+              className={`w-full px-4 py-3 rounded-lg border ${errors.alcoholFrequency ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900`}
             >
               <option value="">Select Frequency</option>
               {frequencyOptions.map((opt) => (
@@ -151,9 +159,8 @@ const Step3SocialHistory = ({ formData, setFormData, errors }) => {
               onChange={(e) =>
                 updateSocialField("alcohol", "amount", e.target.value)
               }
-              className={`w-full px-4 py-3 rounded-md border ${
-                errors.alcoholAmount ? "border-red-500" : "border-gray-300"
-              } bg-white text-gray-900`}
+              className={`w-full px-4 py-3 rounded-lg border ${errors.alcoholAmount ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900`}
             >
               <option value="">Select Amount</option>
               {amountOptions.map((opt) => (
@@ -167,8 +174,8 @@ const Step3SocialHistory = ({ formData, setFormData, errors }) => {
       </div>
 
       {/* Drugs Section */}
-      <div className="p-4 border rounded-xl bg-gray-50">
-        <label className="inline-flex items-center gap-2 font-medium text-gray-700">
+      <div className="p-5 rounded-xl border border-gray-200 bg-blue-50">
+        <label className="inline-flex items-center gap-2 font-medium text-blue-800">
           <input
             type="checkbox"
             className="accent-blue-600"
@@ -184,7 +191,7 @@ const Step3SocialHistory = ({ formData, setFormData, errors }) => {
               onChange={(e) =>
                 updateSocialField("drugs", "type", e.target.value)
               }
-              className="w-full px-4 py-3 rounded-md border border-gray-300 bg-white text-gray-900"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900"
             >
               <option value="Cannabis">Cannabis</option>
               <option value="Stimulants">Stimulants</option>
@@ -197,9 +204,8 @@ const Step3SocialHistory = ({ formData, setFormData, errors }) => {
               onChange={(e) =>
                 updateSocialField("drugs", "frequency", e.target.value)
               }
-              className={`w-full px-4 py-3 rounded-md border ${
-                errors.drugFrequency ? "border-red-500" : "border-gray-300"
-              } bg-white text-gray-900`}
+              className={`w-full px-4 py-3 rounded-lg border ${errors.drugFrequency ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900`}
             >
               <option value="">Select Frequency</option>
               {frequencyOptions.map((opt) => (
@@ -215,54 +221,86 @@ const Step3SocialHistory = ({ formData, setFormData, errors }) => {
                 updateSocialField("drugs", "route", e.target.value)
               }
               placeholder="Administration Route"
-              className={`w-full px-4 py-3 rounded-md border ${
-                errors.drugRoute ? "border-red-500" : "border-gray-300"
-              } bg-white text-gray-900`}
+              className={`w-full px-4 py-3 rounded-lg border ${errors.drugRoute ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900`}
             />
           </div>
         )}
       </div>
 
-      {/* Other Fields */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <input
-          type="text"
-          value={socialHistory.diet}
-          onChange={(e) => updateSocialField("diet", null, e.target.value)}
-          placeholder="Diet (e.g. vegetarian, balanced)"
-          className={`w-full px-4 py-3 rounded-md border ${
-            errors.diet ? "border-red-500" : "border-gray-300"
-          } bg-white text-gray-900`}
-        />
-        <input
-          type="text"
-          value={socialHistory.exercise}
-          onChange={(e) => updateSocialField("exercise", null, e.target.value)}
-          placeholder="Exercise (e.g. 3x/week)"
-          className={`w-full px-4 py-3 rounded-md border ${
-            errors.exercise ? "border-red-500" : "border-gray-300"
-          } bg-white text-gray-900`}
-        />
-        <input
-          type="text"
-          value={socialHistory.hobbies}
-          onChange={(e) => updateSocialField("hobbies", null, e.target.value)}
-          placeholder="Hobbies"
-          className={`w-full px-4 py-3 rounded-md border ${
-            errors.hobbies ? "border-red-500" : "border-gray-300"
-          } bg-white text-gray-900`}
-        />
-        <input
-          type="text"
-          value={socialHistory.livingSituation}
-          onChange={(e) =>
-            updateSocialField("livingSituation", null, e.target.value)
-          }
-          placeholder="Living Situation (e.g. alone, family)"
-          className={`w-full px-4 py-3 rounded-md border ${
-            errors.livingSituation ? "border-red-500" : "border-gray-300"
-          } bg-white text-gray-900`}
-        />
+      {/* Lifestyle Fields */}
+      <div className="col-span-full p-5 border border-gray-200 bg-blue-50 rounded-xl mt-4">
+        <h3 className="text-lg font-semibold text-blue-800 mb-2">
+          Lifestyle & Daily Habits
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Please provide additional details about your daily lifestyle. This
+          helps us tailor your care plan.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <label className="block mb-1 text-sm font-medium text-blue-700">
+              Diet
+            </label>
+            <input
+              type="text"
+              value={socialHistory.diet}
+              onChange={(e) => updateSocialField("diet", null, e.target.value)}
+              placeholder="e.g. Balanced, Vegetarian, Keto"
+              className={`w-full px-4 py-3 rounded-lg border ${errors.diet ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-200`}
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 text-sm font-medium text-blue-700">
+              Exercise
+            </label>
+            <input
+              type="text"
+              value={socialHistory.exercise}
+              onChange={(e) =>
+                updateSocialField("exercise", null, e.target.value)
+              }
+              placeholder="e.g. 3 times a week, daily walks"
+              className={`w-full px-4 py-3 rounded-lg border ${errors.exercise ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-200`}
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 text-sm font-medium text-blue-700">
+              Hobbies
+            </label>
+            <input
+              type="text"
+              value={socialHistory.hobbies}
+              onChange={(e) =>
+                updateSocialField("hobbies", null, e.target.value)
+              }
+              placeholder="e.g. Reading, Gardening"
+              className={`w-full px-4 py-3 rounded-lg border ${errors.hobbies ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-200`}
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 text-sm font-medium text-blue-700">
+              Living Situation
+            </label>
+            <input
+              type="text"
+              value={socialHistory.livingSituation}
+              onChange={(e) =>
+                updateSocialField("livingSituation", null, e.target.value)
+              }
+              placeholder="e.g. Alone, With family"
+              className={`w-full px-4 py-3 rounded-lg border ${errors.livingSituation ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-200`}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

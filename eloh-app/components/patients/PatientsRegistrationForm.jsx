@@ -140,7 +140,7 @@ const PatientsRegistrationForm = () => {
     return <p className="text-center text-black py-10">Loading...</p>;
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-6 py-8 bg-white rounded-3xl shadow-lg border border-gray-200 transition-all duration-500">
+    <div className="w-full max-w-2xl mx-auto px-6 py-8 bg-white rounded-3xl transition-all duration-500">
       <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">
         Patients Registration Form
       </h2>
