@@ -150,50 +150,52 @@ const PatientMeetingSetup = () => {
             No doctors available
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center">
-            {doctors.map((doc) => (
-              <div
-                key={doc.userId}
-                onClick={() => {
-                  if (currentUser?.uid && doc.userId) {
-                    sendNotificationToDoctor(doc.userId, currentUser.uid);
-                    router.push(
-                      `/room/${doc.userId}?patientId=${currentUser.uid}`
-                    );
-                  }
-                }}
-                className={`rounded-lg p-4 max-w-xs shadow-md transition duration-200 flex flex-col justify-between items-center gap-4
-                  ${currentUser?.uid && doc.userId
-                    ? "cursor-pointer bg-gray-800 hover:bg-gray-700"
-                    : "cursor-not-allowed bg-gray-700 opacity-50"
-                  }
+          <div className="flex justify-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-[1300px]">
+              {doctors.map((doc) => (
+                <div
+                  key={doc.userId}
+                  onClick={() => {
+                    if (currentUser?.uid && doc.userId) {
+                      sendNotificationToDoctor(doc.userId, currentUser.uid);
+                      router.push(
+                        `/room/${doc.userId}?patientId=${currentUser.uid}`
+                      );
+                    }
+                  }}
+                  className={`rounded-lg p-4 max-w-xs shadow-md transition duration-200 flex flex-col justify-between items-center gap-4
+                    ${currentUser?.uid && doc.userId
+                      ? "cursor-pointer bg-gray-800 hover:bg-gray-700"
+                      : "cursor-not-allowed bg-gray-700 opacity-50"
+                    }
                   `}
-              >
-                {/* Left - Text Info */}
-                <div className="space-y-2 text-center">
-                  <h3 className="text-lg font-bold text-white">{doc.fullName}</h3>
-                  <p className="text-sm text-gray-300">
-                    Practice No: <span className="font-medium">{doc.practiceNumber}</span>
-                  </p>
-                  <p className="text-sm text-gray-300">Email: {doc.email}</p>
-                  <p className="text-sm text-gray-300">Phone: {doc.phoneNumber}</p>
-                  <p className="text-sm text-blue-400 mt-2 hover:underline cursor-pointer">
-                    Click to join meeting
-                  </p>
-                </div>
+                >
+                  {/* Doctor Info */}
+                  <div className="space-y-2 text-center">
+                    <h3 className="text-lg font-bold text-white">{doc.fullName}</h3>
+                    <p className="text-sm text-gray-300">
+                      Practice No: <span className="font-medium">{doc.practiceNumber}</span>
+                    </p>
+                    <p className="text-sm text-gray-300">Email: {doc.email}</p>
+                    <p className="text-sm text-gray-300">Phone: {doc.phoneNumber}</p>
+                    <p className="text-sm text-blue-400 mt-2 hover:underline cursor-pointer">
+                      Click to join meeting
+                    </p>
+                  </div>
 
-                {/* Right - Image */}
-                <div className="flex-shrink-0">
-                  <Image
-                    src={doc.photoUrl}
-                    alt={doc.fullName}
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 rounded-full object-cover border-2 border-gray-600"
-                  />
+                  {/* Doctor Image */}
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={doc.photoUrl}
+                      alt={doc.fullName}
+                      width={64}
+                      height={64}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-gray-600"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
       </section>
