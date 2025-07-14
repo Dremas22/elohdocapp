@@ -2,6 +2,7 @@
 
 import DoctorDashboardNavbar from "@/app/dashboard/doctor/doctorNav";
 import SidebarMenu from "./doctorSidebar";
+import DooctorEarnings from "./doctorEarnings";
 
 /**
  * DoctorsCollectionViewer
@@ -62,6 +63,8 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
               <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-transparent font-extrabold text-4xl sm:text-5xl md:text-6xl leading-tight mt-10 mb-10">
                 Welcome to your virtual surgery.
               </h1>
+
+              <DooctorEarnings />
 
               {/* Mobile Navigation shown below welcome message on mobile */}
               <div className="block lg:hidden w-80 mt-25">
