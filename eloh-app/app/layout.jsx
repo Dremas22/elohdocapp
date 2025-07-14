@@ -1,6 +1,7 @@
 export const revalidate = 300;
 
 import { Geist, Geist_Mono } from "next/font/google";
+import { ToastContainer } from "react-toastify";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,6 +29,13 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <ToastContainer
+          position="top-center"
+          autoClose={3000}
+          closeOnClick
+          pauseOnHover
+          bodyClassName="text-sm"
+        />
       </body>
     </html>
   );
