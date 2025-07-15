@@ -3,6 +3,9 @@
 import DoctorDashboardNavbar from "@/app/dashboard/doctor/doctorNav";
 import SidebarMenu from "./doctorSidebar";
 import DooctorEarnings from "./doctorEarnings";
+import SearchBar from "@/components/doctors/SearchBar";
+import { useState } from "react";
+import FilteredPatientsTable from "./FilteredPatientsTable";
 
 /**
  * DoctorsCollectionViewer
@@ -17,6 +20,25 @@ import DooctorEarnings from "./doctorEarnings";
  * @param {Array} props.patients - (Optional) A list of assigned patients (currently unused).
  */
 const DoctorsCollectionViewer = ({ userDoc, patients }) => {
+  const [filteredPatients, setFilteredPatients] = useState([]);
+  const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [showEarnings, setShowEarnings] = useState(false);
+
+  const handleSearch = (query) => {
+    if (!query) {
+      setFilteredPatients([]);
+      return;
+    }
+
+    const filtered = patients?.filter(
+      (p) =>
+        p.fullName?.toLowerCase().includes(query) ||
+        p.idNumber?.toLowerCase().includes(query)
+    );
+
+    setFilteredPatients(filtered);
+  };
   // Handles a case where userDoc is missing
   if (!userDoc) {
     return (
@@ -44,19 +66,18 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
 
       {/* Main layout section */}
       <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
-
         {/* Desktop Navigation: displayed on the left side of the screen*/}
         <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(100vh-5rem)]">
           <SidebarMenu
             practiceNumber={practiceNumber}
             isVerified={isVerified}
             userDoc={userDoc}
+            setShowEarnings={setShowEarnings}
           />
         </aside>
 
         {/* Main content panel */}
         <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
-
           {isVerified === true ? (
             <>
               {/* Welcome banner for verified doctors */}
@@ -64,7 +85,25 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                 Welcome to your virtual surgery.
               </h1>
 
-              <DooctorEarnings />
+              {showEarnings && <DooctorEarnings />}
+
+              <SearchBar
+                onSearch={handleSearch}
+                query={query}
+                setQuery={setQuery}
+                debouncedQuery={debouncedQuery}
+                setDebouncedQuery={setDebouncedQuery}
+              />
+
+              {debouncedQuery ? (
+                filteredPatients.length > 0 ? (
+                  <FilteredPatientsTable patients={filteredPatients} />
+                ) : (
+                  <p className="text-gray-400 mt-4">
+                    No patients found for "{query}".
+                  </p>
+                )
+              ) : null}
 
               {/* Mobile Navigation shown below welcome message on mobile */}
               <div className="block lg:hidden w-80 mt-25">
@@ -79,17 +118,23 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
           ) : isVerified === false ? (
             // Message shown if account is still pending verification
             <div className="text-gray-600">
-              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                Verification Pending
+              </h2>
               <p>
-                Once your account is verified, you'll be able to access sensitive patient information here.
+                Once your account is verified, you'll be able to access
+                sensitive patient information here.
               </p>
             </div>
           ) : (
             // Message shown if account was declined
             <div className="text-red-600">
-              <h2 className="text-lg font-semibold mb-2">Verification Declined</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                Verification Declined
+              </h2>
               <p>
-                We could not verify your account. Please ensure your practice number is registered or contact support for help.
+                We could not verify your account. Please ensure your practice
+                number is registered or contact support for help.
               </p>
             </div>
           )}

@@ -16,8 +16,6 @@ const ViewMedicalRecords = ({ userDoc, mode, setNoteOpen }) => {
 
   const selectedNotes = userDoc?.medicalHistory?.[noteKeyMap[mode]] || [];
 
-  console.log(selectedNotes, selectedRecord, "XXXX");
-
   return (
     <div className="text-[#333] p-8 w-full max-w-6xl mx-auto">
       <div className="overflow-x-auto relative">
