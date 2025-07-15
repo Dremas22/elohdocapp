@@ -6,6 +6,7 @@ import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import ViewMedicalRecords from "../viewMedicalRecords";
 
 const PatientMeetingSetup = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -132,6 +133,8 @@ const PatientMeetingSetup = () => {
             </button>
           </div>
         </div>
+
+         <ViewMedicalRecords />
 
         {/* Available Doctors Section */}
         <h2 className="text-2xl font-semibold text-center mb-6 mt-16 text-white">
