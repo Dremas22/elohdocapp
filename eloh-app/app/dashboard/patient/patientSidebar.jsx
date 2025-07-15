@@ -82,8 +82,8 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
         }
       );
 
-      const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Update failed");
+      const result = await res.json();
 
       console.log("✅ User updated:", result);
     } catch (err) {
