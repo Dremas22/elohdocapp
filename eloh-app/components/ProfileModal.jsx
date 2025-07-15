@@ -19,9 +19,41 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
     city: userDoc?.location?.city || "",
     addressLine: userDoc?.location?.addressLine || "",
   });
+  const [logo, setLogo] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [imageError, setImageError] = useState(null);
 
   const handleLocationChange = (field, value) => {
     setLocation((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+
+    if (!file) {
+      setImageError(null);
+      setLogo(null);
+      setPreviewUrl(null);
+      return;
+    }
+
+    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      setImageError("Only PNG, JPG, or WEBP images are allowed.");
+      setLogo(null);
+      setPreviewUrl(null);
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setImageError("File size must be under 2MB.");
+      setLogo(null);
+      setPreviewUrl(null);
+      return;
+    }
+
+    setImageError(null);
+    setLogo(file);
+    setPreviewUrl(URL.createObjectURL(file));
   };
 
   const handleDbSave = async () => {
@@ -54,6 +86,9 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
       ...(isPatient && { location }),
     };
 
+    // TODO: Make sure you also save logo to firebase storage
+    console.log(logo, "LOGO_IMAGE");
+
     await onSave(updatedData);
     onClose();
   };
@@ -67,6 +102,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
         >
           ✕
         </button>
+
         <h2 className="text-2xl font-bold mb-5 text-[#0d6efd] text-center">
           Edit Profile
         </h2>
@@ -106,10 +142,9 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
             </div>
           </div>
 
-          {/* Location for patients */}
+          {/* Patient Location Fields */}
           {isPatient && (
             <>
-              {/* Country Dropdown */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Country
@@ -130,7 +165,6 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
                 </select>
               </div>
 
-              {/* City */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
                   City
@@ -138,14 +172,11 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
                 <input
                   type="text"
                   value={location.city}
-                  onChange={(e) =>
-                    handleLocationChange("city", e.target.value)
-                  }
+                  onChange={(e) => handleLocationChange("city", e.target.value)}
                   className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0d6efd]"
                 />
               </div>
 
-              {/* Address Line */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Address Line
@@ -160,6 +191,68 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
                 />
               </div>
             </>
+          )}
+        </div>
+
+        <div className="m-4">
+          {/* Image Upload for doctors only */}
+          {userDoc?.role === "doctor" && (
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Choose Logo
+              </label>
+              <div className="flex items-center gap-6">
+                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-gray-300 shadow-sm flex items-center justify-center bg-gray-100">
+                  {previewUrl ? (
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="text-xs text-gray-400 select-none">
+                      No Image
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label
+                    htmlFor="profileImageInput"
+                    className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 12a4 4 0 01-8 0 4 4 0 018 0z"
+                      ></path>
+                    </svg>
+                    Choose Image
+                  </label>
+                  <input
+                    id="profileImageInput"
+                    type="file"
+                    accept="image/png, image/jpeg, image/webp"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                  <p className="mt-1 text-xs text-gray-500 select-none">
+                    Supported formats: PNG, JPEG, WEBP
+                  </p>
+                  {imageError && (
+                    <p className="text-red-500 text-xs mt-1">{imageError}</p>
+                  )}
+                </div>
+              </div>
+            </div>
           )}
         </div>
 

@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiUser, FiBell, FiFileText, FiFile, FiCalendar, FiFolder, } from "react-icons/fi";
+import { FiUser, FiBell, FiCalendar } from "react-icons/fi";
 import Calendar from "@/app/dashboard/doctor/calendar";
 import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
+import { FaMoneyCheckAlt } from "react-icons/fa";
 
 /**
  * Renders a grid or column of action buttons with optional notification indicators.
@@ -65,7 +66,13 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
  * @param {Object} userDoc - Firebase user document data.
  * @param {boolean} [compact=false] - Whether the layout is compact (mobile view).
  */
-const SidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false }) => {
+const SidebarMenu = ({
+  practiceNumber,
+  isVerified,
+  userDoc,
+  compact = false,
+  setShowEarnings,
+}) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [hasNotification, setHasNotification] = useState(false);
   const [notificationPayload, setNotificationPayload] = useState(null);
@@ -99,11 +106,7 @@ const SidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false }) =
       icon: <FiUser className="h-6 w-6" />,
       onClick: () => setProfileOpen(true),
     },
-    {
-      title: "Patient Medical Records",
-      icon: <FiFolder className="h-6 w-6" />,
-      onClick: () => alert("Accessing patient medical records..."),
-    },
+
     {
       title: "Meeting Notifications",
       hasNotification,
@@ -111,15 +114,14 @@ const SidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false }) =
       onClick: () => handleNotification(),
     },
     {
-      title: "Prescription",
-      icon: <FiFileText className="h-6 w-6" />,
-      onClick: () => alert("Opening prescription module..."),
+      title: "Earnings",
+      icon: <FaMoneyCheckAlt className="h-6 w-6" />,
+      onClick: () => {
+        setShowEarnings(true);
+        alert("Opening earnings");
+      },
     },
-    {
-      title: "Sick Note",
-      icon: <FiFile className="h-6 w-6" />,
-      onClick: () => alert("Opening sick note editor..."),
-    },
+
     {
       title: "Schedule Availability",
       icon: <FiCalendar className="h-6 w-6" />,
@@ -131,11 +133,14 @@ const SidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false }) =
   const handleProfileSave = async (updatedData) => {
     setProfileLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/users/update`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: userDoc.role, data: updatedData }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/users/update`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role: userDoc.role, data: updatedData }),
+        }
+      );
 
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Update failed");
@@ -144,9 +149,8 @@ const SidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false }) =
     } catch (err) {
       console.error("❌ Update error:", err.message);
     } finally {
-      setProfileLoading(false)
+      setProfileLoading(false);
       setProfileOpen(false);
-
     }
   };
 
@@ -172,10 +176,11 @@ const SidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false }) =
 
       {/* Sidebar Container */}
       <div
-        className={`p-6 text-white z-10 ${compact
-          ? "bg-gray-950 pt-11 pr-19 pl-18 w-[full] h-[65vh]"
-          : "bg-[#123158] pt-30 w-64 h-full shadow-lg"
-          }`}
+        className={`p-6 text-white z-10 ${
+          compact
+            ? "bg-gray-950 pt-11 pr-19 pl-18 w-[full] h-[65vh]"
+            : "bg-[#123158] pt-30 w-64 h-full shadow-lg"
+        }`}
       >
         {/* Verification Status Message */}
         {isVerified === false && (
@@ -193,7 +198,11 @@ const SidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false }) =
         {isVerified === true && (
           <>
             {/* Doctor's Practice Number */}
-            <div className={`text-center font-bold ${compact ? "text-lg" : "text-sm"} text-[#66e4ff] mb-15`}>
+            <div
+              className={`text-center font-bold ${
+                compact ? "text-lg" : "text-sm"
+              } text-[#66e4ff] mb-15`}
+            >
               <div>Practice Number</div>
               <div>{practiceNumber || "N/A"}</div>
             </div>
@@ -211,8 +220,9 @@ const SidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false }) =
 
       {/* Sliding Calendar Drawer */}
       <div
-        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
+          calendarOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <button
           onClick={() => setCalendarOpen(false)}
