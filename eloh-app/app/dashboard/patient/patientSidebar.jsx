@@ -28,10 +28,10 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
             onClick={onClick}
             disabled={isDisabled}
             className={`relative flex items-center justify-center rounded-xl text-sm font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
-                ${compact ? "h-15 w-18" : "w-24 h-12"}
-                bg-[#03045e] hover:bg-[#023e8a] text-white
-                ${isDisabled ? "!cursor-not-allowed" : ""}
-                ${customClass || ""}
+              ${compact ? "h-15 w-18" : "w-24 h-12"}
+              bg-[#03045e] hover:bg-[#023e8a] text-white
+              ${isDisabled ? "!cursor-not-allowed" : ""}
+              ${customClass || ""}
             `}
             aria-label={title}
             type="button"
@@ -52,15 +52,6 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   );
 };
 
-const modeMap = {
-  prescriptions: "Displaying all prescriptions.",
-  "general-notes": "Displaying all general medical records.",
-  "sick-notes": "Displaying all sick notes.",
-};
-
-/**
- * SidebarMenu for Patients
- */
 const PatientSidebarMenu = ({ userDoc, compact = false }) => {
   const [hasNotification, setHasNotification] = useState(false);
   const [notificationPayload, setNotificationPayload] = useState(null);
@@ -68,7 +59,6 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
-  const [mode, setMode] = useState("general-notes"); // or descriptions or sick-notes or
 
   useEffect(() => {
     const unsubscribe = onMessage(messaging, (payload) => {
@@ -92,13 +82,15 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
         }
       );
 
-      if (!res.ok) throw new Error(result.error || "Update failed");
       const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Update failed");
+
+      console.log("✅ User updated:", result);
     } catch (err) {
       console.error("❌ Update error:", err.message);
     } finally {
-      setProfileOpen(false);
       setProfileLoading(false);
+      setProfileOpen(false);
     }
   };
 
@@ -149,13 +141,6 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
         />
       )}
 
-      {/** TODO: Replace the below p tag with a proper component */}
-      <p className="text-sm text-red-600 mt-2">
-        {mode === "prescriptions" && "Displaying all prescriptions."}
-        {mode === "general-notes" && "Displaying all general medical records."}
-        {mode === "sick-notes" && "Displaying all sick notes."}
-      </p>
-
       <div
         className={`p-6 text-white z-10 ${
           compact
@@ -164,7 +149,7 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
         }`}
       >
         <div className="flex text-center w-full pl-5 font-bold text-[#66e4ff] text-lg mb-5">
-          Welcome, {userDoc?.fullName || "Patient"}!
+          Welcome, {userDoc?.displayName?.split(" ")[0] || "Patient"}!
         </div>
 
         <ActionButtons
