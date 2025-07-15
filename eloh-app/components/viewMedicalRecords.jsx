@@ -1,82 +1,97 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { FiX } from "react-icons/fi";
+import NotePreview from "./editor/NotePreview";
+import { convertTimestamp } from "@/lib/convertFirebaseDate";
 
-const mockRecords = [
-  {
-    id: "1",
-    date: "2023-10-01",
-    name: "John Doe",
-    idNo: "123456",
-  },
-  {
-    id: "2",
-    date: "2023-11-15",
-    name: "Jane Smith",
-    idNo: "789012",
-  },
-];
-
-const ViewMedicalRecords = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+const ViewMedicalRecords = ({ userDoc, mode, setNoteOpen }) => {
   const [selectedRecord, setSelectedRecord] = useState(null);
-  const [activeTab, setActiveTab] = useState("general");
-  const [notes, setNotes] = useState({
-    general: "Loading...",
-    sick: "Loading...",
-    prescription: "Loading...",
-  });
 
-  useEffect(() => {
-    if (selectedRecord) {
-      // Simulated fetch from Firebase:
-      setTimeout(() => {
-        setNotes({
-          general: `General Notes for ${selectedRecord.name}`,
-          sick: `Sick Note for ${selectedRecord.name}`,
-          prescription: `Prescription for ${selectedRecord.name}`,
-        });
-      }, 800);
-    }
-  }, [selectedRecord]);
+  const noteKeyMap = {
+    "general-notes": "generalNotes",
+    prescriptions: "prescriptions",
+    "sick-notes": "sickNotes",
+  };
 
-  const filteredRecords = mockRecords.filter((record) =>
-    `${record.name} ${record.idNo}`.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const selectedNotes = userDoc?.medicalHistory?.[noteKeyMap[mode]] || [];
 
   return (
     <div className="text-[#333] p-8 w-full max-w-6xl mx-auto">
-      
+      <div className="overflow-x-auto relative">
+        {/* Close Button */}
+        <div className="flex justify-end mb-2">
+          <button
+            onClick={() => setNoteOpen(false)}
+            className="text-gray-500 hover:text-red-600 text-xl"
+            aria-label="Close Table"
+          >
+            <FiX />
+          </button>
+        </div>
 
-      <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
           <thead className="bg-gray-100">
             <tr>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Date</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Patient Name</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Patient ID No.</th>
+              <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
+                Date
+              </th>
+              <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
+                Doctor
+              </th>
+              <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
+                Summary
+              </th>
             </tr>
           </thead>
+
           <tbody>
-            {filteredRecords.length > 0 ? (
-              filteredRecords.map((record) => (
+            {selectedNotes.length > 0 ? (
+              selectedNotes.map((record, index) => (
                 <tr
-                  key={record.id}
+                  key={index}
                   className="hover:bg-blue-50 cursor-pointer transition"
-                  onClick={() => {
-                    setSelectedRecord(record);
-                    setActiveTab("general");
-                  }}
+                  onClick={() => setSelectedRecord(record)}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">{record.date}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{record.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{record.idNo}</td>
+                  <td className="px-6 py-4">
+                    {convertTimestamp(record?.createdAt)}
+                  </td>
+                  <td className="px-6 py-4">{record.doctorName || "N/A"}</td>
+                  <td className="px-6 py-4">
+                    {(() => {
+                      const content = record.content;
+
+                      if (typeof content === "string") {
+                        // For generalNotes
+                        return content;
+                      }
+
+                      if (typeof content === "object") {
+                        // For prescriptions or sickNotes
+                        if (content.instructions) {
+                          return content.instructions;
+                        }
+
+                        if (content.reason) {
+                          return `Reason: ${content.reason}`;
+                        }
+
+                        if (content.startDate && content.endDate) {
+                          return `From ${convertTimestamp(
+                            content?.startDate
+                          )} to ${convertTimestamp(content?.endDate)}`;
+                        }
+                      }
+
+                      return "View full note";
+                    })()}
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td colSpan="3" className="text-center px-6 py-4 text-gray-500">
-                  No records found.
+                  No {noteKeyMap[mode]} available.
                 </td>
               </tr>
             )}
@@ -84,62 +99,14 @@ const ViewMedicalRecords = () => {
         </table>
       </div>
 
-      {/* Overlay Modal */}
+      {/* Modal */}
       {selectedRecord && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-white w-full max-w-3xl p-6 rounded-lg shadow-lg relative">
-            {/* Close Button */}
-            <button
-              onClick={() => setSelectedRecord(null)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-red-600 text-xl"
-            >
-              &times;
-            </button>
-
-            <h2 className="text-xl font-semibold mb-4">
-              Medical Notes for {selectedRecord.name}
-            </h2>
-
-            {/* Toggle Buttons */}
-            <div className="flex gap-4 mb-4">
-              <button
-                onClick={() => setActiveTab("general")}
-                className={`px-4 py-2 rounded-md ${
-                  activeTab === "general"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700"
-                }`}
-              >
-                General Notes
-              </button>
-              <button
-                onClick={() => setActiveTab("sick")}
-                className={`px-4 py-2 rounded-md ${
-                  activeTab === "sick"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700"
-                }`}
-              >
-                Sick Note
-              </button>
-              <button
-                onClick={() => setActiveTab("prescription")}
-                className={`px-4 py-2 rounded-md ${
-                  activeTab === "prescription"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700"
-                }`}
-              >
-                Prescription
-              </button>
-            </div>
-
-            {/* Notes Content */}
-            <div className="bg-gray-100 p-4 rounded-lg min-h-[150px] whitespace-pre-wrap">
-              {notes[activeTab]}
-            </div>
-          </div>
-        </div>
+        <NotePreview
+          previewData={selectedRecord}
+          isLoading={false}
+          onClose={() => setSelectedRecord(null)}
+          noteType={noteKeyMap[mode]}
+        />
       )}
     </div>
   );

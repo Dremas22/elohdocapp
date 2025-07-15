@@ -52,7 +52,23 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   );
 };
 
-const PatientSidebarMenu = ({ userDoc, compact = false }) => {
+/**
+ * 
+ *  userDoc={userDoc}
+          mode={mode}
+          setMode={setMode}
+          noteOpen={noteOpen}
+          setNoteOpen={setNoteOpen} 
+ */
+
+const PatientSidebarMenu = ({
+  userDoc,
+  mode,
+  setMode,
+  noteOpen,
+  setNoteOpen,
+  compact = false,
+}) => {
   const [hasNotification, setHasNotification] = useState(false);
   const [notificationPayload, setNotificationPayload] = useState(null);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -84,8 +100,6 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
 
       if (!res.ok) throw new Error(result.error || "Update failed");
       const result = await res.json();
-
-      console.log("✅ User updated:", result);
     } catch (err) {
       console.error("❌ Update error:", err.message);
     } finally {
@@ -103,17 +117,26 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
     {
       title: "View Prescriptions",
       icon: <FiFileText className="h-6 w-6" />,
-      onClick: () => setMode("prescriptions"),
+      onClick: () => {
+        setMode("prescriptions");
+        setNoteOpen((prev) => !prev);
+      },
     },
     {
       title: "View Medical Records",
       icon: <FiFolder className="h-6 w-6" />,
-      onClick: () => setMode("general-notes"),
+      onClick: () => {
+        setMode("general-notes");
+        setNoteOpen((prev) => !prev);
+      },
     },
     {
       title: "View Sick Notes",
       icon: <FiFile className="h-6 w-6" />,
-      onClick: () => setMode("sick-notes"),
+      onClick: () => {
+        setMode("sick-notes");
+        setNoteOpen((prev) => !prev);
+      },
     },
     {
       title: "Request Ambulance",

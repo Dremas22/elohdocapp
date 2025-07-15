@@ -12,6 +12,8 @@ const PatientDashboard = () => {
   const [userDoc, setUserDoc] = useState(null);
   const [showChat, setShowChat] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [mode, setMode] = useState("general-notes"); // prescriptions // sick-notes
 
   // Fetch patient userDoc when currentUser is available
   useEffect(() => {
@@ -71,17 +73,35 @@ const PatientDashboard = () => {
 
       <div className="relative z-10 flex flex-col lg:flex-row w-full flex-grow">
         <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(50vh-5rem)]">
-          <PatientSidebarMenu userDoc={userDoc} />
+          <PatientSidebarMenu
+            userDoc={userDoc}
+            mode={mode}
+            setMode={setMode}
+            noteOpen={noteOpen}
+            setNoteOpen={setNoteOpen}
+          />
         </aside>
 
         <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
           <div className="w-full mt-8">
-            <PatientMeetingSetup />
+            <PatientMeetingSetup
+              mode={mode}
+              noteOpen={noteOpen}
+              setNoteOpen={setNoteOpen}
+              userDoc={userDoc}
+            />
           </div>
         </main>
       </div>
       <div className="block lg:hidden w-80 pl-7 mt-4">
-        <PatientSidebarMenu userDoc={userDoc} compact />
+        <PatientSidebarMenu
+          userDoc={userDoc}
+          mode={mode}
+          setMode={setMode}
+          noteOpen={noteOpen}
+          setNoteOpen={setNoteOpen}
+          compact
+        />
       </div>
 
       {showChat && (

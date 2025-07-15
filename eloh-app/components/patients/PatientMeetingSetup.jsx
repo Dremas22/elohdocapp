@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import ViewMedicalRecords from "../viewMedicalRecords";
 
-const PatientMeetingSetup = () => {
+const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   const { currentUser, loading } = useCurrentUser();
   const [roomID, setRoomID] = useState("");
   const [doctors, setDoctors] = useState([]);
@@ -134,7 +134,13 @@ const PatientMeetingSetup = () => {
           </div>
         </div>
 
-         <ViewMedicalRecords />
+        {noteOpen && (
+          <ViewMedicalRecords
+            userDoc={userDoc}
+            mode={mode}
+            setNoteOpen={setNoteOpen}
+          />
+        )}
 
         {/* Available Doctors Section */}
         <h2 className="text-2xl font-semibold text-center mb-6 mt-16 text-white">
@@ -166,9 +172,10 @@ const PatientMeetingSetup = () => {
                     }
                   }}
                   className={`rounded-lg p-4 w-full shadow-md transition duration-200 flex flex-col justify-between items-center gap-4
-                    ${currentUser?.uid && doc.userId
-                      ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
-                      : "cursor-not-allowed bg-gray-700 opacity-50"
+                    ${
+                      currentUser?.uid && doc.userId
+                        ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
+                        : "cursor-not-allowed bg-gray-700 opacity-50"
                     }
                   `}
                 >
@@ -179,9 +186,7 @@ const PatientMeetingSetup = () => {
                     </h3>
                     <p className="text-sm text-gray-300">
                       Practice No:{" "}
-                      <span className="font-medium">
-                        {doc.practiceNumber}
-                      </span>
+                      <span className="font-medium">{doc.practiceNumber}</span>
                     </p>
                     <p className="text-sm text-gray-300">Email: {doc.email}</p>
                     <p className="text-sm text-gray-300">

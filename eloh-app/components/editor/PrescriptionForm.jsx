@@ -19,7 +19,7 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
   const [showPreview, setShowPreview] = useState(false);
 
   const [date, setDate] = useState("");
-  const [instructions, setInstructions] = useState("Take with food.");
+  const [instructions, setInstructions] = useState("");
   const [medications, setMedications] = useState([]);
   const [fieldErrors, setFieldErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
