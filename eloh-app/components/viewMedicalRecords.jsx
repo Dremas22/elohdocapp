@@ -16,6 +16,8 @@ const ViewMedicalRecords = ({ userDoc, mode, setNoteOpen }) => {
 
   const selectedNotes = userDoc?.medicalHistory?.[noteKeyMap[mode]] || [];
 
+  console.log(selectedNotes, selectedRecord, "XXXX");
+
   return (
     <div className="text-[#333] p-8 w-full max-w-6xl mx-auto">
       <div className="overflow-x-auto relative">
@@ -53,7 +55,7 @@ const ViewMedicalRecords = ({ userDoc, mode, setNoteOpen }) => {
                   className="hover:bg-blue-50 cursor-pointer transition"
                   onClick={() => setSelectedRecord(record)}
                 >
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-bla">
                     {convertTimestamp(record?.createdAt)}
                   </td>
                   <td className="px-6 py-4">{record.doctorName || "N/A"}</td>
