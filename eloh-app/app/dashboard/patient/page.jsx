@@ -29,7 +29,6 @@ const PatientDashboard = () => {
 
         if (!res.ok)
           throw new Error(data.message || "Failed to load user data.");
-        console.log(data, "DATA");
         setUserDoc(data);
       } catch (error) {
         console.error("Error fetching userDoc:", error);
