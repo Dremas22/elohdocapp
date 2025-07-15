@@ -1,4 +1,5 @@
 "use client";
+import { convertTimestamp } from "@/lib/convertFirebaseDate";
 
 const NotePreview = ({ previewData, noteType, isLoading, onClose }) => {
   if (isLoading) {
@@ -31,7 +32,7 @@ const NotePreview = ({ previewData, noteType, isLoading, onClose }) => {
             <p className="text-xl font-bold text-[#03045e]">
               {previewData.doctorName}
             </p>
-            <p className="text-sm text-gray-600">{previewData.docotorEmail}</p>
+            <p className="text-sm text-gray-600">{previewData.doctorEmail}</p>
             <p className="text-sm text-gray-600">{previewData.phoneNumber}</p>
           </div>
         </div>
@@ -46,11 +47,11 @@ const NotePreview = ({ previewData, noteType, isLoading, onClose }) => {
             <div className="space-y-2 text-gray-800">
               <p>
                 <span className="font-medium">Start Date:</span>{" "}
-                {previewData.content.startDate}
+                {convertTimestamp(previewData?.content?.startDate)}
               </p>
               <p>
                 <span className="font-medium">End Date:</span>{" "}
-                {previewData.content.endDate}
+                {convertTimestamp(previewData?.content?.endDate)}
               </p>
               <p>
                 <span className="font-medium">Reason for Absence:</span>{" "}
@@ -68,7 +69,7 @@ const NotePreview = ({ previewData, noteType, isLoading, onClose }) => {
             <div className="space-y-2 text-gray-800">
               <p>
                 <span className="font-medium">Date:</span>{" "}
-                {previewData.content.date}
+                {convertTimestamp(previewData?.content?.date)}
               </p>
               <p>
                 <span className="font-medium">Instructions:</span>{" "}
@@ -76,11 +77,22 @@ const NotePreview = ({ previewData, noteType, isLoading, onClose }) => {
               </p>
               <p className="font-medium">Medication:</p>
               <ul className="list-disc list-inside">
-                {previewData.medications?.map((item, index) => (
+                {previewData?.content?.medications?.map((item, index) => (
                   <li key={index}>{item}</li>
                 ))}
               </ul>
             </div>
+          </div>
+        )}
+
+        {noteType === "generalNotes" && (
+          <div>
+            <h1 className="text-lg font-semibold underline mb-4">
+              General Medical Note
+            </h1>
+            <p className="text-gray-800 whitespace-pre-line">
+              {previewData.content}
+            </p>
           </div>
         )}
 

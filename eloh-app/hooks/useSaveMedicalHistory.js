@@ -5,6 +5,7 @@ const useSaveMedicalHistory = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [allNotes, setAllNotes] = useState(null);
 
   const resetError = () => setError(null);
   const resetSuccess = () => setSuccessMessage(null);
@@ -79,6 +80,49 @@ const useSaveMedicalHistory = () => {
     }
   };
 
+  const fetchAllNotes = async (patientId) => {
+    resetError();
+    setAllNotes(null);
+
+    if (!patientId) {
+      const msg = "Patient ID is required to fetch notes.";
+      setError(msg);
+      return { success: false, error: msg };
+    }
+
+    setSubmitting(true);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/patients/get-all-notes`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ patientId }),
+        }
+      );
+
+      if (!res.ok) {
+        const errData = await res.json();
+        const msg = errData?.error || "Failed to fetch notes.";
+        setError(msg);
+        return { success: false, error: msg };
+      }
+
+      const data = await res.json();
+      setAllNotes(data.notes);
+
+      return { success: true, data: data.notes };
+    } catch (err) {
+      console.error("Error fetching notes:", err);
+      const msg = "Unexpected error occurred while fetching notes.";
+      setError(msg);
+      return { success: false, error: msg };
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return {
     handleSaveNote,
     submitting,
@@ -86,6 +130,8 @@ const useSaveMedicalHistory = () => {
     successMessage,
     resetError,
     resetSuccess,
+    allNotes,
+    fetchAllNotes,
   };
 };
 
