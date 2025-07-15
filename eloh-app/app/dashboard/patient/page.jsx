@@ -84,7 +84,7 @@ const PatientDashboard = () => {
           <PatientSidebarMenu userDoc={userDoc} compact />
         </div>
 
-        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center sm:h-[100vh] h-[205vh] bg-transparent">
+        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center sm:h-[100vh] h-[210vh] bg-transparent">
           <div className="w-full mt-8">
             <PatientMeetingSetup
               mode={mode}
