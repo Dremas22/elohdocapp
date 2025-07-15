@@ -144,7 +144,9 @@ const SidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false }) =
     } catch (err) {
       console.error("❌ Update error:", err.message);
     } finally {
+      setProfileLoading(false)
       setProfileOpen(false);
+
     }
   };
 
