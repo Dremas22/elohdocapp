@@ -93,8 +93,9 @@ const PatientSidebarMenu = ({ userDoc, compact = false }) => {
         } catch (err) {
             console.error("❌ Update error:", err.message);
         } finally {
-            setProfileOpen(false);
             setProfileLoading(false);
+            setProfileOpen(false);
+
         }
     };
 
