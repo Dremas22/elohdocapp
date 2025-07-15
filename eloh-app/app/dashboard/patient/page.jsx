@@ -13,7 +13,7 @@ const PatientDashboard = () => {
   const [showChat, setShowChat] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
-  const [mode, setMode] = useState("general-notes"); // prescriptions // sick-notes
+  const [mode, setMode] = useState("general-notes");
 
   // Fetch patient userDoc when currentUser is available
   useEffect(() => {
@@ -95,7 +95,7 @@ const PatientDashboard = () => {
           />
         </div>
 
-        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center sm:h-[100vh] h-[210vh] bg-transparent">
+        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center sm:h-[100vh] h-[215vh] bg-transparent">
           <div className="w-full mt-8">
             <PatientMeetingSetup
               mode={mode}
