@@ -70,7 +70,9 @@ const PatientDashboard = () => {
     <div className="min-h-screen flex flex-col pt-20 relative overflow-hidden bg-gray-950 text-white">
       <PatientDashboardNavbar />
 
-      <div className="relative z-10 flex flex-col lg:flex-row w-full flex-grow">
+      <div className="relative z-10 flex flex-col lg:flex-row w-full h-full flex-grow">
+
+        {/* Desktop sidebar menu */}
         <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(50vh-5rem)]">
           <PatientSidebarMenu
             userDoc={userDoc}
@@ -81,7 +83,19 @@ const PatientDashboard = () => {
           />
         </aside>
 
-        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
+        {/* Mobile sidebar menu*/}
+        <div className="block lg:hidden w-80 pl-7 mt-4">
+          <PatientSidebarMenu
+            userDoc={userDoc}
+            mode={mode}
+            setMode={setMode}
+            noteOpen={noteOpen}
+            setNoteOpen={setNoteOpen}
+            compact
+          />
+        </div>
+
+        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center sm:h-[100vh] h-[210vh] bg-transparent">
           <div className="w-full mt-8">
             <PatientMeetingSetup
               mode={mode}
@@ -92,16 +106,8 @@ const PatientDashboard = () => {
           </div>
         </main>
       </div>
-      <div className="block lg:hidden w-80 pl-7 mt-4">
-        <PatientSidebarMenu
-          userDoc={userDoc}
-          mode={mode}
-          setMode={setMode}
-          noteOpen={noteOpen}
-          setNoteOpen={setNoteOpen}
-          compact
-        />
-      </div>
+
+
 
       {showChat && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">

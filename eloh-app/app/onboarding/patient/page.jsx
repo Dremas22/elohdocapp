@@ -1,13 +1,14 @@
 "use client";
 
-import PatientsRegistrationForm from "@/components/patients/PatientsRegistrationForm";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import PatientsRegistrationForm from "@/components/patients/PatientsRegistrationForm";
 
 const PatientOnboarding = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [logoVisible, setLogoVisible] = useState(false);
 
   useEffect(() => {
     async function checkUser() {
@@ -19,7 +20,6 @@ const PatientOnboarding = () => {
 
         if (!data.authenticated) {
           router.push("/sign-in?role=patient");
-
           return;
         }
 
@@ -28,8 +28,8 @@ const PatientOnboarding = () => {
           return;
         }
 
-        // Authenticated but not registered, show the form
         setShowForm(true);
+        setLogoVisible(true); // trigger logo fade-in
       } catch (error) {
         console.error("Error checking registration:", error);
       } finally {
@@ -40,7 +40,6 @@ const PatientOnboarding = () => {
     checkUser();
   }, []);
 
-  // Custom Loading State
   if (loading || !showForm) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]">
@@ -55,12 +54,22 @@ const PatientOnboarding = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] px-4 py-8 sm:px-6 md:px-12 lg:px-16 flex items-center justify-center">
-      <div className="w-full max-w-6xl bg-white rounded-3xl shadow-2xl p-8 md:p-16 flex flex-col md:flex-row gap-10 md:gap-12 border border-[#90e0ef]">
+    <div className="relative min-h-screen bg-[#f8f9fa] px-4 py-8 sm:px-6 md:px-12 lg:px-16 flex items-center justify-center overflow-hidden">
+
+      <div className="w-full max-w-6xl bg-white rounded-3xl shadow-2xl p-8 md:p-16 flex flex-col md:flex-row gap-10 md:gap-12 border border-[#90e0ef] relative z-10">
         {/* Left Section */}
+        {/* Background Logo */}
+        <img
+          src="/images/elohdoc.png"
+          alt="ElohDoc Logo Background"
+          className={`pointer-events-none absolute top-1/3 sm:top-1/2 sm:left-1/4 left-1/2 max-w-[70vh] max-h-[70vh] opacity-1 transform -translate-x-1/2 -translate-y-1/2 select-none transition-opacity duration-1000 ease-in-out ${logoVisible ? "opacity-15" : "opacity-0"
+            }`}
+          draggable={true}
+        />
         <div className="w-full md:w-1/2 text-center md:text-left flex flex-col justify-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#03045e] mb-6">
-            Welcome! 👋
+            Welcome!
+
           </h1>
           <p className="text-[#000000] text-base sm:text-lg mb-6">
             Let&apos;s get you set up to access quality healthcare and connect
@@ -87,7 +96,7 @@ const PatientOnboarding = () => {
           </p>
         </div>
 
-        {/* Right Section - Form */}
+        {/* Right Section - Patient Form */}
         <div className="w-full md:w-1/2 mt-10 md:mt-0">
           <PatientsRegistrationForm />
         </div>
