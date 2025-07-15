@@ -70,7 +70,7 @@ const PatientDashboard = () => {
     <div className="min-h-screen flex flex-col pt-20 relative overflow-hidden bg-gray-950 text-white">
       <PatientDashboardNavbar />
 
-      <div className="relative z-10 flex flex-col lg:flex-row w-full flex-grow">
+      <div className="relative z-10 flex flex-col lg:flex-row w-full h-full flex-grow">
         <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(50vh-5rem)]">
           <PatientSidebarMenu
             userDoc={userDoc}
@@ -84,7 +84,7 @@ const PatientDashboard = () => {
           <PatientSidebarMenu userDoc={userDoc} compact />
         </div>
 
-        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
+        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center sm:h-[100vh] h-[205vh] bg-transparent">
           <div className="w-full mt-8">
             <PatientMeetingSetup
               mode={mode}
