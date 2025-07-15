@@ -80,6 +80,9 @@ const PatientDashboard = () => {
             setNoteOpen={setNoteOpen}
           />
         </aside>
+        <div className="block lg:hidden w-80 pl-7 mt-4">
+          <PatientSidebarMenu userDoc={userDoc} compact />
+        </div>
 
         <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
           <div className="w-full mt-8">
