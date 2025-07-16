@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiX } from "react-icons/fi";
+import { MdCloseFullscreen } from "react-icons/md";
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
 import NotePreview from "@/components/editor/NotePreview";
 
@@ -36,7 +36,7 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
 
   return (
     <div className="text-[#333] p-8 w-full max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-center">Patient Records</h1>
+      <h1 className="text-2xl text-gray-200  font-bold mb-6 text-center">Patient Records</h1>
 
       {/* Toggle Buttons */}
       <div className="flex justify-center gap-4 mb-6">
@@ -44,11 +44,9 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
           <button
             key={id}
             onClick={() => setMode(type)}
-            className={`px-4 py-2 rounded-md font-medium shadow ${
-              mode === type
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
+            className={`px-4 py-1 rounded-xl font-medium shadow-[0_4px_#999] active:shadow-[0_2px_#666] ${mode === type
+              ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
           >
             {label}
           </button>
@@ -56,8 +54,10 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
       </div>
 
       {/* Table Section */}
-      <div className="overflow-x-auto relative bg-white rounded-lg shadow-md border border-gray-200">
-        <div className="flex justify-end px-4 pt-4">
+      <div className="overflow-x-auto pl bg-white rounded-lg -ml-11.5 sm:-ml-4 shadow-md border border-gray-200 w-[95vw] sm:w-full px-2 sm:px-6 text-sm sm:text-base">
+
+
+        <div className="flex justify-end px-4 pt-3">
           <button
             onClick={() => {
               setSelectedRecord(null);
@@ -67,12 +67,12 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
             className="text-gray-500 hover:text-red-600 text-xl"
             aria-label="Close Table"
           >
-            <FiX />
+            < MdCloseFullscreen />
           </button>
         </div>
 
         <table className="min-w-full bg-white">
-          <thead className="bg-gray-100">
+          <thead className="bg-gray-100 px-10 ">
             <tr>
               <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
                 Date
@@ -80,7 +80,7 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
               <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
                 Doctor
               </th>
-              <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
+              <th className="sm:px-6 px-3 py-3 text-sm font-semibold text-gray-600 text-center">
                 Summary
               </th>
             </tr>

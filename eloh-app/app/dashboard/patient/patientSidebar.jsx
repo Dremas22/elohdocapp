@@ -148,10 +148,11 @@ const PatientSidebarMenu = ({
             showTitle: true,
         },
         {
-
+            title: "Ambulance",
             icon: <span className={`${compact ? "text-2xl" : "text-xl"}`}>🚑</span>,
             onClick: () => alert("Ambulance request initiated..."),
-            customClass: compact ? "ml-[54px]" : "sm:ml-[0px]"
+            customClass: compact ? "ml-[54px]" : "sm:ml-[0px]",
+            showTitle: false,
         },
     ];
 
@@ -200,7 +201,7 @@ const PatientSidebarMenu = ({
             </div>
 
             {/* Mobile Bottom Bar */}
-            <div className="lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[35vh] px-8 py-6 overflow-auto bg-gray-900/20 backdrop-blur-md">
+            <div className="lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[25vh] px-8 py-6 overflow-auto bg-gray-900/20 backdrop-blur-md">
                 <ActionButtons
                     buttons={actionButtons}
                     notificationCount={notificationCount}
@@ -208,6 +209,7 @@ const PatientSidebarMenu = ({
                     compact={true}
                 />
             </div>
+
         </>
     );
 };
