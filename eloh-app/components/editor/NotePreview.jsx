@@ -10,8 +10,6 @@ const NotePreview = ({ previewData, noteType, isLoading, onClose }) => {
     return <p className="text-gray-400">No preview data available.</p>;
   }
 
-  console.log(previewData, "PREVIEW_DATA FROM DOC DASH");
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white w-full max-w-3xl p-8 rounded-lg shadow-xl relative">

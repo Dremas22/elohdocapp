@@ -36,7 +36,9 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
 
   return (
     <div className="text-[#333] p-8 w-full max-w-6xl mx-auto">
-      <h1 className="text-2xl text-gray-200  font-bold mb-6 text-center">Patient Records</h1>
+      <h1 className="text-2xl text-gray-200  font-bold mb-6 text-center">
+        Patient Records
+      </h1>
 
       {/* Toggle Buttons */}
       <div className="flex justify-center gap-4 mb-6">
@@ -44,9 +46,11 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
           <button
             key={id}
             onClick={() => setMode(type)}
-            className={`px-4 py-1 rounded-xl font-medium shadow-[0_4px_#999] active:shadow-[0_2px_#666] ${mode === type
-              ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+            className={`px-4 py-1 rounded-xl font-medium shadow-[0_4px_#999] active:shadow-[0_2px_#666] ${
+              mode === type
+                ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
           >
             {label}
           </button>
@@ -55,8 +59,6 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
 
       {/* Table Section */}
       <div className="overflow-x-auto pl bg-white rounded-lg -ml-11.5 sm:-ml-4 shadow-md border border-gray-200 w-[95vw] sm:w-full px-2 sm:px-6 text-sm sm:text-base">
-
-
         <div className="flex justify-end px-4 pt-3">
           <button
             onClick={() => {
@@ -67,7 +69,7 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
             className="text-gray-500 hover:text-red-600 text-xl"
             aria-label="Close Table"
           >
-            < MdCloseFullscreen />
+            <MdCloseFullscreen />
           </button>
         </div>
 
@@ -102,7 +104,6 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
                   <td className="px-6 py-4 text-center">
                     {(() => {
                       const content = record.content;
-                      console.log(content, "CONTENT");
                       if (typeof content === "string") return content;
                       if (typeof content === "object") {
                         if (content.instructions) return content.instructions;
