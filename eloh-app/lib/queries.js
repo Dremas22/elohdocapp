@@ -107,10 +107,6 @@ export async function notifyDoctorAndGetPatient(doctorId, patientId) {
   return data.patient;
 }
 
-// // Usage example in React event handler
-// const patientData = await notifyDoctorAndGetPatient(doc.userId, currentUser.uid);
-// console.log("Patient info from API:", patientData);
-
 /**
  * Adds or updates a document in a specified Firestore collection.
  *
