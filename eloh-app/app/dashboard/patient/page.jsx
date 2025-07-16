@@ -6,6 +6,7 @@ import PatientMeetingSetup from "@/components/patients/PatientMeetingSetup";
 import PatientDashboardNavbar from "@/app/dashboard/patient/patientNav";
 import PatientSidebarMenu from "./patientSidebar";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import Link from "next/link";
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -60,6 +61,12 @@ const PatientDashboard = () => {
             <p className="text-sm mt-1">
               Please make sure your account is registered correctly.
             </p>
+            <Link
+              href="/sign-in?role=patient"
+              className="inline-block mt-4 text-blue-600 hover:underline font-medium"
+            >
+              Go to Sign In
+            </Link>
           </div>
         </div>
       </div>
