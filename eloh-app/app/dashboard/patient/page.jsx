@@ -14,6 +14,7 @@ const PatientDashboard = () => {
   const [userLoading, setUserLoading] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [mode, setMode] = useState("general-notes"); // prescriptions // sick-notes
+  const [openViewPatientRecords, setOpenViewPatientRecords] = useState(false);
 
   // Fetch patient userDoc when currentUser is available
   useEffect(() => {
@@ -71,7 +72,6 @@ const PatientDashboard = () => {
       <PatientDashboardNavbar />
 
       <div className="relative z-10 flex flex-col lg:flex-row w-full h-full flex-grow">
-
         {/* Desktop sidebar menu */}
         <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(50vh-5rem)]">
           <PatientSidebarMenu
@@ -106,8 +106,6 @@ const PatientDashboard = () => {
           </div>
         </main>
       </div>
-
-
 
       {showChat && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">

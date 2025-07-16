@@ -117,8 +117,7 @@ const SidebarMenu = ({
       title: "Earnings",
       icon: <FaMoneyCheckAlt className="h-6 w-6" />,
       onClick: () => {
-        setShowEarnings(true);
-        alert("Opening earnings");
+        setShowEarnings((prev) => !prev);
       },
     },
 

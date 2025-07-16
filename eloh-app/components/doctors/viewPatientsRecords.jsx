@@ -1,33 +1,38 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
-import NotePreview from "./NotePreview"; // assuming you have this component
+import { convertTimestamp } from "@/lib/convertFirebaseDate";
+import NotePreview from "@/components/editor/NotePreview";
 
-const ViewPatientsRecords = ({ data }) => {
-  const [mode, setMode] = useState("generalNotes");
+const noteTypes = [
+  { id: "generalNotes", type: "generalNotes", label: "General Notes" },
+  { id: "prescriptions", type: "prescriptions", label: "Prescriptions" },
+  { id: "sickNotes", type: "sickNotes", label: "Sick Notes" },
+];
+
+const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
+  const [mode, setMode] = useState(noteTypes[0].type);
   const [selectedNotes, setSelectedNotes] = useState([]);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
-  const noteTypes = ["generalNotes", "prescriptions", "sickNotes"];
-  const noteKeyMap = {
-    generalNotes: "General Notes",
-    prescriptions: "Prescriptions",
-    sickNotes: "Sick Notes",
-  };
-
   useEffect(() => {
     if (data && data[mode]) {
-      setSelectedNotes(data[mode]);
+      const notesObject = data[mode];
+      const notesArray = Object.values(notesObject); // 👈 convert to array
+      setSelectedNotes(notesArray);
     } else {
       setSelectedNotes([]);
     }
   }, [data, mode]);
 
-  const convertTimestamp = (timestamp) => {
-    const date = new Date(timestamp);
-    return isNaN(date) ? "N/A" : date.toLocaleDateString();
-  };
+  if (!data) {
+    return (
+      <div className="text-center text-gray-500 mt-10">
+        No medical history found for this patient.
+      </div>
+    );
+  }
 
   return (
     <div className="text-[#333] p-8 w-full max-w-6xl mx-auto">
@@ -35,9 +40,9 @@ const ViewPatientsRecords = ({ data }) => {
 
       {/* Toggle Buttons */}
       <div className="flex justify-center gap-4 mb-6">
-        {noteTypes.map((type) => (
+        {noteTypes.map(({ id, type, label }) => (
           <button
-            key={type}
+            key={id}
             onClick={() => setMode(type)}
             className={`px-4 py-2 rounded-md font-medium shadow ${
               mode === type
@@ -45,19 +50,19 @@ const ViewPatientsRecords = ({ data }) => {
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
           >
-            {noteKeyMap[type]}
+            {label}
           </button>
         ))}
       </div>
 
       {/* Table Section */}
       <div className="overflow-x-auto relative bg-white rounded-lg shadow-md border border-gray-200">
-        {/* Close Button */}
         <div className="flex justify-end px-4 pt-4">
           <button
             onClick={() => {
               setSelectedRecord(null);
               setSelectedNotes([]);
+              setOpenViewPatientRecords(false);
             }}
             className="text-gray-500 hover:text-red-600 text-xl"
             aria-label="Close Table"
@@ -80,7 +85,6 @@ const ViewPatientsRecords = ({ data }) => {
               </th>
             </tr>
           </thead>
-
           <tbody>
             {selectedNotes.length > 0 ? (
               selectedNotes.map((record, index) => (
@@ -98,6 +102,7 @@ const ViewPatientsRecords = ({ data }) => {
                   <td className="px-6 py-4 text-center">
                     {(() => {
                       const content = record.content;
+                      console.log(content, "CONTENT");
                       if (typeof content === "string") return content;
                       if (typeof content === "object") {
                         if (content.instructions) return content.instructions;
@@ -114,11 +119,9 @@ const ViewPatientsRecords = ({ data }) => {
               ))
             ) : (
               <tr>
-                <td
-                  colSpan="3"
-                  className="text-center px-6 py-4 text-gray-500"
-                >
-                  No {noteKeyMap[mode]} available.
+                <td colSpan="3" className="text-center px-6 py-4 text-gray-500">
+                  No {noteTypes.find((type) => type.type === mode)?.label}{" "}
+                  available.
                 </td>
               </tr>
             )}
@@ -132,7 +135,7 @@ const ViewPatientsRecords = ({ data }) => {
           previewData={selectedRecord}
           isLoading={false}
           onClose={() => setSelectedRecord(null)}
-          noteType={noteKeyMap[mode]}
+          noteType={mode}
         />
       )}
     </div>
