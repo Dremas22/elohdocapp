@@ -1,6 +1,10 @@
 "use client";
 
-const FilteredPatientsTable = ({ patients }) => {
+const FilteredPatientsTable = ({
+  patients,
+  setOpenViewPatientRecords,
+  setSelectedPatient,
+}) => {
   if (!patients?.length) return null;
 
   return (
@@ -18,7 +22,10 @@ const FilteredPatientsTable = ({ patients }) => {
             <tr
               key={idx}
               className="hover:bg-white/50 hover:text-black transition cursor-pointer"
-              onClick={() => alert(patient?.fullName)}
+              onClick={() => {
+                setSelectedPatient(patient);
+                setOpenViewPatientRecords(true);
+              }}
             >
               <td className="px-6 py-3">{patient.fullName || "—"}</td>
               <td className="px-6 py-3">{patient.idNumber || "—"}</td>

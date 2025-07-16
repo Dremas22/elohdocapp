@@ -6,6 +6,7 @@ import DooctorEarnings from "./doctorEarnings";
 import SearchBar from "@/components/doctors/SearchBar";
 import { useState } from "react";
 import FilteredPatientsTable from "./FilteredPatientsTable";
+import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
 
 /**
  * DoctorsCollectionViewer
@@ -24,6 +25,8 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [showEarnings, setShowEarnings] = useState(false);
+  const [openViewPatientRecords, setOpenViewPatientRecords] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
   const handleSearch = (query) => {
     if (!query) {
@@ -97,13 +100,24 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
 
               {debouncedQuery ? (
                 filteredPatients.length > 0 ? (
-                  <FilteredPatientsTable patients={filteredPatients} />
+                  <FilteredPatientsTable
+                    patients={filteredPatients}
+                    setOpenViewPatientRecords={setOpenViewPatientRecords}
+                    setSelectedPatient={setSelectedPatient}
+                  />
                 ) : (
                   <p className="text-gray-400 mt-4">
                     No patients found for "{query}".
                   </p>
                 )
               ) : null}
+
+              {openViewPatientRecords && (
+                <ViewPatientsRecords
+                  data={selectedPatient?.medicalHistory}
+                  setOpenViewPatientRecords={setOpenViewPatientRecords}
+                />
+              )}
 
               {/* Mobile Navigation shown below welcome message on mobile */}
               <div className="block lg:hidden w-80 mt-25">
