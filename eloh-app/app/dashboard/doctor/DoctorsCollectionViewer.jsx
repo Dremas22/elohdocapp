@@ -42,6 +42,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
 
     setFilteredPatients(filtered);
   };
+
   // Handles a case where userDoc is missing
   if (!userDoc) {
     return (
@@ -59,7 +60,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
     );
   }
 
-  // Destructuring  verification and practice number from user profile
+  // Destructuring verification and practice number from user profile
   const { practiceNumber, isVerified } = userDoc;
 
   return (
@@ -69,7 +70,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
 
       {/* Main layout section */}
       <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
-        {/* Desktop Navigation: displayed on the left side of the screen*/}
+        {/* Desktop Sidebar */}
         <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(100vh-5rem)]">
           <SidebarMenu
             practiceNumber={practiceNumber}
@@ -80,7 +81,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
         </aside>
 
         {/* Main content panel */}
-        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
+        <main className="w-full h-[200vh] lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
           {isVerified === true ? (
             <>
               {/* Welcome banner for verified doctors */}
@@ -119,33 +120,28 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                 />
               )}
 
-              {/* Mobile Navigation shown below welcome message on mobile */}
-              <div className="block lg:hidden w-80 mt-25">
+              {/* Mobile Navigation shown below welcome message */}
+              <div className="block lg:hidden w-80 mt-10">
                 <SidebarMenu
                   practiceNumber={practiceNumber}
                   isVerified={isVerified}
                   userDoc={userDoc}
+                  setShowEarnings={setShowEarnings}
                   compact
                 />
               </div>
             </>
           ) : isVerified === false ? (
-            // Message shown if account is still pending verification
             <div className="text-gray-600">
-              <h2 className="text-lg font-semibold mb-2">
-                Verification Pending
-              </h2>
+              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
               <p>
                 Once your account is verified, you'll be able to access
                 sensitive patient information here.
               </p>
             </div>
           ) : (
-            // Message shown if account was declined
             <div className="text-red-600">
-              <h2 className="text-lg font-semibold mb-2">
-                Verification Declined
-              </h2>
+              <h2 className="text-lg font-semibold mb-2">Verification Declined</h2>
               <p>
                 We could not verify your account. Please ensure your practice
                 number is registered or contact support for help.
