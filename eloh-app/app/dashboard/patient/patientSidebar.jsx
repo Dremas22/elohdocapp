@@ -5,7 +5,6 @@ import {
     FiUser,
     FiFileText,
     FiFile,
-    FiFolder,
     FiX,
     FiMenu,
 } from "react-icons/fi";
@@ -16,41 +15,49 @@ import ProfileModal from "@/components/ProfileModal";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
     const layout = compact
-        ? "grid grid-cols-3 gap-6 justify-around"
-        : "flex flex-col gap-6 items-center";
+        ? "grid grid-cols-3 gap-10 justify-around"
+        : "flex flex-col gap-5 items-center";
 
     return (
         <div className={`${layout} w-full`}>
-            {buttons.map(({ icon, title, onClick, hasNotification, customClass }) => {
-                const isDisabled = title === "Appointment Alerts" && !payload;
+            {buttons.map(
+                ({ icon, title, onClick, hasNotification, customClass, showTitle }) => {
+                    const isDisabled = title === "Appointment Alerts" && !payload;
 
-                return (
-                    <button
-                        key={title}
-                        title={title}
-                        onClick={onClick}
-                        disabled={isDisabled}
-                        className={`relative flex items-center justify-center rounded-xl text-sm font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
-              ${compact ? "h-14 w-14" : "w-24 h-12"}
+                    return (
+                        <button
+                            key={title}
+                            title={title}
+                            onClick={onClick}
+                            disabled={isDisabled}
+                            className={`relative flex items-center justify-center rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
+              ${compact ? "h-14 w-24" : "w-36 h-12"}
               bg-[#03045e] hover:bg-[#023e8a] text-white
               ${isDisabled ? "!cursor-not-allowed" : ""}
               ${customClass || ""}
             `}
-                        aria-label={title}
-                        type="button"
-                    >
-                        <span className={`${isDisabled ? "text-gray-600" : "text-white"}`}>
-                            {icon}
-                        </span>
+                            aria-label={title}
+                            type="button"
+                        >
+                            {compact && showTitle ? (
+                                <span className="text-white text-xs text-center leading-tight">
+                                    {title}
+                                </span>
+                            ) : (
+                                <span className={`${isDisabled ? "text-gray-600" : "text-white"}`}>
+                                    {icon}
+                                </span>
+                            )}
 
-                        {hasNotification && notificationCount > 0 && (
-                            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white">
-                                {notificationCount}
-                            </span>
-                        )}
-                    </button>
-                );
-            })}
+                            {hasNotification && notificationCount > 0 && (
+                                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white">
+                                    {notificationCount}
+                                </span>
+                            )}
+                        </button>
+                    );
+                }
+            )}
         </div>
     );
 };
@@ -107,37 +114,42 @@ const PatientSidebarMenu = ({
             title: "Profile",
             icon: <FiUser className="h-6 w-6" />,
             onClick: () => setProfileOpen(true),
+            showTitle: false,
         },
         {
-            title: "View Prescriptions",
+            title: "Prescriptions",
             icon: <FiFileText className="h-6 w-6" />,
             onClick: () => {
                 if (setMode) setMode("prescriptions");
                 if (setNoteOpen) setNoteOpen((prev) => !prev);
             },
+            showTitle: compact,
         },
         {
-            title: "View Medical Records",
-            icon: <FiFolder className="h-6 w-6" />,
+            title: "Notes",
+            icon: <FiFile className="h-6 w-6" />,
             onClick: () => {
                 if (setMode) setMode("general-notes");
                 if (setNoteOpen) setNoteOpen((prev) => !prev);
             },
+            showTitle: compact,
         },
         {
-            title: "View Sick Notes",
+            title: "Sick Notes",
             icon: <FiFile className="h-6 w-6" />,
             onClick: () => {
                 if (setMode) setMode("sick-notes");
                 if (setNoteOpen) setNoteOpen((prev) => !prev);
             },
-            customClass: compact ? "ml-[55px]" : "sm:ml-[0px]",
+            customClass: compact ? "ml-[54px]" : "sm:ml-[0px]",
+            showTitle: compact,
         },
         {
             title: "Request Ambulance",
-            icon: <span className={`${compact ? "text-3xl" : "text-2xl"}`}>🚑</span>,
+            icon: <span className={`${compact ? "text-2xl" : "text-xl"}`}>🚑</span>,
             onClick: () => alert("Ambulance request initiated..."),
-            customClass: compact ? "ml-[55px]" : "sm:ml-[0px]",
+            customClass: compact ? "ml-[54px]" : "sm:ml-[0px]",
+            showTitle: false,
         },
     ];
 
@@ -159,7 +171,7 @@ const PatientSidebarMenu = ({
                 />
             )}
 
-            {/* Desktop Toggle Button */}
+            {/* Toggle Button */}
             {!compact && (
                 <button
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -171,13 +183,12 @@ const PatientSidebarMenu = ({
                 </button>
             )}
 
-            {/* Sidebar for Desktop */}
+            {/* Sidebar */}
             <div
                 className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(100vh-5rem)] fixed top-20 left-0
           ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
         `}
             >
-
                 <ActionButtons
                     buttons={actionButtons}
                     notificationCount={notificationCount}
@@ -186,8 +197,8 @@ const PatientSidebarMenu = ({
                 />
             </div>
 
-            {/* Floating Bar for Mobile */}
-            <div className="lg:hidden fixed bottom-0 left-3.5 right-0 z-40 h-[30vh] bg-gray-950 px-6 py-6 overflow-auto">
+            {/* Mobile Bottom Bar */}
+            <div className="lg:hidden fixed bottom-0 right-2.5 z-40 h-[35vh] bg-gray-950 px-8 py-6 overflow-auto">
                 <ActionButtons
                     buttons={actionButtons}
                     notificationCount={notificationCount}
