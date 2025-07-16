@@ -175,11 +175,10 @@ const SidebarMenu = ({
 
       {/* Sidebar Container */}
       <div
-        className={`p-6 text-white z-10 ${
-          compact
-            ? "bg-gray-950 pt-11 pr-19 pl-18 w-[full] h-[65vh]"
-            : "bg-[#123158] pt-30 w-64 h-full shadow-lg"
-        }`}
+        className={`p-6 text-white z-10 ${compact
+          ? "bg-gray-950 pt-11 pr-19 pl-18 w-[full] h-[65vh]"
+          : "bg-[#123158] pt-30 w-64 h-full shadow-lg"
+          }`}
       >
         {/* Verification Status Message */}
         {isVerified === false && (
@@ -198,9 +197,8 @@ const SidebarMenu = ({
           <>
             {/* Doctor's Practice Number */}
             <div
-              className={`text-center font-bold ${
-                compact ? "text-lg" : "text-sm"
-              } text-[#66e4ff] mb-15`}
+              className={`text-center font-bold ${compact ? "text-lg" : "text-sm"
+                } text-[#66e4ff] mb-15`}
             >
               <div>Practice Number</div>
               <div>{practiceNumber || "N/A"}</div>
@@ -219,9 +217,8 @@ const SidebarMenu = ({
 
       {/* Sliding Calendar Drawer */}
       <div
-        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
-          calendarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <button
           onClick={() => setCalendarOpen(false)}
