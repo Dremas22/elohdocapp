@@ -6,7 +6,6 @@ import PatientMeetingSetup from "@/components/patients/PatientMeetingSetup";
 import PatientDashboardNavbar from "@/app/dashboard/patient/patientNav";
 import PatientSidebarMenu from "./patientSidebar";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import Link from "next/link";
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -46,7 +45,7 @@ const PatientDashboard = () => {
   if (loading || userLoading) {
     return (
       <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p>Loading your dashboard...</p>
+        <div className="w-12 h-12 border-4 border-[#90e0ef] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -61,12 +60,6 @@ const PatientDashboard = () => {
             <p className="text-sm mt-1">
               Please make sure your account is registered correctly.
             </p>
-            <Link
-              href="/sign-in?role=patient"
-              className="inline-block mt-4 text-blue-600 hover:underline font-medium"
-            >
-              Go to Sign In
-            </Link>
           </div>
         </div>
       </div>
@@ -101,7 +94,7 @@ const PatientDashboard = () => {
           />
         </div>
 
-        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center sm:h-[100vh] h-[210vh] bg-transparent">
+        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center sm:h-[100vh] h-[20vh] bg-transparent">
           <div className="w-full mt-8">
             <PatientMeetingSetup
               mode={mode}
