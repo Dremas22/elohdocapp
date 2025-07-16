@@ -12,10 +12,11 @@ import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
+import { FaLessThanEqual } from "react-icons/fa";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
     const layout = compact
-        ? "grid grid-cols-3 gap-10 justify-around"
+        ? "grid grid-cols-3 gap-6 justify-around"
         : "flex flex-col gap-5 items-center";
 
     return (
@@ -30,25 +31,27 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
                             title={title}
                             onClick={onClick}
                             disabled={isDisabled}
-                            className={`relative flex items-center justify-center rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
-              ${compact ? "h-14 w-24" : "w-36 h-12"}
-              bg-[#03045e] hover:bg-[#023e8a] text-white
-              ${isDisabled ? "!cursor-not-allowed" : ""}
-              ${customClass || ""}
-            `}
+                            className={`relative flex ${compact ? "flex-col gap-1" : "flex-row"} items-center justify-center rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
+                ${compact ? "h-15 w-24" : "w-36 h-12"}
+                bg-[#03045e]/90 hover:bg-[#023e8a] text-white
+                ${isDisabled ? "!cursor-not-allowed" : ""}
+                ${customClass || ""}
+              `}
                             aria-label={title}
                             type="button"
                         >
-                            {compact && showTitle ? (
-                                <span className="text-white text-xs text-center leading-tight">
+                            <span className={`${isDisabled ? "text-gray-600" : "text-white"}`}>
+                                {icon}
+                            </span>
+
+                            {/* Title for mobile */}
+                            {compact && showTitle && (
+                                <span className="text-white text-[11px] text-center leading-tight">
                                     {title}
-                                </span>
-                            ) : (
-                                <span className={`${isDisabled ? "text-gray-600" : "text-white"}`}>
-                                    {icon}
                                 </span>
                             )}
 
+                            {/* Notification badge */}
                             {hasNotification && notificationCount > 0 && (
                                 <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white">
                                     {notificationCount}
@@ -114,7 +117,7 @@ const PatientSidebarMenu = ({
             title: "Profile",
             icon: <FiUser className="h-6 w-6" />,
             onClick: () => setProfileOpen(true),
-            showTitle: false,
+            showTitle: true,
         },
         {
             title: "Prescriptions",
@@ -123,7 +126,7 @@ const PatientSidebarMenu = ({
                 if (setMode) setMode("prescriptions");
                 if (setNoteOpen) setNoteOpen((prev) => !prev);
             },
-            showTitle: compact,
+            showTitle: true,
         },
         {
             title: "Notes",
@@ -132,7 +135,7 @@ const PatientSidebarMenu = ({
                 if (setMode) setMode("general-notes");
                 if (setNoteOpen) setNoteOpen((prev) => !prev);
             },
-            showTitle: compact,
+            showTitle: true,
         },
         {
             title: "Sick Notes",
@@ -142,14 +145,13 @@ const PatientSidebarMenu = ({
                 if (setNoteOpen) setNoteOpen((prev) => !prev);
             },
             customClass: compact ? "ml-[54px]" : "sm:ml-[0px]",
-            showTitle: compact,
+            showTitle: true,
         },
         {
-            title: "Request Ambulance",
+
             icon: <span className={`${compact ? "text-2xl" : "text-xl"}`}>🚑</span>,
             onClick: () => alert("Ambulance request initiated..."),
-            customClass: compact ? "ml-[54px]" : "sm:ml-[0px]",
-            showTitle: false,
+            customClass: compact ? "ml-[54px]" : "sm:ml-[0px]"
         },
     ];
 
@@ -198,7 +200,7 @@ const PatientSidebarMenu = ({
             </div>
 
             {/* Mobile Bottom Bar */}
-            <div className="lg:hidden fixed bottom-0 right-2.5 z-40 h-[35vh] bg-gray-950 px-8 py-6 overflow-auto">
+            <div className="lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[35vh] px-8 py-6 overflow-auto bg-gray-900/20 backdrop-blur-md">
                 <ActionButtons
                     buttons={actionButtons}
                     notificationCount={notificationCount}
