@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { phoneCodes, africanCountries } from "@/constants";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
   const isPatient = userDoc?.role === "patient";
@@ -24,32 +25,42 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [imageError, setImageError] = useState(null);
   const router = useRouter();
+  const fileInputRef = useRef();
 
   const handleLocationChange = (field, value) => {
     setLocation((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const resetFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    setLogo(null);
+    setPreviewUrl(null);
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
 
     if (!file) {
-      setImageError(null);
-      setLogo(null);
-      setPreviewUrl(null);
+      resetFileInput();
       return;
     }
 
-    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
-      setImageError("Only PNG, JPG, or WEBP images are allowed.");
-      setLogo(null);
-      setPreviewUrl(null);
+    const isValidType = ["image/png", "image/jpeg", "image/webp"].includes(
+      file.type
+    );
+    const isValidSize = file.size <= 2 * 1024 * 1024;
+
+    if (!isValidType) {
+      toast.error("Only PNG, JPG, or WEBP images are allowed.");
+      resetFileInput();
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      setImageError("File size must be under 2MB.");
-      setLogo(null);
-      setPreviewUrl(null);
+    if (!isValidSize) {
+      toast.error("File size must be under 2MB.");
+      resetFileInput();
       return;
     }
 
@@ -241,6 +252,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
                     Choose Image
                   </label>
                   <input
+                    ref={fileInputRef}
                     id="profileImageInput"
                     type="file"
                     accept="image/png, image/jpeg, image/webp"
@@ -248,11 +260,8 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
                     className="hidden"
                   />
                   <p className="mt-1 text-xs text-gray-500 select-none">
-                    Supported formats: PNG, JPEG, WEBP
+                    Supported formats: PNG, JPEG, WEBP (max 2MB)
                   </p>
-                  {imageError && (
-                    <p className="text-red-500 text-xs mt-1">{imageError}</p>
-                  )}
                 </div>
               </div>
             </div>
