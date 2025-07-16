@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { phoneCodes, africanCountries } from "@/constants";
+import { useRouter } from "next/navigation";
 
 const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
   const isPatient = userDoc?.role === "patient";
@@ -22,6 +23,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
   const [logo, setLogo] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [imageError, setImageError] = useState(null);
+  const router = useRouter();
 
   const handleLocationChange = (field, value) => {
     setLocation((prev) => ({ ...prev, [field]: value }));
@@ -90,6 +92,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
     console.log(logo, "LOGO_IMAGE");
 
     await onSave(updatedData);
+    router.refresh();
     onClose();
   };
 
