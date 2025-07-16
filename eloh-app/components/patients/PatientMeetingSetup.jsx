@@ -64,8 +64,6 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         alert(`Error: ${data.error}`);
         return;
       }
-
-      console.log("Notification sent successfully:", data.message);
     } catch (error) {
       console.error("Error sending notification:", error);
       alert("Something went wrong while sending the notification.");
@@ -172,9 +170,10 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
                     }
                   }}
                   className={`rounded-lg p-4 w-full shadow-md transition duration-200 flex flex-col justify-between items-center gap-4
-                    ${currentUser?.uid && doc.userId
-                      ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
-                      : "cursor-not-allowed bg-gray-700 opacity-50"
+                    ${
+                      currentUser?.uid && doc.userId
+                        ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
+                        : "cursor-not-allowed bg-gray-700 opacity-50"
                     }
                   `}
                 >

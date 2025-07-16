@@ -17,46 +17,59 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
 
   return (
     <div className={`${layout} w-full`}>
-      {buttons.map(({ icon, title, onClick, hasNotification, customClass, showTitle = true }) => {
-        const isMeetingNotifications = title === "Meeting Notifications";
-        const isDisabled = isMeetingNotifications && !payload;
+      {buttons.map(
+        ({
+          icon,
+          title,
+          onClick,
+          hasNotification,
+          customClass,
+          showTitle = true,
+        }) => {
+          const isMeetingNotifications = title === "Meeting Notifications";
+          const isDisabled = isMeetingNotifications && !payload;
 
-        return (
-          <button
-            key={title}
-            title={title}
-            onClick={onClick}
-            disabled={isDisabled}
-            className={`relative flex ${compact ? "flex-col gap-1" : "flex-row"} items-center justify-center rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
+          return (
+            <button
+              key={title}
+              title={title}
+              onClick={onClick}
+              disabled={isDisabled}
+              className={`relative flex ${
+                compact ? "flex-col gap-1" : "flex-row"
+              } items-center justify-center rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
               ${compact ? "h-15 w-24" : "w-36 h-12"}
               bg-[#03045e]/90 hover:bg-[#023e8a] text-white
               ${isDisabled ? "!cursor-not-allowed" : ""}
               ${customClass || ""}
             `}
-            aria-label={title}
-            type="button"
-          >
-            <span className={`${isDisabled ? "text-gray-600" : "text-white"}`}>
-              {icon}
-            </span>
-
-            <span
-              className={`text-white text-[11px] text-center leading-tight ${compact ? "block" : "hidden lg:hidden"
-                }`}
+              aria-label={title}
+              type="button"
             >
-              {title}
-            </span>
-
-
-            {/* Notification badge */}
-            {hasNotification && notificationCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white">
-                {notificationCount}
+              <span
+                className={`${isDisabled ? "text-gray-600" : "text-white"}`}
+              >
+                {icon}
               </span>
-            )}
-          </button>
-        );
-      })}
+
+              <span
+                className={`text-white text-[11px] text-center leading-tight ${
+                  compact ? "block" : "hidden lg:hidden"
+                }`}
+              >
+                {title}
+              </span>
+
+              {/* Notification badge */}
+              {hasNotification && notificationCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white">
+                  {notificationCount}
+                </span>
+              )}
+            </button>
+          );
+        }
+      )}
     </div>
   );
 };
@@ -96,16 +109,17 @@ const DoctorSidebarMenu = ({
   const handleProfileSave = async (updatedData) => {
     setProfileLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/users/update`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: userDoc.role, data: updatedData }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/users/update`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role: userDoc.role, data: updatedData }),
+        }
+      );
 
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Update failed");
-
-      console.log("✅ User updated:", result);
     } catch (err) {
       console.error("❌ Update error:", err.message);
     } finally {
@@ -214,11 +228,11 @@ const DoctorSidebarMenu = ({
         />
       </div>
 
-
       {/* Sliding Calendar Drawer */}
       <div
-        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
+          calendarOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <button
           onClick={() => setCalendarOpen(false)}

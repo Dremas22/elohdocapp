@@ -29,6 +29,7 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
   const handleSignatureSave = (dataUrl) => {
     setSignature(dataUrl);
     setShowSignaturePad(false);
+    // TODO: Make sure you save the signature in firestore
     console.log("Saved signature:", dataUrl);
   };
 
