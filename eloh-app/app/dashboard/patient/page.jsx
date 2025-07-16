@@ -67,7 +67,7 @@ const PatientDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col pt-20 relative overflow-hidden bg-gray-950 text-white">
+    <div className="min-h-screen flex flex-col pt-20 relative overflow-x-hidden bg-gray-950 text-white">
       <PatientDashboardNavbar />
 
       <div className="relative z-10 flex flex-col lg:flex-row w-full h-full flex-grow">
@@ -94,7 +94,7 @@ const PatientDashboard = () => {
           />
         </div>
 
-        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center sm:h-[100vh] h-[20vh] bg-transparent">
+        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center sm:h-[100vh] md:h-[300vh]: h-[290vh] bg-transparent">
           <div className="w-full mt-8">
             <PatientMeetingSetup
               mode={mode}

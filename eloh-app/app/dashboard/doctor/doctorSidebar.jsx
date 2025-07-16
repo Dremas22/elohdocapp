@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FiUser, FiBell, FiCalendar, FiX, FiMenu } from "react-icons/fi";
+import { IoCloseCircleSharp } from "react-icons/io5";
 import Calendar from "@/app/dashboard/doctor/calendar";
 import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
@@ -221,9 +222,9 @@ const DoctorSidebarMenu = ({
       >
         <button
           onClick={() => setCalendarOpen(false)}
-          className="absolute right-2 text-red-600 text-sm hover:underline z-50"
+          className="absolute pt-51.5 scale-200 right-1.5 text-red-600 text-sm hover:underline z-50"
         >
-          Close
+          <IoCloseCircleSharp />
         </button>
         <Calendar />
       </div>
