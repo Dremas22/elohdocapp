@@ -5,7 +5,7 @@ import Image from "next/image";
 import { saveDiagnosis } from "@/lib/saveDiagnoses";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
-const Chat = () => {
+const Chat = ({ setShowChat }) => {
   const { currentUser, loading } = useCurrentUser();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -45,11 +45,12 @@ const Chat = () => {
         setMessages(updatedMessages);
 
         if (aiResponse.includes("Consult Now") && currentUser?.uid) {
-          await saveDiagnosis({
-            userId: currentUser?.uid,
-            symptoms: newMessages.filter((m) => m.role === "user").map((m) => m.content).join("; "),
-            diagnosis: aiResponse,
-          });
+          // await saveDiagnosis({
+          //   userId: currentUser?.uid,
+          //   symptoms: newMessages.filter((m) => m.role === "user").map((m) => m.content).join("; "),
+          //   diagnosis: aiResponse,
+          // });
+          setShowChat(false)
         }
       }
     } catch (err) {
