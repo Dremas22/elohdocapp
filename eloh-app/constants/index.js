@@ -133,6 +133,20 @@ export const africanCountries = [
   { id: "ZW_jd83kdls", title: "Zimbabwe" },
 ];
 
+export const southAfricanLanguages = [
+  { id: "af", value: "Afrikaans" },
+  { id: "en", value: "English" },
+  { id: "nr", value: "isiNdebele" },
+  { id: "xh", value: "isiXhosa" },
+  { id: "zu", value: "isiZulu" },
+  { id: "nso", value: "Sepedi" },
+  { id: "st", value: "Sesotho" },
+  { id: "tn", value: "Setswana" },
+  { id: "ss", value: "siSwati" },
+  { id: "ve", value: "Tshivenda" },
+  { id: "ts", value: "Xitsonga" },
+];
+
 export const noteTypeMap = {
   note: "generalNotes",
   "sick-note": "sickNotes",
