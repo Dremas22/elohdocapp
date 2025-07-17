@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { saveDiagnosis } from "@/lib/saveDiagnoses";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const Chat = ({ setShowChat }) => {
   const { currentUser, loading } = useCurrentUser();
@@ -11,10 +12,12 @@ const Chat = ({ setShowChat }) => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
@@ -41,16 +44,33 @@ const Chat = ({ setShowChat }) => {
       const aiResponse = data?.content;
 
       if (aiResponse) {
-        const updatedMessages = [...newMessages, { role: "assistant", content: aiResponse }];
+        const updatedMessages = [
+          ...newMessages,
+          { role: "assistant", content: aiResponse },
+        ];
         setMessages(updatedMessages);
 
         if (aiResponse.includes("Consult Now") && currentUser?.uid) {
-          // await saveDiagnosis({
-          //   userId: currentUser?.uid,
-          //   symptoms: newMessages.filter((m) => m.role === "user").map((m) => m.content).join("; "),
-          //   diagnosis: aiResponse,
-          // });
-          setShowChat(false)
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_URL}/api/save-ai-diagnosis`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                aiResponse: aiResponse,
+              }),
+            }
+          );
+
+          toast.success(
+            "Diagnosis complete. Redirecting you to the payment page to book your consultation...",
+            {
+              duration: 3000,
+            }
+          );
+
+          setShowChat(false);
+          //router.push("/payment");
         }
       }
     } catch (err) {
@@ -68,22 +88,24 @@ const Chat = ({ setShowChat }) => {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full bg-gradient-to-br from-[#cce7ff] via-[#99d6ff] to-[#66b3ff]">
+    <div className="flex flex-col h-[90vh] max-h-screen w-full bg-gradient-to-br from-[#cce7ff] via-[#99d6ff] to-[#66b3ff]">
       {/* Navbar */}
       <nav className="w-full h-16 bg-[#003b5c] text-white flex items-center justify-between px-6 shadow-md z-50">
         <div className="text-lg font-bold">Elohdoc Chat</div>
       </nav>
 
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      {/* Chat Area */}
+      <div className="flex flex-1 flex-col overflow-hidden">
         <div
           ref={chatContainerRef}
-          className="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-[#f8fbff]"
+          className="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-[#f8fbff] scroll-smooth"
         >
           {messages.map((m, index) => (
             <div
               key={index}
-              className={`flex items-end ${m.role === "user" ? "justify-end" : "justify-start"}`}
+              className={`flex items-end ${
+                m.role === "user" ? "justify-end" : "justify-start"
+              }`}
             >
               {m.role === "assistant" && (
                 <Image
@@ -97,10 +119,11 @@ const Chat = ({ setShowChat }) => {
               )}
 
               <div
-                className={`px-4 py-2 text-sm max-w-[80%] whitespace-pre-wrap ${m.role === "user"
-                  ? "bg-blue-600 text-white rounded-2xl rounded-br-none shadow-xl"
-                  : "bg-blue-100 text-[#003b5c] rounded-2xl rounded-bl-none shadow-xl"
-                  }`}
+                className={`px-4 py-2 text-sm max-w-[80%] break-words whitespace-pre-wrap ${
+                  m.role === "user"
+                    ? "bg-blue-600 text-white rounded-2xl rounded-br-none shadow-xl"
+                    : "bg-blue-100 text-[#003b5c] rounded-2xl rounded-bl-none shadow-xl"
+                }`}
               >
                 {m.content}
               </div>
@@ -143,8 +166,11 @@ const Chat = ({ setShowChat }) => {
           )}
         </div>
 
-        {/* Input area */}
-        <form onSubmit={handleSubmit} className="border-t border-blue-100 flex p-3 bg-white">
+        {/* Input Area */}
+        <form
+          onSubmit={handleSubmit}
+          className="flex p-3 bg-white border-t border-blue-100"
+        >
           <input
             type="text"
             name="input"
@@ -157,7 +183,7 @@ const Chat = ({ setShowChat }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className="bg-[#03045e] text-white py-2 px-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            className="bg-[#03045e] text-white py-2 px-4 text-sm sm:text-base font-semibold rounded-r-md shadow-md hover:bg-[#023e8a] transition-all duration-200"
           >
             {isLoading ? "..." : "Send"}
           </button>
