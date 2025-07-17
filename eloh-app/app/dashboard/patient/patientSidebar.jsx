@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiUser, FiFileText, FiFile, FiX, FiMenu } from "react-icons/fi";
+import { FiUser, FiFile, FiX, FiMenu } from "react-icons/fi";
+import { FaFilePrescription } from "react-icons/fa";
+import { CiMedicalClipboard } from "react-icons/ci";
 import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
@@ -25,9 +27,8 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               title={title}
               onClick={onClick}
               disabled={isDisabled}
-              className={`relative flex ${
-                compact ? "flex-col gap-1" : "flex-row"
-              } items-center justify-center rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
+              className={`relative flex ${compact ? "flex-col gap-1" : "flex-row"
+                } items-center justify-center rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
                 ${compact ? "h-15 w-24" : "w-36 h-12"}
                 bg-[#03045e]/90 hover:bg-[#023e8a] text-white
                 ${isDisabled ? "!cursor-not-allowed" : ""}
@@ -120,7 +121,7 @@ const PatientSidebarMenu = ({
     },
     {
       title: "Prescriptions",
-      icon: <FiFileText className="h-6 w-6" />,
+      icon: <FaFilePrescription className="h-6 w-6" />,
       onClick: () => {
         if (setMode) setMode("prescriptions");
         if (setNoteOpen) setNoteOpen((prev) => !prev);
@@ -128,8 +129,8 @@ const PatientSidebarMenu = ({
       showTitle: true,
     },
     {
-      title: "Notes",
-      icon: <FiFile className="h-6 w-6" />,
+      title: "Patient File",
+      icon: <CiMedicalClipboard className="h-6 w-6" />,
       onClick: () => {
         if (setMode) setMode("general-notes");
         if (setNoteOpen) setNoteOpen((prev) => !prev);
