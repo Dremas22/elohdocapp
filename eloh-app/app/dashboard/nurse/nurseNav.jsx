@@ -52,7 +52,7 @@ const NurseDashboardNavbar = () => {
     const { photoUrl, fullName, email } = userDoc || {};
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-[#123158] py-6 px-6 flex justify-between items-center">
+        <header className="fixed top-0 left-0 right-0 z-50 h-19 bg-gray-300 py-6 px-6 flex justify-between items-center">
 
             {/* Left Section: Avatar + Name */}
             <div className="flex items-center gap-4">
@@ -68,7 +68,7 @@ const NurseDashboardNavbar = () => {
                     <div className="w-12 h-12 rounded-full bg-gray-300" />
                 )}
 
-                <div className="leading-tight text-sm text-[#E4E9EE] hidden md:block">
+                <div className="leading-tight text-sm text-[#123158] hidden md:block">
                     <p className="font-semibold">{fullName || email || "Nurse"}</p>
                 </div>
             </div>
@@ -89,9 +89,9 @@ const NurseDashboardNavbar = () => {
                     onClick={handleAuthAction}
                     aria-label="Sign Out"
                     title="Sign Out"
-                    className="bg-[#03045e] text-white py-2 px-3 text-xs md:text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex items-center justify-center gap-2 cursor-pointer"
+                    className="bg-[#03045e] text-white py-3 px-3 text-xs md:text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex items-center justify-center gap-2 cursor-pointer"
                 >
-                    <FiLogOut className="w-7 h-5 md:w-10 md:h-6" />
+                    <p>Sign Out</p>
                 </button>
             </div>
         </header>
