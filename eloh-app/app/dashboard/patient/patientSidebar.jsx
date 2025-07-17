@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { FiUser, FiFile, FiX, FiMenu } from "react-icons/fi";
 import { FaFilePrescription } from "react-icons/fa";
 import { CiMedicalClipboard } from "react-icons/ci";
+import { GiAmbulance } from "react-icons/gi";
 import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
-import { FaLessThanEqual } from "react-icons/fa";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
@@ -27,9 +27,9 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               title={title}
               onClick={onClick}
               disabled={isDisabled}
-              className={`relative flex ${compact ? "flex-col gap-1" : "flex-row"
-                } items-center justify-center rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
-                ${compact ? "h-15 w-24" : "w-36 h-12"}
+              className={`relative flex flex-col items-center justify-center gap-1
+                rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
+                ${compact ? "h-15 w-24" : "w-36 h-20"}
                 bg-[#03045e]/90 hover:bg-[#023e8a] text-white
                 ${isDisabled ? "!cursor-not-allowed" : ""}
                 ${customClass || ""}
@@ -37,20 +37,16 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               aria-label={title}
               type="button"
             >
-              <span
-                className={`${isDisabled ? "text-gray-600" : "text-white"}`}
-              >
+              <span className={`${isDisabled ? "text-gray-600" : "text-white"}`}>
                 {icon}
               </span>
 
-              {/* Title for mobile */}
-              {compact && showTitle && (
+              {showTitle && (
                 <span className="text-white text-[11px] text-center leading-tight">
                   {title}
                 </span>
               )}
 
-              {/* Notification badge */}
               {hasNotification && notificationCount > 0 && (
                 <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white">
                   {notificationCount}
@@ -129,7 +125,7 @@ const PatientSidebarMenu = ({
       showTitle: true,
     },
     {
-      title: "Patient File",
+      title: "Patient Files",
       icon: <CiMedicalClipboard className="h-6 w-6" />,
       onClick: () => {
         if (setMode) setMode("general-notes");
@@ -149,10 +145,13 @@ const PatientSidebarMenu = ({
     },
     {
       title: "Ambulance",
-      icon: <span className={`${compact ? "text-2xl" : "text-xl"}`}>🚑</span>,
-      onClick: () => alert("Ambulance request initiated..."),
+      icon: <GiAmbulance className="h-6 w-6" />,
+      onClick: () => {
+        if (setMode) setMode("sick-notes");
+        if (setNoteOpen) setNoteOpen((prev) => !prev);
+      },
       customClass: compact ? "ml-[54px]" : "sm:ml-[0px]",
-      showTitle: false,
+      showTitle: true,
     },
   ];
 
@@ -188,7 +187,7 @@ const PatientSidebarMenu = ({
 
       {/* Sidebar */}
       <div
-        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(100vh-5rem)] fixed top-20 left-0
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0
           ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
         `}
       >

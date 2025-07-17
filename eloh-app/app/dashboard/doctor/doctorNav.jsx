@@ -6,7 +6,6 @@ import { signOut } from "firebase/auth";
 import { auth, db } from "@/db/client";
 import { useRouter } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
-import { FiLogOut } from "react-icons/fi";
 
 /**
  * DoctorDashboardNavbar
@@ -70,7 +69,7 @@ const DoctorDashboardNavbar = () => {
   const { photoUrl, fullName } = userDoc || {};
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-gray-300 py-6 px-6 flex justify-between items-center">
+    <header className="fixed top-0 left-0 right-0 z-50 h-18 bg-gray-300 py-6 px-6 flex justify-between items-center">
 
       {/* Left Section: Avatar + Name  on desktop */}
       <div className="flex items-center gap-4">

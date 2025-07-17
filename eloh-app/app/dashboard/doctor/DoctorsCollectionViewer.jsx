@@ -64,7 +64,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   const { practiceNumber, isVerified } = userDoc;
 
   return (
-    <div className="min-h-screen flex flex-col pt-20 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col pt-18 relative overflow-hidden">
       {/* Top fixed navbar */}
       <DoctorDashboardNavbar />
 
