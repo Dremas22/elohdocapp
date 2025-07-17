@@ -12,8 +12,8 @@ import { FaMoneyCheckAlt } from "react-icons/fa";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
-    ? "grid grid-cols-2 gap-6 justify-around"
-    : "flex flex-col gap-5 items-center";
+    ? "grid grid-cols-3 gap-6 justify-around" // 3 buttons side-by-side on mobile
+    : "flex flex-col gap-5 items-center";     // stacked on desktop
 
   return (
     <div className={`${layout} w-full`}>
@@ -35,32 +35,30 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               title={title}
               onClick={onClick}
               disabled={isDisabled}
-              className={`relative flex ${
-                compact ? "flex-col gap-1" : "flex-row"
-              } items-center justify-center rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
-              ${compact ? "h-15 w-24" : "w-36 h-12"}
-              bg-[#03045e]/90 hover:bg-[#023e8a] text-white
-              ${isDisabled ? "!cursor-not-allowed" : ""}
-              ${customClass || ""}
-            `}
+              className={`relative flex flex-col items-center justify-center gap-1
+                rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1
+                transition-all duration-200 ease-in-out cursor-pointer
+                ${compact ? "h-20 w-20" : "w-36 h-20"}  // smaller square buttons on mobile
+                bg-[#03045e]/90 hover:bg-[#023e8a] text-white
+                ${isDisabled ? "!cursor-not-allowed" : ""}
+                ${customClass || ""}
+              `}
               aria-label={title}
               type="button"
             >
               <span
-                className={`${isDisabled ? "text-gray-600" : "text-white"}`}
+                className={`flex items-center justify-center ${isDisabled ? "text-gray-600" : "text-white"
+                  }`}
               >
                 {icon}
               </span>
 
-              <span
-                className={`text-white text-[11px] text-center leading-tight ${
-                  compact ? "block" : "hidden lg:hidden"
-                }`}
-              >
-                {title}
-              </span>
+              {showTitle && (
+                <span className="text-white text-[11px] text-center leading-tight">
+                  {title}
+                </span>
+              )}
 
-              {/* Notification badge */}
               {hasNotification && notificationCount > 0 && (
                 <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white">
                   {notificationCount}
@@ -135,18 +133,12 @@ const DoctorSidebarMenu = ({
       onClick: () => setProfileOpen(true),
     },
     {
-      title: "Meeting Notifications",
-      hasNotification,
-      icon: <FiBell className="h-6 w-6" />,
-      onClick: () => handleNotification(),
-    },
-    {
       title: "Earnings",
       icon: <FaMoneyCheckAlt className="h-6 w-6" />,
       onClick: () => setShowEarnings((prev) => !prev),
     },
     {
-      title: "Schedule Availability",
+      title: "Schedule",
       icon: <FiCalendar className="h-6 w-6" />,
       onClick: () => setCalendarOpen(true),
     },
@@ -176,7 +168,7 @@ const DoctorSidebarMenu = ({
       {!compact && (
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="absolute top-6 right-[-2.2rem] bg-[#123158] hover:bg-[#0e2a4b] text-white p-2 rounded-l z-30 hidden lg:block"
+          className="absolute top-7 right-[-2.2rem] bg-[#123158] hover:bg-[#0e2a4b] text-white p-2 rounded-l z-30 hidden lg:block"
           aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
           type="button"
         >
@@ -186,9 +178,9 @@ const DoctorSidebarMenu = ({
 
       {/* Sidebar */}
       <div
-        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(100vh-5rem)] fixed top-20 left-0
-          ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
-        `}
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0
+        ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
+      `}
       >
         {isVerified === false && (
           <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-xs p-2 rounded text-center mb-3">
@@ -219,20 +211,19 @@ const DoctorSidebarMenu = ({
       </div>
 
       {/* Mobile Bottom Bar */}
-      <div className="lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[35vh] px-8 py-6 overflow-auto bg-gray-900/20 backdrop-blur-md">
+      <div className="lg:hidden fixed bottom-0 right-0 left-0 z-40 sm:h-[35vh] h-[20vh] px-8 py-6 overflow-auto bg-gray-900/20 backdrop-blur-md">
         <ActionButtons
           buttons={actionButtons}
           notificationCount={notificationCount}
           payload={notificationPayload}
-          compact={true}
+          compact={true} // triggers 3 column grid + smaller buttons
         />
       </div>
 
       {/* Sliding Calendar Drawer */}
       <div
-        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
-          calendarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <button
           onClick={() => setCalendarOpen(false)}
