@@ -10,7 +10,7 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
   const [userDoc, setUserDoc] = useState(null);
-  const [showChat, setShowChat] = useState(false);
+  const [showChat, setShowChat] = useState(true);
   const [userLoading, setUserLoading] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [mode, setMode] = useState("general-notes"); // prescriptions // sick-notes
@@ -109,7 +109,7 @@ const PatientDashboard = () => {
       {showChat && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
           <div className="w-full max-w-2xl mx-auto p-4">
-            <Chat />
+            <Chat setShowChat={setShowChat} />
           </div>
         </div>
       )}
