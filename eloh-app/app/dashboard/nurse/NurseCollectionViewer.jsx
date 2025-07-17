@@ -87,7 +87,7 @@ const NurseCollectionViewer = () => {
   const { practiceNumber, isVerified } = userDoc;
 
   return (
-    <div className="min-h-screen flex flex-col pt-20 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col pt-18 relative overflow-hidden">
       <NurseDashboardNavbar />
 
       <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
