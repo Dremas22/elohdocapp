@@ -67,7 +67,7 @@ const PatientDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col pt-20 relative overflow-x-hidden bg-gray-950 text-white">
+    <div className="min-h-screen flex flex-col pt-18 relative overflow-x-hidden bg-gray-950 text-white">
       <PatientDashboardNavbar />
 
       <div className="relative z-10 flex flex-col lg:flex-row w-full h-full flex-grow">
