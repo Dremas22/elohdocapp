@@ -1,58 +1,93 @@
 "use client";
 
-import React from "react";
+import Image from "next/image";
+import { FaUserNurse, FaSyringe, FaNotesMedical } from "react-icons/fa";
 
-const PayToNurse = ({ setPaymentMethod, setShowPaymentOptions }) => {
+const nursePackages = [
+  {
+    subscriptionName: "1 Nurse consultation",
+    title: (
+      <>
+        1 <span className="hidden md:inline">Consultation</span>
+      </>
+    ),
+    description:
+      "Access to once-off consultation, nurse prescription and sick note.",
+    price: "R200",
+    icon: <FaUserNurse className="text-3xl text-[#03045e]" />,
+  },
+  {
+    subscriptionName: "2 Nurse consultations",
+    title: (
+      <>
+        2 <span className="hidden md:inline">Consultations</span>
+      </>
+    ),
+    description:
+      "Access to 2 consultations, nurse prescriptions and sick notes.",
+    price: "R400",
+    icon: <FaSyringe className="text-3xl text-[#03045e]" />,
+  },
+  {
+    subscriptionName: "3 Nurse consultations",
+    title: (
+      <>
+        3 <span className="hidden md:inline">Consultations</span>
+      </>
+    ),
+    description:
+      "Access to 3 consultations, nurse prescriptions and sick notes.",
+    price: "R600",
+    icon: <FaNotesMedical className="text-3xl text-[#03045e]" />,
+  },
+];
+
+const PayToNurse = ({ setSelectedPackage }) => {
   return (
-    <div className="text-black">
-      <h2 className="text-2xl font-semibold mb-6">Choose a Consultation Package</h2>
+    <div className="text-black px-4 sm:px-6 lg:px-8 py-8 max-w-6xl mx-auto">
+      <h2 className="text-3xl font-bold mb-10 text-center text-[#03045e]">
+        Choose a Nurse Consultation Package
+      </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        {/* Card 1 */}
-        <div className="bg-[#caf0f8] p-6 rounded-xl shadow-md flex flex-col justify-between">
-          <div>
-            <h1 className="text-xl font-bold mb-2">1 Consultation</h1>
-            <p className="mb-4">
-              Access to once-off consultation, nurse prescription and sick note.
-            </p>
-          </div>
-          <button
-            className="bg-[#03045e] text-white py-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] 
-              transition-all duration-200 ease-in-out cursor-pointer"
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {nursePackages.map((pkg, index) => (
+          <div
+            key={index}
+            className="relative bg-white border border-gray-200 p-6 rounded-2xl shadow-md flex flex-col justify-between transition-all hover:shadow-lg hover:-translate-y-1"
           >
-            R200
-          </button>
-        </div>
+            {/* Logo inside each card */}
+            <div className="absolute top-4 right-4 border border-gray-400 rounded-full">
+              <Image
+                src="/images/elohdoc.png"
+                alt="ElohDoc Logo"
+                width={40}
+                height={40}
+                className="rounded-full object-contain"
+              />
+            </div>
 
-        {/* Card 2 */}
-        <div className="bg-[#caf0f8] p-6 rounded-xl shadow-md flex flex-col justify-between">
-          <div>
-            <h1 className="text-xl font-bold mb-2">2 Consultations</h1>
-            <p className="mb-4">
-              Access to 2 consultations, nurse prescriptions and sick notes.
-            </p>
+            {/* Icon & Title */}
+            <div className="flex items-center gap-4 mb-4">
+              {pkg.icon}
+              <h3 className="text-xl font-semibold text-[#03045e]">
+                {pkg.title}
+              </h3>
+            </div>
+
+            {/* Description */}
+            <p className="text-gray-700 text-sm flex-1">{pkg.description}</p>
+
+            {/* Button */}
+            <button
+              onClick={() => {
+                setSelectedPackage(pkg);
+              }}
+              className="mt-6 bg-[#03045e] text-white py-3 text-base font-semibold rounded-xl hover:bg-[#023e8a] transition duration-200 shadow-sm active:translate-y-0.5"
+            >
+              {pkg.price}
+            </button>
           </div>
-          <button
-            className="bg-[#03045e] text-white py-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] 
-              transition-all duration-200 ease-in-out cursor-pointer"
-          >
-            R400
-          </button>
-        </div>
-        <div className="bg-[#caf0f8] p-6 rounded-xl shadow-md flex flex-col justify-between">
-          <div>
-            <h1 className="text-xl font-bold mb-2">3 Consultations</h1>
-            <p className="mb-4">
-              Access to 3 consultations, nurse prescriptions and sick notes.
-            </p>
-          </div>
-          <button
-            className="bg-[#03045e] text-white py-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] 
-              transition-all duration-200 ease-in-out cursor-pointer"
-          >
-            R600
-          </button>
-        </div>
+        ))}
       </div>
     </div>
   );
