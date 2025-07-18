@@ -6,7 +6,7 @@ import { convertTimestamp } from "@/lib/convertFirebaseDate";
 import NotePreview from "@/components/editor/NotePreview";
 
 const noteTypes = [
-  { id: "generalNotes", type: "generalNotes", label: "General Notes" },
+  { id: "generalNotes", type: "generalNotes", label: "Patient Files" },
   { id: "prescriptions", type: "prescriptions", label: "Prescriptions" },
   { id: "sickNotes", type: "sickNotes", label: "Sick Notes" },
 ];
@@ -28,7 +28,7 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
 
   if (!data) {
     return (
-      <div className="text-center text-gray-500 mt-10">
+      <div className="text-center text-gray-500 mt-2">
         No medical history found for this patient.
       </div>
     );
@@ -41,16 +41,15 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
       </h1>
 
       {/* Toggle Buttons */}
-      <div className="flex justify-center gap-4 mb-6">
+      <div className="flex justify-center  gap-4 mb-6">
         {noteTypes.map(({ id, type, label }) => (
           <button
             key={id}
             onClick={() => setMode(type)}
-            className={`px-4 py-1 rounded-xl font-medium shadow-[0_4px_#999] active:shadow-[0_2px_#666] ${
-              mode === type
-                ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
+            className={`px-4 py-1 rounded-xl font-medium shadow-[0_4px_#999] active:shadow-[0_2px_#666] ${mode === type
+              ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
           >
             {label}
           </button>

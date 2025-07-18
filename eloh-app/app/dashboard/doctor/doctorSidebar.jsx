@@ -164,7 +164,7 @@ const DoctorSidebarMenu = ({
         />
       )}
 
-      {/* Toggle Button */}
+      {/* Toggle Button
       {!compact && (
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -174,7 +174,7 @@ const DoctorSidebarMenu = ({
         >
           {isSidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
         </button>
-      )}
+      )} */}
 
       {/* Sidebar */}
       <div
