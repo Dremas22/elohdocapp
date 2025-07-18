@@ -14,10 +14,10 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
     resetError,
     resetSuccess,
   } = useSaveMedicalHistory();
+
   const [signature, setSignature] = useState(null);
   const [showSignaturePad, setShowSignaturePad] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-
   const [date, setDate] = useState("");
   const [instructions, setInstructions] = useState("");
   const [medications, setMedications] = useState([]);
@@ -29,7 +29,6 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
   const handleSignatureSave = (dataUrl) => {
     setSignature(dataUrl);
     setShowSignaturePad(false);
-    // TODO: Make sure you save the signature in firestore
     console.log("Saved signature:", dataUrl);
   };
 
@@ -54,16 +53,11 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
     setFieldErrors({});
 
     const errors = {};
-
-    const trimmedMedications = medications
-      .map((m) => m.trim())
-      .filter((m) => m.length > 0);
+    const trimmedMedications = medications.map((m) => m.trim()).filter((m) => m);
 
     if (!date) errors.date = "Please select a date.";
-    if (!instructions.trim())
-      errors.instructions = "Instructions are required.";
-    if (trimmedMedications.length === 0)
-      errors.medications = "At least one medication is required.";
+    if (!instructions.trim()) errors.instructions = "Instructions are required.";
+    if (trimmedMedications.length === 0) errors.medications = "At least one medication is required.";
     if (!signature) errors.signature = "Doctor's signature is required.";
 
     if (Object.keys(errors).length > 0) {
@@ -96,13 +90,10 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
         `${process.env.NEXT_PUBLIC_URL}/api/get-latest-note`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ patientId, noteType: "prescriptions" }),
         }
       );
-
       const data = await response.json();
       setPreviewData(data?.note);
       setOpenPreview(true);
@@ -130,46 +121,24 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
       </p>
 
       <div className="bg-gray-100 p-4 rounded-md space-y-4 border border-gray-300">
+        {/* Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Date
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className={`w-full px-3 py-2 text-black rounded-md border ${
-              fieldErrors.date ? "border-red-500" : "border-gray-300"
-            }`}
+            className={`w-full px-3 py-2 text-black rounded-md border ${fieldErrors.date ? "border-red-500" : "border-gray-300"
+              }`}
           />
           {fieldErrors.date && (
             <p className="text-red-600 text-xs mt-1">{fieldErrors.date}</p>
           )}
         </div>
 
+        {/* Medications - moved above instructions */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Instructions
-          </label>
-          <textarea
-            value={instructions}
-            onChange={(e) => setInstructions(e.target.value)}
-            rows={3}
-            className={`w-full px-3 py-2 text-black rounded-md border ${
-              fieldErrors.instructions ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-          {fieldErrors.instructions && (
-            <p className="text-red-600 text-xs mt-1">
-              {fieldErrors.instructions}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Medications
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Medications</label>
           {medications.map((med, index) => (
             <div key={index} className="flex gap-2 mb-2">
               <input
@@ -201,8 +170,26 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
             + Add Medication
           </button>
         </div>
+
+        {/* Instructions - moved below medications */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Instructions</label>
+          <textarea
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            rows={3}
+            className={`w-full px-3 py-2 text-black rounded-md border ${fieldErrors.instructions ? "border-red-500" : "border-gray-300"
+              }`}
+          />
+          {fieldErrors.instructions && (
+            <p className="text-red-600 text-xs mt-1">
+              {fieldErrors.instructions}
+            </p>
+          )}
+        </div>
       </div>
 
+      {/* Signature */}
       <div>
         <p className="font-semibold mb-2">Doctor’s Signature</p>
         {signature ? (
@@ -237,16 +224,17 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
         )}
       </div>
 
+      {/* Feedback messages */}
       {error && (
         <div className="text-red-600 text-sm font-semibold">{error}</div>
       )}
-
       {successMessage && (
         <div className="text-green-700 text-sm font-semibold">
           {successMessage}
         </div>
       )}
 
+      {/* Submit & Preview */}
       <div className="flex justify-center gap-4">
         <button
           onClick={handleSubmit}

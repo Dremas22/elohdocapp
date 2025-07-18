@@ -11,12 +11,11 @@ import SaveStripePayment from "@/components/SaveStripePayment";
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
   const [userDoc, setUserDoc] = useState(null);
-  const [showChat, setShowChat] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
-  const [mode, setMode] = useState("general-notes"); // prescriptions // sick-notes
+  const [mode, setMode] = useState("general-notes");
 
-  // Fetch patient userDoc when currentUser is available
   useEffect(() => {
     setUserLoading(true);
     const fetchUserDoc = async () => {
@@ -68,7 +67,8 @@ const PatientDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col pt-18 relative overflow-x-hidden bg-gray-950 text-white">
+    <div className="min-h-screen flex flex-col pt-18 relative sm:h-[50vh] h-[145vh] bg-gray-950 text-white overflow-hidden">
+      {/* Fixed Navbar */}
       <PatientDashboardNavbar />
       <SaveStripePayment />
       <div className="relative z-10 flex flex-col lg:flex-row w-full h-full flex-grow">
@@ -83,8 +83,8 @@ const PatientDashboard = () => {
           />
         </aside>
 
-        {/* Mobile sidebar menu*/}
-        <div className="block lg:hidden w-80 pl-7 mt-4">
+        {/* Mobile sidebar */}
+        <div className="block lg:hidden w-80 pl-7">
           <PatientSidebarMenu
             userDoc={userDoc}
             mode={mode}
@@ -95,8 +95,12 @@ const PatientDashboard = () => {
           />
         </div>
 
-        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center sm:h-[100vh] md:h-[300vh]: h-[290vh] bg-transparent">
-          <div className="w-full mt-8">
+        {/* Scrollable only on mobile */}
+        <main
+          className="w-full lg:w-3/4 flex flex-col overflow-y-auto lg:overflow-hidden"
+          style={{ height: "calc(120vh - 5rem)" }} // Navbar height assumed ~5rem
+        >
+          <div className="flex flex-col items-center justify-start flex-grow">
             <PatientMeetingSetup
               mode={mode}
               noteOpen={noteOpen}
@@ -107,6 +111,7 @@ const PatientDashboard = () => {
         </main>
       </div>
 
+      {/* Floating Chat Modal */}
       {showChat && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
           <div className="w-full max-w-2xl mx-auto p-4">
