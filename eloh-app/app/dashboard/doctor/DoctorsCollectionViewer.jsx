@@ -4,7 +4,7 @@ import DoctorDashboardNavbar from "@/app/dashboard/doctor/doctorNav";
 import SidebarMenu from "./doctorSidebar";
 import DooctorEarnings from "./doctorEarnings";
 import SearchBar from "@/components/doctors/SearchBar";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import FilteredPatientsTable from "./FilteredPatientsTable";
 import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
 
@@ -18,7 +18,7 @@ import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
  *
  * @param {Object} props
  * @param {Object} props.userDoc - The authenticated doctor's user document.
- * @param {Array} props.patients - (Optional) A list of assigned patients (currently unused).
+ * @param {Array} props.patients - (Optional) A list of assigned patients.
  */
 const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   const [filteredPatients, setFilteredPatients] = useState([]);
@@ -28,6 +28,14 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   const [openViewPatientRecords, setOpenViewPatientRecords] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
 
+  const patientRecordsRef = useRef(null);
+
+  useEffect(() => {
+    if (openViewPatientRecords && patientRecordsRef.current) {
+      patientRecordsRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [openViewPatientRecords]);
+
   const handleSearch = (query) => {
     if (!query) {
       setFilteredPatients([]);
@@ -36,14 +44,13 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
 
     const filtered = patients?.filter(
       (p) =>
-        p.fullName?.toLowerCase().includes(query) ||
-        p.idNumber?.toLowerCase().includes(query)
+        p.fullName?.toLowerCase().includes(query.toLowerCase()) ||
+        p.idNumber?.toLowerCase().includes(query.toLowerCase())
     );
 
     setFilteredPatients(filtered);
   };
 
-  // Handles a case where userDoc is missing
   if (!userDoc) {
     return (
       <div className="min-h-screen bg-gray-50 pt-20">
@@ -60,7 +67,6 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
     );
   }
 
-  // Destructuring verification and practice number from user profile
   const { practiceNumber, isVerified } = userDoc;
 
   return (
@@ -69,7 +75,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
       <DoctorDashboardNavbar />
 
       {/* Main layout section */}
-      <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
+      <div className="relative z-10 flex flex-col  lg:flex-row w-full bg-gray-950 flex-grow">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(100vh-5rem)]">
           <SidebarMenu
@@ -81,10 +87,9 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
         </aside>
 
         {/* Main content panel */}
-        <main className="w-full h-[150vh] lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
+        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent overflow-y-auto ">
           {isVerified === true ? (
             <>
-              {/* Welcome banner for verified doctors */}
               <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-transparent font-extrabold text-4xl sm:text-5xl md:text-6xl leading-tight mt-10 mb-10">
                 Welcome to your virtual surgery.
               </h1>
@@ -113,14 +118,20 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                 )
               ) : null}
 
+              {/* Scrollable Patient Record Panel */}
               {openViewPatientRecords && (
-                <ViewPatientsRecords
-                  data={selectedPatient?.medicalHistory}
-                  setOpenViewPatientRecords={setOpenViewPatientRecords}
-                />
+                <div
+                  ref={patientRecordsRef}
+                  className="w-full overflow-y-auto max-h-[calc(100vh-5rem)] px-4 mt-6"
+                >
+                  <ViewPatientsRecords
+                    data={selectedPatient?.medicalHistory}
+                    setOpenViewPatientRecords={setOpenViewPatientRecords}
+                  />
+                </div>
               )}
 
-              {/* Mobile Navigation shown below welcome message */}
+              {/* Mobile Sidebar shown below welcome message */}
               <div className="block lg:hidden w-80 mt-10">
                 <SidebarMenu
                   practiceNumber={practiceNumber}
