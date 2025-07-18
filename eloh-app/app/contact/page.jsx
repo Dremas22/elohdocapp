@@ -9,8 +9,8 @@ const Contact = () => {
       <div className="flex flex-col items-center justify-center w-full min-h-screen px-6 py-12 bg-white text-gray-800">
         <h1 className="text-4xl font-bold text-[#03045e] mb-4">Contact Us</h1>
         <p className="text-center max-w-xl text-sm sm:text-base mb-10 text-gray-600">
-          Have questions, suggestions, or need assistance? We'd love to hear from you.
-          Please reach out using the details below or drop us a message.
+          If you have suggestions or need assistance,
+          please reach out using the details below or drop us a message.
         </p>
 
         <div className="w-full max-w-md space-y-6">
@@ -19,7 +19,7 @@ const Contact = () => {
             <input
               type="email"
               placeholder="you@example.com"
-              className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03045e]"
+              className="p-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03045e]"
             />
           </div>
 
@@ -28,7 +28,7 @@ const Contact = () => {
             <textarea
               rows="4"
               placeholder="Your message..."
-              className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03045e]"
+              className="p-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#03045e]"
             />
           </div>
 
