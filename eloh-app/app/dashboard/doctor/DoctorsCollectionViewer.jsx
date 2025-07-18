@@ -7,6 +7,7 @@ import SearchBar from "@/components/doctors/SearchBar";
 import { useState, useRef, useEffect } from "react";
 import FilteredPatientsTable from "./FilteredPatientsTable";
 import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
+import { FiX } from "react-icons/fi";
 
 
 const DoctorsCollectionViewer = ({ userDoc, patients }) => {
@@ -64,7 +65,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
       <DoctorDashboardNavbar />
 
       {/* Main layout section */}
-      <div className="relative z-10 flex flex-col  lg:flex-row w-full bg-gray-950 flex-grow">
+      <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(100vh-5rem)]">
           <SidebarMenu
@@ -83,7 +84,28 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                 Welcome to your virtual surgery.
               </h1>
 
-              {showEarnings && <DooctorEarnings />}
+              {/* Earnings Modal */}
+              {showEarnings && (
+                <div className="fixed inset-0 bg-opacity-40 backdrop-blur-md z-50 flex items-center justify-center px-4">
+                  <div className="bg-white rounded-xl text-black p-6 w-full max-w-4xl shadow-lg relative border-t-8 border-[#0d6efd]">
+                    {/* Close Button */}
+                    <button
+                      onClick={() => setShowEarnings(false)}
+                      className="absolute top-3 right-4 text-gray-600 hover:text-red-600 text-xl"
+                      aria-label="Close Earnings"
+                    >
+                      <FiX />
+                    </button>
+
+                    <h2 className="text-2xl font-bold mb-5 text-[#0d6efd] text-center">
+                      Earnings
+                    </h2>
+
+                    {/* Earnings content */}
+                    <DooctorEarnings />
+                  </div>
+                </div>
+              )}
 
               <SearchBar
                 onSearch={handleSearch}
