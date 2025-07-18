@@ -8,18 +8,7 @@ import { useState, useRef, useEffect } from "react";
 import FilteredPatientsTable from "./FilteredPatientsTable";
 import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
 
-/**
- * DoctorsCollectionViewer
- * Displays the doctor's dashboard, including:
- * - Navbar
- * - Sidebar with action buttons
- * - Welcome message or verification status
- * - Conditional mobile/desktop layouts
- *
- * @param {Object} props
- * @param {Object} props.userDoc - The authenticated doctor's user document.
- * @param {Array} props.patients - (Optional) A list of assigned patients.
- */
+
 const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [query, setQuery] = useState("");
