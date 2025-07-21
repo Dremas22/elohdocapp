@@ -4,6 +4,7 @@ import React from "react";
 import ChooseDesignation from "../components/selection";
 import Video from "../components/video";
 import Navbar from "./maiNavbar";
+import AmbulanceButton from "./AmbulanceButton";
 
 const LandingPage = () => {
   return (
@@ -13,6 +14,7 @@ const LandingPage = () => {
         <Video />
         <ChooseDesignation />
       </div>
+      <AmbulanceButton />
     </div>
   );
 };
