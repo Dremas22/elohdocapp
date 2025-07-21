@@ -7,11 +7,6 @@ import PatientDashboardNavbar from "@/app/dashboard/patient/patientNav";
 import PatientSidebarMenu from "./patientSidebar";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import SaveStripePayment from "@/components/SaveStripePayment";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
-import { db } from "@/db/client";
-import { doc, getDoc } from "firebase/firestore";
-import Link from "next/link";
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
