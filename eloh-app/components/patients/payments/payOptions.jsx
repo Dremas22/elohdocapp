@@ -35,15 +35,16 @@ const PayOptions = () => {
       toast.error("Please select a consultation package.");
       return;
     }
-
+  
     const priceIdMap = {
-      "1 Nurse consultation": "price_1Rm9qsGanontDcTuuCCguvBr",
-      "2 Nurse consultations": "price_1Rm9rtGanontDcTuu79xBCr9",
-      "3 Nurse consultations": "price_1Rm9tEGanontDcTuSEHa2g5w",
-      "1 Doctor consultation": "price_1Rm9mOGanontDcTu3CRPC3rv",
-      "2 Doctor consultations": "price_1Rm9nyGanontDcTuPejhKzZg",
-      "3 Doctor consultations": "price_1Rm9pDGanontDcTu93Y7HDAy",
+      "1 Nurse consultation": "price_1RnETc05W53pwfR7Ypa9CnER",
+      "2 Nurse consultations": "price_1RnESz05W53pwfR7DozsskCR",
+      "3 Nurse consultations": "price_1RnERg05W53pwfR7HYvsbXyo",
+      "1 Doctor consultation": "price_1RnEVF05W53pwfR7E3oYmlLg",
+      "2 Doctor consultations": "price_1RnEUm05W53pwfR7j5WbV4jI",
+      "3 Doctor consultations": "price_1RnEUG05W53pwfR7O6LMhnzv",
     };
+    //Stripe checkout error: No such price: 'price_1Rm9pDGanontDcTu93Y7HDAy'
 
     const priceId = priceIdMap[selectedPackage.subscriptionName];
     if (!priceId) {

@@ -5,13 +5,14 @@ import { auth, db } from "@/db/server";
 
 // Map price ID to consultations and type
 const consultationMap = {
-  price_1Rm9qsGanontDcTuuCCguvBr: { consultations: 1, type: "nurse" },
-  price_1Rm9rtGanontDcTuu79xBCr9: { consultations: 2, type: "nurse" },
-  price_1Rm9tEGanontDcTuSEHa2g5w: { consultations: 3, type: "nurse" },
-  price_1Rm9mOGanontDcTu3CRPC3rv: { consultations: 1, type: "doctor" },
-  price_1Rm9nyGanontDcTuPejhKzZg: { consultations: 2, type: "doctor" },
-  price_1Rm9pDGanontDcTu93Y7HDAy: { consultations: 3, type: "doctor" },
+  price_1RnETc05W53pwfR7Ypa9CnER: { consultations: 1, type: "nurse" },
+  price_1RnESz05W53pwfR7DozsskCR: { consultations: 2, type: "nurse" },
+  price_1RnERg05W53pwfR7HYvsbXyo: { consultations: 3, type: "nurse" },
+  price_1RnEVF05W53pwfR7E3oYmlLg: { consultations: 1, type: "doctor" },
+  price_1RnEUm05W53pwfR7j5WbV4jI: { consultations: 2, type: "doctor" },
+  price_1RnEUG05W53pwfR7O6LMhnzv: { consultations: 3, type: "doctor" },
 };
+//Stripe checkout error: No such price: 'price_1Rm9pDGanontDcTu93Y7HDAy'
 
 export async function GET(req) {
   const sessionId = req.nextUrl.searchParams.get("session_id");
