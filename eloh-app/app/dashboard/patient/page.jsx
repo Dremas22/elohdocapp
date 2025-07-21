@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { db } from "@/db/client";
 import { doc, getDoc } from "firebase/firestore";
+import Link from "next/link";
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -25,32 +26,32 @@ const PatientDashboard = () => {
   const router = useRouter();
 
   useEffect(() => {
-      const checkConsultations = async () => {
-        try {
-          if (!loading && currentUser) {
-            setIsLoading(true);
-            const userRef = doc(db, "patients", currentUser.uid);
-            const userSnap = await getDoc(userRef);
-            const userData = userSnap.data();
-  
-            const consultations = userData?.numberOfConsultations || 0;
-           
-            if (consultations >= 1) {
-              toast.info(
-                "You already have consultations available. Redirecting..."
-              );
-              setShowPayButton(false);
-            }
+    const checkConsultations = async () => {
+      try {
+        if (!loading && currentUser) {
+          setIsLoading(true);
+          const userRef = doc(db, "patients", currentUser.uid);
+          const userSnap = await getDoc(userRef);
+          const userData = userSnap.data();
+
+          const consultations = userData?.numberOfConsultations || 0;
+
+          if (consultations >= 1) {
+            toast.info(
+              "You already have consultations available. Redirecting..."
+            );
+            setShowPayButton(false);
           }
-        } catch (error) {
-          console.error("Something went wrong while checking user data");
-        } finally {
-          setIsLoading(false);
         }
-      };
-  
-      checkConsultations();
-    }, [currentUser?.uid]);
+      } catch (error) {
+        console.error("Something went wrong while checking user data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkConsultations();
+  }, [currentUser?.uid]);
 
   useEffect(() => {
     setUserLoading(true);
@@ -85,7 +86,6 @@ const PatientDashboard = () => {
       </div>
     );
   }
-
   if (!userDoc) {
     return (
       <div className="min-h-screen bg-gray-50 pt-20">
@@ -96,6 +96,11 @@ const PatientDashboard = () => {
             <p className="text-sm mt-1">
               Please make sure your account is registered correctly.
             </p>
+            <Link href="/sign-in?role=patient">
+              <span className="inline-block mt-4 text-blue-600 hover:underline">
+                Go to Sign In
+              </span>
+            </Link>
           </div>
         </div>
       </div>

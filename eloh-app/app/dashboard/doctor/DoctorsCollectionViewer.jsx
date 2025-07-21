@@ -8,6 +8,7 @@ import { useState, useRef, useEffect } from "react";
 import FilteredPatientsTable from "./FilteredPatientsTable";
 import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
 import { FiX } from "react-icons/fi";
+import Link from "next/link";
 
 const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   const [filteredPatients, setFilteredPatients] = useState([]);
@@ -43,13 +44,18 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   if (!userDoc) {
     return (
       <div className="min-h-screen bg-gray-50 pt-20">
-        <DoctorDashboardNavbar />
+        <PatientDashboardNavbar />
         <div className="flex items-center justify-center h-full">
           <div className="text-center text-gray-600">
             <p className="text-lg font-medium">No user data found.</p>
             <p className="text-sm mt-1">
               Please make sure your account is registered correctly.
             </p>
+            <Link href="/sign-in?role=doctor">
+              <span className="inline-block mt-4 text-blue-600 hover:underline">
+                Go to Sign In
+              </span>
+            </Link>
           </div>
         </div>
       </div>
