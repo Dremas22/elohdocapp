@@ -1,8 +1,8 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/maiNavbar";
 import { FaHeartbeat, FaUserMd, FaStethoscope } from "react-icons/fa";
-import { MdLocalHospital } from "react-icons/md";
+
 
 const About = () => {
   return (

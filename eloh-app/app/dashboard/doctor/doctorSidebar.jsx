@@ -196,7 +196,7 @@ const DoctorSidebarMenu = ({
       </div>
 
       {/* Mobile Bottom Bar */}
-      <div className="lg:hidden fixed bottom-0 right-0 left-0 z-40 sm:h-[38vh] h-[30vh] px-6 py-4 overflow-auto bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-5">
+      <div className="lg:hidden fixed bottom-0 right-0 left-0 z-40 sm:h-[38vh] h-[22vh] px-6 py-4 overflow-auto bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-5">
         <ActionButtons
           buttons={actionButtons}
           notificationCount={notificationCount}

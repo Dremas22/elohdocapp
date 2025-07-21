@@ -2,13 +2,12 @@
 
 import DoctorDashboardNavbar from "@/app/dashboard/doctor/doctorNav";
 import SidebarMenu from "./doctorSidebar";
-import DooctorEarnings from "./doctorEarnings";
+import DoctorEarnings from "./doctorEarnings";
 import SearchBar from "@/components/doctors/SearchBar";
 import { useState, useRef, useEffect } from "react";
 import FilteredPatientsTable from "./FilteredPatientsTable";
 import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
 import { FiX } from "react-icons/fi";
-
 
 const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   const [filteredPatients, setFilteredPatients] = useState([]);
@@ -64,7 +63,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
       {/* Top fixed navbar */}
       <DoctorDashboardNavbar />
 
-      {/* Main layout section */}
+      {/* Layout: Sidebar + Main Panel */}
       <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(100vh-5rem)]">
@@ -76,23 +75,24 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
           />
         </aside>
 
-        {/* Main content panel */}
-        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent overflow-y-auto ">
+        {/* Main Panel */}
+        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent overflow-y-auto">
           {isVerified === true ? (
             <>
+              {/* Welcome Banner */}
               <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-transparent font-extrabold text-4xl sm:text-5xl md:text-6xl leading-tight mt-10 mb-10">
                 Welcome to your virtual surgery.
               </h1>
 
               {/* Earnings Modal */}
               {showEarnings && (
-                <div className="fixed inset-0 bg-opacity-40 backdrop-blur-md z-50 flex items-center justify-center px-4">
+                <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-md z-50 flex items-center justify-center px-4">
                   <div className="bg-white rounded-xl text-black p-6 w-full max-w-4xl shadow-lg relative border-t-8 border-[#0d6efd]">
                     {/* Close Button */}
                     <button
                       onClick={() => setShowEarnings(false)}
                       className="absolute top-3 right-4 text-gray-600 hover:text-red-600 text-xl"
-                      aria-label="Close Earnings"
+                      aria-label="Close Earnings Modal"
                     >
                       <FiX />
                     </button>
@@ -101,12 +101,12 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                       Earnings
                     </h2>
 
-                    {/* Earnings content */}
-                    <DooctorEarnings />
+                    <DoctorEarnings />
                   </div>
                 </div>
               )}
 
+              {/* Search Input */}
               <SearchBar
                 onSearch={handleSearch}
                 query={query}
@@ -115,6 +115,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                 setDebouncedQuery={setDebouncedQuery}
               />
 
+              {/* Filtered Patients Table */}
               {debouncedQuery ? (
                 filteredPatients.length > 0 ? (
                   <FilteredPatientsTable
@@ -129,7 +130,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                 )
               ) : null}
 
-              {/* Scrollable Patient Record Panel */}
+              {/* Patient Record Viewer */}
               {openViewPatientRecords && (
                 <div
                   ref={patientRecordsRef}
@@ -142,7 +143,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                 </div>
               )}
 
-              {/* Mobile Sidebar shown below welcome message */}
+              {/* Mobile Sidebar (Below Welcome Message) */}
               <div className="block lg:hidden w-80 mt-10">
                 <SidebarMenu
                   practiceNumber={practiceNumber}
@@ -155,7 +156,9 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
             </>
           ) : isVerified === false ? (
             <div className="text-gray-600">
-              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                Verification Pending
+              </h2>
               <p>
                 Once your account is verified, you'll be able to access
                 sensitive patient information here.
@@ -163,7 +166,9 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
             </div>
           ) : (
             <div className="text-red-600">
-              <h2 className="text-lg font-semibold mb-2">Verification Declined</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                Verification Declined
+              </h2>
               <p>
                 We could not verify your account. Please ensure your practice
                 number is registered or contact support for help.
