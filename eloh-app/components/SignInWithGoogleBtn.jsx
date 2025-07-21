@@ -92,7 +92,7 @@ const GoogleSignInButton = () => {
           {isLoading ? "Signing in..." : "Sign In with Google"}
         </button>
 
-        <p>Cpmponent goes here</p>
+        <p>Component goes here</p>
       </div>
     </div>
   );
