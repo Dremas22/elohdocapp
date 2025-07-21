@@ -91,6 +91,8 @@ const GoogleSignInButton = () => {
           <FcGoogle size={22} />
           {isLoading ? "Signing in..." : "Sign In with Google"}
         </button>
+
+        <p>Cpmponent goes here</p>
       </div>
     </div>
   );
