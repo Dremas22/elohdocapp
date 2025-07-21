@@ -6,6 +6,7 @@ import PatientMeetingSetup from "@/components/patients/PatientMeetingSetup";
 import PatientDashboardNavbar from "@/app/dashboard/patient/patientNav";
 import PatientSidebarMenu from "./patientSidebar";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import SaveStripePayment from "@/components/SaveStripePayment";
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -69,11 +70,10 @@ const PatientDashboard = () => {
     <div className="min-h-screen flex flex-col pt-18 relative sm:h-[50vh] h-[145vh] bg-gray-950 text-white overflow-hidden">
       {/* Fixed Navbar */}
       <PatientDashboardNavbar />
-
-      {/* Main Layout */}
-      <div className="relative z-10 flex flex-col lg:flex-row w-full flex-grow">
-        {/* Desktop sidebar */}
-        <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(100vh-5rem)]">
+      <SaveStripePayment />
+      <div className="relative z-10 flex flex-col lg:flex-row w-full h-full flex-grow">
+        {/* Desktop sidebar menu */}
+        <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(50vh-5rem)]">
           <PatientSidebarMenu
             userDoc={userDoc}
             mode={mode}

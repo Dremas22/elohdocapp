@@ -5,6 +5,8 @@ import Image from "next/image";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/db/client";
 
 const Chat = ({ setShowChat }) => {
   const { currentUser, loading } = useCurrentUser();
@@ -13,6 +15,35 @@ const Chat = ({ setShowChat }) => {
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const checkConsultations = async () => {
+      try {
+        if (!loading && currentUser) {
+          setIsLoading(true);
+          const userRef = doc(db, "patients", currentUser.uid);
+          const userSnap = await getDoc(userRef);
+          const userData = userSnap.data();
+
+          const consultations = userData?.numberOfConsultations || 0;
+          console.log(consultations, "CONSULT", userData);
+          if (consultations >= 1) {
+            toast.info(
+              "You already have consultations available. Redirecting..."
+            );
+            setShowChat(false);
+            router.push("/dashboard/patient");
+          }
+        }
+      } catch (error) {
+        console.error("Something went wrong while checking user data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkConsultations();
+  }, [currentUser?.uid]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -70,7 +101,7 @@ const Chat = ({ setShowChat }) => {
           );
 
           setShowChat(false);
-          //router.push("/payment");
+          router.push("/payment");
         }
       }
     } catch (err) {
@@ -176,13 +207,13 @@ const Chat = ({ setShowChat }) => {
             name="input"
             onChange={(e) => setInput(e.target.value)}
             value={input}
-            disabled={isLoading}
+            disabled={isLoading || loading}
             placeholder="Type your message..."
             className="flex-1 bg-[#f0f8ff] text-black px-4 py-2 text-sm rounded-l-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || loading}
             className="bg-[#03045e] text-white py-2 px-4 text-sm sm:text-base font-semibold rounded-r-md shadow-md hover:bg-[#023e8a] transition-all duration-200"
           >
             {isLoading ? "..." : "Send"}
