@@ -7,14 +7,50 @@ import PatientDashboardNavbar from "@/app/dashboard/patient/patientNav";
 import PatientSidebarMenu from "./patientSidebar";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import SaveStripePayment from "@/components/SaveStripePayment";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { db } from "@/db/client";
+import { doc, getDoc } from "firebase/firestore";
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
   const [userDoc, setUserDoc] = useState(null);
   const [showChat, setShowChat] = useState(false);
+  const [showPayButton, setShowPayButton] = useState(true);
   const [userLoading, setUserLoading] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [mode, setMode] = useState("general-notes");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter();
+
+  useEffect(() => {
+      const checkConsultations = async () => {
+        try {
+          if (!loading && currentUser) {
+            setIsLoading(true);
+            const userRef = doc(db, "patients", currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            const userData = userSnap.data();
+  
+            const consultations = userData?.numberOfConsultations || 0;
+           
+            if (consultations >= 1) {
+              toast.info(
+                "You already have consultations available. Redirecting..."
+              );
+              setShowPayButton(false);
+            }
+          }
+        } catch (error) {
+          console.error("Something went wrong while checking user data");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+      checkConsultations();
+    }, [currentUser?.uid]);
 
   useEffect(() => {
     setUserLoading(true);
@@ -110,7 +146,16 @@ const PatientDashboard = () => {
           </div>
         </main>
       </div>
-
+      {showPayButton && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
+          <button
+            onClick={() => router.push("/payment")}
+            className="bg-white text-black px-6 py-3 rounded-lg shadow-lg hover:bg-gray-200 transition"
+          >
+            Go to Payment
+          </button>
+        </div>
+      )}
       {/* Floating Chat Modal */}
       {showChat && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
