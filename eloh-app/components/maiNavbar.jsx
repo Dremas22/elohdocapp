@@ -8,13 +8,15 @@ const Navbar = () => {
     <nav className="bg-[#00b4d8] p-6">
       <div className="container mx-auto flex justify-between items-center">
 
-        {/* Logo on the left */}
+        {/* Logo on the left that redirects to landing page */}
         <div className="flex items-center">
-          <img
-            src="/images/elohdoc.png"
-            alt="Eloh Logo"
-            className="h-10 sm:h-10 w-auto object-contain px-3 pl-4 sm:pl-8 cursor-pointer transform scale-400 sm:scale-600"
-          />
+          <Link href="/" passHref>
+            <img
+              src="/images/elohdoc.png"
+              alt="Eloh Logo"
+              className="h-10 sm:h-10 w-auto object-contain px-3 pl-4 sm:pl-8 cursor-pointer transform scale-400 sm:scale-600"
+            />
+          </Link>
         </div>
 
         {/* Links on the right */}
