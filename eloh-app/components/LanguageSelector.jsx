@@ -5,7 +5,7 @@ export default function LanguageSelector() {
   const [selectedLang, setSelectedLang] = useState("");
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("preferredLanguage");
+    const savedLang = localStorage.getItem("ElohDocApp_preferredLanguage");
     if (savedLang) {
       setSelectedLang(savedLang);
     }
