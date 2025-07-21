@@ -7,6 +7,8 @@ import PatientDashboardNavbar from "@/app/dashboard/patient/patientNav";
 import PatientSidebarMenu from "./patientSidebar";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import SaveStripePayment from "@/components/SaveStripePayment";
+import { useRouter } from "next/navigation";
+
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
