@@ -3,7 +3,7 @@
 import React from "react";
 import ChooseDesignation from "../components/selection";
 import Video from "../components/video";
-import Navbar from "./navbar";
+import Navbar from "./maiNavbar";
 
 const LandingPage = () => {
   return (
