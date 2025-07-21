@@ -75,7 +75,7 @@ const GoogleSignInButton = () => {
       <div className="absolute inset-0 backdrop-blur-md bg-white/20 z-0" />
 
       {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center justify-start pt-40 px-4 text-center h-full">
+      <div className="relative z-10 flex flex-col items-center justify-start pt-30 px-4 text-center h-full">
         <h2 className="text-3xl md:text-4xl font-bold text-[#03045e] mb-6">
           {capitalizedRole} Sign-In
         </h2>
@@ -87,13 +87,16 @@ const GoogleSignInButton = () => {
         <button
           onClick={handleSignIn}
           disabled={isLoading}
-          className="bg-[#03045e] hover:bg-[#0077b6] text-white flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer"
+          className="bg-[#03045e] hover:bg-[#0077b6] text-white mb-5 flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer"
         >
           <FcGoogle size={22} />
           {isLoading ? "Signing in..." : "Sign In with Google"}
         </button>
+        <div >
+          < SignInOrSignUpForm />
+        </div>
 
-        <SignInOrSignUpForm />
+
 
       </div>
     </div>

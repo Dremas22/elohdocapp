@@ -1,89 +1,78 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const SignInOrSignUpForm = () => {
-  const [activeForm, setActiveForm] = useState('signin'); // ✅ Removed TypeScript syntax
+  const [activeForm, setActiveForm] = useState("signin");
 
   return (
-    <div className=" flex pd-10 items-center justify-center bg-gray-100 px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-        {/* Toggle Buttons */}
-        <div className="flex justify-between mb-6">
+    <div className="flex items-center justify-center w-full px-4">
+      <div className="w-full max-w-md backdrop-blur-md bg-white/70 border border-gray-200 rounded-2xl shadow-xl p-8">
+        {/* Toggle Tabs */}
+        <div className="flex mb-6 rounded-lg overflow-hidden shadow-sm">
           <button
-            onClick={() => setActiveForm('signin')}
-            className={`w-1/2 py-2 rounded-l-lg text-white ${
-              activeForm === 'signin' ? 'bg-blue-600' : 'bg-blue-300'
-            }`}
+            onClick={() => setActiveForm("signin")}
+            className={`w-1/2 py-2 cursor-pointer text-sm font-semibold transition ${activeForm === "signin"
+              ? "bg-[#03045e] text-white hover:bg-blue-800"
+              : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+              }`}
           >
             Sign In
           </button>
           <button
-            onClick={() => setActiveForm('signup')}
-            className={`w-1/2 py-2 rounded-r-lg text-white ${
-              activeForm === 'signup' ? 'bg-green-600' : 'bg-green-300'
-            }`}
+            onClick={() => setActiveForm("signup")}
+            className={`w-1/2 py-2 text-sm font-semibold transition ${activeForm === "signup"
+              ? "bg-green-600 text-white"
+              : "bg-green-100 text-green-700 hover:bg-green-200"
+              }`}
           >
             Sign Up
           </button>
         </div>
 
-        {/* Form */}
-        {activeForm === 'signin' ? (
-          <div>
-            <h2 className="text-xl font-bold text-center mb-4 text-gray-700">Welcome Back 👋</h2>
-            <form className="space-y-4">
-              <input
-                type="email"
-                placeholder="Email"
-                required
-                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                required
-                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-              >
-                Sign In
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div>
-            <h2 className="text-xl font-bold text-center mb-4 text-gray-700">Create an Account ✨</h2>
-            <form className="space-y-4">
-              <input
-                type="email"
-                placeholder="Email"
-                required
-                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                required
-                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
+        {/* Form Container */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-bold text-center text-[#03045e] mb-4">
+            {activeForm === "signin"
+              ? "Welcome Back 👋"
+              : "Create an Account ✨"}
+          </h2>
+
+          <form className="space-y-4">
+            <input
+              type="email"
+              placeholder="Email"
+              required
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+
+            <input
+              type="password"
+              placeholder="Password"
+              required
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+
+            {activeForm === "signup" && (
               <input
                 type="password"
                 placeholder="Confirm Password"
                 required
-                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
               />
-              <button
-                type="submit"
-                className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-              >
-                Sign Up
-              </button>
-            </form>
-          </div>
-        )}
+            )}
+
+            <button
+              type="submit"
+              className={`w-full py-2 shadow-[0_9px_#999] active:shadow-[0_5px_#666] text-white rounded-lg font-semibold transition ${activeForm === "signin"
+                ? "bg-[#03045e] hover:bg-blue-600"
+                : "bg-green-600 hover:bg-green-700"
+                }`}
+            >
+              {activeForm === "signin" ? "Sign In" : "Sign Up"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
