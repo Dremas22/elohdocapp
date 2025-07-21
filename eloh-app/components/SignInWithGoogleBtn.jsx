@@ -8,6 +8,7 @@ import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
+import SignInOrSignUpForm from "./signInOrSignUpForm";
 
 const GoogleSignInButton = () => {
   const router = useRouter();
@@ -92,7 +93,8 @@ const GoogleSignInButton = () => {
           {isLoading ? "Signing in..." : "Sign In with Google"}
         </button>
 
-        <p>Component goes here</p>
+        <SignInOrSignUpForm />
+
       </div>
     </div>
   );
