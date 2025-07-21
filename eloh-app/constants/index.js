@@ -152,3 +152,14 @@ export const noteTypeMap = {
   "sick-note": "sickNotes",
   prescription: "prescriptions",
 };
+
+export const banks = [
+  { id: "absa", title: "Absa Bank" },
+  { id: "capitec", title: "Capitec Bank" },
+  { id: "fnb", title: "FNB (First National Bank)" },
+  { id: "nedbank", title: "Nedbank" },
+  { id: "standard", title: "Standard Bank" },
+  { id: "tyme", title: "TymeBank" },
+  { id: "investec", title: "Investec" },
+  { id: "african", title: "African Bank" },
+];

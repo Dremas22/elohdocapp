@@ -6,6 +6,7 @@ import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
 import NurseDashboardNavbar from "@/app/dashboard/nurse/nurseNav";
 import NurseSidebarMenu from "./nurseSidebar"; // New sidebar component
+import Link from "next/link";
 
 const NurseCollectionViewer = () => {
   const [userDoc, setUserDoc] = useState(null);
@@ -73,11 +74,18 @@ const NurseCollectionViewer = () => {
   if (!userDoc) {
     return (
       <div className="min-h-screen bg-gray-50 pt-20">
-        <NurseDashboardNavbar />
+        <PatientDashboardNavbar />
         <div className="flex items-center justify-center h-full">
           <div className="text-center text-gray-600">
             <p className="text-lg font-medium">No user data found.</p>
-            <p className="text-sm mt-1">Please make sure your account is registered correctly.</p>
+            <p className="text-sm mt-1">
+              Please make sure your account is registered correctly.
+            </p>
+            <Link href="/sign-in?role=nurse">
+              <span className="inline-block mt-4 text-blue-600 hover:underline">
+                Go to Sign In
+              </span>
+            </Link>
           </div>
         </div>
       </div>
@@ -108,7 +116,6 @@ const NurseCollectionViewer = () => {
                 Welcome Nurse!
               </h1>
 
-
               {/* Mobile Sidebar under main content */}
               <div className="block lg:hidden w-80 mt-10">
                 <NurseSidebarMenu
@@ -121,12 +128,18 @@ const NurseCollectionViewer = () => {
             </>
           ) : isVerified === false ? (
             <div className="text-gray-600 text-center">
-              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
-              <p>Once verified, you can access patient records and tools here.</p>
+              <h2 className="text-lg font-semibold mb-2">
+                Verification Pending
+              </h2>
+              <p>
+                Once verified, you can access patient records and tools here.
+              </p>
             </div>
           ) : (
             <div className="text-red-600 text-center">
-              <h2 className="text-lg font-semibold mb-2">Verification Declined</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                Verification Declined
+              </h2>
               <p>Please contact support to verify your practice information.</p>
             </div>
           )}
