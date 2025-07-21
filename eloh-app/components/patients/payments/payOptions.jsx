@@ -1,5 +1,7 @@
 "use client";
 
+"use client";
+
 import { useState } from "react";
 import PayToDoctor from "./payToDoctor";
 import PayToNurse from "./payToNurse";
@@ -26,89 +28,6 @@ const PayOptions = () => {
     setSelectedOption(optionValue);
   };
 
-  const handleCheckout = async () => {
-    if (
-      !selectedPackage ||
-      !selectedPackage.title ||
-      !selectedPackage.subscriptionName
-    ) {
-      toast.error("Please select a consultation package.");
-      return;
-    }
-  
-    const priceIdMap = {
-      "1 Nurse consultation": "price_1RnETc05W53pwfR7Ypa9CnER",
-      "2 Nurse consultations": "price_1RnESz05W53pwfR7DozsskCR",
-      "3 Nurse consultations": "price_1RnERg05W53pwfR7HYvsbXyo",
-      "1 Doctor consultation": "price_1RnEVF05W53pwfR7E3oYmlLg",
-      "2 Doctor consultations": "price_1RnEUm05W53pwfR7j5WbV4jI",
-      "3 Doctor consultations": "price_1RnEUG05W53pwfR7O6LMhnzv",
-    };
-    //Stripe checkout error: No such price: 'price_1Rm9pDGanontDcTu93Y7HDAy'
-
-    const priceId = priceIdMap[selectedPackage.subscriptionName];
-    if (!priceId) {
-      toast.error("Invalid package selected.");
-      return;
-    }
-
-    const stripe = await stripePromise;
-
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/stripe-checkout`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            priceId,
-            customerEmail: currentUser?.email,
-          }),
-        }
-      );
-
-      const data = await res.json();
-
-      if (data.error) {
-        toast.error(`Error: ${data.error}`);
-        return;
-      }
-
-      const result = await stripe?.redirectToCheckout({
-        sessionId: data.id,
-      });
-
-      if (result?.error) {
-        toast.error(result.error.message);
-      }
-    } catch (error) {
-      toast.error("Checkout failed. Please try again.");
-      console.error(error);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
-  if (!currentUser) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen text-center space-y-4">
-        <p className="text-gray-700 text-lg">Please sign in to proceed.</p>
-        <Link
-          href="/sign-in?role=patient"
-          className="text-[#03045e] font-semibold underline hover:text-[#023e8a] transition"
-        >
-          Sign In
-        </Link>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-white min-h-screen py-10 px-4 sm:px-6 lg:px-8 text-black">
       <div className="max-w-4xl mx-auto text-center">
@@ -127,11 +46,10 @@ const PayOptions = () => {
             <button
               key={option.value}
               onClick={() => handleSelect(option.value)}
-              className={`px-6 py-3 rounded-xl text-lg font-semibold shadow-md transition duration-200 ${
-                selectedOption === option.value
+              className={`px-6 py-3 rounded-xl text-lg font-semibold shadow-md transition duration-200 ${selectedOption === option.value
                   ? "bg-[#03045e] text-white"
                   : "bg-gray-100 text-[#03045e] hover:bg-gray-200"
-              }`}
+                }`}
             >
               {option.label}
             </button>

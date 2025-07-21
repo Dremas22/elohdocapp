@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { FiUser, FiFile, FiX, FiMenu } from "react-icons/fi";
 import { FaFilePrescription } from "react-icons/fa";
 import { CiMedicalClipboard } from "react-icons/ci";
-import { GiAmbulance } from "react-icons/gi";
 import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
@@ -13,7 +12,7 @@ import ProfileModal from "@/components/ProfileModal";
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
     ? "grid grid-cols-3 gap-6 justify-around"
-    : "flex flex-col gap-5 items-center";
+    : "flex flex-col gap-7 items-center";
 
   return (
     <div className={`${layout} w-full`}>
@@ -143,16 +142,6 @@ const PatientSidebarMenu = ({
       customClass: compact ? "ml-[54px]" : "sm:ml-[0px]",
       showTitle: true,
     },
-    {
-      title: "Ambulance",
-      icon: <GiAmbulance className="h-6 w-6" />,
-      onClick: () => {
-        if (setMode) setMode("sick-notes");
-        if (setNoteOpen) setNoteOpen((prev) => !prev);
-      },
-      customClass: compact ? "ml-[54px]" : "sm:ml-[0px]",
-      showTitle: true,
-    },
   ];
 
   return (
@@ -187,7 +176,7 @@ const PatientSidebarMenu = ({
 
       {/* Sidebar */}
       <div
-        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-25 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0
           ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
         `}
       >
