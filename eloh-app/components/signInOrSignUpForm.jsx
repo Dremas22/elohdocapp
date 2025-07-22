@@ -90,21 +90,19 @@ const SignInOrSignUpForm = ({ role: selectedRole }) => {
         <div className="flex mb-6 rounded-lg overflow-hidden shadow-sm">
           <button
             onClick={() => setActiveForm("signin")}
-            className={`w-1/2 py-2 text-sm font-semibold transition ${
-              activeForm === "signin"
-                ? "bg-[#03045e] text-white"
-                : "bg-blue-100 text-blue-700 hover:bg-blue-200"
-            }`}
+            className={`w-1/2 py-2 text-sm font-semibold transition ${activeForm === "signin"
+              ? "bg-[#03045e] text-white"
+              : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+              }`}
           >
             Sign In
           </button>
           <button
             onClick={() => setActiveForm("signup")}
-            className={`w-1/2 py-2 text-sm font-semibold transition ${
-              activeForm === "signup"
-                ? "bg-green-600 text-white"
-                : "bg-green-100 text-green-700 hover:bg-green-200"
-            }`}
+            className={`w-1/2 py-2 text-sm font-semibold transition ${activeForm === "signup"
+              ? "bg-[#03045e] text-white"
+              : "bg-blue-100 text--700 blue hover:bg-blue-200"
+              }`}
           >
             Sign Up
           </button>
@@ -169,11 +167,10 @@ const SignInOrSignUpForm = ({ role: selectedRole }) => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full flex justify-center items-center gap-2 py-2 shadow-[0_9px_#999] active:shadow-[0_5px_#666] text-white rounded-lg font-semibold transition ${
-                activeForm === "signin"
-                  ? "bg-[#03045e] hover:bg-blue-600"
-                  : "bg-green-600 hover:bg-green-700"
-              } ${isSubmitting ? "opacity-60 cursor-not-allowed" : ""}`}
+              className={`w-full flex justify-center items-center gap-2 py-2 shadow-[0_9px_#999] active:shadow-[0_5px_#666] text-white rounded-lg font-semibold transition ${activeForm === "signin"
+                ? "bg-[#03045e] hover:bg-blue-600"
+                : "bg-[#03045e] hover:bg-blue-700"
+                } ${isSubmitting ? "opacity-60 cursor-not-allowed" : ""}`}
             >
               {isSubmitting && (
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
