@@ -25,9 +25,12 @@ const Step5MedicalHistory = ({ formData, setFormData, errors }) => {
 
   return (
     <div className="bg-blue-50 p-6 rounded-xl border border-blue-200 shadow-sm">
-      <h3 className="text-xl font-semibold text-blue-800 mb-4">Medical History</h3>
+      <h3 className="text-xl font-semibold text-blue-800 mb-4">
+        Medical History
+      </h3>
       <p className="text-sm text-gray-600 mb-6">
-        Please list your medical history details. Separate multiple entries with commas.
+        Please list your medical history details. Separate multiple entries with
+        commas.
       </p>
 
       <div className="grid grid-cols-1 gap-6">
@@ -45,9 +48,13 @@ const Step5MedicalHistory = ({ formData, setFormData, errors }) => {
               placeholder={`${label} (comma-separated)`}
               value={medicalHistory[key].join(", ")}
               onChange={(e) => updateHistory(key, e.target.value)}
-              className={`w-full px-4 py-3 rounded-lg border ${errors.medicalHistory ? "border-red-500" : "border-gray-300"
-                } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300`}
+              className={`w-full px-4 py-3 rounded-lg border ${
+                errors.medicalHistory ? "border-red-500" : "border-gray-300"
+              } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300`}
             />
+            {errors[key] && (
+              <p className="text-sm text-red-600 mt-1">{errors[key]}</p>
+            )}
           </div>
         ))}
       </div>

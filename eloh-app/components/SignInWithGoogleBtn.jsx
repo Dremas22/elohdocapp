@@ -92,12 +92,9 @@ const GoogleSignInButton = () => {
           <FcGoogle size={22} />
           {isLoading ? "Signing in..." : "Sign In with Google"}
         </button>
-        <div >
-          < SignInOrSignUpForm />
+        <div>
+          <SignInOrSignUpForm role={role} />
         </div>
-
-
-
       </div>
     </div>
   );

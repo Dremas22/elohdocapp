@@ -25,6 +25,7 @@ const Step1BasicInfo = ({ formData, setFormData, errors }) => {
       </div>
 
       {/* Full Name */}
+      {/* Full Name */}
       <div className="col-span-full">
         <label className="block mb-1 text-sm font-medium text-blue-700">
           Full Name
@@ -32,11 +33,23 @@ const Step1BasicInfo = ({ formData, setFormData, errors }) => {
         <input
           type="text"
           name="fullName"
-          value={currentUser.displayName || ""}
-          disabled
+          onChange={(e) =>
+            setFormData({ ...formData, fullName: e.target.value })
+          }
+          value={currentUser.displayName || formData.fullName || ""}
+          disabled={!!currentUser.displayName}
           placeholder="Full Name"
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-600 focus:outline-none"
+          className={`w-full px-4 py-3 rounded-lg border ${
+            errors.fullName ? "border-red-500" : "border-gray-300"
+          } ${
+            currentUser.displayName
+              ? "bg-gray-100 text-gray-600"
+              : "bg-white text-gray-900"
+          } focus:outline-none`}
         />
+        {errors.fullName && (
+          <p className="text-sm text-red-600 mt-1">{errors.fullName}</p>
+        )}
       </div>
 
       {/* Email */}
@@ -67,8 +80,9 @@ const Step1BasicInfo = ({ formData, setFormData, errors }) => {
             setFormData({ ...formData, idNumber: e.target.value })
           }
           placeholder="ID Number"
-          className={`w-full px-4 py-3 rounded-lg border ${errors.idNumber ? "border-red-500" : "border-gray-300"
-            } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-200`}
+          className={`w-full px-4 py-3 rounded-lg border ${
+            errors.idNumber ? "border-red-500" : "border-gray-300"
+          } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-200`}
         />
         {errors.idNumber && (
           <p className="text-sm text-red-600 mt-1">{errors.idNumber}</p>

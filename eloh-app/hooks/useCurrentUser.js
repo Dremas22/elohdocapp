@@ -58,9 +58,7 @@ const useCurrentUser = () => {
         vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
       });
     } catch (err) {
-      toast.error("Unable to get FCM token", {
-        icon: <AiOutlineCloseCircle className="text-red-600 text-xl" />,
-      });
+      console.error("Unable to retrieve FCM token", err);
     }
 
     await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {

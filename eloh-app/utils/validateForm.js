@@ -74,14 +74,25 @@ export const validateStep = (step, formData, isFinal = false) => {
       hospitalizations,
       majorInjuries,
     } = medicalHistory;
-    if (
-      !childhoodIllnesses.length &&
-      !adultIllnesses.length &&
-      !surgeries.length &&
-      !hospitalizations.length &&
-      !majorInjuries.length
-    ) {
-      errors.medicalHistory = "At least one medical history entry required.";
+
+    if (!childhoodIllnesses.length) {
+      errors.childhoodIllnesses = "Childhood illnesses are required.";
+    }
+
+    if (!adultIllnesses.length) {
+      errors.adultIllnesses = "Adult illnesses are required.";
+    }
+
+    if (!surgeries.length) {
+      errors.surgeries = "Surgical history is required.";
+    }
+
+    if (!hospitalizations.length) {
+      errors.hospitalizations = "Hospitalization history is required.";
+    }
+
+    if (!majorInjuries.length) {
+      errors.majorInjuries = "Major injuries history is required.";
     }
   }
 
