@@ -6,39 +6,27 @@ import { FaStethoscope, FaNotesMedical, FaUserMd } from "react-icons/fa";
 const doctorPackages = [
   {
     subscriptionName: "1 Doctor consultation",
-    title: (
-      <>
-        1 <span className="hidden md:inline">Consultation</span>
-      </>
-    ),
+    title: "1 Consultation",
     description:
       "Access to once-off consultation, doctor prescription and sick note.",
     price: "R500",
-    icon: <FaStethoscope className="text-3xl text-[#03045e]" />,
+    icon: <FaStethoscope className="text-5xl sm:scale-130 text-[#03045e]" />,
   },
   {
     subscriptionName: "2 Doctor consultations",
-    title: (
-      <>
-        2 <span className="hidden md:inline">Consultations</span>
-      </>
-    ),
+    title: "2 Consultations",
     description:
       "Access to 2 consultations, doctor prescriptions and sick notes.",
     price: "R1000",
-    icon: <FaNotesMedical className="text-3xl text-[#03045e]" />,
+    icon: <FaNotesMedical className="text-5xl sm:scale-500 text-[#03045e]" />,
   },
   {
     subscriptionName: "3 Doctor consultations",
-    title: (
-      <>
-        3 <span className="hidden md:inline">Consultations</span>
-      </>
-    ),
+    title: "3 Consultations",
     description:
       "Access to 3 consultations, doctor prescriptions and sick notes.",
     price: "R1500",
-    icon: <FaUserMd className="text-3xl text-[#03045e]" />,
+    icon: <FaUserMd className="text-5xl sm:scale-500 text-[#03045e]" />,
   },
 ];
 
@@ -55,7 +43,6 @@ const PayToDoctor = ({ setSelectedPackage }) => {
             key={index}
             className="relative bg-white border border-gray-200 p-6 rounded-2xl shadow-md flex flex-col justify-between transition-all hover:shadow-lg hover:-translate-y-1"
           >
-            {/* Logo inside each card */}
             <div className="absolute top-4 right-4 border border-gray-400 rounded-full">
               <Image
                 src="/images/elohdoc.png"
@@ -66,23 +53,18 @@ const PayToDoctor = ({ setSelectedPackage }) => {
               />
             </div>
 
-            {/* Icon & Title */}
             <div className="flex items-center gap-4 mb-4">
               {pkg.icon}
-              <h3 className="text-xl font-semibold text-[#03045e]">
-                {pkg.title}
-              </h3>
+              <h3 className="text-xl font-semibold text-[#03045e]">{pkg.title}</h3>
             </div>
 
-            {/* Description */}
             <p className="text-gray-700 text-sm flex-1">{pkg.description}</p>
 
-            {/* Button */}
             <button
               onClick={() => {
                 setSelectedPackage(pkg);
               }}
-              className="mt-6 bg-[#03045e] text-white py-3 text-base font-semibold rounded-xl hover:bg-[#023e8a] transition duration-200 shadow-sm active:translate-y-0.5"
+              className="mt-6 bg-[#03045e] text-white py-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
             >
               {pkg.price}
             </button>

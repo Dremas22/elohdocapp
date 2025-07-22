@@ -75,7 +75,7 @@ const GoogleSignInButton = () => {
       <div className="absolute inset-0 backdrop-blur-md bg-white/20 z-0" />
 
       {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center justify-start pt-30 px-4 text-center h-full">
+      <div className="relative z-10 flex flex-col items-center justify-start pt-15 px-4 text-center h-full">
         <h2 className="text-3xl md:text-4xl font-bold text-[#03045e] mb-6">
           {capitalizedRole} Sign-In
         </h2>

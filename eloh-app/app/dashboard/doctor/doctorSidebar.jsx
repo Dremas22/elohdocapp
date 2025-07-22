@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiUser, FiCalendar } from "react-icons/fi";
+import { FiUser, FiCalendar, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { IoCloseCircleSharp } from "react-icons/io5";
 import { FaMoneyCheckAlt } from "react-icons/fa";
 import Calendar from "@/app/dashboard/doctor/calendar";
@@ -9,7 +9,7 @@ import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
-import ToggleButton from "./availabilityBtn"; // ✅ Make sure this path is correct
+import ToggleButton from "./availabilityBtn"; // ✅ Check this path
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
@@ -83,8 +83,9 @@ const DoctorSidebarMenu = ({
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isAvailable, setIsAvailable] = useState(false); // toggle state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Desktop sidebar
+  const [isAvailable, setIsAvailable] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false); // Mobile toggle
 
   useEffect(() => {
     const unsubscribe = onMessage(messaging, (payload) => {
@@ -153,7 +154,7 @@ const DoctorSidebarMenu = ({
         />
       )}
 
-      {/* Sidebar for Desktop */}
+      {/* Desktop Sidebar */}
       <div
         className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"
           }`}
@@ -183,9 +184,10 @@ const DoctorSidebarMenu = ({
               compact={false}
             />
 
-            {/* Toggle Button Below Action Buttons - Desktop Only */}
             <div className="mt-6 flex flex-col items-center">
-              <label className="mb-2 text-sm text-[#a0cfff] select-none">Available</label>
+              <label className="mb-2 text-sm text-[#a0cfff] select-none">
+                {isAvailable ? "Available" : "Unavailable"}
+              </label>
               <ToggleButton
                 checked={isAvailable}
                 onChange={() => setIsAvailable(!isAvailable)}
@@ -195,8 +197,27 @@ const DoctorSidebarMenu = ({
         )}
       </div>
 
-      {/* Mobile Bottom Bar */}
-      <div className="lg:hidden fixed bottom-0 right-0 left-0 z-40 sm:h-[38vh] h-[22vh] px-6 py-4 overflow-auto bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-5">
+      {/* ✅ Floating Mobile Toggle Button with Arrow */}
+      <button
+        className="lg:hidden fixed bottom-3 right-4 z-50 bg-[#03045e] text-white rounded-full p-1 shadow-lg"
+        onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+      >
+        {mobileSidebarOpen ? (
+          <FiChevronDown className="h-6 w-6" />
+        ) : (
+          <FiChevronUp className="h-6 w-6" />
+        )}
+      </button>
+
+      {/* ✅ Mobile Sidebar with Slide Animation */}
+      <div
+        className={`
+          lg:hidden fixed bottom-0 right-0 left-0 z-40 sm:h-[38vh] h-[24vh]
+          px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5
+          transition-transform duration-500 ease-in-out bg-gray-900/20
+          ${mobileSidebarOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"}
+        `}
+      >
         <ActionButtons
           buttons={actionButtons}
           notificationCount={notificationCount}
@@ -204,9 +225,10 @@ const DoctorSidebarMenu = ({
           compact={true}
         />
 
-        {/* Toggle Button - Mobile Only */}
         <div className="flex items-center gap-3">
-          <label className="text-sm text-[#a0cfff] select-none">Availability</label>
+          <label className="text-sm text-[#a0cfff] select-none">
+            {isAvailable ? "Available" : "Unavailable"}
+          </label>
           <ToggleButton
             checked={isAvailable}
             onChange={() => setIsAvailable(!isAvailable)}
@@ -214,7 +236,7 @@ const DoctorSidebarMenu = ({
         </div>
       </div>
 
-      {/* Sliding Calendar Drawer */}
+      {/* Calendar Drawer */}
       <div
         className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
           }`}
