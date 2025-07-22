@@ -183,9 +183,11 @@ const DoctorSidebarMenu = ({
               compact={false}
             />
 
-            {/* Toggle Button Below Action Buttons - Desktop Only */}
+            {/* Toggle Button with dynamic label - Desktop Only */}
             <div className="mt-6 flex flex-col items-center">
-              <label className="mb-2 text-sm text-[#a0cfff] select-none">Available</label>
+              <label className="mb-2 text-sm text-[#a0cfff] select-none">
+                {isAvailable ? "Available" : "Unavailable"}
+              </label>
               <ToggleButton
                 checked={isAvailable}
                 onChange={() => setIsAvailable(!isAvailable)}
@@ -204,9 +206,11 @@ const DoctorSidebarMenu = ({
           compact={true}
         />
 
-        {/* Toggle Button - Mobile Only */}
+        {/* Toggle Button - Mobile with dynamic label */}
         <div className="flex items-center gap-3">
-          <label className="text-sm text-[#a0cfff] select-none">Availability</label>
+          <label className="text-sm text-[#a0cfff] select-none">
+            {isAvailable ? "Available" : "Unavailable"}
+          </label>
           <ToggleButton
             checked={isAvailable}
             onChange={() => setIsAvailable(!isAvailable)}
