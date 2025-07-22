@@ -25,6 +25,7 @@ const PatientsRegistrationForm = () => {
   const [currentStep, setCurrentStep] = useState(0);
 
   const initialFormData = {
+    fullName: currentUser?.displayName || "",
     idNumber: "",
     location: { country: "", city: "", addressLine: "" },
     phoneCode: "+27",
@@ -108,7 +109,7 @@ const PatientsRegistrationForm = () => {
         ...formData,
         phoneNumber: `${formData.phoneCode}${formData.phoneNumber}`,
         userId: currentUser?.uid,
-        fullName: currentUser?.displayName,
+        fullName: currentUser?.displayName || formData.fullName,
         email: currentUser?.email,
         role: "patient",
       };

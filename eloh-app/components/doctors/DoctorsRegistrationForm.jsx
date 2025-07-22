@@ -10,6 +10,7 @@ const DoctorsRegistrationForm = () => {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
+    fullName: currentUser?.displayName || "",
     practiceNumber: "",
     phoneCode: "+27",
     phoneNumber: "",
@@ -48,6 +49,10 @@ const DoctorsRegistrationForm = () => {
   const validate = () => {
     const newErrors = {};
 
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "Full name is required";
+    }
+
     if (!formData.practiceNumber.trim()) {
       newErrors.practiceNumber = "Practice number is required.";
     } else if (!/^\d{7}$/.test(formData.practiceNumber.trim())) {
@@ -83,7 +88,7 @@ const DoctorsRegistrationForm = () => {
         ...cleanFormData,
         phoneNumber: combinedPhoneNumber,
         userId: currentUser?.uid,
-        fullName: currentUser?.displayName,
+        fullName: currentUser?.displayName || formData.fullName,
         photoUrl: currentUser?.photoURL,
         email: currentUser?.email,
         role: "doctor",
@@ -125,9 +130,7 @@ const DoctorsRegistrationForm = () => {
 
   if (loading)
     return (
-      <p className="text-[#03045e] text-center py-10 font-medium">
-        Loading...
-      </p>
+      <p className="text-[#03045e] text-center py-10 font-medium">Loading...</p>
     );
 
   return (
@@ -150,11 +153,23 @@ const DoctorsRegistrationForm = () => {
             <input
               type="text"
               name="fullName"
-              value={currentUser?.displayName || ""}
-              disabled
-              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-300 text-gray-600 cursor-not-allowed"
+              onChange={(e) =>
+                setFormData({ ...formData, fullName: e.target.value })
+              }
+              value={currentUser.displayName || formData.fullName || ""}
+              disabled={!!currentUser.displayName}
               placeholder="Full Name"
+              className={`w-full px-4 py-3 rounded-lg border ${
+                errors.fullName ? "border-red-500" : "border-gray-300"
+              } ${
+                currentUser.displayName
+                  ? "bg-gray-100 text-gray-600"
+                  : "bg-white text-gray-900"
+              } focus:outline-none`}
             />
+            {errors.fullName && (
+              <p className="text-sm text-red-600 mt-1">{errors.fullName}</p>
+            )}
           </div>
 
           {/* Email */}
@@ -177,7 +192,9 @@ const DoctorsRegistrationForm = () => {
               value={formData.practiceNumber}
               onChange={handleChange}
               placeholder="Practice Number"
-              className={`w-full px-4 py-3 rounded-xl border ${errors.practiceNumber ? "border-red-500" : "border-gray-300"} bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
+              className={`w-full px-4 py-3 rounded-xl border ${
+                errors.practiceNumber ? "border-red-500" : "border-gray-300"
+              } bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
             />
             {errors.practiceNumber && (
               <p className="text-sm text-red-600 mt-1">
@@ -192,7 +209,9 @@ const DoctorsRegistrationForm = () => {
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-xl border ${errors.category ? "border-red-500" : "border-gray-300"} bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
+              className={`w-full px-4 py-3 rounded-xl border ${
+                errors.category ? "border-red-500" : "border-gray-300"
+              } bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
             >
               <option value="" disabled>
                 Select Category
@@ -230,13 +249,13 @@ const DoctorsRegistrationForm = () => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 placeholder="Phone Number"
-                className={`w-full px-4 py-3 rounded-xl border ${errors.phoneNumber ? "border-red-500" : "border-gray-300"} bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
+                className={`w-full px-4 py-3 rounded-xl border ${
+                  errors.phoneNumber ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
               />
             </div>
             {errors.phoneNumber && (
-              <p className="text-sm text-red-600 mt-1">
-                {errors.phoneNumber}
-              </p>
+              <p className="text-sm text-red-600 mt-1">{errors.phoneNumber}</p>
             )}
           </div>
         </div>

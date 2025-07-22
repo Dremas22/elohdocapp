@@ -175,7 +175,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
         }
       }
 
-      // Step 2: Delete diagnoses linked to user (assuming userId === uid)
+      // Step 2: Delete diagnoses linked to user (userId === uid)
       const diagnosesQuery = query(
         collection(db, "diagnosis"),
         where("userId", "==", uid)
