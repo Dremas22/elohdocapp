@@ -166,8 +166,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                 Verification Pending
               </h2>
               <p>
-                Once your account is verified, you'll be able to access
-                sensitive patient information here.
+                Once your account is verified, you'll access patient information here.
               </p>
             </div>
           ) : (
