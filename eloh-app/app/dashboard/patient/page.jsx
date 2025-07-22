@@ -8,7 +8,9 @@ import PatientSidebarMenu from "./patientSidebar";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import SaveStripePayment from "@/components/SaveStripePayment";
 import { useRouter } from "next/navigation";
-
+import { db } from "@/db/client";
+import { doc, getDoc } from "firebase/firestore";
+import { toast } from "react-toastify";
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -25,9 +27,9 @@ const PatientDashboard = () => {
   useEffect(() => {
     const checkConsultations = async () => {
       try {
-        if (!loading && currentUser) {
+        if (!loading && currentUser?.uid) {
           setIsLoading(true);
-          const userRef = doc(db, "patients", currentUser.uid);
+          const userRef = doc(db, "patients", currentUser?.uid);
           const userSnap = await getDoc(userRef);
           const userData = userSnap.data();
 
@@ -41,7 +43,7 @@ const PatientDashboard = () => {
           }
         }
       } catch (error) {
-        console.error("Something went wrong while checking user data");
+        console.error("Something went wrong while checking user data", error);
       } finally {
         setIsLoading(false);
       }
@@ -57,7 +59,7 @@ const PatientDashboard = () => {
 
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_URL}/api/patients/${currentUser.uid}`
+          `${process.env.NEXT_PUBLIC_URL}/api/patients/${currentUser?.uid}`
         );
         const data = await res.json();
 
