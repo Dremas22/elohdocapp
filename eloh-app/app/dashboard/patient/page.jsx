@@ -140,7 +140,7 @@ const PatientDashboard = () => {
           className="w-full lg:w-3/4 flex flex-col overflow-y-auto lg:overflow-hidden"
           style={{ height: "calc(120vh - 5rem)" }} // Navbar height assumed ~5rem
         >
-          <div className="flex flex-col items-center justify-start flex-grow">
+          <div className="flex flex-col sm:mr-28 items-center justify-start flex-grow">
             <PatientMeetingSetup
               mode={mode}
               noteOpen={noteOpen}

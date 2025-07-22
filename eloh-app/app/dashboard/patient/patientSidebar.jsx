@@ -139,7 +139,7 @@ const PatientSidebarMenu = ({
         if (setMode) setMode("sick-notes");
         if (setNoteOpen) setNoteOpen((prev) => !prev);
       },
-      customClass: compact ? "ml-[54px]" : "sm:ml-[0px]",
+      customClass: compact ? "ml-[110px]" : "sm:ml-[0px]",
       showTitle: true,
     },
   ];

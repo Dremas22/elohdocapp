@@ -73,7 +73,7 @@ const DoctorsDashboard = async () => {
     }
 
     return (
-      <div>
+      <div className="bg-gray-950 pr-20">
         <DoctorsCollectionViewer userDoc={doctorData} patients={patients} />
       </div>
     );
