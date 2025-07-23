@@ -7,7 +7,6 @@ import {
   RoomAudioRenderer,
   useTracks,
   RoomContext,
-  ParticipantName,
 } from "@livekit/components-react";
 import { Room, Track } from "livekit-client";
 import "@livekit/components-styles";
@@ -34,13 +33,13 @@ const MeetingRoom = () => {
       })
   );
 
-  // ✅ Only compute userName once currentUser is ready
+  // Compute userName when ready
   const name = useMemo(() => {
     if (loading) return null;
     return currentUser?.displayName || `Guest_${Date.now()}`;
   }, [currentUser, loading]);
 
-  const encodedName = encodeURIComponent(name);
+  const encodedName = encodeURIComponent(name || "");
 
   const handleJoin = async () => {
     if (!name || !room) return;
@@ -72,7 +71,13 @@ const MeetingRoom = () => {
     };
   }, [roomInstance]);
 
-  // ✅ Wait until user is loaded
+  // Auto-join once everything is ready
+  useEffect(() => {
+    if (!hasJoined && name && room) {
+      handleJoin();
+    }
+  }, [hasJoined, name, room]);
+
   if (loading || !name) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100 text-gray-700">
@@ -84,36 +89,39 @@ const MeetingRoom = () => {
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
       {!hasJoined ? (
-        <button
-          onClick={handleJoin}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition"
-        >
-          Join Meeting Room
-        </button>
+        <div className="text-lg font-medium text-gray-700">
+          Joining meeting...
+        </div>
       ) : (
         <RoomContext.Provider value={roomInstance}>
-          <div data-lk-theme="default" style={{ height: "100dvh" }}>
+          <div
+            data-lk-theme="default"
+            style={{ height: "100dvh" }}
+            className="bg-gray-500 border border-gray-900"
+          >
             <MyVideoConference roomID={room} />
             <RoomAudioRenderer />
             <ControlBar />
           </div>
         </RoomContext.Provider>
       )}
+      <RichTextEditor roomID={room} />
     </div>
   );
 };
 
 function MyVideoConference({ roomID }) {
+  const { currentUser, loading } = useCurrentUser();
   const tracks = useTracks(
     [
-      { source: Track.Source.Camera, withPlaceholder: true },
+      { source: Track.Source.Camera, withPlaceholder: false },
       { source: Track.Source.ScreenShare, withPlaceholder: false },
     ],
     { onlySubscribed: false }
   );
 
   return (
-    <>
+    <div className="w-full h-screen flex items-center justify-evenly">
       <GridLayout
         tracks={tracks}
         style={{ height: "calc(100vh - var(--lk-control-bar-height))" }}
@@ -124,16 +132,18 @@ function MyVideoConference({ roomID }) {
               key={trackRef.participant.identity}
               className="relative rounded-lg overflow-hidden shadow"
             >
+              <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-sm">
+                {trackRef.participant.identity}'s Meeting
+              </div>
               <ParticipantTile trackRef={trackRef} />
               <div className="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-sm">
-                {trackRef.participant.identity}
+                {currentUser?.displayName || `Guest_${Date.now()}`}
               </div>
             </div>
           ))}
         </>
       </GridLayout>
-      <RichTextEditor roomID={roomID} />
-    </>
+    </div>
   );
 }
 
