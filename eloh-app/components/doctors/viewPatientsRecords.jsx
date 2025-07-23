@@ -50,7 +50,12 @@ const ViewPatientsRecords = ({
           <button
             key={id}
             onClick={() => setMode(type)}
-            className="bg-[#03045e] text-white py-2 px-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
+            className={`py-2 px-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out
+        ${mode === type
+                ? "bg-[#2c4253] text-white hover:bg-[#023e8a]" // lighter blue for active + darker text
+                : "bg-[#03045e] text-white hover:bg-[#023e8a]"
+              }
+      `}
           >
             {label}
           </button>
