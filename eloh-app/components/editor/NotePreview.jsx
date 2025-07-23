@@ -49,6 +49,14 @@ const NotePreview = ({
             <p>{docPhone}</p>
           </div>
         </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-600 mb-1">
+            Patient Name:
+          </label>
+          <p className="text-lg font-semibold italic text-gray-900">
+            {previewData?.patientName || "N/A"}
+          </p>
+        </div>
 
         {/* Preview Body */}
         <div className="text-gray-800 font-serif text-[16px] sm:text-[17px] leading-relaxed text-justify">
