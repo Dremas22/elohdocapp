@@ -204,7 +204,6 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-[10px] z-50 flex items-center justify-center">
-
       <div className="bg-white rounded-xl text-black p-6 w-full max-w-md shadow-lg relative border-t-8 border-[#0d6efd]">
         <h2 className="text-2xl font-bold mb-5 text-[#0d6efd] text-center">
           Edit Profile
