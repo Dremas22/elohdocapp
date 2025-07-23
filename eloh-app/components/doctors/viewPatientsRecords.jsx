@@ -11,7 +11,11 @@ const noteTypes = [
   { id: "sickNotes", type: "sickNotes", label: "Sick Notes" },
 ];
 
-const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
+const ViewPatientsRecords = ({
+  data,
+  setOpenViewPatientRecords,
+  signature,
+}) => {
   const [mode, setMode] = useState(noteTypes[0].type);
   const [selectedNotes, setSelectedNotes] = useState([]);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -121,10 +125,7 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
               ))
             ) : (
               <tr>
-                <td
-                  colSpan="3"
-                  className="text-center px-6 py-4 text-gray-500"
-                >
+                <td colSpan="3" className="text-center px-6 py-4 text-gray-500">
                   No {noteTypes.find((type) => type.type === mode)?.label}{" "}
                   available.
                 </td>
@@ -141,6 +142,7 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
           isLoading={false}
           onClose={() => setSelectedRecord(null)}
           noteType={mode}
+          signature={signature}
         />
       )}
     </div>
