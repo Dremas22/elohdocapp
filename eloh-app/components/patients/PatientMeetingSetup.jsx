@@ -168,7 +168,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
                     if (currentUser?.uid && doc.userId) {
                       sendNotificationToDoctor(doc.userId, currentUser.uid);
                       router.push(
-                        `/room/${doc.userId}?patientId=${currentUser.uid}`
+                        `/room?doctorId=${doc.userId}&patientId=${currentUser.uid}`
                       );
                     }
                   }}

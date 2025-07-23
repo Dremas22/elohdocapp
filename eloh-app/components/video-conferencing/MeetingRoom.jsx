@@ -1,133 +1,150 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
+import {
+  ControlBar,
+  GridLayout,
+  ParticipantTile,
+  RoomAudioRenderer,
+  useTracks,
+  RoomContext,
+} from "@livekit/components-react";
+import { Room, Track } from "livekit-client";
+import "@livekit/components-styles";
+import { useEffect, useState, useMemo } from "react";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { useSearchParams } from "next/navigation";
+import RichTextEditor from "@/components/editor/TextEditor";
 
-const MeetingRoom = ({
-  doctorId,
-  patientId,
-  isDoctor,
-  userId,
-  currentUser,
-  loading,
-  patientData,
-  setPatientData,
-}) => {
-  const containerRef = useRef(null);
-  const hasJoined = useRef(false);
+const MeetingRoom = () => {
+  const { currentUser, loading } = useCurrentUser();
+  const searchParams = useSearchParams();
 
-  const [isNotifying, setIsNotifying] = useState(false);
-  const [notifyError, setNotifyError] = useState(null);
-  const [isJoining, setIsJoining] = useState(false);
-  const [participants, setParticipants] = useState([]);
+  const doctorId = searchParams.get("doctorId");
+  const patientId = searchParams.get("patientId");
+  const room = doctorId;
+  const [token, setToken] = useState("");
+  const [hasJoined, setHasJoined] = useState(false);
 
-  // Notify doctor and fetch patient data
-  useEffect(() => {
-    if (!doctorId || !patientId || loading) return;
+  const [roomInstance] = useState(
+    () =>
+      new Room({
+        adaptiveStream: true,
+        dynacast: true,
+      })
+  );
 
-    const notifyAndFetchPatient = async () => {
-      setIsNotifying(true);
-      setNotifyError(null);
+  // Compute userName when ready
+  const name = useMemo(() => {
+    if (loading) return null;
+    return currentUser?.displayName || `Guest_${Date.now()}`;
+  }, [currentUser, loading]);
 
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_URL}/api/notify-doctor`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ doctorId, patientId }),
-          }
+  const encodedName = encodeURIComponent(name || "");
+
+  const handleJoin = async () => {
+    if (!name || !room) return;
+
+    try {
+      const resp = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/token?room=${room}&username=${encodedName}`
+      );
+      const data = await resp.json();
+
+      if (data.token) {
+        setToken(data.token);
+        await roomInstance.connect(
+          process.env.NEXT_PUBLIC_LIVEKIT_URL,
+          data.token
         );
-
-        if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(errorText || "Failed to notify doctor");
-        }
-
-        const data = await res.json();
-        setPatientData(data.patient);
-      } catch (error) {
-        console.error("Error notifying doctor:", error);
-        setNotifyError(error.message);
-      } finally {
-        setIsNotifying(false);
+        setHasJoined(true);
+      } else {
+        console.error("Token not returned:", data);
       }
-    };
-
-    notifyAndFetchPatient();
-  }, [doctorId, patientId, loading]);
-
-  // Join Zego meeting room
-  useEffect(() => {
-    if (
-      !containerRef.current ||
-      hasJoined.current ||
-      loading ||
-      !currentUser?.displayName ||
-      !patientId
-    ) {
-      return;
+    } catch (e) {
+      console.error("Error joining room:", e);
     }
+  };
 
-    setIsJoining(true);
-    hasJoined.current = true;
+  useEffect(() => {
+    return () => {
+      roomInstance.disconnect();
+    };
+  }, [roomInstance]);
 
-    const appID = parseInt(process.env.NEXT_PUBLIC_ZEGO_APP_ID);
-    const serverSecret = process.env.NEXT_PUBLIC_ZEGO_SERVER_SECRET;
+  // Auto-join once everything is ready
+  useEffect(() => {
+    if (!hasJoined && name && room) {
+      handleJoin();
+    }
+  }, [hasJoined, name, room]);
 
-    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
-      appID,
-      serverSecret,
-      doctorId,
-      patientId,
-      currentUser.displayName,
-      1800
+  if (loading || !name) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100 text-gray-700">
+        <div className="text-lg font-semibold">Loading user info...</div>
+      </div>
     );
-
-    const zp = ZegoUIKitPrebuilt.create(kitToken);
-
-    zp.joinRoom({
-      container: containerRef.current,
-      scenario: {
-        mode: ZegoUIKitPrebuilt.VideoConference,
-      },
-      sharedLinks: [
-        {
-          name: "Copy Link",
-          url:
-            window.location.protocol +
-            "//" +
-            window.location.host +
-            window.location.pathname +
-            "?roomID=" +
-            doctorId,
-        },
-      ],
-      onJoinRoom: () => {
-        setIsJoining(false);
-      },
-    });
-  }, [doctorId, patientId, currentUser?.displayName, loading]);
+  }
 
   return (
-    <div className="w-full h-screen flex flex-col bg-gray-900 text-white">
-      {notifyError && (
-        <div className="bg-red-600 text-white p-2 text-center">
-          {notifyError}
+    <div className="flex items-center justify-center h-screen bg-gray-100">
+      {!hasJoined ? (
+        <div className="text-lg font-medium text-gray-700">
+          Joining meeting...
         </div>
+      ) : (
+        <RoomContext.Provider value={roomInstance}>
+          <div
+            data-lk-theme="default"
+            style={{ height: "100dvh" }}
+            className="bg-gray-500 border border-gray-900"
+          >
+            <MyVideoConference roomID={room} />
+            <RoomAudioRenderer />
+            <ControlBar />
+          </div>
+        </RoomContext.Provider>
       )}
-
-      {(isNotifying || isJoining) && (
-        <div className="text-center p-2 text-gray-300">
-          {isNotifying
-            ? "Sending notification..."
-            : "Preparing Meeting Room ..."}
-        </div>
-      )}
-
-      <div className="flex-grow" ref={containerRef}></div>
+      <RichTextEditor roomID={room} />
     </div>
   );
 };
+
+function MyVideoConference({ roomID }) {
+  const { currentUser, loading } = useCurrentUser();
+  const tracks = useTracks(
+    [
+      { source: Track.Source.Camera, withPlaceholder: false },
+      { source: Track.Source.ScreenShare, withPlaceholder: false },
+    ],
+    { onlySubscribed: false }
+  );
+
+  return (
+    <div className="w-full h-screen flex items-center justify-evenly">
+      <GridLayout
+        tracks={tracks}
+        style={{ height: "calc(100vh - var(--lk-control-bar-height))" }}
+      >
+        <>
+          {tracks.map((trackRef) => (
+            <div
+              key={trackRef.participant.identity}
+              className="relative rounded-lg overflow-hidden shadow"
+            >
+              <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-sm">
+                {trackRef.participant.identity}'s Meeting
+              </div>
+              <ParticipantTile trackRef={trackRef} />
+              <div className="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-sm">
+                {currentUser?.displayName || `Guest_${Date.now()}`}
+              </div>
+            </div>
+          ))}
+        </>
+      </GridLayout>
+    </div>
+  );
+}
 
 export default MeetingRoom;
