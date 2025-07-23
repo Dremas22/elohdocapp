@@ -82,7 +82,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
         </aside>
 
         {/* Main Panel */}
-        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent overflow-y-auto">
+        <main className="w-full lg:w-3/4 flex flex-col items-center  justify-center text-center bg-transparent overflow-y-auto">
           {isVerified === true ? (
             <>
               {/* Welcome Banner */}

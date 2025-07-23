@@ -5,7 +5,8 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import ViewMedicalRecords from "../viewMedicalRecords";
 
 const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
@@ -15,6 +16,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -39,6 +41,15 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
 
     fetchDoctors();
   }, []);
+
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({
+        left: direction === "right" ? 320 : -320,
+        behavior: "smooth",
+      });
+    }
+  };
 
   const fullName = currentUser?.displayName || `Unknown-user_${Date.now()}`;
 
@@ -130,8 +141,26 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             No doctors available
           </p>
         ) : (
-          <div className="flex justify-center w-full">
-            <div className="grid w-full max-w-full px-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="relative mt-10">
+            {/* Scroll Buttons */}
+            <button
+              onClick={() => scroll("left")}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 hover:bg-[#292a46] text-white p-2 rounded-full shadow-lg cursor-pointer"
+            >
+              <FaArrowLeft />
+            </button>
+            <button
+              onClick={() => scroll("right")}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hover:bg-[#292a46] text-white p-2 rounded-full shadow-lg cursor-pointer"
+            >
+              <FaArrowRight />
+            </button>
+
+            {/* Scrollable Cards */}
+            <div
+              ref={scrollRef}
+              className="flex overflow-x-auto space-x-4 px-2 scrollbar-hide"
+            >
               {doctors.map((doc) => (
                 <div
                   key={doc.userId}
@@ -143,12 +172,12 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
                       );
                     }
                   }}
-                  className={`rounded-lg p-4 w-full shadow-md flex flex-col items-center gap-4 transition duration-200 ${
-                    currentUser?.uid && doc.userId
-                      ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
-                      : "cursor-not-allowed bg-gray-700 opacity-50"
-                  }`}
+                  className={`min-w-[260px] sm:min-w-[280px] md:min-w-[300px] rounded-lg p-4 shadow-md flex-shrink-0 flex flex-col items-center gap-4 transition duration-200 ${currentUser?.uid && doc.userId
+                    ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
+                    : "cursor-not-allowed bg-gray-700 opacity-50"
+                    }`}
                 >
+
                   <div className="text-center space-y-2">
                     <h3 className="text-lg font-bold text-white">
                       {doc.fullName}
@@ -163,14 +192,13 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
                       Click to join meeting
                     </p>
                   </div>
-
-                  {userDoc?.photoURL && (
+                  {doc.photoUrl && (
                     <Image
                       src={doc.photoUrl}
                       alt={doc.fullName}
                       width={64}
                       height={64}
-                      className="w-16 h-16 rounded-full border border-amber-50 object-cover"
+                      className="w-16 h-16 rounded-full border border-white object-cover"
                     />
                   )}
                 </div>
