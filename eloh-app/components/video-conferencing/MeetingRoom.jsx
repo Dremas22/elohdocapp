@@ -110,40 +110,20 @@ const MeetingRoom = () => {
   );
 };
 
-function MyVideoConference({ roomID }) {
-  const { currentUser, loading } = useCurrentUser();
+function MyVideoConference() {
+
   const tracks = useTracks(
     [
-      { source: Track.Source.Camera, withPlaceholder: false },
+      { source: Track.Source.Camera, withPlaceholder: true },
       { source: Track.Source.ScreenShare, withPlaceholder: false },
     ],
-    { onlySubscribed: false }
+    { onlySubscribed: false },
   );
-
   return (
-    <div className="w-full h-screen flex items-center justify-evenly">
-      <GridLayout
-        tracks={tracks}
-        style={{ height: "calc(100vh - var(--lk-control-bar-height))" }}
-      >
-        <>
-          {tracks.map((trackRef) => (
-            <div
-              key={trackRef.participant.identity}
-              className="relative rounded-lg overflow-hidden shadow"
-            >
-              <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-sm">
-                {trackRef.participant.identity}'s Meeting
-              </div>
-              <ParticipantTile trackRef={trackRef} />
-              <div className="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-sm">
-                {currentUser?.displayName || `Guest_${Date.now()}`}
-              </div>
-            </div>
-          ))}
-        </>
-      </GridLayout>
-    </div>
+    <GridLayout tracks={tracks} style={{ height: 'calc(100vh - var(--lk-control-bar-height))' }}>
+
+      <ParticipantTile />
+    </GridLayout>
   );
 }
 
