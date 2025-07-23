@@ -44,7 +44,7 @@ export async function POST(req) {
       token: fcmToken,
       notification: {
         title: "New Consultation Request",
-        body: `${patientName} wants to start a video consultation.\nJoin here: ${process.env.NEXT_PUBLIC_URL}/room/${doctorId}?patientId=${patientId}`,
+        body: `${patientName} wants to start a video consultation.\nJoin here: ${process.env.NEXT_PUBLIC_URL}/room?${doctorId}&patientId=${patientId}`,
       },
       data: {
         roomId: doctorId,
