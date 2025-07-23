@@ -19,7 +19,7 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
   useEffect(() => {
     if (data && data[mode]) {
       const notesObject = data[mode];
-      const notesArray = Object.values(notesObject); // 👈 convert to array
+      const notesArray = Object.values(notesObject);
       setSelectedNotes(notesArray);
     } else {
       setSelectedNotes([]);
@@ -36,20 +36,17 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
 
   return (
     <div className="text-[#333] p-8 w-full max-w-6xl mx-auto">
-      <h1 className="text-2xl text-gray-200  font-bold mb-6 text-center">
+      <h1 className="text-2xl text-gray-200 font-bold mb-6 text-center">
         Patient Records
       </h1>
 
       {/* Toggle Buttons */}
-      <div className="flex justify-center  gap-4 mb-6">
+      <div className="flex justify-center gap-4 mb-6">
         {noteTypes.map(({ id, type, label }) => (
           <button
             key={id}
             onClick={() => setMode(type)}
-            className={`px-4 py-1 rounded-xl font-medium shadow-[0_4px_#999] active:shadow-[0_2px_#666] ${mode === type
-              ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
+            className="bg-[#03045e] text-white py-2 px-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
           >
             {label}
           </button>
@@ -57,7 +54,7 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
       </div>
 
       {/* Table Section */}
-      <div className="overflow-x-auto pl bg-white rounded-lg -ml-11.5 sm:-ml-4 shadow-md border border-gray-200 w-[95vw] sm:w-full px-2 sm:px-6 text-sm sm:text-base">
+      <div className="overflow-x-auto bg-white rounded-lg shadow-md border border-gray-200 w-[77vw] sm:w-full px-2 sm:px-6 text-sm sm:text-base -ml-11.5 sm:-ml-4">
         <div className="flex justify-end px-4 pt-3">
           <button
             onClick={() => {
@@ -73,7 +70,7 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
         </div>
 
         <table className="min-w-full bg-white">
-          <thead className="bg-gray-100 px-10 ">
+          <thead className="bg-gray-100">
             <tr>
               <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
                 Date
@@ -81,7 +78,7 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
               <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
                 Doctor
               </th>
-              <th className="sm:px-6 px-3 py-3 text-sm font-semibold text-gray-600 text-center">
+              <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center hidden sm:table-cell">
                 Summary
               </th>
             </tr>
@@ -100,7 +97,7 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
                   <td className="px-6 py-4 text-center">
                     {record.doctorName || "N/A"}
                   </td>
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-6 py-4 text-center hidden sm:table-cell">
                     {(() => {
                       const content = record.content;
                       if (typeof content === "string") return content;
@@ -119,7 +116,10 @@ const ViewPatientsRecords = ({ data, setOpenViewPatientRecords }) => {
               ))
             ) : (
               <tr>
-                <td colSpan="3" className="text-center px-6 py-4 text-gray-500">
+                <td
+                  colSpan="3"
+                  className="text-center px-6 py-4 text-gray-500"
+                >
                   No {noteTypes.find((type) => type.type === mode)?.label}{" "}
                   available.
                 </td>
