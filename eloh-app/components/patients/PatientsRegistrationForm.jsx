@@ -74,8 +74,8 @@ const PatientsRegistrationForm = () => {
     if (currentUser) {
       setFormData((prev) => ({
         ...prev,
-        email: currentUser.email || "",
-        photoUrl: currentUser.photoURL || "",
+        email: currentUser?.email || "",
+        photoUrl: currentUser?.photoURL || "",
       }));
     }
   }, [currentUser]);
