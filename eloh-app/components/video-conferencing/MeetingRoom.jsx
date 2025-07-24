@@ -111,7 +111,6 @@ const MeetingRoom = () => {
           ← Back
         </button>
       )}
-
       {/* Loading State */}
       {!hasJoined ? (
         <div className="m-auto text-lg font-semibold text-gray-700">
@@ -123,8 +122,9 @@ const MeetingRoom = () => {
           <RoomContext.Provider value={roomInstance}>
             <div
               data-lk-theme="default"
-              className={`${isDoctor ? "flex-[0.6]" : "flex-1"
-                } bg-gray-900 border-r border-gray-700 overflow-hidden`}
+              className={`${
+                isDoctor ? "flex-[0.6]" : "flex-1"
+              } bg-gray-900 border-r border-gray-700 overflow-hidden`}
             >
               <MyVideoConference roomID={room} />
               <RoomAudioRenderer />
@@ -146,22 +146,51 @@ const MeetingRoom = () => {
           ) : null}
         </>
       )}
+      <>
+        {/* Left: Video Conference */}
+        <RoomContext.Provider value={roomInstance}>
+          <div
+            data-lk-theme="default"
+            className={`${
+              isDoctor ? "flex-[0.6]" : "flex-1"
+            } bg-gray-900 border-r border-gray-700 overflow-hidden`}
+          >
+            <MyVideoConference roomID={room} />
+            <RoomAudioRenderer />
+            <ControlBar />
+          </div>
+        </RoomContext.Provider>
+
+        {/* Right: Text Editor for Doctor Only */}
+        {typeof isDoctor === "undefined" ? (
+          // Still determining if user is doctor
+          <div className="flex-[0.4] min-w-[400px] h-full bg-white border-l border-gray-300 shadow-inner flex items-center justify-center">
+            <p className="text-gray-600 text-lg">Loading editor...</p>
+          </div>
+        ) : isDoctor ? (
+          // Doctor confirmed
+          <div className="flex-[0.4] min-w-[400px] h-full bg-white border-l border-gray-300 shadow-inner overflow-y-auto">
+            <RichTextEditor roomID={doctorId} />
+          </div>
+        ) : null}
+      </>
     </div>
   );
 };
 
 function MyVideoConference() {
-
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
       { source: Track.Source.ScreenShare, withPlaceholder: false },
     ],
-    { onlySubscribed: false },
+    { onlySubscribed: false }
   );
   return (
-    <GridLayout tracks={tracks} style={{ height: 'calc(100vh - var(--lk-control-bar-height))' }}>
-
+    <GridLayout
+      tracks={tracks}
+      style={{ height: "calc(100vh - var(--lk-control-bar-height))" }}
+    >
       <ParticipantTile />
     </GridLayout>
   );
