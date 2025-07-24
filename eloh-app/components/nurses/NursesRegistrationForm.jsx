@@ -25,8 +25,8 @@ const NursesRegistrationForm = () => {
     if (currentUser) {
       setFormData((prev) => ({
         ...prev,
-        email: currentUser.email || "",
-        photoUrl: currentUser.photoUrl || "",
+        email: currentUser?.email || "",
+        photoUrl: currentUser?.photoUrl || "",
       }));
     }
   }, [currentUser]);
@@ -181,8 +181,9 @@ const NursesRegistrationForm = () => {
               value={formData.practiceNumber}
               onChange={handleChange}
               placeholder="Practice Number"
-              className={`w-full px-4 py-3 rounded-lg border ${errors.practiceNumber ? "border-red-500" : "border-gray-300"
-                } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-150`}
+              className={`w-full px-4 py-3 rounded-lg border ${
+                errors.practiceNumber ? "border-red-500" : "border-gray-300"
+              } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-150`}
             />
             {errors.practiceNumber && (
               <p className="mt-1 text-sm text-red-600">
@@ -197,8 +198,9 @@ const NursesRegistrationForm = () => {
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-lg border ${errors.category ? "border-red-500" : "border-gray-300"
-                } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-150`}
+              className={`w-full px-4 py-3 rounded-lg border ${
+                errors.category ? "border-red-500" : "border-gray-300"
+              } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-150`}
             >
               <option value="" disabled>
                 Select Category
@@ -236,8 +238,9 @@ const NursesRegistrationForm = () => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 placeholder="Phone Number"
-                className={`w-full px-4 py-3 rounded-lg border ${errors.phoneNumber ? "border-red-500" : "border-gray-300"
-                  } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-150`}
+                className={`w-full px-4 py-3 rounded-lg border ${
+                  errors.phoneNumber ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-150`}
                 pattern="^[0-9]{9}$"
               />
             </div>
