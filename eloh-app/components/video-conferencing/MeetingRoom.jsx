@@ -174,7 +174,6 @@ const MeetingRoom = () => {
           </div>
         ) : null}
       </>
-      )}
     </div>
   );
 };
