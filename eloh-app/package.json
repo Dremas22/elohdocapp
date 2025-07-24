@@ -12,7 +12,6 @@
     "@livekit/components-react": "^2.9.14",
     "@livekit/components-styles": "^1.1.6",
     "@stripe/stripe-js": "^7.5.0",
-    "@zegocloud/zego-uikit-prebuilt": "^2.15.0",
     "firebase": "^11.9.0",
     "firebase-admin": "^13.4.0",
     "livekit-server-sdk": "^2.13.1",
