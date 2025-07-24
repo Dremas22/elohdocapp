@@ -123,9 +123,8 @@ const MeetingRoom = () => {
           <RoomContext.Provider value={roomInstance}>
             <div
               data-lk-theme="default"
-              className={`${
-                isDoctor ? "flex-[0.6]" : "flex-1"
-              } bg-gray-900 border-r border-gray-700 overflow-hidden`}
+              className={`${isDoctor ? "flex-[0.6]" : "flex-1"
+                } bg-gray-900 border-r border-gray-700 overflow-hidden`}
             >
               <MyVideoConference roomID={room} />
               <RoomAudioRenderer />
@@ -152,22 +151,17 @@ const MeetingRoom = () => {
 };
 
 function MyVideoConference() {
-  // `useTracks` returns all camera and screen share tracks. If a user
-  // joins without a published camera track, a placeholder track is returned.
+
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
       { source: Track.Source.ScreenShare, withPlaceholder: false },
     ],
-    { onlySubscribed: false }
+    { onlySubscribed: false },
   );
   return (
-    <GridLayout
-      tracks={tracks}
-      style={{ height: "calc(100vh - var(--lk-control-bar-height))" }}
-    >
-      {/* The GridLayout accepts zero or one child. The child is used
-      as a template to render all passed in tracks. */}
+    <GridLayout tracks={tracks} style={{ height: 'calc(100vh - var(--lk-control-bar-height))' }}>
+
       <ParticipantTile />
     </GridLayout>
   );

@@ -145,13 +145,13 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             {/* Scroll Buttons */}
             <button
               onClick={() => scroll("left")}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 hover:bg-[#292a46] text-white p-2 rounded-full shadow-lg cursor-pointer"
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
             >
               <FaArrowLeft />
             </button>
             <button
               onClick={() => scroll("right")}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hover:bg-[#292a46] text-white p-2 rounded-full shadow-lg cursor-pointer"
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
             >
               <FaArrowRight />
             </button>
