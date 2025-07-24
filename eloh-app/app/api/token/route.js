@@ -6,6 +6,17 @@ export const revalidate = 0;
 export async function GET(req) {
   const room = req.nextUrl.searchParams.get("room");
   const username = req.nextUrl.searchParams.get("username");
+  // Get token from cookies or Authorization header
+  const cookieToken = req.cookies.get("session")?.value;
+  const headerToken = req.headers.get("authorization")?.split("Bearer ")[1];
+  const token = cookieToken || headerToken;
+
+  if (!token) {
+    return NextResponse.json(
+      { error: "Unauthorized User, Please sign-in to join meeting" },
+      { status: 401 }
+    );
+  }
   if (!room) {
     return NextResponse.json(
       { error: 'Missing "room" query parameter' },
