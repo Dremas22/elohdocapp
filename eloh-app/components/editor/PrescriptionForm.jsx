@@ -53,11 +53,15 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
     setFieldErrors({});
 
     const errors = {};
-    const trimmedMedications = medications.map((m) => m.trim()).filter((m) => m);
+    const trimmedMedications = medications
+      .map((m) => m.trim())
+      .filter((m) => m);
 
     if (!date) errors.date = "Please select a date.";
-    if (!instructions.trim()) errors.instructions = "Instructions are required.";
-    if (trimmedMedications.length === 0) errors.medications = "At least one medication is required.";
+    if (!instructions.trim())
+      errors.instructions = "Instructions are required.";
+    if (trimmedMedications.length === 0)
+      errors.medications = "At least one medication is required.";
     if (!signature) errors.signature = "Doctor's signature is required.";
 
     if (Object.keys(errors).length > 0) {
@@ -112,6 +116,7 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
           noteType="prescriptions"
           isLoading={isLoading}
           onClose={() => setOpenPreview(false)}
+          signature={signature}
         />
       )}
       <h2 className="text-xl font-semibold text-[#03045e]">Prescription</h2>
@@ -123,13 +128,16 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
       <div className="bg-gray-100 p-4 rounded-md space-y-4 border border-gray-300">
         {/* Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Date
+          </label>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className={`w-full px-3 py-2 text-black rounded-md border ${fieldErrors.date ? "border-red-500" : "border-gray-300"
-              }`}
+            className={`w-full px-3 py-2 text-black rounded-md border ${
+              fieldErrors.date ? "border-red-500" : "border-gray-300"
+            }`}
           />
           {fieldErrors.date && (
             <p className="text-red-600 text-xs mt-1">{fieldErrors.date}</p>
@@ -138,7 +146,9 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
 
         {/* Medications - moved above instructions */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Medications</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Medications
+          </label>
           {medications.map((med, index) => (
             <div key={index} className="flex gap-2 mb-2">
               <input
@@ -173,13 +183,16 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
 
         {/* Instructions - moved below medications */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Instructions</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Instructions
+          </label>
           <textarea
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
             rows={3}
-            className={`w-full px-3 py-2 text-black rounded-md border ${fieldErrors.instructions ? "border-red-500" : "border-gray-300"
-              }`}
+            className={`w-full px-3 py-2 text-black rounded-md border ${
+              fieldErrors.instructions ? "border-red-500" : "border-gray-300"
+            }`}
           />
           {fieldErrors.instructions && (
             <p className="text-red-600 text-xs mt-1">

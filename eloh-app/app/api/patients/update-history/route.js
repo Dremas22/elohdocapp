@@ -74,6 +74,8 @@ export async function POST(request) {
     // 📝 Build new note (string or object)
     const newNote = {
       doctorName: doctorData.fullName,
+      patientName: patientData.fullName,
+      practiceNumber: doctorData.practiceNumber,
       doctorEmail: doctorData.email,
       phoneNumber: doctorData.phoneNumber,
       content: noteContent,

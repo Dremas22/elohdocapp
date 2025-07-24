@@ -38,13 +38,13 @@ export async function POST(req) {
       updatedAt: rawPatientData.updatedAt?.toDate().toISOString() || null,
     };
 
-    const patientName = patientData.fullName || "A patient";
+    const patientName = patientData?.fullName || "A patient";
 
     await getMessaging().send({
       token: fcmToken,
       notification: {
         title: "New Consultation Request",
-        body: `${patientName} wants to start a video consultation.\nJoin here: ${process.env.NEXT_PUBLIC_URL}/room/${doctorId}?patientId=${patientId}`,
+        body: `${patientName} wants to start a video consultation.\nJoin here: ${process.env.NEXT_PUBLIC_URL}/room?doctorId=${doctorId}&patientId=${patientId}`,
       },
       data: {
         roomId: doctorId,
@@ -52,7 +52,7 @@ export async function POST(req) {
       },
       webpush: {
         fcmOptions: {
-          link: `${process.env.NEXT_PUBLIC_URL}/room/${doctorId}?patientId=${patientId}`,
+          link: `${process.env.NEXT_PUBLIC_URL}/room?doctorId=${doctorId}&patientId=${patientId}`,
         },
       },
     });
