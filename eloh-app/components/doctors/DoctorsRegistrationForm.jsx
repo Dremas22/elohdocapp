@@ -26,8 +26,8 @@ const DoctorsRegistrationForm = () => {
     if (currentUser) {
       setFormData((prev) => ({
         ...prev,
-        email: currentUser.email || "",
-        photoUrl: currentUser.photoUrl || "",
+        email: currentUser?.email || "",
+        photoUrl: currentUser?.photoUrl || "",
       }));
     }
   }, [currentUser]);
@@ -106,7 +106,6 @@ const DoctorsRegistrationForm = () => {
       const result = await response.json();
 
       if (response.status === 200 && result.message === "User already exists") {
-        alert("User already exists");
         router.push("/dashboard/doctor");
       } else if (response.status === 201) {
         setFormData({
@@ -156,13 +155,13 @@ const DoctorsRegistrationForm = () => {
               onChange={(e) =>
                 setFormData({ ...formData, fullName: e.target.value })
               }
-              value={currentUser.displayName || formData.fullName || ""}
-              disabled={!!currentUser.displayName}
+              value={currentUser?.displayName || formData.fullName || ""}
+              disabled={!!currentUser?.displayName}
               placeholder="Full Name"
               className={`w-full px-4 py-3 rounded-lg border ${
                 errors.fullName ? "border-red-500" : "border-gray-300"
               } ${
-                currentUser.displayName
+                currentUser?.displayName
                   ? "bg-gray-100 text-gray-600"
                   : "bg-white text-gray-900"
               } focus:outline-none`}
