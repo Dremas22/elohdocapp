@@ -8,6 +8,7 @@ import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
+import { useRouter } from "next/navigation";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
@@ -36,7 +37,9 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               aria-label={title}
               type="button"
             >
-              <span className={`${isDisabled ? "text-gray-600" : "text-white"}`}>
+              <span
+                className={`${isDisabled ? "text-gray-600" : "text-white"}`}
+              >
                 {icon}
               </span>
 
@@ -74,6 +77,7 @@ const PatientSidebarMenu = ({
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onMessage(messaging, (payload) => {
@@ -99,6 +103,7 @@ const PatientSidebarMenu = ({
 
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Update failed");
+      router.refresh();
     } catch (err) {
       console.error("❌ Update error:", err.message);
     } finally {

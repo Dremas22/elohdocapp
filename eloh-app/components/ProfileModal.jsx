@@ -191,6 +191,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
 
       // Step 4: Sign out and notify
       await handleSignOut();
+      router.refresh();
       toast.success("Your account and all associated data have been deleted.");
     } catch (error) {
       console.error("Account deletion error:", error);
