@@ -12,18 +12,21 @@ import { Room, Track } from "livekit-client";
 import "@livekit/components-styles";
 import { useEffect, useState, useMemo } from "react";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import RichTextEditor from "@/components/editor/TextEditor";
+import { toast } from "react-toastify";
 
 const MeetingRoom = () => {
   const { currentUser, loading } = useCurrentUser();
   const searchParams = useSearchParams();
-
-  const doctorId = searchParams.get("doctorId");
   const patientId = searchParams.get("patientId");
+  const doctorId = searchParams.get("doctorId");
+  const isDoctor = doctorId === currentUser?.uid;
+
   const room = doctorId;
   const [token, setToken] = useState("");
   const [hasJoined, setHasJoined] = useState(false);
+  const router = useRouter();
 
   const [roomInstance] = useState(
     () =>
@@ -42,7 +45,10 @@ const MeetingRoom = () => {
   const encodedName = encodeURIComponent(name || "");
 
   const handleJoin = async () => {
-    if (!name || !room) return;
+    if (!name || !room || !currentUser?.uid) {
+      toast.error("You must be logged in to continue.");
+      return;
+    }
 
     try {
       const resp = await fetch(
@@ -78,6 +84,14 @@ const MeetingRoom = () => {
     }
   }, [hasJoined, name, room]);
 
+  const handleGoBack = () => {
+    if (isDoctor) {
+      router.push("/dashboard/doctor");
+    } else {
+      router.back();
+    }
+  };
+
   if (loading || !name) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100 text-gray-700">
@@ -87,63 +101,75 @@ const MeetingRoom = () => {
   }
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
+    <div className="flex h-screen w-full bg-gray-100 relative">
+      {/* Back Button */}
+      {hasJoined && (
+        <button
+          onClick={handleGoBack}
+          className="absolute top-6 left-6 z-50 bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg hover:bg-gray-200 transition duration-200"
+        >
+          ← Back
+        </button>
+      )}
+
+      {/* Loading State */}
       {!hasJoined ? (
-        <div className="text-lg font-medium text-gray-700">
+        <div className="m-auto text-lg font-semibold text-gray-700">
           Joining meeting...
         </div>
       ) : (
-        <RoomContext.Provider value={roomInstance}>
-          <div
-            data-lk-theme="default"
-            style={{ height: "100dvh" }}
-            className="bg-gray-500 border border-gray-900"
-          >
-            <MyVideoConference roomID={room} />
-            <RoomAudioRenderer />
-            <ControlBar />
-          </div>
-        </RoomContext.Provider>
+        <>
+          {/* Left: Video Conference */}
+          <RoomContext.Provider value={roomInstance}>
+            <div
+              data-lk-theme="default"
+              className={`${
+                isDoctor ? "flex-[0.6]" : "flex-1"
+              } bg-gray-900 border-r border-gray-700 overflow-hidden`}
+            >
+              <MyVideoConference roomID={room} />
+              <RoomAudioRenderer />
+              <ControlBar />
+            </div>
+          </RoomContext.Provider>
+
+          {/* Right: Text Editor for Doctor Only */}
+          {typeof isDoctor === "undefined" ? (
+            // Still determining if user is doctor
+            <div className="flex-[0.4] min-w-[400px] h-full bg-white border-l border-gray-300 shadow-inner flex items-center justify-center">
+              <p className="text-gray-600 text-lg">Loading editor...</p>
+            </div>
+          ) : isDoctor ? (
+            // Doctor confirmed
+            <div className="flex-[0.4] min-w-[400px] h-full bg-white border-l border-gray-300 shadow-inner overflow-y-auto">
+              <RichTextEditor roomID={doctorId} />
+            </div>
+          ) : null}
+        </>
       )}
-      <RichTextEditor roomID={room} />
     </div>
   );
 };
 
-function MyVideoConference({ roomID }) {
-  const { currentUser, loading } = useCurrentUser();
+function MyVideoConference() {
+  // `useTracks` returns all camera and screen share tracks. If a user
+  // joins without a published camera track, a placeholder track is returned.
   const tracks = useTracks(
     [
-      { source: Track.Source.Camera, withPlaceholder: false },
+      { source: Track.Source.Camera, withPlaceholder: true },
       { source: Track.Source.ScreenShare, withPlaceholder: false },
     ],
     { onlySubscribed: false }
   );
-
   return (
-    <div className="w-full h-screen flex items-center justify-evenly">
-      <GridLayout
-        tracks={tracks}
-        style={{ height: "calc(100vh - var(--lk-control-bar-height))" }}
-      >
-        <>
-          {tracks.map((trackRef) => (
-            <div
-              key={trackRef.participant.identity}
-              className="relative rounded-lg overflow-hidden shadow"
-            >
-              <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-sm">
-                {trackRef.participant.identity}'s Meeting
-              </div>
-              <ParticipantTile trackRef={trackRef} />
-              <div className="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-sm">
-                {currentUser?.displayName || `Guest_${Date.now()}`}
-              </div>
-            </div>
-          ))}
-        </>
-      </GridLayout>
-    </div>
+    <GridLayout
+      tracks={tracks}
+      style={{ height: "calc(100vh - var(--lk-control-bar-height))" }}
+    >
+      {/* The GridLayout accepts zero or one child. The child is used
+      as a template to render all passed in tracks. */}
+      <ParticipantTile />
+    </GridLayout>
   );
 }
 
