@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiUser, FiFile, FiX, FiMenu } from "react-icons/fi";
+import {
+  FiUser,
+  FiFile,
+  FiX,
+  FiMenu,
+  FiChevronUp,
+  FiChevronDown,
+} from "react-icons/fi";
 import { FaFilePrescription } from "react-icons/fa";
 import { CiMedicalClipboard } from "react-icons/ci";
 import { messaging } from "@/db/client";
@@ -77,6 +84,7 @@ const PatientSidebarMenu = ({
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -151,6 +159,7 @@ const PatientSidebarMenu = ({
 
   return (
     <>
+      {/* Notification Modal */}
       {showNotificationModal && (
         <NotificationModal
           payload={notificationPayload}
@@ -158,6 +167,7 @@ const PatientSidebarMenu = ({
         />
       )}
 
+      {/* Profile Modal */}
       {profileOpen && (
         <ProfileModal
           userDoc={userDoc}
@@ -167,19 +177,7 @@ const PatientSidebarMenu = ({
         />
       )}
 
-      {/* Toggle Button
-      {!compact && (
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="absolute top-6 right-[-2.2rem] bg-[#123158] hover:bg-[#0e2a4b] text-white p-2 rounded-l z-30 hidden lg:block"
-          aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
-          type="button"
-        >
-          {isSidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
-        </button>
-      )} */}
-
-      {/* Sidebar */}
+      {/* Desktop Sidebar */}
       <div
         className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-25 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0
           ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
@@ -193,8 +191,26 @@ const PatientSidebarMenu = ({
         />
       </div>
 
-      {/* Mobile Bottom Bar */}
-      <div className="lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[25vh] px-8 py-6 overflow-auto bg-gray-900/20 backdrop-blur-md">
+      {/* Floating Mobile Toggle Button */}
+      <button
+        className="lg:hidden fixed bottom-3 right-4 z-50 bg-[#03045e] text-white rounded-full p-1 shadow-lg"
+        onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+      >
+        {mobileSidebarOpen ? (
+          <FiChevronDown className="h-6 w-6" />
+        ) : (
+          <FiChevronUp className="h-6 w-6" />
+        )}
+      </button>
+
+      {/* Slide-up Mobile Sidebar */}
+      <div
+        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40
+          sm:h-[38vh] h-[26vh] px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5
+          transition-transform duration-500 ease-in-out bg-gray-900/20
+          ${mobileSidebarOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"}
+        `}
+      >
         <ActionButtons
           buttons={actionButtons}
           notificationCount={notificationCount}
