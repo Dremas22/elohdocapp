@@ -126,7 +126,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         )}
 
         {/* Available Doctors */}
-        <h2 className="text-2xl font-semibold text-center mt-16 mb-6 text-white">
+        <h2 className="text-2xl font-semibold text-center mt-10 mb-6 text-white">
           Available Doctors
         </h2>
 
