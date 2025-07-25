@@ -10,6 +10,7 @@ import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
 import ToggleButton from "./availabilityBtn"; // ✅ Check this path
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
@@ -47,7 +48,11 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               aria-label={title}
               type="button"
             >
-              <span className={`flex items-center justify-center ${isDisabled ? "text-gray-600" : "text-white"}`}>
+              <span
+                className={`flex items-center justify-center ${
+                  isDisabled ? "text-gray-600" : "text-white"
+                }`}
+              >
                 {icon}
               </span>
               {showTitle && (
@@ -86,6 +91,7 @@ const DoctorSidebarMenu = ({
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Desktop sidebar
   const [isAvailable, setIsAvailable] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false); // Mobile toggle
+  const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onMessage(messaging, (payload) => {
@@ -97,14 +103,62 @@ const DoctorSidebarMenu = ({
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/doctor/toggle-availability`
+        );
+        const data = await res.json();
+        if (res.ok) {
+          setIsAvailable(data.available || false);
+        }
+      } catch (err) {
+        console.error("Failed to fetch availability:", err);
+      } finally {
+        setFetching(false);
+      }
+    };
+
+    fetchAvailability();
+  }, []);
+
+  // Toggle availability on backend
+  const handleToggle = async () => {
+    setFetching(true);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/doctor/toggle-availability`,
+        {
+          method: "POST",
+        }
+      );
+
+      const data = await res.json();
+      console.log(data, "DATA");
+      if (res.ok) {
+        setIsAvailable(data.available);
+      } else {
+        console.error("Error:", data.error);
+      }
+    } catch (err) {
+      console.error("Toggle failed:", err);
+    } finally {
+      setFetching(false);
+    }
+  };
+
   const handleProfileSave = async (updatedData) => {
     setProfileLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/users/update`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: userDoc.role, data: updatedData }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/users/update`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role: userDoc.role, data: updatedData }),
+        }
+      );
 
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Update failed");
@@ -156,8 +210,9 @@ const DoctorSidebarMenu = ({
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"
-          }`}
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 ${
+          !isSidebarOpen ? "-translate-x-full" : "translate-x-0"
+        }`}
       >
         {isVerified === false && (
           <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-xs p-2 rounded text-center mb-3">
@@ -190,7 +245,8 @@ const DoctorSidebarMenu = ({
               </label>
               <ToggleButton
                 checked={isAvailable}
-                onChange={() => setIsAvailable(!isAvailable)}
+                onChange={handleToggle}
+                fetching={fetching}
               />
             </div>
           </>
@@ -215,7 +271,11 @@ const DoctorSidebarMenu = ({
           lg:hidden fixed bottom-0 right-0 left-0 z-40 sm:h-[38vh] h-[24vh]
           px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5
           transition-transform duration-500 ease-in-out bg-gray-900/20
-          ${mobileSidebarOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"}
+          ${
+            mobileSidebarOpen
+              ? "translate-y-0 opacity-100"
+              : "translate-y-full opacity-0 pointer-events-none"
+          }
         `}
       >
         <ActionButtons
@@ -238,8 +298,9 @@ const DoctorSidebarMenu = ({
 
       {/* Calendar Drawer */}
       <div
-        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
+          calendarOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <button
           onClick={() => setCalendarOpen(false)}
