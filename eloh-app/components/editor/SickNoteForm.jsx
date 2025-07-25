@@ -5,7 +5,14 @@ import SignaturePad from "./SignaturePad";
 import useSaveMedicalHistory from "@/hooks/useSaveMedicalHistory";
 import NotePreview from "./NotePreview";
 
+/**
+ * SickNoteForm Component
+ * 
+ * Renders a form for doctors to create and submit a sick note for a patient.
+ * Includes validation, signature capture, and preview functionality.
+ */
 const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
+  // Custom hook to manage save logic and state
   const {
     handleSaveNote,
     error,
@@ -15,10 +22,13 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
     successMessage,
   } = useSaveMedicalHistory();
 
+  // Form state
   const [startDate, setStartDate] = useState(new Date().toDateString());
   const [endDate, setEndDate] = useState("");
   const [reason, setReason] = useState("");
   const [signature, setSignature] = useState(null);
+
+  // UI control states
   const [showSignaturePad, setShowSignaturePad] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [openPreview, setOpenPreview] = useState(false);
@@ -26,35 +36,39 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [previewData, setPreviewData] = useState(null);
 
+  // Save signature data from SignaturePad
   const handleSignatureSave = (dataUrl) => {
     setSignature(dataUrl);
     setShowSignaturePad(false);
   };
 
+  // Form submission handler
   const handleSubmit = async () => {
     resetError();
     resetSuccess();
 
     const errors = {};
 
-    // Field-level validation
+    // Basic validation
     if (!startDate) errors.startDate = "Start date is required.";
     if (!endDate) errors.endDate = "End date is required.";
     if (!reason.trim()) errors.reason = "Reason is required.";
     if (!signature) errors.signature = "Doctor's signature is required.";
 
-    // Stop if any errors
+    // If errors exist, block submission and display them
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
       return;
     }
 
+    // Prepare data to be saved
     const noteContent = {
       startDate,
       endDate,
       reason: reason.trim(),
     };
 
+    // Call the save handler
     const { success } = await handleSaveNote({
       mode,
       noteContent,
@@ -62,9 +76,11 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
       roomID: doctorId,
     });
 
+    // Show preview button only if successful
     if (success) setShowPreview(true);
   };
 
+  // Preview sick note from server
   const handlePreview = async () => {
     setIsLoading(true);
     try {
@@ -91,6 +107,7 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
 
   return (
     <div className="p-6 bg-white rounded-lg text-black space-y-6 shadow-md">
+      {/* Show Preview Modal */}
       {openPreview && (
         <NotePreview
           previewData={previewData}
@@ -98,14 +115,17 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
           isLoading={isLoading}
         />
       )}
+
       <h2 className="text-xl font-semibold text-[#03045e]">Sick Note</h2>
 
+      {/* Patient Info */}
       <p>
         <strong>Patient Name:</strong> {patientData?.fullName}
       </p>
 
       {/* Date Fields */}
       <div className="bg-gray-100 p-4 rounded-md border border-gray-300 space-y-4">
+        {/* Start Date */}
         <div>
           <label className="block mb-1 font-semibold" htmlFor="start-date">
             Start Date:
@@ -122,6 +142,7 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
           )}
         </div>
 
+        {/* End Date */}
         <div>
           <label className="block mb-1 font-semibold" htmlFor="end-date">
             End Date:
@@ -139,7 +160,7 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
         </div>
       </div>
 
-      {/* Reason Field */}
+      {/* Reason for Absence */}
       <div>
         <label className="block mb-1 font-semibold" htmlFor="reason">
           Reason for Absence:
@@ -157,6 +178,7 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
         )}
       </div>
 
+      {/* Display summary of rest period */}
       <p>
         <strong>Recommended Rest Period:</strong> {startDate || "---"} to{" "}
         {endDate || "---"}
@@ -166,6 +188,7 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
       <div>
         <p className="font-semibold mb-2">Doctor’s Signature</p>
 
+        {/* If signature exists, show image and remove button */}
         {signature ? (
           <>
             <img
@@ -182,6 +205,7 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
           </>
         ) : (
           <>
+            {/* Show signature pad if toggled on */}
             {!showSignaturePad && (
               <button
                 onClick={() => setShowSignaturePad(true)}
@@ -194,18 +218,19 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
           </>
         )}
 
+        {/* Signature validation error */}
         {fieldErrors.signature && (
           <p className="text-sm text-red-600 mt-2">{fieldErrors.signature}</p>
         )}
       </div>
 
-      {/* Feedback Messages */}
+      {/* Server response messages */}
       {error && <p className="text-sm text-red-600 font-semibold">{error}</p>}
       {successMessage && (
         <p className="text-sm text-green-700 font-semibold">{successMessage}</p>
       )}
 
-      {/* Actions */}
+      {/* Submit & Preview Buttons */}
       <div className="flex justify-center gap-4">
         <button
           onClick={handleSubmit}
