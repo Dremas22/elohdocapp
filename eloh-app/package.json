@@ -12,8 +12,11 @@
     "@livekit/components-react": "^2.9.14",
     "@livekit/components-styles": "^1.1.6",
     "@stripe/stripe-js": "^7.5.0",
+    "culori": "^4.0.2",
     "firebase": "^11.9.0",
     "firebase-admin": "^13.4.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
     "livekit-server-sdk": "^2.13.1",
     "next": "15.3.3",
     "openai": "^5.9.0",
@@ -26,6 +29,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "autoprefixer": "^10.4.21",
     "tailwindcss": "^4"
   }
 }
