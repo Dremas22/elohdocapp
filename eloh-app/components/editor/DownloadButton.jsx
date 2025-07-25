@@ -10,7 +10,7 @@ const DownloadButton = ({
   return (
     <button
       type={type}
-      className={`bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ease-in-out active:translate-y-[1px] disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`flex items-center gap-2 bg-[#03045e] text-white py-2 px-4 text-sm sm:text-base font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer disabled:cursor-not-allowed ${className}`}
       onClick={onClick}
       disabled={disabled}
     >
