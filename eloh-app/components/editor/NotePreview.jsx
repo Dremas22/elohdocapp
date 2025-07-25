@@ -6,7 +6,9 @@ import { convertOKLCHtoRGB } from "@/lib/convertOKLCHtoRGB";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { toast } from "react-toastify";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
+import FullMedicalRecords from "../patients/FullMedicalRecords";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 /**
  * NotePreview Component
@@ -33,6 +35,49 @@ const NotePreview = ({
 }) => {
   // Show loading or no-data message while loading or if previewData is not provided
   const previewRef = useRef(null);
+  const [showFullRecord, setShowFullRecord] = useState(false);
+  const [medicalHistory, setMedicalHistory] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { loading: userLoading, currentUser } = useCurrentUser();
+
+  useEffect(() => {
+    if (!userLoading && !currentUser) {
+      toast.error("Please sign-in to see patient history");
+      return;
+    }
+    const fetchMedicalHistory = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/patients/get-medical-records`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ patientId: currentUser?.uid }),
+          }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to fetch history");
+        }
+
+        setMedicalHistory(data.medicalHistory);
+      } catch (err) {
+        console.error("Fetch failed:", err);
+        toast.error("Failed to load medical records.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (currentUser?.uid) {
+      fetchMedicalHistory();
+    }
+  }, [currentUser?.uid]);
+
   if (isLoading || !previewData)
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 px-4">
@@ -131,8 +176,32 @@ const NotePreview = ({
     }
   };
 
+  const handleViewFullRecord = () => {
+    setShowFullRecord(true);
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-2 sm:px-4">
+      {showFullRecord && (
+        <div className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm pointer-events-auto flex justify-center items-center">
+          <div className="relative bg-white rounded-xl shadow-xl p-6 h-[80vh] w-full mx-4 mt-10 overflow-auto">
+            {/* Close Button */}
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg font-bold"
+              onClick={() => setShowFullRecord(false)}
+            >
+              &times;
+            </button>
+
+            {/* Medical Record Component */}
+            <FullMedicalRecords
+              medicalHistory={medicalHistory}
+              loading={loading}
+            />
+          </div>
+        </div>
+      )}
+
       <div
         role="dialog"
         aria-modal="true"
@@ -276,10 +345,21 @@ const NotePreview = ({
             {/* General Notes */}
             {noteType === "generalNotes" && (
               <div className="relative bg-white p-4 sm:p-6 rounded-xl border border-gray-300">
+                {/* Top-right button */}
+                <div className="absolute bottom-0 right-0 z-20">
+                  <button
+                    onClick={handleViewFullRecord}
+                    className="bg-[#023e8a] hover:bg-[#0077b6] text-white text-sm font-medium py-2 px-4 rounded-md shadow ml-6"
+                  >
+                    View Full Medical Record
+                  </button>
+                </div>
+
                 <div className="relative z-10 space-y-6">
                   <h2 className="text-xl sm:text-2xl font-bold text-center text-[#023e8a]">
                     Patient Medical Report
                   </h2>
+
                   <div className="grid sm:grid-cols-2 gap-4 border border-gray-200 p-4 rounded-xl bg-white">
                     <div>
                       <p className="text-sm text-gray-500">Patient Name</p>
@@ -298,12 +378,14 @@ const NotePreview = ({
                       <p className="font-medium">Dr. {docName}</p>
                     </div>
                   </div>
+
                   <div className="bg-white border border-gray-200 p-4 rounded-xl whitespace-pre-line text-sm sm:text-base">
                     <h3 className="text-base sm:text-lg font-semibold text-[#023e8a] mb-2">
                       Doctor's Notes:
                     </h3>
                     <p>{previewData.content?.note || previewData.content}</p>
                   </div>
+
                   {signature && (
                     <div className="text-right">
                       <img
@@ -318,6 +400,7 @@ const NotePreview = ({
                     </div>
                   )}
                 </div>
+
                 <br />
                 <ElodocWatermark />
               </div>
