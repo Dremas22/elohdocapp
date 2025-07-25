@@ -1,6 +1,36 @@
 import { auth, db } from "@/db/server";
 import { NextResponse } from "next/server";
 
+export async function GET(req) {
+  try {
+    const cookieToken = req.cookies.get("session")?.value;
+    const headerToken = req.headers.get("authorization")?.split("Bearer ")[1];
+    const token = cookieToken || headerToken;
+
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    let decodedToken;
+    try {
+      decodedToken = await auth.verifySessionCookie(token, true);
+    } catch (err) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const doctorRef = db.collection("doctors").doc(decodedToken.uid);
+    const snap = await doctorRef.get();
+
+    if (!snap.exists) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ available: snap.data()?.available ?? false });
+  } catch (err) {
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
 export async function POST(req) {
   try {
     // Step 1: Get session token
