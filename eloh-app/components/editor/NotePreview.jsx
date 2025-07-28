@@ -190,7 +190,7 @@ const NotePreview = ({
           <div className="relative bg-white rounded-xl shadow-xl p-6 h-[80vh] w-full mx-4 mt-10 overflow-auto">
             {/* Close Button */}
             <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg font-bold"
+              className="absolute top-0.5 right-2 text-gray-500 hover:text-gray-700 text-lg font-bold"
               onClick={() => setShowFullRecord(false)}
             >
               &times;
@@ -313,7 +313,7 @@ const NotePreview = ({
                       Prescribed Medication(s):
                     </p>
                     {previewData.content?.medications &&
-                    Object.values(previewData.content.medications).length >
+                      Object.values(previewData.content.medications).length >
                       0 ? (
                       <p className="text-gray-800">
                         {Object.values(previewData.content.medications).join(
@@ -348,15 +348,7 @@ const NotePreview = ({
             {/* General Notes */}
             {noteType === "generalNotes" && (
               <div className="relative bg-white p-4 sm:p-6 rounded-xl border border-gray-300">
-                {/* Top-right button */}
-                <div className="absolute bottom-0 right-0 z-20">
-                  <button
-                    onClick={handleViewFullRecord}
-                    className="bg-[#023e8a] hover:bg-[#0077b6] text-white text-sm font-medium py-2 px-4 rounded-md shadow ml-6"
-                  >
-                    View Full Medical Record
-                  </button>
-                </div>
+
 
                 <div className="relative z-10 space-y-6">
                   <h2 className="text-xl sm:text-2xl font-bold text-center text-[#023e8a]">
@@ -417,6 +409,14 @@ const NotePreview = ({
           <FaDownload className="shrink-0" />
           <span>Download</span>
         </DownloadButton>
+        <div className="absolute bottom-5 sm:bottom-7 right-3 z-20">
+          <button
+            onClick={handleViewFullRecord}
+            className="flex items-center gap-2 bg-[#03045e] text-white py-2 px-4 text-sm sm:text-base font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer disabled:cursor-not-allowed "
+          >
+            View Medical Record
+          </button>
+        </div>
       </div>
     </div>
   );
