@@ -60,6 +60,9 @@ const NurseCollectionViewer = () => {
     return () => unsubscribe();
   }, []);
 
+  // TODO: The above is the available data
+  console.log(userDoc, patients, "DATA");
+
   if (loading) {
     return (
       <>
@@ -74,7 +77,7 @@ const NurseCollectionViewer = () => {
   if (!userDoc) {
     return (
       <div className="min-h-screen bg-gray-50 pt-20">
-        <PatientDashboardNavbar />
+        <NurseDashboardNavbar />
         <div className="flex items-center justify-center h-full">
           <div className="text-center text-gray-600">
             <p className="text-lg font-medium">No user data found.</p>

@@ -2,33 +2,7 @@ import { auth, db } from "@/db/server";
 import { cookies } from "next/headers";
 import DoctorsCollectionViewer from "./DoctorsCollectionViewer";
 import Link from "next/link";
-
-// Convert Firestore Timestamps, Dates, or nested timestamp-like objects
-function serializeData(obj) {
-  if (obj === null || obj === undefined) return obj;
-
-  if (typeof obj?.toDate === "function") {
-    return obj.toDate().toISOString();
-  }
-
-  if (obj instanceof Date) {
-    return obj.toISOString();
-  }
-
-  if (typeof obj === "object") {
-    if (obj._seconds !== undefined && obj._nanoseconds !== undefined) {
-      return new Date(obj._seconds * 1000).toISOString();
-    }
-
-    const result = {};
-    for (const key in obj) {
-      result[key] = serializeData(obj[key]);
-    }
-    return result;
-  }
-
-  return obj;
-}
+import { serializeData } from "@/lib/queries";
 
 const DoctorsDashboard = async () => {
   const cookieStore = await cookies();

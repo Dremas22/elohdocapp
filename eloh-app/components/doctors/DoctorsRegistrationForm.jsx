@@ -117,6 +117,9 @@ const DoctorsRegistrationForm = () => {
           email: currentUser?.email,
         });
         router.push("/dashboard/doctor");
+        toast.success("User successfully registered");
+        // 🔁 Force token refresh so custom claims are available immediately
+        await currentUser?.getIdToken(true);
       } else {
         console.error(result.error || "Something went wrong");
       }
