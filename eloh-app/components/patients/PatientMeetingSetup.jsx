@@ -3,19 +3,18 @@
 import { db } from "@/db/client";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { collection, getDocs } from "firebase/firestore";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import ViewMedicalRecords from "../viewMedicalRecords";
+import StaffScroller from "./StaffController";
 
 const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   const { currentUser, loading } = useCurrentUser();
   const [roomID, setRoomID] = useState("");
   const [doctors, setDoctors] = useState([]);
+  const [nurses, setNurses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const router = useRouter();
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -29,11 +28,18 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
           id: doc.id,
           ...doc.data(),
         }));
+        const nursesCollection = collection(db, "nurses");
+        const nursesSnapshot = await getDocs(nursesCollection);
+        const nursesList = nursesSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         setDoctors(doctorsList);
+        setNurses(nursesList);
       } catch (error) {
-        console.error("Error fetching doctors:", error);
+        console.error("Error fetching doctors & nurses:", error);
         setDoctors([]);
-        setError("Error fetching doctors");
+        setError("Error fetching doctors & nurses");
       } finally {
         setIsLoading(false);
       }
@@ -125,13 +131,10 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
           </div>
         )}
 
-        {/* Available Doctors */}
-        <h2 className="text-2xl font-semibold text-center mt-10 mb-6 text-white">
-          Available Doctors
-        </h2>
-
         {isLoading ? (
-          <p className="text-center text-gray-500 mt-20">Loading doctors...</p>
+          <p className="text-center text-gray-500 mt-20">
+            Loading doctors & nurses...
+          </p>
         ) : error ? (
           <p className="text-red-600 text-center mt-20 font-semibold">
             {error}
@@ -157,53 +160,11 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             </button>
 
             {/* Scrollable Cards */}
-            <div
-              ref={scrollRef}
-              className="flex overflow-x-auto space-x-4 px-2 scrollbar-hide"
-            >
-              {doctors.map((doc) => (
-                <div
-                  key={doc.userId}
-                  onClick={() => {
-                    if (currentUser?.uid && doc.userId) {
-                      sendNotificationToDoctor(doc.userId, currentUser.uid);
-                      router.push(
-                        `/room?doctorId=${doc.userId}&patientId=${currentUser.uid}`
-                      );
-                    }
-                  }}
-                  className={`min-w-[260px] sm:min-w-[280px] md:min-w-[300px] rounded-lg p-4 shadow-md flex-shrink-0 flex flex-col items-center gap-4 transition duration-200 ${currentUser?.uid && doc.userId
-                    ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
-                    : "cursor-not-allowed bg-gray-700 opacity-50"
-                    }`}
-                >
-
-                  <div className="text-center space-y-2">
-                    <h3 className="text-lg font-bold text-white">
-                      {doc.fullName}
-                    </h3>
-                    <p className="text-sm text-gray-300">
-                      Practice No:{" "}
-                      <span className="font-medium">{doc.practiceNumber}</span>
-                    </p>
-                    <p className="text-sm text-gray-300">{doc.email}</p>
-                    <p className="text-sm text-gray-300">{doc.phoneNumber}</p>
-                    <p className="text-sm text-blue-400 mt-2 hover:underline">
-                      Click to join meeting
-                    </p>
-                  </div>
-                  {doc.photoUrl && (
-                    <Image
-                      src={doc.photoUrl}
-                      alt={doc.fullName}
-                      width={64}
-                      height={64}
-                      className="w-16 h-16 rounded-full border border-white object-cover"
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
+            <StaffScroller
+              doctors={doctors}
+              nurses={nurses}
+              sendNotificationToDoctor={sendNotificationToDoctor}
+            />
           </div>
         )}
       </div>
