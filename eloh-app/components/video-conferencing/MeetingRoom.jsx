@@ -20,7 +20,7 @@ const MeetingRoom = () => {
   const { currentUser, loading } = useCurrentUser();
   const searchParams = useSearchParams();
   const patientId = searchParams.get("patientId");
-  const doctorId = searchParams.get("doctorId");
+  const doctorId = searchParams.get("staffId");
 
   const isDoctor = doctorId === currentUser?.uid;
   const room = doctorId;
@@ -117,8 +117,9 @@ const MeetingRoom = () => {
           <RoomContext.Provider value={roomInstance}>
             <div
               data-lk-theme="default"
-              className={`${isDoctor ? "flex-[0.6]" : "flex-1"
-                } bg-[#caf0f8] border-r border-[#90e0ef] overflow-hidden relative flex flex-col`}
+              className={`${
+                isDoctor ? "flex-[0.6]" : "flex-1"
+              } bg-[#caf0f8] border-r border-[#90e0ef] overflow-hidden relative flex flex-col`}
             >
               {/* 🔴 Top Navbar with "Live" Ping + Close */}
               <header className="bg-gray-300 w-full text-white py-2 px-4 font-semibold text-lg shadow flex items-center justify-between">
@@ -128,7 +129,9 @@ const MeetingRoom = () => {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
                   </span>
-                  <span className="text-white text-base sm:text-lg">Live Consultation</span>
+                  <span className="text-white text-base sm:text-lg">
+                    Live Consultation
+                  </span>
                 </div>
 
                 {/* ❌ Close Button with Icon */}
@@ -162,7 +165,9 @@ const MeetingRoom = () => {
             </div>
           ) : isDoctor ? (
             <div className="flex-[0.4] min-w-[400px] h-full bg-white border-l border-[#90e0ef] shadow-inner overflow-y-auto p-4">
-              <h2 className="text-xl font-semibold text-[#0077b6] mb-4">Doctor’s Notes</h2>
+              <h2 className="text-xl font-semibold text-[#0077b6] mb-4">
+                Doctor’s Notes
+              </h2>
               <RichTextEditor roomID={doctorId} />
             </div>
           ) : null}
