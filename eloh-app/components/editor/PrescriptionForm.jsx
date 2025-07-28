@@ -117,6 +117,7 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
           isLoading={isLoading}
           onClose={() => setOpenPreview(false)}
           signature={signature}
+          patientId={patientId}
         />
       )}
       <h2 className="text-xl font-semibold text-[#03045e]">Prescription</h2>

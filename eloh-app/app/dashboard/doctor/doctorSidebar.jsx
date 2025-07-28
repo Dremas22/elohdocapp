@@ -135,7 +135,6 @@ const DoctorSidebarMenu = ({
       );
 
       const data = await res.json();
-      console.log(data, "DATA");
       if (res.ok) {
         setIsAvailable(data.available);
       } else {

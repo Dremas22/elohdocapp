@@ -200,3 +200,31 @@ export const updateUserField = async (
     };
   }
 };
+
+// Convert Firestore Timestamps, Dates, or nested timestamp-like objects
+
+export function serializeData(obj) {
+  if (obj === null || obj === undefined) return obj;
+
+  if (typeof obj?.toDate === "function") {
+    return obj.toDate().toISOString();
+  }
+
+  if (obj instanceof Date) {
+    return obj.toISOString();
+  }
+
+  if (typeof obj === "object") {
+    if (obj._seconds !== undefined && obj._nanoseconds !== undefined) {
+      return new Date(obj._seconds * 1000).toISOString();
+    }
+
+    const result = {};
+    for (const key in obj) {
+      result[key] = serializeData(obj[key]);
+    }
+    return result;
+  }
+
+  return obj;
+}

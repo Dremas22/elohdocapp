@@ -67,9 +67,12 @@ const ViewMedicalRecords = ({ userDoc, mode, setNoteOpen }) => {
                         if (typeof content === "string") return content;
                         if (typeof content === "object") {
                           if (content.instructions) return content.instructions;
-                          if (content.reason) return `Reason: ${content.reason}`;
+                          if (content.reason)
+                            return `Reason: ${content.reason}`;
                           if (content.startDate && content.endDate)
-                            return `From ${convertTimestamp(content.startDate)} to ${convertTimestamp(content.endDate)}`;
+                            return `From ${convertTimestamp(
+                              content.startDate
+                            )} to ${convertTimestamp(content.endDate)}`;
                         }
                         return "View full note";
                       })()}
@@ -78,7 +81,10 @@ const ViewMedicalRecords = ({ userDoc, mode, setNoteOpen }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="3" className="text-center px-6 py-4 text-gray-500">
+                  <td
+                    colSpan="3"
+                    className="text-center px-6 py-4 text-gray-500"
+                  >
                     No {noteKeyMap[mode]} available.
                   </td>
                 </tr>
@@ -95,6 +101,7 @@ const ViewMedicalRecords = ({ userDoc, mode, setNoteOpen }) => {
           isLoading={false}
           onClose={() => setSelectedRecord(null)}
           noteType={noteKeyMap[mode]}
+          patientId={userDoc?.userId}
         />
       )}
     </div>

@@ -15,6 +15,7 @@ const ViewPatientsRecords = ({
   data,
   setOpenViewPatientRecords,
   signature,
+  patientId,
 }) => {
   const [mode, setMode] = useState(noteTypes[0].type);
   const [selectedNotes, setSelectedNotes] = useState([]);
@@ -51,10 +52,11 @@ const ViewPatientsRecords = ({
             key={id}
             onClick={() => setMode(type)}
             className={`py-2 px-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out
-        ${mode === type
-                ? "bg-[#2c4253] text-white hover:bg-[#023e8a]" // lighter blue for active + darker text
-                : "bg-[#03045e] text-white hover:bg-[#023e8a]"
-              }
+        ${
+          mode === type
+            ? "bg-[#2c4253] text-white hover:bg-[#023e8a]" // lighter blue for active + darker text
+            : "bg-[#03045e] text-white hover:bg-[#023e8a]"
+        }
       `}
           >
             {label}
@@ -143,6 +145,7 @@ const ViewPatientsRecords = ({
           onClose={() => setSelectedRecord(null)}
           noteType={mode}
           signature={signature}
+          patientId={patientId}
         />
       )}
     </div>

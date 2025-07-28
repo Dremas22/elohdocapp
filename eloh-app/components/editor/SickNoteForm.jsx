@@ -7,7 +7,7 @@ import NotePreview from "./NotePreview";
 
 /**
  * SickNoteForm Component
- * 
+ *
  * Renders a form for doctors to create and submit a sick note for a patient.
  * Includes validation, signature capture, and preview functionality.
  */
@@ -113,6 +113,7 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
           previewData={previewData}
           noteType="sickNotes"
           isLoading={isLoading}
+          patientId={patientId}
         />
       )}
 
