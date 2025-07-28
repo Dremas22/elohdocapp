@@ -17,7 +17,7 @@ const NursesList = ({ nurses, sendNotificationToDoctor }) => {
             if (currentUser?.uid && nurse.userId) {
               sendNotificationToDoctor(nurse.userId, currentUser.uid);
               router.push(
-                `/room?nurseId=${nurse.userId}&patientId=${currentUser.uid}`
+                `/room?staffId=${nurse.userId}&patientId=${currentUser.uid}`
               );
             }
           }}
