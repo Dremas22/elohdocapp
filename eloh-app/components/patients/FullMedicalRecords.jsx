@@ -1,3 +1,5 @@
+// FullMedicalRecords
+
 import ToggleMedicalSection from "./ToggleMedicalSection";
 
 const FullMedicalRecords = ({ medicalHistory, loading }) => {
@@ -14,14 +16,14 @@ const FullMedicalRecords = ({ medicalHistory, loading }) => {
   };
 
   return (
-    <div className="flex gap-4 h-full">
+    <div className="flex flex-col lg:flex-row gap-4 h-full">
       {/* Left - Toggle Sections */}
-      <div className="w-3/4 h-full overflow-hidden">
+      <div className="w-full lg:w-3/4 h-full overflow-hidden">
         <ToggleMedicalSection medicalHistory={medicalHistory} />
       </div>
 
-      {/* Right - Always visible static sections */}
-      <div className="w-1/4 h-full overflow-y-auto pr-2 space-y-4">
+      {/* Right - Static Sections */}
+      <div className="w-full lg:w-1/4 h-full overflow-y-auto pr-2 space-y-4">
         {Object.entries(staticSections).map(([key, title]) => (
           <div
             key={key}
