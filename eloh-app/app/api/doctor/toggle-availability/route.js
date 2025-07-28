@@ -1,89 +1,83 @@
 import { auth, db } from "@/db/server";
 import { NextResponse } from "next/server";
 
+async function verifyUserAndGetRole(token) {
+  try {
+    const decodedToken = await auth.verifySessionCookie(token, true);
+
+    const { uid, role } = decodedToken;
+
+    if (!["doctor", "nurse"].includes(role)) {
+      throw new Error("Invalid role");
+    }
+
+    return { uid, role };
+  } catch (err) {
+    console.error("Token verification failed:", err);
+    throw new Error("Unauthorized");
+  }
+}
+
 export async function GET(req) {
   try {
     const cookieToken = req.cookies.get("session")?.value;
     const headerToken = req.headers.get("authorization")?.split("Bearer ")[1];
     const token = cookieToken || headerToken;
 
-    if (!token) {
+    if (!token)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { uid, role } = await verifyUserAndGetRole(token);
+
+    const userRef = db.collection(`${role}s`).doc(uid);
+    const snapshot = await userRef.get();
+
+    if (!snapshot.exists) {
+      return NextResponse.json({ error: `${role} not found` }, { status: 404 });
     }
 
-    let decodedToken;
-    try {
-      decodedToken = await auth.verifySessionCookie(token, true);
-    } catch (err) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const doctorRef = db.collection("doctors").doc(decodedToken.uid);
-    const snap = await doctorRef.get();
-
-    if (!snap.exists) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({ available: snap.data()?.available ?? false });
+    return NextResponse.json({
+      available: snapshot.data()?.available ?? false,
+    });
   } catch (err) {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: err.message || "Server error" },
+      { status: err.message === "Unauthorized" ? 401 : 500 }
+    );
   }
 }
 
 export async function POST(req) {
   try {
-    // Step 1: Get session token
     const cookieToken = req.cookies.get("session")?.value;
     const headerToken = req.headers.get("authorization")?.split("Bearer ")[1];
     const token = cookieToken || headerToken;
 
-    if (!token) {
+    if (!token)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { uid, role } = await verifyUserAndGetRole(token);
+
+    const userRef = db.collection(`${role}s`).doc(uid);
+    const docSnap = await userRef.get();
+
+    if (!docSnap.exists) {
+      return NextResponse.json({ error: `${role} not found` }, { status: 404 });
     }
 
-    // Step 2: Verify Firebase session token
-    let decodedToken;
-    try {
-      decodedToken = await auth?.verifySessionCookie(token, true);
-    } catch (err) {
-      console.error("Session verification failed:", err);
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = decodedToken.uid;
-
-    // Step 3: Check if user is in doctors collection
-    const doctorRef = db?.collection("doctors").doc(userId);
-    const doctorSnap = await doctorRef.get();
-
-    if (!doctorSnap.exists) {
-      return NextResponse.json(
-        { error: "Doctor record not found" },
-        { status: 404 }
-      );
-    }
-
-    const doctorData = doctorSnap.data();
-
-    // Step 4: Check role
-    if (doctorData.role !== "doctor") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    // Determine new availability
-    const currentAvailability = doctorData.available ?? false;
+    const currentAvailability = docSnap.data()?.available ?? false;
     const newAvailability = !currentAvailability;
 
-    // Update availability
-    await doctorRef.update({ available: newAvailability });
+    await userRef.update({ available: newAvailability });
 
     return NextResponse.json({
-      message: "Doctor availability updated successfully",
+      message: `${
+        role.charAt(0).toUpperCase() + role.slice(1)
+      } availability updated`,
       available: newAvailability,
     });
   } catch (error) {
-    console.error("Error toggling availability:", error);
+    console.error("Availability update error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
