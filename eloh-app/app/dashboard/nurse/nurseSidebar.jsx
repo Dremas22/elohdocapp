@@ -15,6 +15,7 @@ import Calendar from "@/app/dashboard/doctor/calendar";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
 import ToggleButton from "@/components/nurses/NurseAvailbilityBtn";
+import { useRouter } from "next/navigation";
 
 /**
  * ActionButtons renders a responsive set of action buttons for both desktop and mobile.
@@ -51,8 +52,9 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
             type="button"
           >
             <span
-              className={`flex items-center justify-center ${isDisabled ? "text-gray-600" : "text-white"
-                }`}
+              className={`flex items-center justify-center ${
+                isDisabled ? "text-gray-600" : "text-white"
+              }`}
             >
               {icon}
             </span>
@@ -79,7 +81,12 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
  * @param {Object} userDoc - User document from the database.
  * @param {boolean} compact - Optional flag for compact/mobile layout.
  */
-const NurseSidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false }) => {
+const NurseSidebarMenu = ({
+  practiceNumber,
+  isVerified,
+  userDoc,
+  compact = false,
+}) => {
   // Calendar visibility state
   const [calendarOpen, setCalendarOpen] = useState(false);
 
@@ -96,6 +103,10 @@ const NurseSidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false
   // Sidebar open/close state (desktop + mobile)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [isAvailable, setIsAvailable] = useState(false);
+
+  const router = useRouter();
 
   /**
    * Listen to Firebase Cloud Messaging for real-time notifications.
@@ -110,13 +121,57 @@ const NurseSidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false
     return () => unsubscribe();
   }, []);
 
-  /**
-   * Handle clicking the notification icon (reset counter and open modal).
-   */
-  const handleNotification = () => {
-    setShowNotificationModal(true);
-    setHasNotification(false);
-    setNotificationCount(0);
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/doctor/toggle-availability`
+        );
+        const data = await res.json();
+        if (res.ok) {
+          setIsAvailable(data.available || false);
+        }
+      } catch (err) {
+        console.error("Failed to fetch availability:", err);
+      } finally {
+        setFetching(false);
+      }
+    };
+
+    fetchAvailability();
+  }, []);
+
+  // /**
+  //  * Handle clicking the notification icon (reset counter and open modal).
+  //  */
+  // const handleNotification = () => {
+  //   setShowNotificationModal(true);
+  //   setHasNotification(false);
+  //   setNotificationCount(0);
+  // };
+
+  // Toggle availability on backend
+  const handleToggle = async () => {
+    setFetching(true);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/doctor/toggle-availability`,
+        {
+          method: "POST",
+        }
+      );
+
+      const data = await res.json();
+      if (res.ok) {
+        setIsAvailable(data.available);
+      } else {
+        console.error("Error:", data.error);
+      }
+    } catch (err) {
+      console.error("Toggle failed:", err);
+    } finally {
+      setFetching(false);
+    }
   };
 
   /**
@@ -127,13 +182,17 @@ const NurseSidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false
   const handleProfileSave = async (updatedData) => {
     setProfileLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/users/update`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: "nurse", data: updatedData }),
-      });
-      const result = await res.json();
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/users/update`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role: "nurse", data: updatedData }),
+        }
+      );
       if (!res.ok) throw new Error(result.error || "Update failed");
+      const result = await res.json();
+      router.refresh();
     } catch (err) {
       console.error("❌ Update error:", err.message);
     } finally {
@@ -183,8 +242,9 @@ const NurseSidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"
-          }`}
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 ${
+          !isSidebarOpen ? "-translate-x-full" : "translate-x-0"
+        }`}
       >
         {/* Verification Message */}
         {isVerified === false && (
@@ -213,9 +273,15 @@ const NurseSidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false
               compact={false}
             />
 
+            {/**isAvailable, fetching, onChange */}
+
             {/* Availability Toggle */}
             <div className="mt-6 flex flex-col items-center">
-              <ToggleButton />
+              <ToggleButton
+                isAvailable={isAvailable}
+                onChange={handleToggle}
+                fetching={fetching}
+              />
             </div>
           </>
         )}
@@ -238,9 +304,10 @@ const NurseSidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false
         className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 sm:h-[35vh] h-[25vh] px-8 py-6 overflow-auto
           bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-5
           transition-transform duration-500 ease-in-out
-          ${mobileSidebarOpen
-            ? "translate-y-0 opacity-100"
-            : "translate-y-full opacity-0 pointer-events-none"
+          ${
+            mobileSidebarOpen
+              ? "translate-y-0 opacity-100"
+              : "translate-y-full opacity-0 pointer-events-none"
           }`}
       >
         <ActionButtons
@@ -256,8 +323,9 @@ const NurseSidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = false
 
       {/* Slide-in Calendar Drawer */}
       <div
-        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
+          calendarOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <button
           onClick={() => setCalendarOpen(false)}
