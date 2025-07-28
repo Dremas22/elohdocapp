@@ -11,12 +11,13 @@ import {
 } from "react-icons/fa";
 
 /**
- * NoteList component displays a list of notes with professional styling.
+ * NoteList Component
+ *
+ * Renders different types of medical notes with consistent layout, icons, and colors.
  *
  * Props:
- * - items: Array of note objects (sickNotes, prescriptions, or generalNotes)
- * - type: string indicating type: "sickNotes" | "prescriptions" | "generalNotes"
- * - renderDate: function to format date objects
+ * - items (array): Array of medical note objects
+ * - type (string): One of "sickNotes", "prescriptions", or "generalNotes"
  */
 const NoteList = ({ items, type }) => {
   if (!items || items.length === 0) {
@@ -27,163 +28,118 @@ const NoteList = ({ items, type }) => {
     );
   }
 
+  // Format timestamp or string dates
   const renderDate = (date) => {
     if (!date) return "N/A";
-    if (typeof date === "string") return date;
-    return convertTimestamp(date);
+    return typeof date === "string" ? date : convertTimestamp(date);
   };
 
   return (
-    <div className="bg-gray-100 min-h-full p-6">
+    <div className="bg-gray-100 min-h-full p-4 sm:p-6">
       <div className="space-y-6">
         {items.map((item, idx) => {
+          // ===== Sick Notes Layout =====
           if (type === "sickNotes") {
             return (
               <article
                 key={idx}
-                className="bg-white rounded-lg shadow-md border border-gray-300 p-6 hover:shadow-lg transition-shadow duration-300"
+                className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow hover:shadow-lg transition-shadow duration-300"
                 role="region"
-                aria-label={`Sick Note for ${
-                  item.patientName || "Unknown Patient"
-                }`}
+                aria-label={`Sick Note for ${item.patientName || "Unknown Patient"}`}
               >
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-800 text-sm sm:text-base leading-relaxed">
-                  <p className="flex items-center gap-2">
-                    <FaUser className="text-[#023e8a]" />
-                    <span className="font-semibold text-[#023e8a]">
-                      Patient:
-                    </span>{" "}
-                    {item.patientName || "N/A"}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <FaStethoscope className="text-[#023e8a]" />
-                    <span className="font-semibold text-[#023e8a]">
-                      Doctor:
-                    </span>{" "}
-                    {item.doctorName || "N/A"}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <FaCalendarAlt className="text-[#023e8a]" />
-                    <span className="font-semibold text-[#023e8a]">
-                      Start Date:
-                    </span>{" "}
-                    {renderDate(item.content?.startDate)}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <FaCalendarAlt className="text-[#023e8a]" />
-                    <span className="font-semibold text-[#023e8a]">
-                      End Date:
-                    </span>{" "}
-                    {renderDate(item.content?.endDate)}
-                  </p>
-                  <p className="col-span-full flex items-start gap-2">
-                    <FaNotesMedical className="text-[#023e8a] mt-1" />
-                    <span className="font-semibold text-[#023e8a]">
-                      Reason:
-                    </span>{" "}
-                    {item.content?.reason || "N/A"}
-                  </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base text-gray-800">
+                  <NoteLine icon={<FaUser />} label="Patient" value={item.patientName} />
+                  <NoteLine icon={<FaStethoscope />} label="Doctor" value={item.doctorName} />
+                  <NoteLine icon={<FaCalendarAlt />} label="Start Date" value={renderDate(item.content?.startDate)} />
+                  <NoteLine icon={<FaCalendarAlt />} label="End Date" value={renderDate(item.content?.endDate)} />
+                  <NoteLine icon={<FaNotesMedical />} label="Reason" value={item.content?.reason} full />
                 </div>
               </article>
             );
           }
 
+          // ===== Prescriptions Layout =====
           if (type === "prescriptions") {
             return (
               <article
                 key={idx}
-                className="bg-white rounded-lg shadow-md border border-gray-300 p-6 hover:shadow-lg transition-shadow duration-300"
+                className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow hover:shadow-lg transition-shadow duration-300"
                 role="region"
-                aria-label={`Prescription for ${
-                  item.patientName || "Unknown Patient"
-                }`}
+                aria-label={`Prescription for ${item.patientName || "Unknown Patient"}`}
               >
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-800 text-sm sm:text-base leading-relaxed">
-                  <p className="flex items-center gap-2">
-                    <FaUser className="text-[#023e8a]" />
-                    <span className="font-semibold text-[#023e8a]">
-                      Patient:
-                    </span>{" "}
-                    {item.patientName || "N/A"}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <FaStethoscope className="text-[#023e8a]" />
-                    <span className="font-semibold text-[#023e8a]">
-                      Doctor:
-                    </span>{" "}
-                    {item.doctorName || "N/A"}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <FaCalendarAlt className="text-[#023e8a]" />
-                    <span className="font-semibold text-[#023e8a]">
-                      Date Issued:
-                    </span>{" "}
-                    {renderDate(item.content?.date)}
-                  </p>
-                  <p className="flex items-center gap-2 col-span-full">
-                    <FaPills className="text-[#023e8a]" />
-                    <span className="font-semibold text-[#023e8a]">
-                      Medications:
-                    </span>{" "}
-                    {item.content?.medications?.join(", ") || "N/A"}
-                  </p>
-                  <p className="flex items-center gap-2 col-span-full">
-                    <FaClipboardList className="text-[#023e8a]" />
-                    <span className="font-semibold text-[#023e8a]">
-                      Instructions:
-                    </span>{" "}
-                    {item.content?.instructions || "N/A"}
-                  </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base text-gray-800">
+                  <NoteLine icon={<FaUser />} label="Patient" value={item.patientName} />
+                  <NoteLine icon={<FaStethoscope />} label="Doctor" value={item.doctorName} />
+                  <NoteLine icon={<FaCalendarAlt />} label="Date Issued" value={renderDate(item.content?.date)} />
+                  <NoteLine
+                    icon={<FaPills />}
+                    label="Medications"
+                    value={item.content?.medications?.join(", ")}
+                    full
+                  />
+                  <NoteLine
+                    icon={<FaClipboardList />}
+                    label="Instructions"
+                    value={item.content?.instructions}
+                    full
+                  />
                 </div>
               </article>
             );
           }
 
+          // ===== General Notes Layout =====
           if (type === "generalNotes") {
             return (
               <article
                 key={idx}
-                className="bg-white rounded-lg shadow-md border border-gray-300 p-6 hover:shadow-lg transition-shadow duration-300"
+                className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow hover:shadow-lg transition-shadow duration-300"
                 role="region"
-                aria-label={`General Note for ${
-                  item.patientName || "Unknown Patient"
-                }`}
+                aria-label={`General Note for ${item.patientName || "Unknown Patient"}`}
               >
                 <p className="text-gray-800 text-sm sm:text-base whitespace-pre-wrap leading-relaxed">
                   {item.content || "N/A"}
                 </p>
+
                 <div className="mt-4 text-xs text-gray-500 italic">
                   Created At: {renderDate(item.createdAt)}
                 </div>
-                <div className="mt-2 flex gap-2 text-gray-800 text-sm items-center">
-                  <FaUser className="text-[#023e8a]" />
-                  <span className="font-semibold text-[#023e8a]">
-                    Patient:
-                  </span>{" "}
-                  {item.patientName || "N/A"}
-                </div>
-                <div className="flex gap-2 text-gray-800 text-sm items-center">
-                  <FaStethoscope className="text-[#023e8a]" />
-                  <span className="font-semibold text-[#023e8a]">
-                    Doctor:
-                  </span>{" "}
-                  {item.doctorName || "N/A"}
+
+                <div className="mt-2 flex flex-col sm:flex-row gap-2 text-sm text-gray-800">
+                  <NoteLine icon={<FaUser />} label="Patient" value={item.patientName} />
+                  <NoteLine icon={<FaStethoscope />} label="Doctor" value={item.doctorName} />
                 </div>
               </article>
             );
           }
 
+          // ===== Unknown Type Fallback =====
           return (
-            <p
+            <div
               key={idx}
-              className="bg-white rounded-lg shadow-md border border-gray-300 p-6 text-center text-gray-500 italic"
+              className="bg-white border border-gray-200 rounded-xl p-4 text-center text-gray-500 italic"
             >
               Unknown Note Type
-            </p>
+            </div>
           );
         })}
       </div>
     </div>
+  );
+};
+
+/**
+ * NoteLine Component
+ *
+ * Reusable layout for icon + label + value
+ */
+const NoteLine = ({ icon, label, value, full = false }) => {
+  return (
+    <p className={`flex items-start gap-2 ${full ? "col-span-full" : ""}`}>
+      <span className="text-[#023e8a] mt-1">{icon}</span>
+      <span className="font-semibold text-[#023e8a]">{label}:</span>&nbsp;
+      {value || "N/A"}
+    </p>
   );
 };
 
