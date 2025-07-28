@@ -49,9 +49,11 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               type="button"
             >
               <span
+
                 className={`flex items-center justify-center ${
                   isDisabled ? "text-gray-600" : "text-white"
                 }`}
+
               >
                 {icon}
               </span>
@@ -270,10 +272,12 @@ const DoctorSidebarMenu = ({
           lg:hidden fixed bottom-0 right-0 left-0 z-40 sm:h-[38vh] h-[24vh]
           px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5
           transition-transform duration-500 ease-in-out bg-gray-900/20
+
           ${
             mobileSidebarOpen
               ? "translate-y-0 opacity-100"
               : "translate-y-full opacity-0 pointer-events-none"
+
           }
         `}
       >
