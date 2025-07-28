@@ -32,6 +32,7 @@ const NotePreview = ({
   isLoading,
   onClose,
   signature,
+  patientId,
 }) => {
   // Show loading or no-data message while loading or if previewData is not provided
   const previewRef = useRef(null);
@@ -54,7 +55,9 @@ const NotePreview = ({
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ patientId: currentUser?.uid }),
+            body: JSON.stringify({
+              patientId: patientId || currentUser?.uid,
+            }),
           }
         );
 

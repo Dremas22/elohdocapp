@@ -4,12 +4,14 @@ import { useState, useEffect } from "react";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { nurseCategories, phoneCodes } from "@/constants";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const NursesRegistrationForm = () => {
   const { loading, currentUser } = useCurrentUser();
   const router = useRouter();
 
   const [formData, setFormData] = useState({
+    fullName: currentUser?.displayName || "",
     practiceNumber: "",
     phoneCode: "+27",
     phoneNumber: "",
@@ -27,6 +29,7 @@ const NursesRegistrationForm = () => {
         ...prev,
         email: currentUser?.email || "",
         photoUrl: currentUser?.photoUrl || "",
+        fullName: currentUser?.displayName || "",
       }));
     }
   }, [currentUser]);
@@ -47,6 +50,10 @@ const NursesRegistrationForm = () => {
 
   const validate = () => {
     const newErrors = {};
+
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "Full name is required";
+    }
 
     if (!formData.practiceNumber.trim()) {
       newErrors.practiceNumber = "Practice number is required.";
@@ -85,7 +92,7 @@ const NursesRegistrationForm = () => {
         ...cleanFormData,
         phoneNumber: combinedPhoneNumber,
         userId: currentUser?.uid,
-        fullName: currentUser?.displayName,
+        fullName: currentUser?.displayName || formData.fullName,
         photoUrl: currentUser?.photoURL,
         email: currentUser?.email,
         role: "nurse",
@@ -103,10 +110,11 @@ const NursesRegistrationForm = () => {
       const result = await response.json();
 
       if (response.status === 200 && result.message === "User already exists") {
-        alert("User already exists");
         router.push("/dashboard/nurse");
       } else if (response.status === 201) {
-        alert("User successfully registered");
+        toast.success("User successfully registered");
+        // 🔁 Force token refresh so custom claims are available immediately
+        await currentUser?.getIdToken(true);
         setFormData({
           practiceNumber: "",
           phoneCode: "+27",
@@ -154,11 +162,23 @@ const NursesRegistrationForm = () => {
             <input
               type="text"
               name="fullName"
-              value={currentUser?.displayName || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, fullName: e.target.value })
+              }
+              value={currentUser?.displayName || formData.fullName || ""}
+              disabled={!!currentUser?.displayName}
               placeholder="Full Name"
-              disabled
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed"
+              className={`w-full px-4 py-3 rounded-lg border ${
+                errors.fullName ? "border-red-500" : "border-gray-300"
+              } ${
+                currentUser?.displayName
+                  ? "bg-gray-100 text-gray-600"
+                  : "bg-white text-gray-900"
+              } focus:outline-none`}
             />
+            {errors.fullName && (
+              <p className="text-sm text-red-600 mt-1">{errors.fullName}</p>
+            )}
           </div>
 
           {/* Email */}
