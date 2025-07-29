@@ -1,6 +1,25 @@
 import { noteTypeMap } from "@/constants";
 import { useState } from "react";
 
+/**
+ * useSaveMedicalHistory hook for managing creation and retrieval of patient medical notes.
+ *
+ * Provides functionality for:
+ * - Saving different types of notes (general notes, prescriptions, sick notes)
+ * - Fetching all medical notes for a specific patient
+ * - Handling loading, error, and success states
+ *
+ * @returns {Object} Object containing note state and handler functions:
+ * @property {Function} handleSaveNote - Saves a medical note (based on mode and content)
+ * @property {Function} fetchAllNotes - Retrieves all notes for a given patient
+ * @property {boolean} submitting - Indicates whether a note operation is in progress
+ * @property {string|null} error - Current error message, if any
+ * @property {string|null} successMessage - Success message after note submission
+ * @property {Function} resetError - Clears the error state
+ * @property {Function} resetSuccess - Clears the success message state
+ * @property {Array|null} allNotes - Retrieved notes from the server
+ */
+
 const useSaveMedicalHistory = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
