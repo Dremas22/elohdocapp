@@ -1,3 +1,27 @@
+/**
+ * Validates multi-step form data for patient intake.
+ *
+ * Validation is conditional based on the current step, but can also validate the entire form if `isFinal` is `true`.
+ *
+ * Steps:
+ * - Step 0: Validates `idNumber`
+ * - Step 1: Validates location (`country`, `city`, `addressLine`), `phoneNumber`, and `email`
+ * - Step 2: Normalizes and prepares social history data (e.g., smoking, alcohol use)
+ * - Step 3: Ensures at least one allergy is provided
+ * - Step 4: Checks that all required medical history fields are filled
+ *
+ * @param {number} step - The current step of the form being validated (0–4).
+ * @param {Object} formData - The complete form data for the patient.
+ * @param {boolean} [isFinal=false] - Whether to validate the entire form regardless of the step.
+ * @returns {Object} An object containing validation errors. Keys correspond to field names and values are error messages.
+ *
+ * @example
+ * const errors = validateStep(1, formData);
+ * if (Object.keys(errors).length) {
+ *   // Show errors to user
+ * }
+ */
+
 export const validateStep = (step, formData, isFinal = false) => {
   const errors = {};
   const {

@@ -1,3 +1,18 @@
+/**
+ * Converts various timestamp formats to a human-readable date string.
+ *
+ * Supports:
+ * - Firestore Timestamp object (`timestamp.toDate()`)
+ * - Firestore native object with `_seconds` field
+ * - JavaScript `Date` object
+ * - ISO date strings or other valid date strings
+ *
+ * Formats the date in `"en-ZA"` locale (e.g., "29 July 2025").
+ *
+ * @param {any} timestamp - The timestamp to convert. Can be Firestore Timestamp, JS Date, object with `_seconds`, or date string.
+ * @returns {string} A formatted date string or a fallback message like "Unknown" or "Invalid date".
+ */
+
 export const convertTimestamp = (timestamp) => {
   if (!timestamp) return "Unknown";
 
