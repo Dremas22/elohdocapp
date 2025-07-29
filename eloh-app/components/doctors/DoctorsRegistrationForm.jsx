@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { doctorCategories, phoneCodes } from "@/constants";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const DoctorsRegistrationForm = () => {
   const { loading, currentUser } = useCurrentUser();
@@ -28,6 +29,7 @@ const DoctorsRegistrationForm = () => {
         ...prev,
         email: currentUser?.email || "",
         photoUrl: currentUser?.photoUrl || "",
+        fullName: currentUser?.displayName || "",
       }));
     }
   }, [currentUser]);
@@ -115,8 +117,12 @@ const DoctorsRegistrationForm = () => {
           category: "",
           role: "doctor",
           email: currentUser?.email,
+          fullName: currentUser?.displayName || formData.fullName,
         });
         router.push("/dashboard/doctor");
+        toast.success("User successfully registered");
+        // 🔁 Force token refresh so custom claims are available immediately
+        await currentUser?.getIdToken(true);
       } else {
         console.error(result.error || "Something went wrong");
       }

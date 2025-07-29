@@ -1,17 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { auth, db } from "@/db/client";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
 import NurseDashboardNavbar from "@/app/dashboard/nurse/nurseNav";
 import NurseSidebarMenu from "./nurseSidebar"; // New sidebar component
 import Link from "next/link";
+import SearchBar from "@/components/doctors/SearchBar";
+import { FiX } from "react-icons/fi";
+import FilteredPatientsTable from "../doctor/FilteredPatientsTable";
+import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
+import Earnings from "../doctor/doctorEarnings";
 
 const NurseCollectionViewer = () => {
   const [userDoc, setUserDoc] = useState(null);
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filteredPatients, setFilteredPatients] = useState([]);
+  const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [showEarnings, setShowEarnings] = useState(false);
+  const [openViewPatientRecords, setOpenViewPatientRecords] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const patientRecordsRef = useRef(null);
 
   useEffect(() => {
     const fetchUserDataAndPatients = async () => {
@@ -60,6 +72,22 @@ const NurseCollectionViewer = () => {
     return () => unsubscribe();
   }, []);
 
+  // Handle patient search by name or ID
+  const handleSearch = (query) => {
+    if (!query) {
+      setFilteredPatients([]);
+      return;
+    }
+
+    const filtered = patients?.filter(
+      (p) =>
+        p.fullName?.toLowerCase().includes(query.toLowerCase()) ||
+        p.idNumber?.toLowerCase().includes(query.toLowerCase())
+    );
+
+    setFilteredPatients(filtered);
+  };
+
   if (loading) {
     return (
       <>
@@ -74,7 +102,7 @@ const NurseCollectionViewer = () => {
   if (!userDoc) {
     return (
       <div className="min-h-screen bg-gray-50 pt-20">
-        <PatientDashboardNavbar />
+        <NurseDashboardNavbar />
         <div className="flex items-center justify-center h-full">
           <div className="text-center text-gray-600">
             <p className="text-lg font-medium">No user data found.</p>
@@ -105,6 +133,7 @@ const NurseCollectionViewer = () => {
             practiceNumber={practiceNumber}
             isVerified={isVerified}
             userDoc={userDoc}
+            setShowEarnings={setShowEarnings}
           />
         </aside>
 
@@ -116,12 +145,74 @@ const NurseCollectionViewer = () => {
                 Welcome Nurse!
               </h1>
 
+              {/* Earnings Modal */}
+              {showEarnings && (
+                <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-md z-50 flex items-center justify-center px-4">
+                  <div className="bg-white rounded-xl text-black p-6 w-full max-w-4xl shadow-lg relative border-t-8 border-[#0d6efd]">
+                    {/* Close button */}
+                    <button
+                      onClick={() => setShowEarnings(false)}
+                      className="absolute top-3 right-4 text-gray-600 hover:text-red-600 text-xl"
+                      aria-label="Close Earnings Modal"
+                    >
+                      <FiX />
+                    </button>
+
+                    <h2 className="text-2xl font-bold mb-5 text-[#0d6efd] text-center">
+                      Earnings
+                    </h2>
+
+                    <Earnings />
+                  </div>
+                </div>
+              )}
+
+              {/* Search Bar */}
+              <div className="mt-8 w-full max-w-3xl px-4">
+                <SearchBar
+                  onSearch={handleSearch}
+                  query={query}
+                  setQuery={setQuery}
+                  debouncedQuery={debouncedQuery}
+                  setDebouncedQuery={setDebouncedQuery}
+                />
+              </div>
+              {/* Search Results Table */}
+              {debouncedQuery ? (
+                filteredPatients.length > 0 ? (
+                  <FilteredPatientsTable
+                    patients={filteredPatients}
+                    setOpenViewPatientRecords={setOpenViewPatientRecords}
+                    setSelectedPatient={setSelectedPatient}
+                  />
+                ) : (
+                  <p className="text-gray-400 mt-4">
+                    No patients found for "{query}".
+                  </p>
+                )
+              ) : null}
+
+              {/* Medical Records Viewer */}
+              {openViewPatientRecords && (
+                <div
+                  ref={patientRecordsRef}
+                  className="w-full overflow-y-auto max-h-[calc(100vh-5rem)] px-4 mt-6"
+                >
+                  <ViewPatientsRecords
+                    data={selectedPatient?.medicalHistory}
+                    setOpenViewPatientRecords={setOpenViewPatientRecords}
+                    patientId={selectedPatient?.userId}
+                  />
+                </div>
+              )}
+
               {/* Mobile Sidebar under main content */}
               <div className="block lg:hidden w-80 mt-10">
                 <NurseSidebarMenu
                   practiceNumber={practiceNumber}
                   isVerified={isVerified}
                   userDoc={userDoc}
+                  setShowEarnings={setShowEarnings}
                   compact
                 />
               </div>

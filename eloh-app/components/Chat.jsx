@@ -26,7 +26,6 @@ const Chat = ({ setShowChat }) => {
           const userData = userSnap.data();
 
           const consultations = userData?.numberOfConsultations || 0;
-          console.log(consultations, "CONSULT", userData);
           if (consultations >= 1) {
             toast.info(
               "You already have consultations available. Redirecting..."

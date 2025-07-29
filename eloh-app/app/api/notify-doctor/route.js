@@ -14,14 +14,19 @@ export async function POST(req) {
     }
 
     const doctorDoc = await db.collection("doctors").doc(doctorId).get();
-    if (!doctorDoc.exists) {
-      return NextResponse.json({ error: "Doctor not found" }, { status: 404 });
+    const nurseDoc = await db.collection("nurses").doc(doctorId).get();
+
+    if (!doctorDoc.exists && !nurseDoc.exists) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const { fcmToken } = doctorDoc.data();
+    // Use whichever one exists
+    const userDoc = doctorDoc.exists ? doctorDoc : nurseDoc;
+    const { fcmToken } = userDoc.data();
+
     if (!fcmToken) {
       return NextResponse.json(
-        { error: "Doctor has no FCM token" },
+        { error: "User has no FCM token" },
         { status: 400 }
       );
     }
@@ -44,7 +49,7 @@ export async function POST(req) {
       token: fcmToken,
       notification: {
         title: "New Consultation Request",
-        body: `${patientName} wants to start a video consultation.\nJoin here: ${process.env.NEXT_PUBLIC_URL}/room?doctorId=${doctorId}&patientId=${patientId}`,
+        body: `${patientName} wants to start a video consultation.\nJoin here: ${process.env.NEXT_PUBLIC_URL}/room?staffId=${doctorId}&patientId=${patientId}`,
       },
       data: {
         roomId: doctorId,
@@ -52,7 +57,7 @@ export async function POST(req) {
       },
       webpush: {
         fcmOptions: {
-          link: `${process.env.NEXT_PUBLIC_URL}/room?doctorId=${doctorId}&patientId=${patientId}`,
+          link: `${process.env.NEXT_PUBLIC_URL}/room?staffId=${doctorId}&patientId=${patientId}`,
         },
       },
     });

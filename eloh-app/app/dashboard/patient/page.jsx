@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { db } from "@/db/client";
 import { doc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -85,6 +86,7 @@ const PatientDashboard = () => {
       </div>
     );
   }
+
   if (!userDoc) {
     return (
       <div className="min-h-screen bg-gray-50 pt-20">
@@ -107,13 +109,14 @@ const PatientDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col pt-18 relative sm:h-[50vh] h-[145vh] bg-gray-950 text-white overflow-hidden">
+    <div className="h-screen flex flex-col pt-18 relative bg-gray-950 text-white overflow-hidden">
       {/* Fixed Navbar */}
       <PatientDashboardNavbar />
       <SaveStripePayment />
-      <div className="relative z-10 flex flex-col lg:flex-row w-full h-full flex-grow">
-        {/* Desktop sidebar menu */}
-        <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(50vh-5rem)]">
+
+      <div className="relative z-10 flex flex-col lg:flex-row w-full flex-grow min-h-0">
+        {/* Desktop sidebar */}
+        <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-0">
           <PatientSidebarMenu
             userDoc={userDoc}
             mode={mode}
@@ -135,12 +138,9 @@ const PatientDashboard = () => {
           />
         </div>
 
-        {/* Scrollable only on mobile */}
-        <main
-          className="w-full lg:w-3/4 flex flex-col overflow-y-auto lg:overflow-hidden"
-          style={{ height: "calc(120vh - 5rem)" }} // Navbar height assumed ~5rem
-        >
-          <div className="flex flex-col sm:mr-28 items-center justify-start flex-grow">
+        {/* Main content area */}
+        <main className="w-full lg:w-3/4 flex flex-col flex-grow min-h-0 overflow-hidden">
+          <div className="flex flex-col items-center justify-start flex-grow overflow-hidden">
             <PatientMeetingSetup
               mode={mode}
               noteOpen={noteOpen}
@@ -150,6 +150,8 @@ const PatientDashboard = () => {
           </div>
         </main>
       </div>
+
+      {/* Payment Modal */}
       {showPayButton && (
         <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
           <button
@@ -160,6 +162,7 @@ const PatientDashboard = () => {
           </button>
         </div>
       )}
+
       {/* Floating Chat Modal */}
       {showChat && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">

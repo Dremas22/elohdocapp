@@ -1,0 +1,60 @@
+// FullMedicalRecords
+
+import SocialHistorySection from "./SocialHistorySection";
+import ToggleMedicalSection from "./ToggleMedicalSection";
+
+const FullMedicalRecords = ({ medicalHistory, loading, socialHistory }) => {
+  if (loading)
+    return <p className="text-sm text-gray-500 italic">Loading...</p>;
+  if (!medicalHistory || !socialHistory)
+    return <p className="text-red-500">No data found.</p>;
+
+  const staticSections = {
+    adultIllnesses: "Adult Illnesses",
+    childhoodIllnesses: "Childhood Illnesses",
+    hospitalizations: "Hospitalizations",
+    majorInjuries: "Major Injuries",
+    surgeries: "Surgeries",
+  };
+
+  return (
+    <div className="flex flex-col lg:flex-row gap-4 h-full">
+      {/* Left - Toggle Sections */}
+      <div className="w-full lg:w-3/4 h-full flex flex-col space-y-4 overflow-x-hidden overflow-y-auto">
+        <div className="flex-1">
+          <ToggleMedicalSection medicalHistory={medicalHistory} />
+        </div>
+        <div className="flex-1">
+          <SocialHistorySection socialHistory={socialHistory} />
+        </div>
+      </div>
+
+      {/* Right - Static Sections */}
+      <div className="w-full lg:w-1/4 h-full overflow-y-auto pr-2 space-y-4">
+        {Object.entries(staticSections).map(([key, title]) => (
+          <div
+            key={key}
+            className="bg-white border border-gray-200 rounded-xl p-4"
+          >
+            <h3 className="text-base font-semibold text-[#023e8a] mb-2">
+              {title}
+            </h3>
+            {medicalHistory?.[key]?.length > 0 ? (
+              <ul className="list-disc list-inside space-y-1 text-gray-800 text-sm">
+                {medicalHistory[key].map((item, index) => (
+                  <li key={index}>
+                    {typeof item === "string" ? item : JSON.stringify(item)}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-gray-500 italic">No records found.</p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default FullMedicalRecords;
