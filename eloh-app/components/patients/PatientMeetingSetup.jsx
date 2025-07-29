@@ -2,7 +2,7 @@
 
 import { db } from "@/db/client";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import ViewMedicalRecords from "../viewMedicalRecords";
@@ -18,34 +18,42 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    const fetchDoctors = async () => {
+    const fetchAvailableStaff = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const doctorsCollection = collection(db, "doctors");
-        const doctorsSnapshot = await getDocs(doctorsCollection);
+        const availableDoctorsQuery = query(
+          collection(db, "doctors"),
+          where("available", "==", true)
+        );
+        const doctorsSnapshot = await getDocs(availableDoctorsQuery);
         const doctorsList = doctorsSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        const nursesCollection = collection(db, "nurses");
-        const nursesSnapshot = await getDocs(nursesCollection);
+
+        const availableNursesQuery = query(
+          collection(db, "nurses"),
+          where("available", "==", true)
+        );
+        const nursesSnapshot = await getDocs(availableNursesQuery);
         const nursesList = nursesSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setDoctors(doctorsList);
-        setNurses(nursesList);
+
+        setDoctors(doctorsList || []);
+        setNurses(nursesList || []);
       } catch (error) {
-        console.error("Error fetching doctors & nurses:", error);
+        console.error("Error fetching available doctors & nurses:", error);
         setDoctors([]);
-        setError("Error fetching doctors & nurses");
+        setError("Error fetching available doctors & nurses");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchDoctors();
+    fetchAvailableStaff();
   }, []);
 
   const scroll = (direction) => {
