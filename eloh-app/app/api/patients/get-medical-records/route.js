@@ -36,8 +36,12 @@ export const POST = async (req) => {
     }
 
     const medicalHistory = patientDoc.data().medicalHistory || {};
+    const socialHistory = patientDoc.data().socialHistory || {};
 
-    return NextResponse.json({ medicalHistory }, { status: 200 });
+    return NextResponse.json(
+      { medicalHistory, socialHistory },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error fetching full medical history:", error);
     return NextResponse.json(

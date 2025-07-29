@@ -38,6 +38,7 @@ const NotePreview = ({
   const previewRef = useRef(null);
   const [showFullRecord, setShowFullRecord] = useState(false);
   const [medicalHistory, setMedicalHistory] = useState(null);
+  const [socialHistory, setSocialHistory] = useState(null);
   const [loading, setLoading] = useState(true);
   const { loading: userLoading, currentUser } = useCurrentUser();
 
@@ -68,6 +69,7 @@ const NotePreview = ({
         }
 
         setMedicalHistory(data.medicalHistory);
+        setSocialHistory(data.socialHistory);
       } catch (err) {
         console.error("Fetch failed:", err);
         toast.error("Failed to load medical records.");
@@ -199,6 +201,7 @@ const NotePreview = ({
             {/* Medical Record Component */}
             <FullMedicalRecords
               medicalHistory={medicalHistory}
+              socialHistory={socialHistory}
               loading={loading}
             />
           </div>
@@ -313,7 +316,7 @@ const NotePreview = ({
                       Prescribed Medication(s):
                     </p>
                     {previewData.content?.medications &&
-                      Object.values(previewData.content.medications).length >
+                    Object.values(previewData.content.medications).length >
                       0 ? (
                       <p className="text-gray-800">
                         {Object.values(previewData.content.medications).join(
@@ -348,8 +351,6 @@ const NotePreview = ({
             {/* General Notes */}
             {noteType === "generalNotes" && (
               <div className="relative bg-white p-4 sm:p-6 rounded-xl border border-gray-300">
-
-
                 <div className="relative z-10 space-y-6">
                   <h2 className="text-xl sm:text-2xl font-bold text-center text-[#023e8a]">
                     Patient Medical Report

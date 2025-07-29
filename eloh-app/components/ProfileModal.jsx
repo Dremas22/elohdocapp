@@ -93,7 +93,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
   const handleDbSave = async () => {
     const errors = {};
 
-    if (userDoc?.role === "doctor") {
+    if (userDoc?.role === "doctor" || userDoc?.role === "nurse") {
       if (!bankingDetails.accountName.trim()) {
         errors.accountName = "Account holder name is required.";
       }
@@ -136,7 +136,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
     const updatedData = {
       phoneNumber: `${phoneCode}${localNumber}`,
       ...(isPatient && { location }),
-      ...(userDoc?.role === "doctor" && {
+      ...((userDoc?.role === "doctor" || userDoc?.role === "nurse") && {
         banking: {
           ...bankingDetails,
         },
@@ -317,62 +317,68 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
         </div>
 
         <div className="m-4">
-          {/* Image Upload for doctors only */}
-          {userDoc?.role === "doctor" && (
+          {/* Banking Details Form - visible for both doctors and nurses */}
+          {["doctor", "nurse"].includes(userDoc?.role) && (
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Choose Logo
-              </label>
-              <div className="flex items-center gap-6">
-                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-gray-300 shadow-sm flex items-center justify-center bg-gray-100">
-                  {previewUrl ? (
-                    <img
-                      src={previewUrl}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="text-xs text-gray-400 select-none">
-                      No Image
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <label
-                    htmlFor="profileImageInput"
-                    className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 12a4 4 0 01-8 0 4 4 0 018 0z"
-                      ></path>
-                    </svg>
-                    Choose Image
+              {/* Image Upload - visible for doctors only */}
+              {userDoc?.role === "doctor" && (
+                <>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Choose Logo
                   </label>
-                  <input
-                    ref={fileInputRef}
-                    id="profileImageInput"
-                    type="file"
-                    accept="image/png, image/jpeg, image/webp"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                  <p className="mt-1 text-xs text-gray-500 select-none">
-                    Supported formats: PNG, JPEG, WEBP (max 2MB)
-                  </p>
-                </div>
-              </div>
+                  <div className="flex items-center gap-6 mb-6">
+                    <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-gray-300 shadow-sm flex items-center justify-center bg-gray-100">
+                      {previewUrl ? (
+                        <img
+                          src={previewUrl}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="text-xs text-gray-400 select-none">
+                          No Image
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="profileImageInput"
+                        className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 12a4 4 0 01-8 0 4 4 0 018 0z"
+                          ></path>
+                        </svg>
+                        Choose Image
+                      </label>
+                      <input
+                        ref={fileInputRef}
+                        id="profileImageInput"
+                        type="file"
+                        accept="image/png, image/jpeg, image/webp"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                      <p className="mt-1 text-xs text-gray-500 select-none">
+                        Supported formats: PNG, JPEG, WEBP (max 2MB)
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
 
+              {/* Banking Details */}
               <div className="space-y-4 mt-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   Banking Details
