@@ -1,11 +1,13 @@
 // FullMedicalRecords
 
+import SocialHistorySection from "./SocialHistorySection";
 import ToggleMedicalSection from "./ToggleMedicalSection";
 
-const FullMedicalRecords = ({ medicalHistory, loading }) => {
+const FullMedicalRecords = ({ medicalHistory, loading, socialHistory }) => {
   if (loading)
     return <p className="text-sm text-gray-500 italic">Loading...</p>;
-  if (!medicalHistory) return <p className="text-red-500">No data found.</p>;
+  if (!medicalHistory || !socialHistory)
+    return <p className="text-red-500">No data found.</p>;
 
   const staticSections = {
     adultIllnesses: "Adult Illnesses",
@@ -18,8 +20,13 @@ const FullMedicalRecords = ({ medicalHistory, loading }) => {
   return (
     <div className="flex flex-col lg:flex-row gap-4 h-full">
       {/* Left - Toggle Sections */}
-      <div className="w-full lg:w-3/4 h-full overflow-hidden">
-        <ToggleMedicalSection medicalHistory={medicalHistory} />
+      <div className="w-full lg:w-3/4 h-full flex flex-col space-y-4 overflow-x-hidden overflow-y-auto">
+        <div className="flex-1">
+          <ToggleMedicalSection medicalHistory={medicalHistory} />
+        </div>
+        <div className="flex-1">
+          <SocialHistorySection socialHistory={socialHistory} />
+        </div>
       </div>
 
       {/* Right - Static Sections */}

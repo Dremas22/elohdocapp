@@ -45,14 +45,37 @@ const NoteList = ({ items, type }) => {
                 key={idx}
                 className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow hover:shadow-lg transition-shadow duration-300"
                 role="region"
-                aria-label={`Sick Note for ${item.patientName || "Unknown Patient"}`}
+                aria-label={`Sick Note for ${
+                  item.patientName || "Unknown Patient"
+                }`}
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base text-gray-800">
-                  <NoteLine icon={<FaUser />} label="Patient" value={item.patientName} />
-                  <NoteLine icon={<FaStethoscope />} label="Doctor" value={item.doctorName} />
-                  <NoteLine icon={<FaCalendarAlt />} label="Start Date" value={renderDate(item.content?.startDate)} />
-                  <NoteLine icon={<FaCalendarAlt />} label="End Date" value={renderDate(item.content?.endDate)} />
-                  <NoteLine icon={<FaNotesMedical />} label="Reason" value={item.content?.reason} full />
+                  <NoteLine
+                    icon={<FaUser />}
+                    label="Patient"
+                    value={item.patientName}
+                  />
+                  <NoteLine
+                    icon={<FaStethoscope />}
+                    label="Doctor"
+                    value={item.doctorName}
+                  />
+                  <NoteLine
+                    icon={<FaCalendarAlt />}
+                    label="Start Date"
+                    value={renderDate(item.content?.startDate)}
+                  />
+                  <NoteLine
+                    icon={<FaCalendarAlt />}
+                    label="End Date"
+                    value={renderDate(item.content?.endDate)}
+                  />
+                  <NoteLine
+                    icon={<FaNotesMedical />}
+                    label="Reason"
+                    value={item.content?.reason}
+                    full
+                  />
                 </div>
               </article>
             );
@@ -65,12 +88,26 @@ const NoteList = ({ items, type }) => {
                 key={idx}
                 className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow hover:shadow-lg transition-shadow duration-300"
                 role="region"
-                aria-label={`Prescription for ${item.patientName || "Unknown Patient"}`}
+                aria-label={`Prescription for ${
+                  item.patientName || "Unknown Patient"
+                }`}
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base text-gray-800">
-                  <NoteLine icon={<FaUser />} label="Patient" value={item.patientName} />
-                  <NoteLine icon={<FaStethoscope />} label="Doctor" value={item.doctorName} />
-                  <NoteLine icon={<FaCalendarAlt />} label="Date Issued" value={renderDate(item.content?.date)} />
+                  <NoteLine
+                    icon={<FaUser />}
+                    label="Patient"
+                    value={item.patientName}
+                  />
+                  <NoteLine
+                    icon={<FaStethoscope />}
+                    label="Doctor"
+                    value={item.doctorName}
+                  />
+                  <NoteLine
+                    icon={<FaCalendarAlt />}
+                    label="Date Issued"
+                    value={renderDate(item.content?.date)}
+                  />
                   <NoteLine
                     icon={<FaPills />}
                     label="Medications"
@@ -95,7 +132,9 @@ const NoteList = ({ items, type }) => {
                 key={idx}
                 className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow hover:shadow-lg transition-shadow duration-300"
                 role="region"
-                aria-label={`General Note for ${item.patientName || "Unknown Patient"}`}
+                aria-label={`General Note for ${
+                  item.patientName || "Unknown Patient"
+                }`}
               >
                 <p className="text-gray-800 text-sm sm:text-base whitespace-pre-wrap leading-relaxed">
                   {item.content || "N/A"}
@@ -106,8 +145,16 @@ const NoteList = ({ items, type }) => {
                 </div>
 
                 <div className="mt-2 flex flex-col sm:flex-row gap-2 text-sm text-gray-800">
-                  <NoteLine icon={<FaUser />} label="Patient" value={item.patientName} />
-                  <NoteLine icon={<FaStethoscope />} label="Doctor" value={item.doctorName} />
+                  <NoteLine
+                    icon={<FaUser />}
+                    label="Patient"
+                    value={item.patientName}
+                  />
+                  <NoteLine
+                    icon={<FaStethoscope />}
+                    label="Doctor"
+                    value={item.doctorName}
+                  />
                 </div>
               </article>
             );
@@ -135,11 +182,17 @@ const NoteList = ({ items, type }) => {
  */
 const NoteLine = ({ icon, label, value, full = false }) => {
   return (
-    <p className={`flex items-start gap-2 ${full ? "col-span-full" : ""}`}>
-      <span className="text-[#023e8a] mt-1">{icon}</span>
-      <span className="font-semibold text-[#023e8a]">{label}:</span>&nbsp;
-      {value || "N/A"}
-    </p>
+    <div
+      className={`flex flex-col xs:flex-row gap-1 xs:gap-2 ${
+        full ? "col-span-full" : ""
+      }`}
+    >
+      <div className="flex items-center gap-1 text-[#023e8a]">
+        <span>{icon}</span>
+        <span className="font-semibold">{label}:</span>
+      </div>
+      <span className="text-gray-800 pl-6 xs:pl-0">{value || "N/A"}</span>
+    </div>
   );
 };
 
