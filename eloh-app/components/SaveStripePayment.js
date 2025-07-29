@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { toast } from "react-toastify";
 
 const SaveStripePayment = () => {
   const searchParams = useSearchParams();
@@ -18,9 +17,9 @@ const SaveStripePayment = () => {
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
-            toast.success("✅ Payment saved to Firestore");
+            console.log("✅ Payment saved to Firestore");
           } else {
-            toast.error("⚠️ Could not save payment:", data.error);
+            console.error("⚠️ Could not save payment:", data.error);
           }
         });
     }

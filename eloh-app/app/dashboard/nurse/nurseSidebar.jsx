@@ -317,7 +317,11 @@ const NurseSidebarMenu = ({
           compact={true}
         />
         <div className="flex items-center gap-3">
-          <ToggleButton />
+          <ToggleButton
+            isAvailable={isAvailable}
+            onChange={handleToggle}
+            fetching={fetching}
+          />
         </div>
       </div>
 
