@@ -18,36 +18,37 @@ const SignaturePad = ({ onSave, onCancel }) => {
   };
 
   return (
-    <div className="bg-gray-800 p-4 rounded-md text-white space-y-4">
-      <h3 className="text-lg font-semibold">Draw Your Signature</h3>
-      <div className="bg-white p-2 rounded">
+    <div className="bg-gray-800 p-4 rounded-md text-white space-y-4 w-full max-w-xl mx-auto">
+      <h3 className="text-lg font-semibold text-center">Draw Your Signature</h3>
+
+      <div className="bg-white p-2 rounded w-full max-w-md mx-auto shadow-md">
         <SignatureCanvas
           ref={sigRef}
           penColor="black"
           canvasProps={{
             width: 400,
             height: 150,
-            className: "rounded bg-white",
+            className: "rounded bg-white w-full h-[150px]",
           }}
         />
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-4">
         <button
           onClick={handleClear}
-          className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center gap-2"
+          className="bg-[#03045e] text-white py-3 px-6 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer w-full sm:w-auto"
         >
           Clear
         </button>
         <button
           onClick={handleSave}
-          className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center gap-2"
+          className="bg-[#03045e] text-white py-3 px-6 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer w-full sm:w-auto"
         >
           Save
         </button>
         <button
           onClick={onCancel}
-          className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center gap-2"
+          className=" bg-[#5e0303] text-white py-3 px-6 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#8a0202] transition-all duration-200 ease-in-out cursor-pointer w-full sm:w-auto"
         >
           Cancel
         </button>
