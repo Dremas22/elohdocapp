@@ -62,21 +62,27 @@ const ViewMedicalRecords = ({ userDoc, mode, setNoteOpen }) => {
                       {record.doctorName || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-center">
-                      {(() => {
-                        const content = record.content;
-                        if (typeof content === "string") return content;
-                        if (typeof content === "object") {
-                          if (content.instructions) return content.instructions;
-                          if (content.reason)
-                            return `Reason: ${content.reason}`;
-                          if (content.startDate && content.endDate)
-                            return `From ${convertTimestamp(
-                              content.startDate
-                            )} to ${convertTimestamp(content.endDate)}`;
-                        }
-                        return "View full note";
-                      })()}
-                    </td>
+  {(() => {
+    const content = record.content;
+
+    const truncate = (text, maxLength = 50) => {
+      return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+    };
+
+    if (typeof content === "string") return truncate(content);
+
+    if (typeof content === "object") {
+      if (content.instructions) return truncate(content.instructions);
+      if (content.reason) return truncate(`Reason: ${content.reason}`);
+      if (content.startDate && content.endDate) {
+        return `From ${convertTimestamp(content.startDate)} to ${convertTimestamp(content.endDate)}`;
+      }
+    }
+
+    return "View full note";
+  })()}
+</td>
+
                   </tr>
                 ))
               ) : (
