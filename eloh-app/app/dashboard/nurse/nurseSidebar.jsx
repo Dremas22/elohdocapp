@@ -7,6 +7,7 @@ import {
   FiCalendar,
   FiChevronUp,
   FiChevronDown,
+  FiDollarSign,
 } from "react-icons/fi";
 import { IoCloseCircleSharp } from "react-icons/io5";
 import { onMessage } from "firebase/messaging";
@@ -85,6 +86,7 @@ const NurseSidebarMenu = ({
   practiceNumber,
   isVerified,
   userDoc,
+  setShowEarnings,
   compact = false,
 }) => {
   // Calendar visibility state
@@ -140,15 +142,6 @@ const NurseSidebarMenu = ({
 
     fetchAvailability();
   }, []);
-
-  // /**
-  //  * Handle clicking the notification icon (reset counter and open modal).
-  //  */
-  // const handleNotification = () => {
-  //   setShowNotificationModal(true);
-  //   setHasNotification(false);
-  //   setNotificationCount(0);
-  // };
 
   // Toggle availability on backend
   const handleToggle = async () => {
@@ -209,9 +202,9 @@ const NurseSidebarMenu = ({
       onClick: () => setProfileOpen(true),
     },
     {
-      title: "Patient Records",
-      icon: <FiFolder className="h-6 w-6" />,
-      onClick: () => alert("Opening patient medical records..."),
+      title: "Earnings",
+      icon: <FiDollarSign className="h-6 w-6" />,
+      onClick: () => setShowEarnings((pre) => !pre),
     },
     {
       title: "Schedule",
@@ -317,7 +310,11 @@ const NurseSidebarMenu = ({
           compact={true}
         />
         <div className="flex items-center gap-3">
-          <ToggleButton />
+          <ToggleButton
+            isAvailable={isAvailable}
+            onChange={handleToggle}
+            fetching={fetching}
+          />
         </div>
       </div>
 

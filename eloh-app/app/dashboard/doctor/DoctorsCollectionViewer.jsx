@@ -2,13 +2,13 @@
 
 import DoctorDashboardNavbar from "@/app/dashboard/doctor/doctorNav";
 import SidebarMenu from "./doctorSidebar";
-import DoctorEarnings from "./doctorEarnings";
 import SearchBar from "@/components/doctors/SearchBar";
 import { useState, useRef, useEffect } from "react";
 import FilteredPatientsTable from "./FilteredPatientsTable";
 import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
 import { FiX } from "react-icons/fi";
 import Link from "next/link";
+import Earnings from "./doctorEarnings";
 
 const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   // State to manage search/filter and modals
@@ -115,7 +115,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                       Earnings
                     </h2>
 
-                    <DoctorEarnings />
+                    <Earnings />
                   </div>
                 </div>
               )}
