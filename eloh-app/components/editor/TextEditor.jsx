@@ -7,28 +7,49 @@ import MeetingRoomNavbar from "./MeetingRoomNavbar";
 import PrescriptionForm from "./PrescriptionForm";
 import SickNoteForm from "./SickNoteForm";
 import useSaveMedicalHistory from "@/hooks/useSaveMedicalHistory";
+
+/**
+ * RichTextEditor component provides an interface for doctors to add medical notes,
+ * prescriptions, or sick notes related to a patient during a meeting.
+ *
+ * @param {Object} props
+ * @param {string} props.roomID - The unique identifier for the current meeting room (doctor's user ID).
+ *
+ * @returns {JSX.Element|null} The editor UI or null if user is not authorized.
+ */
 const RichTextEditor = ({ roomID }) => {
   const { loading, currentUser } = useCurrentUser();
-  const { handleSaveNote, error, submitting, successMessage } =
-    useSaveMedicalHistory();
+
+  // Hook for saving notes with status/error feedback
+  const { handleSaveNote, error, submitting, successMessage } = useSaveMedicalHistory();
+
+  // State for the current textual note input
   const [currentNote, setCurrentNote] = useState("");
+
+  // State to hold fetched patient data for the current patientId
   const [patientData, setPatientData] = useState(null);
-  const [mode, setMode] = useState("note"); // "note", "prescription", "sick-note"
+
+  // Mode determines which form/view to show: "note", "prescription", or "sick-note"
+  const [mode, setMode] = useState("note");
+
+  // Retrieve patientId from URL query params
   const searchParams = useSearchParams();
   const patientIdFromQuery = searchParams.get("patientId");
   const patientId = patientIdFromQuery;
 
+  // Check if current user is the doctor associated with the roomID
   const isDoctor = roomID === currentUser?.uid;
 
-  //  Fetch patient data on mount
+  /**
+   * Fetch patient data when component mounts or patientId changes.
+   * Only runs if patientId is defined.
+   */
   useEffect(() => {
     const fetchPatientData = async () => {
       if (!patientId) return;
 
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_URL}/api/patients/${patientId}`
-        );
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/patients/${patientId}`);
         if (!res.ok) throw new Error("Failed to fetch patient data");
         const data = await res.json();
         setPatientData(data);
@@ -40,20 +61,23 @@ const RichTextEditor = ({ roomID }) => {
     fetchPatientData();
   }, [patientId]);
 
+  // Show loading message while user or auth state is loading
   if (loading || !currentUser) return <p>Loading...</p>;
 
   return (
     <>
       {isDoctor && patientData ? (
         <div className="w-full p-4 bg-white text-black border-l border-gray-700 flex flex-col justify-between">
-          {/** Error */}
+          {/* Display error message if any */}
           {error && <p className="text-red-500">{error}</p>}
-          {/** Success message */}
+
+          {/* Display success message */}
           {successMessage && <p className="text-green-500">{successMessage}</p>}
-          {/* Pass patientData, mode, and setMode to Navbar - Dont forget to fetch doctor's Info */}
+
+          {/* Navigation bar for switching between modes */}
           <MeetingRoomNavbar mode={mode} setMode={setMode} doctorId={roomID} />
 
-          {/* Render content based on selected mode */}
+          {/* Conditional rendering of form based on selected mode */}
           <div className="mt-4 flex-grow bg-white">
             {mode === "note" && (
               <>

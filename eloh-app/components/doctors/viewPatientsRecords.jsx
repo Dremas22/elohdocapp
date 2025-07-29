@@ -42,7 +42,7 @@ const ViewPatientsRecords = ({
   return (
     <div className="text-[#333] p-8 w-full max-w-6xl mx-auto">
       <h1 className="text-2xl text-gray-200 font-bold mb-6 text-center">
-        Patient Records
+        Patient Medical Records
       </h1>
 
       {/* Toggle Buttons */}
@@ -52,11 +52,10 @@ const ViewPatientsRecords = ({
             key={id}
             onClick={() => setMode(type)}
             className={`py-2 px-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out
-        ${
-          mode === type
-            ? "bg-[#2c4253] text-white hover:bg-[#023e8a]" // lighter blue for active + darker text
-            : "bg-[#03045e] text-white hover:bg-[#023e8a]"
-        }
+        ${mode === type
+                ? "bg-[#2c4253] text-white hover:bg-[#023e8a]"
+                : "bg-[#03045e] text-white hover:bg-[#023e8a]"
+              }
       `}
           >
             {label}
@@ -65,7 +64,7 @@ const ViewPatientsRecords = ({
       </div>
 
       {/* Table Section */}
-      <div className="overflow-x-auto bg-white rounded-lg shadow-md border border-gray-200 w-[77vw] sm:w-full px-2 sm:px-6 text-sm sm:text-base -ml-11.5 sm:-ml-4">
+      <div className="overflow-x-auto bg-white rounded-lg shadow-md border border-gray-200 w-[88vw] sm:w-full px-2 sm:px-6 text-sm sm:text-base -ml-11.5 sm:-ml-4">
         <div className="flex justify-end px-4 pt-3">
           <button
             onClick={() => {
