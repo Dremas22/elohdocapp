@@ -9,7 +9,7 @@ import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
-import ToggleButton from "./availabilityBtn"; // ✅ Check this path
+import ToggleButton from "./availabilityBtn";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
@@ -50,9 +50,8 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
             >
               <span
 
-                className={`flex items-center justify-center ${
-                  isDisabled ? "text-gray-600" : "text-white"
-                }`}
+                className={`flex items-center justify-center ${isDisabled ? "text-gray-600" : "text-white"
+                  }`}
 
               >
                 {icon}
@@ -211,9 +210,8 @@ const DoctorSidebarMenu = ({
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 ${
-          !isSidebarOpen ? "-translate-x-full" : "translate-x-0"
-        }`}
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"
+          }`}
       >
         {isVerified === false && (
           <div className="bg-yellow-100 text-yellow-800 border border-yellow-800 text-xs p-2 rounded text-center mb-3">
@@ -273,10 +271,9 @@ const DoctorSidebarMenu = ({
           px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5
           transition-transform duration-500 ease-in-out bg-gray-900/20
 
-          ${
-            mobileSidebarOpen
-              ? "translate-y-0 opacity-100"
-              : "translate-y-full opacity-0 pointer-events-none"
+          ${mobileSidebarOpen
+            ? "translate-y-0 opacity-100"
+            : "translate-y-full opacity-0 pointer-events-none"
 
           }
         `}
@@ -301,9 +298,8 @@ const DoctorSidebarMenu = ({
 
       {/* Calendar Drawer */}
       <div
-        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
-          calendarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <button
           onClick={() => setCalendarOpen(false)}
