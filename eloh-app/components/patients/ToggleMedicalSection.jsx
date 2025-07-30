@@ -16,18 +16,17 @@ const ToggleMedicalSection = ({ medicalHistory }) => {
   return (
     <div className="flex flex-col h-full max-h-full overflow-hidden">
       {/* Toggle Buttons */}
-      <div className="flex flex-wrap sm:flex-row gap-3 mb-4 justify-start sm:justify-between">
+      <div className="flex flex-col sm:flex-row pr-8 gap-3 m-4 w-full">
         {toggleSections.map((key) => {
           const isActive = activeToggle === key;
           return (
             <button
               key={key}
               onClick={() => setActiveToggle(key)}
-              className={`flex-1 sm:flex-none px-4 py-2 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200
-                ${
-                  isActive
-                    ? "bg-[#03045e] text-white shadow-md"
-                    : "bg-gray-100 text-gray-800 hover:bg-[#0077b6] hover:text-white"
+              className={`w-full sm:w-auto px-4 py-2 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200
+                ${isActive
+                  ? "bg-[#03045e] text-white shadow-[0_4px_#999] active:shadow-[0_2px_#666] "
+                  : "bg-gray-100 text-gray-800 hover:bg-[#0077b6] hover:text-white shadow-[0_4px_#999] active:shadow-[0_2px_#666] "
                 }
               `}
             >
@@ -43,6 +42,7 @@ const ToggleMedicalSection = ({ medicalHistory }) => {
           <h3 className="text-base sm:text-lg font-semibold text-[#023e8a] mb-3">
             {sectionTitles[activeToggle]}
           </h3>
+
           {medicalHistory?.[activeToggle]?.length > 0 ? (
             <NoteList
               items={medicalHistory[activeToggle]}
