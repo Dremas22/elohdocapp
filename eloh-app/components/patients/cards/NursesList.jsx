@@ -21,11 +21,10 @@ const NursesList = ({ nurses, sendNotificationToDoctor }) => {
               );
             }
           }}
-          className={`min-w-[260px] sm:min-w-[280px] md:min-w-[300px] rounded-lg p-4 shadow-md flex-shrink-0 flex flex-col items-center gap-4 transition duration-200 ${
-            currentUser?.uid && nurse.userId
+          className={`min-w-[260px] sm:min-w-[280px] md:min-w-[300px] rounded-lg p-4 shadow-md flex-shrink-0 flex flex-col items-center gap-4 transition duration-200 ${currentUser?.uid && nurse.userId
               ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
               : "cursor-not-allowed bg-gray-700 opacity-50"
-          }`}
+            }`}
         >
           <div className="text-center space-y-2">
             <h3 className="text-lg font-bold text-white">{nurse.fullName}</h3>

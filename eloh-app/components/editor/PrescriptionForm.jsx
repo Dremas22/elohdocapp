@@ -29,7 +29,6 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
   const handleSignatureSave = (dataUrl) => {
     setSignature(dataUrl);
     setShowSignaturePad(false);
-    console.log("Saved signature:", dataUrl);
   };
 
   const handleMedicationChange = (index, value) => {
@@ -43,8 +42,7 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
   };
 
   const handleRemoveMedication = (index) => {
-    const updated = medications.filter((_, i) => i !== index);
-    setMedications(updated);
+    setMedications(medications.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async () => {
@@ -53,15 +51,11 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
     setFieldErrors({});
 
     const errors = {};
-    const trimmedMedications = medications
-      .map((m) => m.trim())
-      .filter((m) => m);
+    const trimmedMedications = medications.map((m) => m.trim()).filter((m) => m);
 
     if (!date) errors.date = "Please select a date.";
-    if (!instructions.trim())
-      errors.instructions = "Instructions are required.";
-    if (trimmedMedications.length === 0)
-      errors.medications = "At least one medication is required.";
+    if (!instructions.trim()) errors.instructions = "Instructions are required.";
+    if (trimmedMedications.length === 0) errors.medications = "At least one medication is required.";
     if (!signature) errors.signature = "Doctor's signature is required.";
 
     if (Object.keys(errors).length > 0) {
@@ -82,9 +76,7 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
       roomID: doctorId,
     });
 
-    if (success) {
-      setShowPreview(true);
-    }
+    if (success) setShowPreview(true);
   };
 
   const handlePreview = async () => {
@@ -109,7 +101,7 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg text-black space-y-6 shadow-md">
+    <div className="p-4 sm:p-6 bg-white rounded-lg text-black space-y-6 shadow-md max-w-full sm:max-w-2xl mx-auto">
       {openPreview && (
         <NotePreview
           previewData={previewData}
@@ -120,153 +112,130 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
           patientId={patientId}
         />
       )}
-      <h2 className="text-xl font-semibold text-[#03045e]">Prescription</h2>
 
-      <p>
-        <strong>Patient Name:</strong> {patientData?.fullName}
-      </p>
+      <h2 className="text-lg sm:text-xl font-semibold text-[#03045e]">Prescription</h2>
+      <p className="text-sm sm:text-base"><strong>Patient Name:</strong> {patientData?.fullName}</p>
 
       <div className="bg-gray-100 p-4 rounded-md space-y-4 border border-gray-300">
-        {/* Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Date
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className={`w-full px-3 py-2 text-black rounded-md border ${
-              fieldErrors.date ? "border-red-500" : "border-gray-300"
-            }`}
+            className={`w-full px-3 py-2 text-black rounded-md border ${fieldErrors.date ? "border-red-500" : "border-gray-300"}`}
           />
           {fieldErrors.date && (
             <p className="text-red-600 text-xs mt-1">{fieldErrors.date}</p>
           )}
         </div>
 
-        {/* Medications - moved above instructions */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Medications
-          </label>
-          {medications.map((med, index) => (
-            <div key={index} className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={med}
-                onChange={(e) => handleMedicationChange(index, e.target.value)}
-                className="flex-grow px-3 py-2 text-black rounded-md border border-gray-300"
-                placeholder="e.g. Amoxicillin 500mg"
-              />
-              <button
-                type="button"
-                onClick={() => handleRemoveMedication(index)}
-                className="text-red-600 font-bold"
-              >
-                ✕
-              </button>
-            </div>
-          ))}
+          <label className="block text-sm font-medium text-gray-700 mb-1">Medications</label>
+          <div className="space-y-2">
+            {medications.map((med, index) => (
+              <div key={index} className="flex gap-2 items-center">
+                <input
+                  type="text"
+                  value={med}
+                  onChange={(e) => handleMedicationChange(index, e.target.value)}
+                  className="flex-grow sm:px-3 px-0.5 py-2 text-black rounded-md border border-gray-300"
+                  placeholder="e.g. Amoxicillin 500mg"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveMedication(index)}
+                  className="text-red-600 font-bold text-xl leading-none px-3 py-1 -ml-11"
+                  aria-label={`Remove medication ${index + 1}`}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+
+          </div>
           {fieldErrors.medications && (
-            <p className="text-red-600 text-xs mb-2">
-              {fieldErrors.medications}
-            </p>
+            <p className="text-red-600 text-xs mt-1 mb-2">{fieldErrors.medications}</p>
           )}
           <button
             type="button"
             onClick={handleAddMedication}
-            className="text-blue-600 text-sm font-medium"
+            className="text-blue-600 text-sm font-medium hover:underline"
           >
             + Add Medication
           </button>
         </div>
 
-        {/* Instructions - moved below medications */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Instructions
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Instructions</label>
           <textarea
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
             rows={3}
-            className={`w-full px-3 py-2 text-black rounded-md border ${
-              fieldErrors.instructions ? "border-red-500" : "border-gray-300"
-            }`}
+            className={`w-full px-3 py-2 text-black rounded-md border resize-y min-h-[80px] ${fieldErrors.instructions ? "border-red-500" : "border-gray-300"}`}
           />
           {fieldErrors.instructions && (
-            <p className="text-red-600 text-xs mt-1">
-              {fieldErrors.instructions}
-            </p>
+            <p className="text-red-600 text-xs mt-1">{fieldErrors.instructions}</p>
           )}
         </div>
       </div>
 
-      {/* Signature */}
-      <div>
-        <p className="font-semibold mb-2">Doctor’s Signature</p>
-        {signature ? (
-          <>
-            <img
-              src={signature}
-              alt="Doctor signature"
-              className="mb-2 border max-w-xs"
-            />
-            <button
-              onClick={() => setSignature(null)}
-              className="bg-red-600 text-white py-2 px-4 text-sm rounded shadow hover:bg-red-700 transition"
-            >
-              Remove Signature
-            </button>
-          </>
-        ) : (
-          <>
-            {!showSignaturePad && (
-              <button
-                onClick={() => setShowSignaturePad(true)}
-                className="bg-[#03045e] text-white py-2 px-4 text-sm rounded shadow hover:bg-[#023e8a]"
-              >
-                Sign Here
-              </button>
-            )}
-            {showSignaturePad && <SignaturePad onSave={handleSignatureSave} />}
-          </>
+      <div className="flex items-center justify-between gap-4">
+        {!signature && !showSignaturePad && (
+          <button
+            onClick={() => setShowSignaturePad(true)}
+            className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            style={{ minWidth: "120px" }}
+          >
+            Sign Here
+          </button>
         )}
-        {fieldErrors.signature && (
-          <p className="text-red-600 text-xs mt-2">{fieldErrors.signature}</p>
-        )}
-      </div>
 
-      {/* Feedback messages */}
-      {error && (
-        <div className="text-red-600 text-sm font-semibold">{error}</div>
-      )}
-      {successMessage && (
-        <div className="text-green-700 text-sm font-semibold">
-          {successMessage}
-        </div>
-      )}
-
-      {/* Submit & Preview */}
-      <div className="flex justify-center gap-4">
         <button
           onClick={handleSubmit}
           disabled={submitting}
-          className="bg-[#03045e] text-white py-3 px-5 text-sm font-semibold rounded-xl shadow active:shadow-md active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
+          className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+          style={{ minWidth: "120px" }}
         >
           {submitting ? "Submitting..." : "Submit"}
         </button>
+      </div>
 
-        {showPreview && (
+      {showSignaturePad && (
+        <SignaturePad
+          onSave={handleSignatureSave}
+          onCancel={() => setShowSignaturePad(false)}
+        />
+      )}
+
+      {signature && (
+        <div className="mt-4">
+          <img src={signature} alt="Doctor signature" className="mb-2 border max-w-full sm:max-w-xs" />
+          <button
+            onClick={() => setSignature(null)}
+            className="bg-red-600 text-white shadow-[0_4px_#999] active:shadow-[0_2px_#666] py-2 px-4 text-sm rounded-lg hover:bg-red-700 transition w-full sm:w-auto"
+          >
+            Remove Signature
+          </button>
+        </div>
+      )}
+      {fieldErrors.signature && (
+        <p className="text-red-600 text-xs mt-2">{fieldErrors.signature}</p>
+      )}
+
+      {error && <p className="text-red-600 text-sm font-semibold mt-2">{error}</p>}
+      {successMessage && <p className="text-green-700 text-sm font-semibold mt-2">{successMessage}</p>}
+
+      {showPreview && (
+        <div className="flex justify-center pt-4">
           <button
             onClick={handlePreview}
-            className="bg-gray-600 text-white py-3 px-5 text-sm font-semibold rounded-xl shadow hover:bg-gray-700 transition"
+            className="w-full sm:w-auto bg-[#03045e] text-white py-3 px-2 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
             {isLoading ? "Loading Preview..." : "Preview"}
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

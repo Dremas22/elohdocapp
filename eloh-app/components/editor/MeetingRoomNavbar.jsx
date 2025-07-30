@@ -43,16 +43,15 @@ const MeetingRoomNavbar = ({ mode, setMode, doctorId }) => {
   return (
     <div className="flex flex-col gap-4 mb-4 w-full">
       {/* Row 1: Buttons */}
-      <div className="flex justify-center gap-6 w-full flex-wrap">
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 w-full z-10">
         {buttonModes.map((m) => (
           <button
             key={m.id}
             onClick={() => setMode(m.id)}
-            className={`w-32 sm:w-36 py-3 px-8 text-base font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center gap-6 ${
-              mode === m.id
-                ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-            }`}
+            className={`w-full sm:w-36 py-3 px-8 text-base font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center ${mode === m.id
+              ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
+              : "bg-[#506f95] text-white hover:bg-[#023e8a]"
+              }`}
           >
             {m.label}
           </button>
@@ -60,7 +59,7 @@ const MeetingRoomNavbar = ({ mode, setMode, doctorId }) => {
       </div>
 
       {/* Row 2: Doctor Info + Logo */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-700 p-4 rounded shadow-md">
+      <div className="flex flex-col-reverse md:flex-row justify-between items-center gap-4 bg-gray-700 p-4 rounded shadow-md">
         {/* Doctor Info */}
         <div className="text-sm text-gray-200 w-full md:w-auto md:text-left text-center">
           <p className="font-semibold">
@@ -70,9 +69,9 @@ const MeetingRoomNavbar = ({ mode, setMode, doctorId }) => {
           <p>{doctorData?.phoneNumber || "Contacts N/A"}</p>
         </div>
 
-        {/* Enlarged Logo Without Increasing Navbar Height */}
-        <div className="flex justify-end w-full md:w-auto">
-          <div className="w-[70px] h-[60px] relative scale-350">
+        {/* Logo */}
+        <div className="flex justify-center w-full md:w-auto">
+          <div className="w-[70px] h-[60px] relative transform scale-300 sm:mr-3">
             <Image
               src="/images/elohdoc.png"
               alt="Eloh App Logo"

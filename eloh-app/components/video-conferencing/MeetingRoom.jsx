@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ControlBar,
   GridLayout,
   ParticipantTile,
   RoomAudioRenderer,
@@ -15,6 +14,7 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { useRouter, useSearchParams } from "next/navigation";
 import RichTextEditor from "@/components/editor/TextEditor";
 import { toast } from "react-toastify";
+import { ControlBar } from "@livekit/components-react";
 
 const MeetingRoom = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -23,6 +23,7 @@ const MeetingRoom = () => {
   const doctorId = searchParams.get("staffId");
 
   const isDoctor = doctorId === currentUser?.uid;
+  const isPatient = !isDoctor;
   const room = doctorId;
 
   const [token, setToken] = useState("");
@@ -37,7 +38,8 @@ const MeetingRoom = () => {
       })
   );
 
-  // Display name once user is loaded
+  const isMobile = useIsMobile();
+
   const name = useMemo(() => {
     if (loading) return null;
     return currentUser?.displayName || `Guest_${Date.now()}`;
@@ -45,7 +47,6 @@ const MeetingRoom = () => {
 
   const encodedName = encodeURIComponent(name || "");
 
-  // Join room logic
   const handleJoin = async () => {
     if (!name || !room || !currentUser?.uid) {
       toast.error("You must be logged in to continue.");
@@ -73,21 +74,18 @@ const MeetingRoom = () => {
     }
   };
 
-  // Disconnect when component unmounts
   useEffect(() => {
     return () => {
       roomInstance.disconnect();
     };
   }, [roomInstance]);
 
-  // Trigger joining when ready
   useEffect(() => {
     if (!hasJoined && name && room) {
       handleJoin();
     }
   }, [hasJoined, name, room]);
 
-  // Handle exit
   const handleClose = () => {
     if (isDoctor) {
       router.push("/dashboard/doctor");
@@ -105,25 +103,29 @@ const MeetingRoom = () => {
   }
 
   return (
-    <div className="flex h-screen w-full bg-[#f1f8ff] font-sans relative overflow-hidden">
+    <div
+      className={`flex ${isMobile && isDoctor ? "flex-col" : "flex-row"
+        } h-screen w-full bg-[#f1f8ff] font-sans relative overflow-hidden`}
+    >
       {!hasJoined ? (
-        // Loading state before joining room
         <div className="m-auto text-lg font-semibold text-[#0077b6]">
           Joining secure session...
         </div>
       ) : (
         <>
-          {/* 🎥 LEFT: Video Conference Section */}
+          {/* 🎥 Video Section */}
           <RoomContext.Provider value={roomInstance}>
             <div
               data-lk-theme="default"
-              className={`${
-                isDoctor ? "flex-[0.6]" : "flex-1"
-              } bg-[#caf0f8] border-r border-[#90e0ef] overflow-hidden relative flex flex-col`}
+              className={`${isDoctor
+                ? isMobile
+                  ? "w-full h-1/2"
+                  : "flex-[0.6]"
+                : "flex-1"
+                } bg-[#788588] border-r border-[#788588] overflow-hidden relative flex flex-col`}
             >
-              {/* 🔴 Top Navbar with "Live" Ping + Close */}
-              <header className="bg-gray-300 w-full text-white py-2 px-4 font-semibold text-lg shadow flex items-center justify-between">
-                {/* Live Ping Indicator and Title */}
+              {/* Top Bar */}
+              <header className="bg-gray-300 text-white py-2 px-4 font-semibold text-lg shadow flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="relative flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
@@ -134,7 +136,6 @@ const MeetingRoom = () => {
                   </span>
                 </div>
 
-                {/* ❌ Close Button with Icon */}
                 <button
                   onClick={handleClose}
                   className="flex items-center gap-2 bg-[#03045e] text-gray-200 py-2 px-4 text-sm sm:text-base font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
@@ -143,28 +144,32 @@ const MeetingRoom = () => {
                 </button>
               </header>
 
-              {/* LiveKit Video Grid */}
               <div className="flex-1">
-                <MyVideoConference />
+                <MyVideoConference isDoctor={isDoctor} isMobile={isMobile} />
               </div>
 
-              {/* Media Control Bar */}
+              {/* ControlBar */}
               <div className="bg-gray-950">
                 <ControlBar />
               </div>
 
-              {/* Audio Output Renderer */}
               <RoomAudioRenderer />
             </div>
           </RoomContext.Provider>
 
-          {/* 📝 RIGHT: Doctor's Notes */}
+
+          {/* 📝 Notes Section */}
           {typeof isDoctor === "undefined" ? (
             <div className="flex-[0.4] min-w-[400px] h-full bg-white border-l border-[#90e0ef] shadow-inner flex items-center justify-center">
               <p className="text-[#0077b6] text-lg">Preparing your editor...</p>
             </div>
           ) : isDoctor ? (
-            <div className="flex-[0.4] min-w-[400px] h-full bg-white border-l border-[#90e0ef] shadow-inner overflow-y-auto p-4">
+            <div
+              className={`${isMobile
+                ? "w-full h-1/2 border-t"
+                : "flex-[0.4] min-w-[400px] border-l"
+                } bg-white border-[#90e0ef] shadow-inner overflow-y-auto p-4`}
+            >
               <h2 className="text-xl font-semibold text-[#0077b6] mb-4">
                 Doctor’s Notes
               </h2>
@@ -177,8 +182,25 @@ const MeetingRoom = () => {
   );
 };
 
-// 🔁 Renders the video tiles in grid layout
-function MyVideoConference() {
+// 🔍 Detect Mobile Device
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize(); // check on load
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return isMobile;
+}
+
+// 🔁 Render Participant Tiles
+function MyVideoConference({ isDoctor, isMobile }) {
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -187,12 +209,30 @@ function MyVideoConference() {
     { onlySubscribed: false }
   );
 
+  const visibleTracks = useMemo(() => {
+    // On mobile, if doctor: only show patient’s video (not self)
+    if (isMobile && isDoctor) {
+      return tracks.filter(
+        (t) =>
+          !t.participant.isLocal &&
+          t.publication?.kind === Track.Kind.Video
+      );
+    }
+
+    // For patients, or on desktop: show all
+    return tracks;
+  }, [tracks, isDoctor, isMobile]);
+
   return (
     <GridLayout
-      tracks={tracks}
+      tracks={visibleTracks}
       style={{
-        height: "calc(100vh - var(--lk-control-bar-height) - 48px)", // navbar + control bar height
+        height: "calc(100vh - var(--lk-control-bar-height) - 48px)",
+        width: "100%",
+        margin: 0,
+        padding: 0,
       }}
+      className="w-full h-full"
     >
       <ParticipantTile />
     </GridLayout>

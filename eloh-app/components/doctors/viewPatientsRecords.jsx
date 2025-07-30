@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { MdCloseFullscreen } from "react-icons/md";
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
 import NotePreview from "@/components/editor/NotePreview";
+import { truncate } from "@/lib/truncate";
 
 const noteTypes = [
   { id: "generalNotes", type: "generalNotes", label: "Patient Files" },
@@ -11,6 +12,26 @@ const noteTypes = [
   { id: "sickNotes", type: "sickNotes", label: "Sick Notes" },
 ];
 
+/**
+ * ViewPatientsRecords component
+ *
+ * This component displays a patient's medical records, categorized into note types such as general notes,
+ * prescriptions, and sick notes. It allows switching between categories and shows a preview modal
+ * for individual records when selected.
+ *
+ * Props:
+ * @param {Object} props - Component props
+ * @param {Object} props.data - All medical notes categorized by type (e.g., generalNotes, prescriptions, sickNotes)
+ * @param {Function} props.setOpenViewPatientRecords - Setter function to toggle visibility of the records view
+ * @param {string} props.signature - Base64 or URL string representing the doctor's digital signature
+ * @param {string} props.patientId - The ID of the patient whose records are being viewed
+ *
+ * Features:
+ * - Tabbed switching between types of medical records
+ * - Table view with date, doctor name, and truncated summary
+ * - Dynamically renders different summary formats depending on the note type
+ * - Opens a modal preview for full note detail
+ */
 const ViewPatientsRecords = ({
   data,
   setOpenViewPatientRecords,
@@ -42,7 +63,7 @@ const ViewPatientsRecords = ({
   return (
     <div className="text-[#333] p-8 w-full max-w-6xl mx-auto">
       <h1 className="text-2xl text-gray-200 font-bold mb-6 text-center">
-        Patient Records
+        Patient Medical Records
       </h1>
 
       {/* Toggle Buttons */}
@@ -52,11 +73,10 @@ const ViewPatientsRecords = ({
             key={id}
             onClick={() => setMode(type)}
             className={`py-2 px-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out
-        ${
-          mode === type
-            ? "bg-[#2c4253] text-white hover:bg-[#023e8a]" // lighter blue for active + darker text
-            : "bg-[#03045e] text-white hover:bg-[#023e8a]"
-        }
+        ${mode === type
+                ? "bg-[#2c4253] text-white hover:bg-[#023e8a]"
+                : "bg-[#03045e] text-white hover:bg-[#023e8a]"
+              }
       `}
           >
             {label}
@@ -65,7 +85,7 @@ const ViewPatientsRecords = ({
       </div>
 
       {/* Table Section */}
-      <div className="overflow-x-auto bg-white rounded-lg shadow-md border border-gray-200 w-[77vw] sm:w-full px-2 sm:px-6 text-sm sm:text-base -ml-11.5 sm:-ml-4">
+      <div className="overflow-x-auto bg-white rounded-lg shadow-md border border-gray-200 w-[88vw] sm:w-full px-2 sm:px-6 text-sm sm:text-base -ml-11.5 sm:-ml-4">
         <div className="flex justify-end px-4 pt-3">
           <button
             onClick={() => {
@@ -108,18 +128,24 @@ const ViewPatientsRecords = ({
                   <td className="px-6 py-4 text-center">
                     {record.doctorName || "N/A"}
                   </td>
-                  <td className="px-6 py-4 text-center hidden sm:table-cell">
+                  <td className="px-6 py-4 text-center">
                     {(() => {
                       const content = record.content;
-                      if (typeof content === "string") return content;
+
+                      if (typeof content === "string") return truncate(content);
+
                       if (typeof content === "object") {
-                        if (content.instructions) return content.instructions;
-                        if (content.reason) return `Reason: ${content.reason}`;
-                        if (content.startDate && content.endDate)
+                        if (content.instructions)
+                          return truncate(content.instructions);
+                        if (content.reason)
+                          return truncate(`Reason: ${content.reason}`);
+                        if (content.startDate && content.endDate) {
                           return `From ${convertTimestamp(
                             content.startDate
                           )} to ${convertTimestamp(content.endDate)}`;
+                        }
                       }
+
                       return "View full note";
                     })()}
                   </td>
