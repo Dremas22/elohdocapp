@@ -58,37 +58,35 @@ const socialHistorySections = {
 
 const SocialHistorySection = ({ socialHistory }) => {
   return (
-    <div className="mt-6 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-      <h3 className="text-xl font-bold text-[#023e8a] mb-4 flex items-center gap-2">
-        <FaHeartbeat className="text-red-500" />
+    <section className="mt-6 bg-white border border-gray-200 rounded-2xl p-6 shadow-md">
+      <h3 className="text-2xl font-semibold text-[#023e8a] mb-6 flex items-center gap-3">
+        <FaHeartbeat className="text-red-500 text-xl" />
         Social History
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {Object.entries(socialHistorySections).map(([key, { label, icon }]) => {
           const value = socialHistory?.[key];
-
           let displayValue = "";
 
           if (typeof value === "boolean") {
             displayValue = value ? (
               <span className="inline-flex items-center gap-1 text-green-600 font-medium">
-                <MdCheckCircle /> Yes
+                <MdCheckCircle className="text-base" />
+                Yes
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 text-red-500 font-medium">
-                <MdCancel /> No
+                <MdCancel className="text-base" />
+                No
               </span>
             );
           } else if (typeof value === "object" && value !== null) {
             displayValue = (
-              <ul className="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <ul className="list-disc list-inside text-gray-600 text-sm space-y-1 mt-1">
                 {Object.entries(value).map(([k, v]) => (
                   <li key={k}>
-                    <span className="font-medium text-gray-800 capitalize">
-                      {k}
-                    </span>
-                    : {v}
+                    <span className="font-medium text-gray-800 capitalize">{k}</span>: {v}
                   </li>
                 ))}
               </ul>
@@ -102,18 +100,18 @@ const SocialHistorySection = ({ socialHistory }) => {
           return (
             <div
               key={key}
-              className="bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm"
+              className="bg-gray-50 hover:bg-gray-100 transition-all duration-200 border border-gray-200 rounded-xl p-4 shadow-sm"
             >
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-lg">{icon}</span>
-                <h4 className="text-sm font-semibold text-gray-900">{label}</h4>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="text-xl">{icon}</div>
+                <h4 className="text-base font-semibold text-gray-900">{label}</h4>
               </div>
-              <div>{displayValue}</div>
+              <div className="pl-1">{displayValue}</div>
             </div>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 };
 
