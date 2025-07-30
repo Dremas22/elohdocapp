@@ -2,7 +2,14 @@
 
 import { db } from "@/db/client";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import ViewMedicalRecords from "../viewMedicalRecords";
@@ -21,40 +28,64 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
     const fetchAvailableStaff = async () => {
       setIsLoading(true);
       setError(null);
+
       try {
-        const availableDoctorsQuery = query(
-          collection(db, "doctors"),
-          where("available", "==", true)
-        );
-        const doctorsSnapshot = await getDocs(availableDoctorsQuery);
-        const doctorsList = doctorsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const patientRef = doc(db, "patients", currentUser?.uid);
+        const patientSnap = await getDoc(patientRef);
 
-        const availableNursesQuery = query(
-          collection(db, "nurses"),
-          where("available", "==", true)
-        );
-        const nursesSnapshot = await getDocs(availableNursesQuery);
-        const nursesList = nursesSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        if (!patientSnap.exists()) {
+          throw new Error("Patient data not found.");
+        }
 
-        setDoctors(doctorsList || []);
-        setNurses(nursesList || []);
+        const { consultationType } = patientSnap.data();
+
+        let doctorQueryPromise = Promise.resolve(null);
+        let nurseQueryPromise = Promise.resolve(null);
+
+        if (consultationType === "doctor" || consultationType === "all") {
+          const doctorQuery = query(
+            collection(db, "doctors"),
+            where("available", "==", true)
+          );
+          doctorQueryPromise = getDocs(doctorQuery);
+        }
+
+        if (consultationType === "nurse" || consultationType === "all") {
+          const nurseQuery = query(
+            collection(db, "nurses"),
+            where("available", "==", true)
+          );
+          nurseQueryPromise = getDocs(nurseQuery);
+        }
+
+        const [doctorsSnapshot, nursesSnapshot] = await Promise.all([
+          doctorQueryPromise,
+          nurseQueryPromise,
+        ]);
+
+        const doctorsList = doctorsSnapshot
+          ? doctorsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          : [];
+        const nursesList = nursesSnapshot
+          ? nursesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+          : [];
+
+        setDoctors(doctorsList);
+        setNurses(nursesList);
       } catch (error) {
-        console.error("Error fetching available doctors & nurses:", error);
+        console.error("Error fetching available staff:", error);
         setDoctors([]);
+        setNurses([]);
         setError("Error fetching available doctors & nurses");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchAvailableStaff();
-  }, []);
+    if (currentUser?.uid) {
+      fetchAvailableStaff();
+    }
+  }, [currentUser?.uid]);
 
   const scroll = (direction) => {
     if (scrollRef.current) {
@@ -147,9 +178,9 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
           <p className="text-red-600 text-center mt-20 font-semibold">
             {error}
           </p>
-        ) : doctors.length === 0 ? (
+        ) : doctors.length === 0 && nurses.length === 0 ? (
           <p className="text-gray-600 text-center mt-20 italic">
-            No doctors available
+            No Staff available
           </p>
         ) : (
           <div className="relative mt-10">
