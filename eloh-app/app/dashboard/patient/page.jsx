@@ -30,13 +30,25 @@ const PatientDashboard = () => {
       try {
         if (!loading && currentUser?.uid) {
           setIsLoading(true);
-          const userRef = doc(db, "patients", currentUser?.uid);
+
+          const userRef = doc(db, "patients", currentUser.uid);
           const userSnap = await getDoc(userRef);
+
+          if (!userSnap.exists()) return;
+
           const userData = userSnap.data();
+          const type = userData.consultationType;
+          const consultations = userData.consultations || {};
 
-          const consultations = userData?.numberOfConsultations || 0;
+          const hasConsultations =
+            type === "doctor"
+              ? (consultations.doctor || 0) >= 1
+              : type === "nurse"
+              ? (consultations.nurse || 0) >= 1
+              : (consultations.doctor || 0) >= 1 ||
+                (consultations.nurse || 0) >= 1;
 
-          if (consultations >= 1) {
+          if (hasConsultations) {
             toast.info(
               "You already have consultations available. Redirecting..."
             );
@@ -51,7 +63,7 @@ const PatientDashboard = () => {
     };
 
     checkConsultations();
-  }, [currentUser?.uid]);
+  }, [currentUser?.uid, loading]);
 
   useEffect(() => {
     setUserLoading(true);

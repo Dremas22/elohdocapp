@@ -43,7 +43,6 @@ const PayOptions = () => {
       "2 Doctor consultations": "price_1RnEUm05W53pwfR7j5WbV4jI",
       "3 Doctor consultations": "price_1RnEUG05W53pwfR7O6LMhnzv",
     };
-    //Stripe checkout error: No such price: 'price_1Rm9pDGanontDcTu93Y7HDAy'
 
     const priceId = priceIdMap[selectedPackage.subscriptionName];
     if (!priceId) {
