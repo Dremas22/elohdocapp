@@ -38,6 +38,7 @@ const MeetingRoom = () => {
 
   const [token, setToken] = useState("");
   const [hasJoined, setHasJoined] = useState(false);
+  const [meetingClosing, setMeetingClosing] = useState(false);
   const router = useRouter();
   const hasAlreadyHandledEnd = useRef(false);
 
@@ -84,6 +85,15 @@ const MeetingRoom = () => {
       return;
     }
 
+    // 🔄 Reset consultationEnded to false on join
+    await setDoc(
+      consultationDocRef,
+      {
+        consultationEnded: false,
+        startedAt: new Date(),
+      },
+      { merge: true }
+    );
     try {
       const resp = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/token?room=${room}&username=${encodedName}`
@@ -126,6 +136,7 @@ const MeetingRoom = () => {
 
     try {
       // hasAlreadyHandledEnd.current = true;
+      setMeetingClosing(true);
 
       // Check if it's already been ended by someone else
       const existingDoc = await getDoc(consultationDocRef);
@@ -153,6 +164,8 @@ const MeetingRoom = () => {
     } catch (e) {
       console.error("Meeting end error:", e);
       toast.error("Something went wrong while ending the meeting.");
+    } finally {
+      setMeetingClosing(false);
     }
   };
 
@@ -199,6 +212,7 @@ const MeetingRoom = () => {
                 <button
                   onClick={handleClose}
                   className="flex items-center gap-2 bg-[#03045e] text-gray-200 py-2 px-4 text-sm sm:text-base font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+                  disabled={meetingClosing}
                 >
                   <span>Close</span>
                 </button>
@@ -237,6 +251,14 @@ const MeetingRoom = () => {
             </div>
           ) : null}
         </>
+      )}
+      {meetingClosing && (
+        <div className="absolute inset-0 bg-black bg-opacity-50 z-[99999] flex flex-col items-center justify-center text-white">
+          <div className="text-2xl font-semibold animate-pulse mb-4">
+            Ending Meeting...
+          </div>
+          <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
+        </div>
       )}
     </div>
   );
