@@ -164,17 +164,7 @@ const PatientDashboard = () => {
         </main>
       </div>
 
-      {/* Payment Modal
-      {showPayButton && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
-          <button
-            onClick={() => router.push("/payment")}
-            className="bg-white text-black px-6 py-3 rounded-lg shadow-lg hover:bg-gray-200 transition"
-          >
-            Go to Payment
-          </button>
-        </div>
-      )} */}
+
 
       {/* Floating Chat Modal */}
       {showChat && (

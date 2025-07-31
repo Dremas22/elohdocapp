@@ -13,6 +13,8 @@ export async function POST(req) {
 
     const response = await openai.chat.completions.create({
       model: "tngtech/deepseek-r1t2-chimera:free",
+      // model: "tngtech/deepseek-r1t-chimera:free",
+
       messages: [
         {
           role: "system",
