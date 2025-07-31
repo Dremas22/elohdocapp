@@ -34,25 +34,25 @@ const MeetingRoom = () => {
   const router = useRouter();
   const hasAlreadyHandledEnd = useRef(false);
 
-  // Firestore doc to track if the consultation has ended
-  const consultationDocRef = doc(db, "consultations", room);
+  // // Firestore doc to track if the consultation has ended
+  // const consultationDocRef = doc(db, "consultations", room);
 
-  // Listen for consultation end triggered by the other party
-  useEffect(() => {
-    const unsubscribe = onSnapshot(consultationDocRef, (docSnap) => {
-      const data = docSnap.data();
-      if (data?.consultationEnded && !hasAlreadyHandledEnd.current) {
-        hasAlreadyHandledEnd.current = true;
-        if (isDoctor) {
-          router.push(`/dashboard/${data.staffRole || "doctor"}`);
-        } else {
-          router.back();
-        }
-      }
-    });
+  // // Listen for consultation end triggered by the other party
+  // useEffect(() => {
+  //   const unsubscribe = onSnapshot(consultationDocRef, (docSnap) => {
+  //     const data = docSnap.data();
+  //     if (data?.consultationEnded && !hasAlreadyHandledEnd.current) {
+  //       hasAlreadyHandledEnd.current = true;
+  //       if (isDoctor) {
+  //         router.push(`/dashboard/${data.staffRole || "doctor"}`);
+  //       } else {
+  //         router.back();
+  //       }
+  //     }
+  //   });
 
-    return () => unsubscribe();
-  }, [room, router, isDoctor]);
+  //   return () => unsubscribe();
+  // }, [room, isDoctor]);
 
   const [roomInstance] = useState(
     () =>
