@@ -16,7 +16,7 @@ import Link from "next/link";
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
   const [userDoc, setUserDoc] = useState(null);
-  const [showChat, setShowChat] = useState(false);
+  const [showChat, setShowChat] = useState(true);
   const [showPayButton, setShowPayButton] = useState(true);
   const [userLoading, setUserLoading] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
@@ -44,15 +44,16 @@ const PatientDashboard = () => {
             type === "doctor"
               ? (consultations.doctor || 0) >= 1
               : type === "nurse"
-              ? (consultations.nurse || 0) >= 1
-              : (consultations.doctor || 0) >= 1 ||
+                ? (consultations.nurse || 0) >= 1
+                : (consultations.doctor || 0) >= 1 ||
                 (consultations.nurse || 0) >= 1;
 
           if (hasConsultations) {
             toast.info(
               "You already have consultations available. Redirecting..."
             );
-            setShowPayButton(false);
+            // setShowPayButton(false);
+            setShowChat(false);
           }
         }
       } catch (error) {
@@ -163,7 +164,7 @@ const PatientDashboard = () => {
         </main>
       </div>
 
-      {/* Payment Modal */}
+      {/* Payment Modal
       {showPayButton && (
         <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
           <button
@@ -173,7 +174,7 @@ const PatientDashboard = () => {
             Go to Payment
           </button>
         </div>
-      )}
+      )} */}
 
       {/* Floating Chat Modal */}
       {showChat && (
