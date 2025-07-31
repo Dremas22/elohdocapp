@@ -17,7 +17,6 @@ const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
   const [userDoc, setUserDoc] = useState(null);
   const [showChat, setShowChat] = useState(true);
-  const [showPayButton, setShowPayButton] = useState(true);
   const [userLoading, setUserLoading] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [mode, setMode] = useState("general-notes");
@@ -52,7 +51,6 @@ const PatientDashboard = () => {
             toast.info(
               "You already have consultations available. Redirecting..."
             );
-            // setShowPayButton(false);
             setShowChat(false);
           }
         }
