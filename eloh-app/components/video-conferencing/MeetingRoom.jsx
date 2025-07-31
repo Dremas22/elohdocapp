@@ -19,6 +19,13 @@ import handleMeetingEnd from "@/lib/postMeetingUpdates";
 import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
 import { db } from "@/db/client";
 
+/**
+ * MeetingRoom component handles the video consultation logic for doctors and patients.
+ * It connects users to a LiveKit room, displays video feeds, and enables doctors to write notes.
+ * It also manages session ending logic through Firestore and client-side hooks.
+ *
+ * @component
+ */
 const MeetingRoom = () => {
   const { currentUser, loading } = useCurrentUser();
   const searchParams = useSearchParams();
@@ -35,7 +42,7 @@ const MeetingRoom = () => {
   const hasAlreadyHandledEnd = useRef(false);
 
   // // Firestore doc to track if the consultation has ended
-  // const consultationDocRef = doc(db, "consultations", room);
+  const consultationDocRef = doc(db, "consultations", room);
 
   // // Listen for consultation end triggered by the other party
   // useEffect(() => {
@@ -115,10 +122,10 @@ const MeetingRoom = () => {
       "Are you sure you want to leave the meeting? This will end the consultation and it cannot be resumed."
     );
 
-    if (!confirmed || hasAlreadyHandledEnd.current) return;
+    if (!confirmed) return;
 
     try {
-      hasAlreadyHandledEnd.current = true;
+      // hasAlreadyHandledEnd.current = true;
 
       // Check if it's already been ended by someone else
       const existingDoc = await getDoc(consultationDocRef);
