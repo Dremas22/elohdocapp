@@ -191,14 +191,7 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
           </button>
         )}
 
-        <button
-          onClick={handleSubmit}
-          disabled={submitting}
-          className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-          style={{ minWidth: "120px" }}
-        >
-          {submitting ? "Submitting..." : "Submit"}
-        </button>
+
       </div>
 
       {showSignaturePad && (
@@ -225,6 +218,15 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
 
       {error && <p className="text-red-600 text-sm font-semibold mt-2">{error}</p>}
       {successMessage && <p className="text-green-700 text-sm font-semibold mt-2">{successMessage}</p>}
+
+      <button
+        onClick={handleSubmit}
+        disabled={submitting}
+        className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+        style={{ minWidth: "120px" }}
+      >
+        {submitting ? "Submitting..." : "Submit"}
+      </button>
 
       {showPreview && (
         <div className="flex justify-center pt-4">
