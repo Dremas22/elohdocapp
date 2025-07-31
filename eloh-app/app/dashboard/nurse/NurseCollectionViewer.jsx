@@ -162,7 +162,7 @@ const NurseCollectionViewer = () => {
                       Earnings
                     </h2>
 
-                    <Earnings />
+                    <Earnings role="nurse" data={userDoc} />
                   </div>
                 </div>
               )}

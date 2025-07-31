@@ -1,8 +1,8 @@
 "use Client";
 
-import React from "react";
-
-const Earnings = () => {
+const Earnings = ({ data }) => {
+  const numberOfConsultations = data?.numberOfConsultations ?? 0;
+  const earnings = data?.earnings ?? 0;
   return (
     <div className="text-[#66e4ff] flex flex-col md:flex-row items-center justify-center gap-8 p-8 w-auto md:w-full">
       {/* Consultations Card */}
@@ -14,7 +14,9 @@ const Earnings = () => {
           Number of Consultations:
         </h1>
 
-        <h2 className="text-3xl font-extrabold text-white drop-shadow-lg">0</h2>
+        <h2 className="text-3xl font-extrabold text-white drop-shadow-lg">
+          {numberOfConsultations}
+        </h2>
         <p className="mt-2 text-sm text-[#a0cfff]">This month</p>
       </div>
 
@@ -27,7 +29,7 @@ const Earnings = () => {
           Total Monthly Earnings:
         </h1>
         <h2 className="text-3xl font-extrabold text-white drop-shadow-lg">
-          R 0.00
+          R {earnings.toFixed(2)}
         </h2>
         <p className="mt-2 text-sm text-[#a0cfff]">
           Based on completed consultations

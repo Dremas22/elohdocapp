@@ -115,7 +115,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                       Earnings
                     </h2>
 
-                    <Earnings />
+                    <Earnings role="doctor" data={userDoc} />
                   </div>
                 </div>
               )}
