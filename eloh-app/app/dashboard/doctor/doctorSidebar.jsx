@@ -38,7 +38,7 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               onClick={onClick}
               disabled={isDisabled}
               className={`relative flex flex-col items-center justify-center gap-1
-                rounded-xl text-xs md:pl-29 pr-29 font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1
+                rounded-xl text-xs md:pl-29 md:pr-29 lg:p-5 font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1
                 transition-all duration-200 ease-in-out cursor-pointer
                 ${compact ? "h-20 w-20 " : "w-36 h-20"}
                 bg-[#03045e]/90 hover:bg-[#023e8a] text-white 

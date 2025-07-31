@@ -4,12 +4,10 @@ import { useState, useEffect } from "react";
 import {
   FiUser,
   FiFile,
-  FiX,
-  FiMenu,
   FiChevronUp,
   FiChevronDown,
 } from "react-icons/fi";
-import { FaFilePrescription } from "react-icons/fa";
+import { FaFilePrescription, FaMoneyCheckAlt } from "react-icons/fa";
 import { CiMedicalClipboard } from "react-icons/ci";
 import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
@@ -19,9 +17,8 @@ import { useRouter } from "next/navigation";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
-    ? "grid grid-cols-3 gap-6 justify-around"
+    ? "grid grid-cols-3 gap-x-5 gap-y-8 justify-around"
     : "flex flex-col gap-7 items-center";
-
   return (
     <div className={`${layout} w-full`}>
       {buttons.map(
@@ -36,7 +33,7 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               disabled={isDisabled}
               className={`relative flex flex-col items-center justify-center gap-1
                 rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
-                ${compact ? "h-15 w-24" : "w-36 h-20"}
+                ${compact ? "h-15 w-24 p-5" : "w-36 h-20"}
                 bg-[#03045e]/90 hover:bg-[#023e8a] text-white
                 ${isDisabled ? "!cursor-not-allowed" : ""}
                 ${customClass || ""}
@@ -81,6 +78,7 @@ const PatientSidebarMenu = ({
   const [notificationPayload, setNotificationPayload] = useState(null);
   const [notificationCount, setNotificationCount] = useState(0);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [showPayButton, setShowPayButton] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -152,7 +150,14 @@ const PatientSidebarMenu = ({
         if (setMode) setMode("sick-notes");
         if (setNoteOpen) setNoteOpen((prev) => !prev);
       },
-      customClass: compact ? "ml-[110px]" : "sm:ml-[0px]",
+      customClass: compact ? "ml-[50px]" : "sm:ml-[0px]",
+      showTitle: true,
+    },
+    {
+      title: "Payments",
+      icon: <FaMoneyCheckAlt className="h-6 w-6" />,
+      onClick: () => router.push("/payment"),
+      customClass: compact ? "ml-[50px]" : "sm:ml-[0px]",
       showTitle: true,
     },
   ];
@@ -206,7 +211,7 @@ const PatientSidebarMenu = ({
       {/* Slide-up Mobile Sidebar */}
       <div
         className={`lg:hidden fixed bottom-0 right-0 left-0 z-40
-          sm:h-[38vh] h-[26vh] px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5
+          sm:h-[38vh] h-[26vh] px-4 py-3 overflow-auto backdrop-blur-md flex flex-col items-center gap-7
           transition-transform duration-500 ease-in-out bg-gray-900/20
           ${mobileSidebarOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"}
         `}
