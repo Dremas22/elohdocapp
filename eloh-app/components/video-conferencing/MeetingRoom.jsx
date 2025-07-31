@@ -9,12 +9,15 @@ import {
 } from "@livekit/components-react";
 import { Room, Track } from "livekit-client";
 import "@livekit/components-styles";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useRouter, useSearchParams } from "next/navigation";
 import RichTextEditor from "@/components/editor/TextEditor";
 import { toast } from "react-toastify";
 import { ControlBar } from "@livekit/components-react";
+import handleMeetingEnd from "@/lib/postMeetingUpdates";
+import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
+import { db } from "@/db/client";
 
 const MeetingRoom = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -29,6 +32,27 @@ const MeetingRoom = () => {
   const [token, setToken] = useState("");
   const [hasJoined, setHasJoined] = useState(false);
   const router = useRouter();
+  const hasAlreadyHandledEnd = useRef(false);
+
+  // Firestore doc to track if the consultation has ended
+  const consultationDocRef = doc(db, "consultations", room);
+
+  // Listen for consultation end triggered by the other party
+  useEffect(() => {
+    const unsubscribe = onSnapshot(consultationDocRef, (docSnap) => {
+      const data = docSnap.data();
+      if (data?.consultationEnded && !hasAlreadyHandledEnd.current) {
+        hasAlreadyHandledEnd.current = true;
+        if (isDoctor) {
+          router.push(`/dashboard/${data.staffRole || "doctor"}`);
+        } else {
+          router.back();
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [room, router, isDoctor]);
 
   const [roomInstance] = useState(
     () =>
@@ -86,11 +110,42 @@ const MeetingRoom = () => {
     }
   }, [hasJoined, name, room]);
 
-  const handleClose = () => {
-    if (isDoctor) {
-      router.push("/dashboard/doctor");
-    } else {
-      router.back();
+  const handleClose = async () => {
+    const confirmed = confirm(
+      "Are you sure you want to leave the meeting? This will end the consultation and it cannot be resumed."
+    );
+
+    if (!confirmed || hasAlreadyHandledEnd.current) return;
+
+    try {
+      hasAlreadyHandledEnd.current = true;
+
+      // Check if it's already been ended by someone else
+      const existingDoc = await getDoc(consultationDocRef);
+      if (existingDoc.exists() && existingDoc.data()?.consultationEnded) return;
+
+      const staffRole = await handleMeetingEnd(patientId, doctorId);
+
+      if (!staffRole) {
+        toast.error("Failed to track meeting end. Please try again.");
+        return;
+      }
+
+      // Mark the consultation as ended in Firestore
+      await setDoc(consultationDocRef, {
+        consultationEnded: true,
+        endedAt: new Date(),
+        staffRole,
+      });
+
+      if (isDoctor) {
+        router.push(`/dashboard/${staffRole}`);
+      } else {
+        router.back();
+      }
+    } catch (e) {
+      console.error("Meeting end error:", e);
+      toast.error("Something went wrong while ending the meeting.");
     }
   };
 
@@ -104,8 +159,9 @@ const MeetingRoom = () => {
 
   return (
     <div
-      className={`flex ${isMobile && isDoctor ? "flex-col" : "flex-row"
-        } h-screen w-full bg-[#f1f8ff] font-sans relative overflow-hidden`}
+      className={`flex ${
+        isMobile && isDoctor ? "flex-col" : "flex-row"
+      } h-screen w-full bg-[#f1f8ff] font-sans relative overflow-hidden`}
     >
       {!hasJoined ? (
         <div className="m-auto text-lg font-semibold text-[#0077b6]">
@@ -117,12 +173,9 @@ const MeetingRoom = () => {
           <RoomContext.Provider value={roomInstance}>
             <div
               data-lk-theme="default"
-              className={`${isDoctor
-                ? isMobile
-                  ? "w-full h-1/2"
-                  : "flex-[0.6]"
-                : "flex-1"
-                } bg-[#788588] border-r border-[#788588] overflow-hidden relative flex flex-col`}
+              className={`${
+                isDoctor ? (isMobile ? "w-full h-1/2" : "flex-[0.6]") : "flex-1"
+              } bg-[#788588] border-r border-[#788588] overflow-hidden relative flex flex-col`}
             >
               {/* Top Bar */}
               <header className="bg-gray-300 text-white py-2 px-4 font-semibold text-lg shadow flex items-center justify-between">
@@ -157,7 +210,6 @@ const MeetingRoom = () => {
             </div>
           </RoomContext.Provider>
 
-
           {/* 📝 Notes Section */}
           {typeof isDoctor === "undefined" ? (
             <div className="flex-[0.4] min-w-[400px] h-full bg-white border-l border-[#90e0ef] shadow-inner flex items-center justify-center">
@@ -165,10 +217,11 @@ const MeetingRoom = () => {
             </div>
           ) : isDoctor ? (
             <div
-              className={`${isMobile
-                ? "w-full h-1/2 border-t"
-                : "flex-[0.4] min-w-[400px] border-l"
-                } bg-white border-[#90e0ef] shadow-inner overflow-y-auto p-4`}
+              className={`${
+                isMobile
+                  ? "w-full h-1/2 border-t"
+                  : "flex-[0.4] min-w-[400px] border-l"
+              } bg-white border-[#90e0ef] shadow-inner overflow-y-auto p-4`}
             >
               <h2 className="text-xl font-semibold text-[#0077b6] mb-4">
                 Doctor’s Notes
@@ -214,8 +267,7 @@ function MyVideoConference({ isDoctor, isMobile }) {
     if (isMobile && isDoctor) {
       return tracks.filter(
         (t) =>
-          !t.participant.isLocal &&
-          t.publication?.kind === Track.Kind.Video
+          !t.participant.isLocal && t.publication?.kind === Track.Kind.Video
       );
     }
 
