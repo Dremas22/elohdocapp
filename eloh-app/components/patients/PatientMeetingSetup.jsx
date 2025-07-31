@@ -39,8 +39,8 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
 
         const { consultationType } = patientSnap.data();
 
-        let doctorQueryPromise = Promise.resolve(null);
-        let nurseQueryPromise = Promise.resolve(null);
+        let doctorQueryPromise = Promise.resolve({ docs: [] });
+        let nurseQueryPromise = Promise.resolve({ docs: [] });
 
         if (consultationType === "doctor" || consultationType === "all") {
           const doctorQuery = query(
