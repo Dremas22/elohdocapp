@@ -85,7 +85,7 @@ const ViewPatientsRecords = ({
       </div>
 
       {/* Table Section */}
-      <div className="overflow-x-auto bg-white rounded-lg shadow-md border border-gray-200 w-[88vw] sm:w-full px-2 sm:px-6 text-sm sm:text-base -ml-11.5 sm:-ml-4">
+      <div className="overflow-x-auto bg-white rounded-lg shadow-md border border-gray-200 lg:w-[60vw] md:w-[75vw] sm:w-full px-2 sm:px-6 text-sm sm:text-base -ml-11.5 sm:-ml-4">
         <div className="flex justify-end px-4 pt-3">
           <button
             onClick={() => {
