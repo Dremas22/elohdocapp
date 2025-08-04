@@ -49,7 +49,7 @@ const useCurrentUser = () => {
 
   const createSession = async (user) => {
     if (!user) return;
-    const token = await user.getIdToken();
+    const token = await user?.getIdToken();
 
     let fcmToken = null;
     try {
@@ -63,6 +63,7 @@ const useCurrentUser = () => {
 
     await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
       method: "POST",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token, fcmToken }),
     });
@@ -84,7 +85,7 @@ const useCurrentUser = () => {
       });
       router.push(`/onboarding/${role}`);
     } catch (error) {
-      toast.error("Registration failed", {
+      toast.error(`Registration failed; ${error?.message}`, {
         icon: <AiOutlineCloseCircle className="text-red-600 text-xl" />,
       });
     } finally {
@@ -104,7 +105,7 @@ const useCurrentUser = () => {
       });
       router.push(`/onboarding/${role}`);
     } catch (error) {
-      toast.error("Login failed", {
+      toast.error(`Login failed: ${error?.message}`, {
         icon: <AiOutlineCloseCircle className="text-red-600 text-xl" />,
       });
     } finally {
@@ -120,7 +121,7 @@ const useCurrentUser = () => {
         icon: <AiOutlineCheckCircle className="text-green-600 text-xl" />,
       });
     } catch (error) {
-      toast.error("Failed to send reset email", {
+      toast.error(`Failed to send reset email: ${error?.message}`, {
         icon: <AiOutlineCloseCircle className="text-red-600 text-xl" />,
       });
     } finally {
@@ -140,9 +141,8 @@ const useCurrentUser = () => {
       toast.success("Logged out successfully", {
         icon: <AiOutlineCheckCircle className="text-green-600 text-xl" />,
       });
-      router.push("/");
     } catch (error) {
-      console.error("Error signing out:", error);
+      console.error(`Error signing out: ${error?.message}`);
     } finally {
       setLoading(false);
     }

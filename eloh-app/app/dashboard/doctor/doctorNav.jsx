@@ -6,10 +6,11 @@ import { signOut } from "firebase/auth";
 import { auth, db } from "@/db/client";
 import { useRouter } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
+import { FaSpinner } from "react-icons/fa";
 
 /**
  * DoctorDashboardNavbar
- * 
+ *
  * This component renders the fixed top navigation bar for doctors which shows:
  * - The doctor's avatar
  * - Name on desktop
@@ -54,6 +55,7 @@ const DoctorDashboardNavbar = () => {
    * Handle user logout: Signs out user from Firebase, removes session on server then redirect to sign-in page
    */
   const handleAuthAction = async () => {
+    setLoading(true);
     try {
       await signOut(auth);
       await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
@@ -62,6 +64,8 @@ const DoctorDashboardNavbar = () => {
       router.push("/sign-in?role=doctor");
     } catch (error) {
       console.error("Error signing out:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -70,7 +74,6 @@ const DoctorDashboardNavbar = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-18 bg-gray-300 py-6 px-6 flex justify-between items-center">
-
       {/* Left Section: Avatar + Name  on desktop */}
       <div className="flex items-center gap-4">
         {/* Avatar Image or Placeholder */}
@@ -107,9 +110,16 @@ const DoctorDashboardNavbar = () => {
         onClick={handleAuthAction}
         aria-label="Sign Out"
         title="Sign Out"
-        className="bg-[#03045e] text-white py-3 px-3 text-xs md:text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex flex-col items-center justify-center gap-1 cursor-pointer"
+        disabled={loading}
+        className="bg-[#03045e] text-white py-3 px-3 text-xs md:text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex flex-col items-center justify-center gap-1 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
       >
-        <span className="text-[10px] sm:text-xs md:text-sm">Sign Out</span>
+        {loading ? (
+          <>
+            <FaSpinner className="w-4 h-4 animate-spin" />
+          </>
+        ) : (
+          <span className="text-[10px] sm:text-xs md:text-sm">Sign Out</span>
+        )}
       </button>
     </header>
   );

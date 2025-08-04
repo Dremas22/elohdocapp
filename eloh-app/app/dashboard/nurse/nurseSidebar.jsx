@@ -151,6 +151,7 @@ const NurseSidebarMenu = ({
         `${process.env.NEXT_PUBLIC_URL}/api/doctor/toggle-availability`,
         {
           method: "POST",
+          credentials: "include",
         }
       );
 
@@ -179,6 +180,7 @@ const NurseSidebarMenu = ({
         `${process.env.NEXT_PUBLIC_URL}/api/users/update`,
         {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ role: "nurse", data: updatedData }),
         }
