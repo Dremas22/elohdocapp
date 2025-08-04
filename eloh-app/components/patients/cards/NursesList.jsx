@@ -11,16 +11,11 @@ const NursesList = ({ nurses, sendNotificationToDoctor }) => {
 
   return (
     <div className="w-full flex justify-center">
-      <div
-        className={`
-          flex flex-wrap gap-6 justify-center items-center
-          max-w-7xl px-4 py-6
-        `}
-      >
+      <div className="flex flex-wrap gap-6 justify-center items-center max-w-7xl px-4 py-6">
         {nurses.map((nurse) => (
           <div
             key={nurse.userId}
-            title={`Consult with Nurse: ${nurse.fullName}`} // Dynamic tooltip
+            title={`Consult with Nurse: ${nurse.fullName}`}
             onClick={() => {
               if (currentUser?.uid && nurse.userId) {
                 sendNotificationToDoctor(nurse.userId, currentUser.uid);
@@ -47,15 +42,14 @@ const NursesList = ({ nurses, sendNotificationToDoctor }) => {
                 Click to join meeting
               </p>
             </div>
-            {nurse.photoUrl && (
-              <Image
-                src={nurse.photoUrl}
-                alt={nurse.fullName}
-                width={64}
-                height={64}
-                className="w-16 h-16 rounded-full border border-white object-cover"
-              />
-            )}
+
+            <Image
+              src={nurse.photoUrl || "/images/deafult_avatar.jpg"}
+              alt={`Nurse ${nurse.fullName}`}
+              width={64}
+              height={64}
+              className="w-16 h-16 rounded-full border border-white object-cover"
+            />
           </div>
         ))}
       </div>

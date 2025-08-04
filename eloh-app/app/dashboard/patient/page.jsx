@@ -15,7 +15,7 @@ import Link from "next/link";
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
   const [userDoc, setUserDoc] = useState(null);
-  const [showChat, setShowChat] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [mode, setMode] = useState("general-notes");

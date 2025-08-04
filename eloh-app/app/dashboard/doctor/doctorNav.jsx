@@ -87,7 +87,7 @@ const DoctorDashboardNavbar = () => {
           />
         ) : (
           <div className="w-12 h-12 rounded-full bg-[#123158] flex items-center justify-center text-white text-lg font-semibold">
-            {fullName?.[0]?.toUpperCase() || "U"}
+            {fullName?.[0]?.toUpperCase() || "D"}
           </div>
         )}
 
