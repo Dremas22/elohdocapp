@@ -32,22 +32,22 @@ const StaffScroller = ({
       {doctors.length > 0 && nurses.length > 0 && (
         <div className="flex justify-center mb-4 space-x-4">
           <button
+            title="view available doctors"
             onClick={() => setView("doctors")}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              view === "doctors"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${view === "doctors"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
           >
             View Doctors
           </button>
           <button
+            title="view available nurses"
             onClick={() => setView("nurses")}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              view === "nurses"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${view === "nurses"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
           >
             View Nurses
           </button>
@@ -66,6 +66,7 @@ const StaffScroller = ({
       >
         {view === "doctors" ? (
           <DoctorsList
+            title='Docs'
             doctors={doctors}
             sendNotificationToDoctor={sendNotificationToDoctor}
           />

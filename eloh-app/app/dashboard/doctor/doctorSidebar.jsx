@@ -20,14 +20,9 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   return (
     <div className={`${layout} w-full`}>
       {buttons.map(
-        ({
-          icon,
-          title,
-          onClick,
-          hasNotification,
-          customClass,
-          showTitle = true,
-        }) => {
+        (
+          { icon, title, onClick, hasNotification, customClass, showTitle = true }
+        ) => {
           const isMeetingNotifications = title === "Meeting Notifications";
           const isDisabled = isMeetingNotifications && !payload;
 
@@ -38,9 +33,9 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               onClick={onClick}
               disabled={isDisabled}
               className={`relative flex flex-col items-center justify-center gap-1
-                rounded-xl text-xs md:pl-29 md:pr-29 lg:p-5 font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1
+                rounded-xl text-xs md:pl-29 sm:pr-29 font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1
                 transition-all duration-200 ease-in-out cursor-pointer
-                ${compact ? "h-20 w-20 " : "w-36 h-20"}
+                ${compact ? "h-20 w-20" : "w-36 h-20"}
                 bg-[#03045e]/90 hover:bg-[#023e8a] text-white 
                 ${isDisabled ? "!cursor-not-allowed" : ""}
                 ${customClass || ""}
@@ -49,10 +44,8 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               type="button"
             >
               <span
-
                 className={`flex items-center justify-center ${isDisabled ? "text-gray-600" : "text-white"
                   }`}
-
               >
                 {icon}
               </span>
@@ -89,9 +82,9 @@ const DoctorSidebarMenu = ({
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Desktop sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isAvailable, setIsAvailable] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false); // Mobile toggle
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
@@ -124,7 +117,6 @@ const DoctorSidebarMenu = ({
     fetchAvailability();
   }, []);
 
-  // Toggle availability on backend
   const handleToggle = async () => {
     setFetching(true);
     try {
@@ -190,7 +182,6 @@ const DoctorSidebarMenu = ({
 
   return (
     <>
-      {/* Notification Modal */}
       {showNotificationModal && (
         <NotificationModal
           payload={notificationPayload}
@@ -198,7 +189,6 @@ const DoctorSidebarMenu = ({
         />
       )}
 
-      {/* Profile Modal */}
       {profileOpen && (
         <ProfileModal
           userDoc={userDoc}
@@ -252,29 +242,29 @@ const DoctorSidebarMenu = ({
         )}
       </div>
 
-      {/* ✅ Floating Mobile Toggle Button with Arrow */}
-      <button
-        className="lg:hidden fixed bottom-3 right-4 z-50 bg-[#03045e] text-white rounded-full p-1 shadow-lg"
-        onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-      >
-        {mobileSidebarOpen ? (
-          <FiChevronDown className="h-6 w-6" />
-        ) : (
-          <FiChevronUp className="h-6 w-6" />
-        )}
-      </button>
+      {/* ✅ Floating Mobile Toggle Button with Tooltip and Cursor Pointer */}
+      <div className="lg:hidden fixed bottom-3 right-4 z-50 group cursor-pointer">
+        <button
+          className="bg-[#03045e] text-white rounded-full p-1 shadow-lg"
+          onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+        >
+          {mobileSidebarOpen ? (
+            <FiChevronDown className="h-6 w-6" />
+          ) : (
+            <FiChevronUp className="h-6 w-6" />
+          )}
+        </button>
+        <div className="absolute bottom-full right-1/2 translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          {mobileSidebarOpen ? "Hide actions" : "Show actions"}
+        </div>
+      </div>
 
-      {/* ✅ Mobile Sidebar with Slide Animation */}
+      {/* Mobile Sidebar */}
       <div
-        className={`
-          lg:hidden fixed bottom-0 right-0 left-0 z-40 md:h-[20vh] sm:h-[38vh] h-[24vh] md:px-5 px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5 transition-transform duration-500 ease-in-out bg-gray-900/20
-
-          ${mobileSidebarOpen
-            ? "translate-y-0 opacity-100"
-            : "translate-y-full opacity-0 pointer-events-none"
-
-          }
-        `}
+        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 md:h-[20vh] sm:h-[38vh] h-[24vh] md:px-5 px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5 transition-transform duration-500 ease-in-out bg-gray-900/20 ${mobileSidebarOpen
+          ? "translate-y-0 opacity-100"
+          : "translate-y-full opacity-0 pointer-events-none"
+          }`}
       >
         <ActionButtons
           buttons={actionButtons}

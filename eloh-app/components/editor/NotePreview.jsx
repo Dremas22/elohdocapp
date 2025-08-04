@@ -142,8 +142,9 @@ const NotePreview = ({
         <div className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm pointer-events-auto flex justify-center items-center">
           <div className="relative bg-white rounded-xl shadow-xl p-6 h-[80vh] w-full mx-4 mt-10 overflow-auto">
             <button
-              className="absolute top-0.5 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold"
+              title="Close full medical record view"
               onClick={() => setShowFullRecord(false)}
+              className="absolute top-0.5 right-2 text-gray-400 hover:text-[#023e8a] text-2xl font-bold cursor-pointer"
             >
               <FaTimes />
             </button>
@@ -164,8 +165,9 @@ const NotePreview = ({
       >
         <button
           onClick={onClose}
+          title="Close preview"
           aria-label="Close preview"
-          className="absolute top-0.5 right-2 text-gray-400 hover:text-[#023e8a] text-2xl font-bold"
+          className="absolute top-0.5 right-2 text-gray-400 hover:text-[#023e8a] text-2xl font-bold cursor-pointer"
         >
           <FaTimes />
         </button>
@@ -309,11 +311,14 @@ const NotePreview = ({
         <div className="flex justify-end gap-3 mt-6">
           {noteType === "generalNotes" && (
             <button
+              aria-label="view"
+              title="View full patient medical record"
               onClick={handleViewFullRecord}
               className="flex items-center gap-2 bg-[#03045e] text-white py-2 px-4 text-sm sm:text-base font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
             >
               View Medical Record
             </button>
+
           )}
           <DownloadButton
             className="min-w-24 flex items-center justify-center gap-2 px-4 py-2"

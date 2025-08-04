@@ -9,7 +9,10 @@
  */
 const ToggleButton = ({ checked, onChange, fetching }) => {
   return (
-    <label className="inline-flex items-center cursor-pointer select-none relative">
+    <label
+      title="Set availability" //  Tooltip 
+      className="inline-flex items-center cursor-pointer select-none relative"
+    >
       {/* Visually hidden checkbox input */}
       <input
         type="checkbox"
