@@ -9,8 +9,10 @@ import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
 import { FiX } from "react-icons/fi";
 import Link from "next/link";
 import Earnings from "./doctorEarnings";
+import { db } from "@/db/client";
+import { doc, onSnapshot } from "firebase/firestore";
 
-const DoctorsCollectionViewer = ({ userDoc, patients }) => {
+const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
   // State to manage search/filter and modals
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [query, setQuery] = useState("");
@@ -18,6 +20,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   const [showEarnings, setShowEarnings] = useState(false);
   const [openViewPatientRecords, setOpenViewPatientRecords] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [userDocState, setUserDoc] = useState(userDoc || {});
 
   // Ref for scrolling to patient record viewer
   const patientRecordsRef = useRef(null);
@@ -28,6 +31,22 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
       patientRecordsRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [openViewPatientRecords]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const unsubscribe = onSnapshot(doc(db, "doctors", userId), (docSnap) => {
+      if (docSnap.exists()) {
+        const updatedData = docSnap.data();
+        setUserDoc((prev) => ({
+          ...prev,
+          ...updatedData,
+        }));
+      }
+    });
+
+    return () => unsubscribe();
+  }, [userId]);
 
   // Handle patient search by name or ID
   const handleSearch = (query) => {
@@ -46,7 +65,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   };
 
   // Show fallback if user document is missing
-  if (!userDoc) {
+  if (!userDocState) {
     return (
       <div className="min-h-screen bg-gray-50 pt-20">
         {/* Navbar fallback (could be updated to a generic navbar) */}
@@ -68,7 +87,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
     );
   }
 
-  const { practiceNumber, isVerified } = userDoc;
+  const { practiceNumber, isVerified } = userDocState;
 
   return (
     <div className="min-h-screen flex flex-col pt-18 relative overflow-hidden">
@@ -82,7 +101,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
           <SidebarMenu
             practiceNumber={practiceNumber}
             isVerified={isVerified}
-            userDoc={userDoc}
+            userDoc={userDocState}
             setShowEarnings={setShowEarnings}
           />
         </aside>
@@ -115,7 +134,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                       Earnings
                     </h2>
 
-                    <Earnings role="doctor" data={userDoc} />
+                    <Earnings role="doctor" data={userDocState} />
                   </div>
                 </div>
               )}
@@ -165,7 +184,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                 <SidebarMenu
                   practiceNumber={practiceNumber}
                   isVerified={isVerified}
-                  userDoc={userDoc}
+                  userDoc={userDocState}
                   setShowEarnings={setShowEarnings}
                   compact
                 />
