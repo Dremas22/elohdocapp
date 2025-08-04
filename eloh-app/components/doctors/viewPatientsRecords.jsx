@@ -68,8 +68,26 @@ const ViewPatientsRecords = ({
       </h1>
 
       {/* Toggle Buttons with Tooltip */}
+      {/* Toggle Buttons with Tooltip */}
       <div className="flex justify-center gap-4 mb-6">
         {noteTypes.map(({ id, type, label }) => (
+          <div key={id} className="relative group">
+            <button
+              onClick={() => setMode(type)}
+              className={`py-2 px-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
+              ${mode === type
+                  ? "bg-[#2c4253] text-white hover:bg-[#023e8a]"
+                  : "bg-[#03045e] text-white hover:bg-[#023e8a]"
+                }
+              `}
+            >
+              {label}
+            </button>
+            {/* Tooltip */}
+            <div className="absolute bottom- border border-amber-50 mb-2 px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+              Switch to {label} view
+            </div>
+          </div>
           <div key={id} className="relative group">
             <button
               onClick={() => setMode(type)}
@@ -93,97 +111,103 @@ const ViewPatientsRecords = ({
       {/* Table Section with Tooltip */}
       <div className="relative group overflow-x-auto bg-white rounded-lg shadow-md border border-gray-200 lg:w-[60vw] md:w-[75vw] sm:w-full px-2 sm:px-6 text-sm sm:text-base -ml-11.5 sm:-ml-4">
 
-        <div className="flex justify-end px-4 pt-3">
-          <button
-            title="close table"
-            onClick={() => {
-              setSelectedRecord(null);
-              setSelectedNotes([]);
-              setOpenViewPatientRecords(false);
-            }}
-            className="text-gray-500 hover:text-red-600 text-xl"
-            aria-label="Close Table"
-          >
-            <MdCloseFullscreen />
-          </button>
-        </div>
+        {/* Table Section with Tooltip */}
+        <div className="relative group overflow-x-auto bg-white rounded-lg shadow-md border border-gray-200 lg:w-[60vw] md:w-[75vw] sm:w-full px-2 sm:px-6 text-sm sm:text-base -ml-11.5 sm:-ml-4">
 
-        <table className="min-w-full bg-white">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
-                Date
-              </th>
-              <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
-                Doctor
-              </th>
-              <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center hidden sm:table-cell">
-                Summary
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {selectedNotes.length > 0 ? (
-              selectedNotes.map((record, index) => (
-                <tr
-                  key={index}
-                  title="Click to view patient record"
-                  className="hover:bg-blue-50 cursor-pointer transition"
-                  onClick={() => setSelectedRecord(record)}
-                >
-                  <td className="px-6 py-4 text-center">
-                    {convertTimestamp(record?.createdAt)}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    {record.doctorName || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    {(() => {
-                      const content = record.content;
+          <div className="flex justify-end px-4 pt-3">
+            <button
+              title="close table"
+              title="close table"
+              onClick={() => {
+                setSelectedRecord(null);
+                setSelectedNotes([]);
+                setOpenViewPatientRecords(false);
+              }}
+              className="text-gray-500 hover:text-red-600 text-xl"
+              aria-label="Close Table"
+            >
+              <MdCloseFullscreen />
+            </button>
+          </div>
 
-                      if (typeof content === "string") return truncate(content);
+          <table className="min-w-full bg-white">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
+                  Date
+                </th>
+                <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
+                  Doctor
+                </th>
+                <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center hidden sm:table-cell">
+                  Summary
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {selectedNotes.length > 0 ? (
+                selectedNotes.map((record, index) => (
+                  <tr
+                    key={index}
+                    title="Click to view patient record"
+                    title="Click to view patient record"
+                    className="hover:bg-blue-50 cursor-pointer transition"
+                    onClick={() => setSelectedRecord(record)}
+                  >
+                    <td className="px-6 py-4 text-center">
+                      {convertTimestamp(record?.createdAt)}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      {record.doctorName || "N/A"}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      {(() => {
+                        const content = record.content;
 
-                      if (typeof content === "object") {
-                        if (content.instructions)
-                          return truncate(content.instructions);
-                        if (content.reason)
-                          return truncate(`Reason: ${content.reason}`);
-                        if (content.startDate && content.endDate) {
-                          return `From ${convertTimestamp(
-                            content.startDate
-                          )} to ${convertTimestamp(content.endDate)}`;
+                        if (typeof content === "string") return truncate(content);
+
+                        if (typeof content === "object") {
+                          if (content.instructions)
+                            return truncate(content.instructions);
+                          if (content.reason)
+                            return truncate(`Reason: ${content.reason}`);
+                          if (content.startDate && content.endDate) {
+                            return `From ${convertTimestamp(
+                              content.startDate
+                            )} to ${convertTimestamp(content.endDate)}`;
+                          }
                         }
-                      }
 
-                      return "View full note";
-                    })()}
+                        return "View full note";
+                      })()}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="text-center px-6 py-4 text-gray-500">
+                    No {noteTypes.find((type) => type.type === mode)?.label} available.
+                    No {noteTypes.find((type) => type.type === mode)?.label} available.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" className="text-center px-6 py-4 text-gray-500">
-                  No {noteTypes.find((type) => type.type === mode)?.label} available.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-      {/* Modal Preview */}
-      {selectedRecord && (
-        <NotePreview
-          previewData={selectedRecord}
-          isLoading={false}
-          onClose={() => setSelectedRecord(null)}
-          noteType={mode}
-          signature={signature}
-          patientId={patientId}
-        />
-      )}
-    </div>
-  );
+        {/* Modal Preview */}
+        {selectedRecord && (
+          <NotePreview
+            previewData={selectedRecord}
+            isLoading={false}
+            onClose={() => setSelectedRecord(null)}
+            noteType={mode}
+            signature={signature}
+            patientId={patientId}
+          />
+        )}
+      </div>
+      );
 };
 
-export default ViewPatientsRecords;
+      export default ViewPatientsRecords;
