@@ -64,7 +64,9 @@ const PatientDashboardNavbar = () => {
             className="rounded-full object-cover"
           />
         ) : (
-          <div className="w-12 h-12 rounded-full bg-gray-300" />
+          <div className="w-12 h-12 rounded-full bg-[#123158] flex items-center justify-center text-white text-lg font-semibold">
+            {fullName?.[0]?.toUpperCase()}
+          </div>
         )}
         {/* Name only visible on md+ screens */}
         <div className="leading-tight text-sm text-[#123158] hidden md:block">
