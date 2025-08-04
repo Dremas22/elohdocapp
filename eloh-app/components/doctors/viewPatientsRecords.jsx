@@ -12,6 +12,27 @@ const noteTypes = [
   { id: "sickNotes", type: "sickNotes", label: "Sick Notes" },
 ];
 
+/**
+ * ViewPatientsRecords component
+ *
+ * This component displays a patient's medical records, categorized into note types such as general notes,
+ * prescriptions, and sick notes. It allows switching between categories and shows a preview modal
+ * for individual records when selected.
+ *
+ * Props:
+ * @param {Object} props - Component props
+ * @param {Object} props.data - All medical notes categorized by type (e.g., generalNotes, prescriptions, sickNotes)
+ * @param {Function} props.setOpenViewPatientRecords - Setter function to toggle visibility of the records view
+ * @param {string} props.signature - Base64 or URL string representing the doctor's digital signature
+ * @param {string} props.patientId - The ID of the patient whose records are being viewed
+ *
+ * Features:
+ * - Tabbed switching between types of medical records
+ * - Table view with date, doctor name, and truncated summary
+ * - Dynamically renders different summary formats depending on the note type
+ * - Opens a modal preview for full note detail
+ */
+
 const ViewPatientsRecords = ({
   data,
   setOpenViewPatientRecords,
