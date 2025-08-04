@@ -74,7 +74,7 @@ const DoctorDashboardNavbar = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-18 bg-gray-300 py-6 px-6 flex justify-between items-center">
-      {/* Left Section: Avatar + Name  on desktop */}
+      {/* Left Section: Avatar + Name on desktop */}
       <div className="flex items-center gap-4">
         {/* Avatar Image or Placeholder */}
         {photoUrl ? (
@@ -86,12 +86,16 @@ const DoctorDashboardNavbar = () => {
             className="rounded-full object-cover"
           />
         ) : (
-          <div className="w-12 h-12 rounded-full bg-gray-300" />
+          <div className="w-12 h-12 rounded-full bg-[#123158] flex items-center justify-center text-white text-lg font-semibold">
+            {fullName?.[0]?.toUpperCase() || "U"}
+          </div>
         )}
 
         {/* Name only visible on medium+ screens */}
         <div className="leading-tight text-sm text-[#123158] hidden md:block">
-          <p className="font-semibold">{fullName || "Doctor"}</p>
+          <p className="font-semibold">
+            {fullName ? `Dr. ${fullName}` : "Doctor"}
+          </p>
         </div>
       </div>
 
