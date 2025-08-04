@@ -49,7 +49,7 @@ const NursesList = ({ nurses, sendNotificationToDoctor }) => {
             </div>
             {nurse.photoUrl && (
               <Image
-                src={nurse.photoUrl}
+                src={nurse.photoUrl || "/images/deafult_avatar.jpg"}
                 alt={nurse.fullName}
                 width={64}
                 height={64}

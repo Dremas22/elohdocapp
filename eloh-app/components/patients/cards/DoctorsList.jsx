@@ -12,10 +12,7 @@ const DoctorsList = ({ doctors, sendNotificationToDoctor }) => {
   return (
     <div className="w-full flex justify-center">
       <div
-        className={`
-          flex flex-wrap gap-6 justify-center items-center
-          max-w-7xl px-4 py-6
-        `}
+        className="flex flex-wrap gap-6 justify-center items-center max-w-7xl px-4 py-6"
       >
         {doctors.map((doc) => (
           <div
@@ -48,15 +45,14 @@ const DoctorsList = ({ doctors, sendNotificationToDoctor }) => {
                 Click to join meeting
               </p>
             </div>
-            {doc.photoUrl && (
-              <Image
-                src={doc.photoUrl}
-                alt={doc.fullName}
-                width={64}
-                height={64}
-                className="w-16 h-16 rounded-full border border-white object-cover"
-              />
-            )}
+
+            <Image
+              src={doc.photoUrl || "/images/deafult_avatar.jpg"}
+              alt={`Dr. ${doc.fullName}`}
+              width={64}
+              height={64}
+              className="w-16 h-16 rounded-full border border-white object-cover"
+            />
           </div>
         ))}
       </div>
