@@ -52,6 +52,7 @@ export async function POST(request) {
 
     if (role === "doctor" || role === "nurse") {
       userDoc.isVerified = false;
+      userDoc.available = true;
     } else if (role === "patient") {
       userDoc.isActive = true;
     }

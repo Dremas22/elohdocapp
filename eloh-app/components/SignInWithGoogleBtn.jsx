@@ -9,17 +9,33 @@ import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import SignInOrSignUpForm from "./signInOrSignUpForm";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { handleAuthAction } from "@/lib/session-signout";
 
+/**
+ * GoogleSignInButton component
+ *
+ * This component renders a Google Sign-In button for users to authenticate using Firebase Authentication.
+ * It also retrieves the user's Firebase Cloud Messaging (FCM) token if available, stores the session on the backend,
+ * and redirects the user to an onboarding page depending on their role (patient, doctor, nurse, etc.).
+ *
+ * It includes animated background elements, toast notifications for success or error handling,
+ * and a fallback form-based authentication component.
+ *
+ * @component
+ * @returns {JSX.Element} A full-screen sign-in page with a Google login button and a fallback form.
+ */
 const GoogleSignInButton = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const role = searchParams.get("role") || "doctor";
+  const role = searchParams.get("role") || "patient";
   const [isLoading, setIsLoading] = useState(false);
 
   const capitalizedRole =
     role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
 
   const handleSignIn = async () => {
+    await handleAuthAction(setIsLoading);
     setIsLoading(true);
     try {
       const result = await signInWithPopup(auth, googleAuth);
