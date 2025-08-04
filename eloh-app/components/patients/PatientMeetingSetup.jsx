@@ -7,6 +7,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   query,
   where,
 } from "firebase/firestore";
@@ -25,29 +26,51 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    const fetchAvailableStaff = async () => {
-      setIsLoading(true);
-      setError(null);
+    if (!currentUser?.uid) return;
 
-      try {
-        const patientRef = doc(db, "patients", currentUser?.uid);
-        const patientSnap = await getDoc(patientRef);
+    const patientRef = doc(db, "patients", currentUser.uid);
+    let unsubDoctors = () => {};
+    let unsubNurses = () => {};
 
+    const unsubPatient = onSnapshot(
+      patientRef,
+      (patientSnap) => {
         if (!patientSnap.exists()) {
-          throw new Error("Patient data not found.");
+          setError("Patient data not found.");
+          setDoctors([]);
+          setNurses([]);
+          return;
         }
 
         const { consultationType } = patientSnap.data();
 
-        let doctorQueryPromise = Promise.resolve({ docs: [] });
-        let nurseQueryPromise = Promise.resolve({ docs: [] });
+        setIsLoading(true);
+        setError(null);
+
+        // Unsubscribe previous listeners
+        unsubDoctors();
+        unsubNurses();
 
         if (consultationType === "doctor" || consultationType === "all") {
           const doctorQuery = query(
             collection(db, "doctors"),
             where("available", "==", true)
           );
-          doctorQueryPromise = getDocs(doctorQuery);
+
+          unsubDoctors = onSnapshot(
+            doctorQuery,
+            (snapshot) => {
+              const docs = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+              setDoctors(docs);
+            },
+            (err) => {
+              console.error("Doctor snapshot error:", err);
+              setDoctors([]);
+            }
+          );
         }
 
         if (consultationType === "nurse" || consultationType === "all") {
@@ -55,36 +78,38 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             collection(db, "nurses"),
             where("available", "==", true)
           );
-          nurseQueryPromise = getDocs(nurseQuery);
+
+          unsubNurses = onSnapshot(
+            nurseQuery,
+            (snapshot) => {
+              const docs = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+              setNurses(docs);
+            },
+            (err) => {
+              console.error("Nurse snapshot error:", err);
+              setNurses([]);
+            }
+          );
         }
 
-        const [doctorsSnapshot, nursesSnapshot] = await Promise.all([
-          doctorQueryPromise,
-          nurseQueryPromise,
-        ]);
-
-        const doctorsList = doctorsSnapshot
-          ? doctorsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-          : [];
-        const nursesList = nursesSnapshot
-          ? nursesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-          : [];
-
-        setDoctors(doctorsList);
-        setNurses(nursesList);
-      } catch (error) {
-        console.error("Error fetching available staff:", error);
-        setDoctors([]);
-        setNurses([]);
-        setError("Error fetching available doctors & nurses");
-      } finally {
+        setIsLoading(false);
+      },
+      (error) => {
+        console.error("Patient snapshot error:", error);
+        setError("Error fetching patient data.");
         setIsLoading(false);
       }
-    };
+    );
 
-    if (currentUser?.uid) {
-      fetchAvailableStaff();
-    }
+    // Cleanup all listeners
+    return () => {
+      unsubPatient();
+      unsubDoctors();
+      unsubNurses();
+    };
   }, [currentUser?.uid]);
 
   const scroll = (direction) => {
@@ -104,6 +129,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         `${process.env.NEXT_PUBLIC_URL}/api/notify-doctor`,
         {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ doctorId, patientId }),
         }

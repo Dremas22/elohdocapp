@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { auth, db } from "@/db/client";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
+
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
 import NurseDashboardNavbar from "@/app/dashboard/nurse/nurseNav";
 import NurseSidebarMenu from "./nurseSidebar"; // New sidebar component
@@ -26,19 +27,17 @@ const NurseCollectionViewer = () => {
   const patientRecordsRef = useRef(null);
 
   useEffect(() => {
-    const fetchUserDataAndPatients = async () => {
-      const user = auth.currentUser;
-
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (!user) {
         setLoading(false);
         return;
       }
 
-      try {
-        const userId = user.uid;
-        const nurseRef = doc(db, "nurses", userId);
-        const nurseSnap = await getDoc(nurseRef);
+      const userId = user?.uid;
+      const nurseRef = doc(db, "nurses", userId);
 
+      // Set up real-time listener on nurse document
+      const unsubscribeDoc = onSnapshot(nurseRef, async (nurseSnap) => {
         if (nurseSnap.exists()) {
           const userDataRaw = nurseSnap.data();
           const userData = {
@@ -48,28 +47,36 @@ const NurseCollectionViewer = () => {
           };
           setUserDoc(userData);
         }
+      });
 
-        const patientsSnap = await getDocs(collection(db, "patients"));
-        const patientsList = patientsSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: convertTimestamp(doc.data().createdAt),
-          updatedAt: convertTimestamp(doc.data().updatedAt),
-        }));
+      // Fetch all patients once
+      const fetchPatients = async () => {
+        try {
+          const patientsSnap = await getDocs(collection(db, "patients"));
+          const patientsList = patientsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: convertTimestamp(doc.data().createdAt),
+            updatedAt: convertTimestamp(doc.data().updatedAt),
+          }));
+          setPatients(patientsList);
+        } catch (err) {
+          console.error("Error fetching patients:", err);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-        setPatients(patientsList);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+      fetchPatients();
 
-      setLoading(false);
-    };
-
-    const unsubscribe = auth.onAuthStateChanged(() => {
-      fetchUserDataAndPatients();
+      return () => {
+        unsubscribeDoc();
+      };
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+    };
   }, []);
 
   // Handle patient search by name or ID

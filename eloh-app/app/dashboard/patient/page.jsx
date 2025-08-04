@@ -7,9 +7,8 @@ import PatientDashboardNavbar from "@/app/dashboard/patient/patientNav";
 import PatientSidebarMenu from "./patientSidebar";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import SaveStripePayment from "@/components/SaveStripePayment";
-import { useRouter } from "next/navigation";
 import { db } from "@/db/client";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { toast } from "react-toastify";
 import Link from "next/link";
 
@@ -20,22 +19,17 @@ const PatientDashboard = () => {
   const [userLoading, setUserLoading] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [mode, setMode] = useState("general-notes");
-  const [isLoading, setIsLoading] = useState(false);
-
-  const router = useRouter();
 
   useEffect(() => {
-    const checkConsultations = async () => {
-      try {
-        if (!loading && currentUser?.uid) {
-          setIsLoading(true);
+    if (!loading && currentUser?.uid) {
+      const userRef = doc(db, "patients", currentUser.uid);
 
-          const userRef = doc(db, "patients", currentUser.uid);
-          const userSnap = await getDoc(userRef);
+      const unsubscribe = onSnapshot(
+        userRef,
+        (snapshot) => {
+          if (!snapshot.exists()) return;
 
-          if (!userSnap.exists()) return;
-
-          const userData = userSnap.data();
+          const userData = snapshot.data();
           const type = userData.consultationType;
           const consultations = userData.consultations || {};
 
@@ -43,8 +37,8 @@ const PatientDashboard = () => {
             type === "doctor"
               ? (consultations.doctor || 0) >= 1
               : type === "nurse"
-                ? (consultations.nurse || 0) >= 1
-                : (consultations.doctor || 0) >= 1 ||
+              ? (consultations.nurse || 0) >= 1
+              : (consultations.doctor || 0) >= 1 ||
                 (consultations.nurse || 0) >= 1;
 
           if (hasConsultations) {
@@ -53,41 +47,39 @@ const PatientDashboard = () => {
             );
             setShowChat(false);
           }
+        },
+        (error) => {
+          console.error("Real-time consultations error:", error);
         }
-      } catch (error) {
-        console.error("Something went wrong while checking user data", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      );
 
-    checkConsultations();
+      return () => unsubscribe(); // Clean up listener
+    }
   }, [currentUser?.uid, loading]);
 
   useEffect(() => {
+    if (!currentUser?.uid) return;
+
     setUserLoading(true);
-    const fetchUserDoc = async () => {
-      if (!currentUser?.uid) return;
+    const userRef = doc(db, "patients", currentUser.uid);
 
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_URL}/api/patients/${currentUser?.uid}`
-        );
-        const data = await res.json();
-
-        if (!res.ok)
-          throw new Error(data.message || "Failed to load user data.");
-        setUserDoc(data);
-      } catch (error) {
-        console.error("Error fetching userDoc:", error);
-      } finally {
+    const unsubscribe = onSnapshot(
+      userRef,
+      (snapshot) => {
+        if (!snapshot.exists()) {
+          setUserDoc(null);
+        } else {
+          setUserDoc({ id: snapshot.id, ...snapshot.data() });
+        }
+        setUserLoading(false);
+      },
+      (error) => {
+        console.error("Error with userDoc real-time listener:", error);
         setUserLoading(false);
       }
-    };
+    );
 
-    if (currentUser?.uid) {
-      fetchUserDoc();
-    }
+    return () => unsubscribe(); // Clean up the listener
   }, [currentUser?.uid]);
 
   if (loading || userLoading) {
