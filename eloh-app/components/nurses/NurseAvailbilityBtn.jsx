@@ -9,19 +9,6 @@ import { useState } from "react";
  * Displays "Available" or "Unavailable" above the switch, and shows a loading spinner on toggle.
  */
 const ToggleButton = ({ isAvailable, fetching, onChange }) => {
-  // const [isAvailable, setIsAvailable] = useState(false);
-  // const [fetching, setFetching] = useState(false);
-
-  // const handleChange = () => {
-  //     if (fetching) return;
-
-  //     setFetching(true);
-  //     setTimeout(() => {
-  //         setIsAvailable((prev) => !prev);
-  //         setFetching(false);
-  //     }, 500); // Simulate async operation
-  // };
-
   return (
     <div className="flex flex-col items-center gap-1 relative">
       {/* Status Label */}
