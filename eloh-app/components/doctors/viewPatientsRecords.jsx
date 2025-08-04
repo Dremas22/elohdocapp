@@ -91,7 +91,7 @@ const ViewPatientsRecords = ({
       </div>
 
       {/* Table Section with Tooltip */}
-      <div className="relative group overflow-x-auto bg-white rounded-lg shadow-md border border-gray-200 lg:w-[60vw] md:w-[75vw] sm:w-full px-2 sm:px-6 text-sm sm:text-base -ml-11.5 sm:-ml-4">
+      <div className="relative group bg-white rounded-lg shadow-md border border-gray-200 lg:w-[60vw] md:w-[75vw] w-[85vw] px-2 sm:px-6 text-sm sm:text-base -ml-10 sm:ml-0">
 
         <div className="flex justify-end px-4 pt-3">
           <button
@@ -101,23 +101,23 @@ const ViewPatientsRecords = ({
               setSelectedNotes([]);
               setOpenViewPatientRecords(false);
             }}
-            className="text-gray-500 hover:text-red-600 text-xl"
+            className="text-gray-500 hover:text-red-600 text-xl cursor-pointer"
             aria-label="Close Table"
           >
             <MdCloseFullscreen />
           </button>
         </div>
 
-        <table className="min-w-full bg-white">
+        <table className="min-w-full bg-white table-fixed">
           <thead className="bg-gray-100">
             <tr>
-              <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
+              <th className="px-2 py-3 text-sm font-semibold text-gray-600 text-center break-words">
                 Date
               </th>
-              <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center">
+              <th className="px-2 py-3 text-sm font-semibold text-gray-600 text-center break-words">
                 Doctor
               </th>
-              <th className="px-6 py-3 text-sm font-semibold text-gray-600 text-center hidden sm:table-cell">
+              <th className="px-2 py-3 text-sm font-semibold text-gray-600 text-center break-words">
                 Summary
               </th>
             </tr>
@@ -131,27 +131,21 @@ const ViewPatientsRecords = ({
                   className="hover:bg-blue-50 cursor-pointer transition"
                   onClick={() => setSelectedRecord(record)}
                 >
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-2 py-4 text-center break-words">
                     {convertTimestamp(record?.createdAt)}
                   </td>
-                  <td className="px-6 py-4 text-center">
-                    {record.doctorName || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-2 py-4 text-center break-words">{record.doctorName || "N/A"}</td>
+                  <td className="px-2 py-4 text-center break-words">
                     {(() => {
                       const content = record.content;
 
                       if (typeof content === "string") return truncate(content);
 
                       if (typeof content === "object") {
-                        if (content.instructions)
-                          return truncate(content.instructions);
-                        if (content.reason)
-                          return truncate(`Reason: ${content.reason}`);
+                        if (content.instructions) return truncate(content.instructions);
+                        if (content.reason) return truncate(`Reason: ${content.reason}`);
                         if (content.startDate && content.endDate) {
-                          return `From ${convertTimestamp(
-                            content.startDate
-                          )} to ${convertTimestamp(content.endDate)}`;
+                          return `From ${convertTimestamp(content.startDate)} to ${convertTimestamp(content.endDate)}`;
                         }
                       }
 
@@ -162,7 +156,7 @@ const ViewPatientsRecords = ({
               ))
             ) : (
               <tr>
-                <td colSpan="3" className="text-center px-6 py-4 text-gray-500">
+                <td colSpan="3" className="text-center px-6 py-4 text-gray-500 break-words">
                   No {noteTypes.find((type) => type.type === mode)?.label} available.
                 </td>
               </tr>
