@@ -128,6 +128,9 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
     );
   }
 
+  const totalStaff = doctors.length + nurses.length;
+  const showArrows = totalStaff >= 4;
+
   return (
     <div className="w-full min-h-screen bg-gray-950">
       <div className="max-w-screen-xl mx-auto px-4 pt-10">
@@ -184,25 +187,32 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
           </p>
         ) : (
           <div className="relative mt-10">
-            {/* Scroll Buttons */}
-            <button
-              onClick={() => scroll("left")}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
-            >
-              <FaArrowLeft />
-            </button>
-            <button
-              onClick={() => scroll("right")}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
-            >
-              <FaArrowRight />
-            </button>
+            {/* Conditionally show scroll buttons */}
+            {showArrows && (
+              <>
+                <button
+                  onClick={() => scroll("left")}
+                  title="Scroll left"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
+                >
+                  <FaArrowLeft />
+                </button>
+                <button
+                  onClick={() => scroll("right")}
+                  title="Scroll right"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
+                >
+                  <FaArrowRight />
+                </button>
+              </>
+            )}
 
             {/* Scrollable Cards */}
             <StaffScroller
               doctors={doctors}
               nurses={nurses}
               sendNotificationToDoctor={sendNotificationToDoctor}
+              ref={scrollRef}
             />
           </div>
         )}
