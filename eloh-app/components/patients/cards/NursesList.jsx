@@ -8,48 +8,58 @@ const NursesList = ({ nurses, sendNotificationToDoctor }) => {
   const router = useRouter();
 
   if (loading) return <div>Loading...</div>;
+
   return (
-    <>
-      {nurses.map((nurse) => (
-        <div
-          key={nurse.userId}
-          onClick={() => {
-            if (currentUser?.uid && nurse.userId) {
-              sendNotificationToDoctor(nurse.userId, currentUser.uid);
-              router.push(
-                `/room?staffId=${nurse.userId}&patientId=${currentUser.uid}`
-              );
-            }
-          }}
-          className={`min-w-[260px] sm:min-w-[280px] md:min-w-[300px] rounded-lg p-4 shadow-md flex-shrink-0 flex flex-col items-center gap-4 transition duration-200 ${currentUser?.uid && nurse.userId
-              ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
-              : "cursor-not-allowed bg-gray-700 opacity-50"
-            }`}
-        >
-          <div className="text-center space-y-2">
-            <h3 className="text-lg font-bold text-white">{nurse.fullName}</h3>
-            <p className="text-sm text-gray-300">
-              Practice No:{" "}
-              <span className="font-medium">{nurse.practiceNumber}</span>
-            </p>
-            <p className="text-sm text-gray-300">{nurse.email}</p>
-            <p className="text-sm text-gray-300">{nurse.phoneNumber}</p>
-            <p className="text-sm text-blue-400 mt-2 hover:underline">
-              Click to join meeting
-            </p>
+    <div className="w-full flex justify-center">
+      <div
+        className={`
+          flex flex-wrap gap-6 justify-center items-center
+          max-w-7xl px-4 py-6
+        `}
+      >
+        {nurses.map((nurse) => (
+          <div
+            key={nurse.userId}
+            title={`Consult with Nurse: ${nurse.fullName}`} // Dynamic tooltip
+            onClick={() => {
+              if (currentUser?.uid && nurse.userId) {
+                sendNotificationToDoctor(nurse.userId, currentUser.uid);
+                router.push(
+                  `/room?staffId=${nurse.userId}&patientId=${currentUser.uid}`
+                );
+              }
+            }}
+            className={`min-w-[260px] sm:min-w-[280px] md:min-w-[300px] rounded-lg p-4 shadow-md flex-shrink-0 flex flex-col items-center gap-4 transition duration-200
+              ${currentUser?.uid && nurse.userId
+                ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
+                : "cursor-not-allowed bg-gray-700 opacity-50"
+              }
+            `}
+          >
+            <div className="text-center space-y-2">
+              <h3 className="text-lg font-bold text-white">{nurse.fullName}</h3>
+              <p className="text-sm text-gray-300">
+                Practice No: <span className="font-medium">{nurse.practiceNumber}</span>
+              </p>
+              <p className="text-sm text-gray-300">{nurse.email}</p>
+              <p className="text-sm text-gray-300">{nurse.phoneNumber}</p>
+              <p className="text-sm text-blue-400 mt-2 hover:underline">
+                Click to join meeting
+              </p>
+            </div>
+            {nurse.photoUrl && (
+              <Image
+                src={nurse.photoUrl}
+                alt={nurse.fullName}
+                width={64}
+                height={64}
+                className="w-16 h-16 rounded-full border border-white object-cover"
+              />
+            )}
           </div>
-          {nurse.photoUrl && (
-            <Image
-              src={nurse.photoUrl}
-              alt={nurse.fullName}
-              width={64}
-              height={64}
-              className="w-16 h-16 rounded-full border border-white object-cover"
-            />
-          )}
-        </div>
-      ))}
-    </>
+        ))}
+      </div>
+    </div>
   );
 };
 

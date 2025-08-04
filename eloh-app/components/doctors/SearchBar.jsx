@@ -30,6 +30,7 @@ const SearchBar = ({
       <input
         type="text"
         placeholder="Search by full name or ID number..."
+        title="Search for patients by full name"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
