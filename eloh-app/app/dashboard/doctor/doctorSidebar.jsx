@@ -104,6 +104,7 @@ const DoctorSidebarMenu = ({
 
   useEffect(() => {
     const fetchAvailability = async () => {
+      setFetching(true);
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_URL}/api/doctor/toggle-availability`
@@ -288,7 +289,8 @@ const DoctorSidebarMenu = ({
           </label>
           <ToggleButton
             checked={isAvailable}
-            onChange={() => setIsAvailable(!isAvailable)}
+            onChange={handleToggle}
+            fetching={fetching}
           />
         </div>
       </div>
