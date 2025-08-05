@@ -28,7 +28,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   useEffect(() => {
     if (!currentUser?.uid) return;
 
-    const patientRef = doc(db, "patients", currentUser.uid);
+    const patientRef = doc(db, "patients", currentUser?.uid);
     let unsubDoctors = () => {};
     let unsubNurses = () => {};
 
