@@ -29,8 +29,8 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
     if (!currentUser?.uid) return;
 
     const patientRef = doc(db, "patients", currentUser?.uid);
-    let unsubDoctors = () => {};
-    let unsubNurses = () => {};
+    let unsubDoctors = () => { };
+    let unsubNurses = () => { };
 
     const unsubPatient = onSnapshot(
       patientRef,
@@ -159,7 +159,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
 
   return (
     <div className="w-full min-h-screen bg-gray-950">
-      <div className="max-w-screen-xl mx-auto px-4 pt-10">
+      <div className="max-w-screen-xl mx-auto px-4 pt-5">
         {/* Header */}
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
           <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text font-extrabold text-transparent text-4xl">
