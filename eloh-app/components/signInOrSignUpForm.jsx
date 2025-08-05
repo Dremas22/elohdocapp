@@ -178,6 +178,8 @@ const SignInOrSignUpForm = ({ role: selectedRole }) => {
               type="submit"
               title={activeForm === "signin" ? "Sign into your account" : "Create a new account"}
               disabled={isSubmitting}
+              aria-busy={isSubmitting}
+              aria-disabled={isSubmitting}
               className={`w-full flex justify-center items-center gap-2 py-2 shadow-[0_9px_#999] active:shadow-[0_5px_#666] text-white rounded-lg font-semibold transition cursor-pointer ${activeForm === "signin"
                 ? "bg-[#03045e] hover:bg-blue-600"
                 : "bg-[#03045e] hover:bg-blue-700"
@@ -186,8 +188,9 @@ const SignInOrSignUpForm = ({ role: selectedRole }) => {
               {isSubmitting && (
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
               )}
-              {activeForm === "signin" ? "Sign In" : "Sign Up"}
+              {isSubmitting ? (activeForm === "signin" ? "Signing In..." : "Signing Up...") : (activeForm === "signin" ? "Sign In" : "Sign Up")}
             </button>
+
 
             {/* Forgot Password Link */}
             {activeForm === "signin" && (
