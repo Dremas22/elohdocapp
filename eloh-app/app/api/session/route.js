@@ -10,47 +10,12 @@ export async function POST(req) {
       return NextResponse.json({ error: "Missing token" }, { status: 400 });
     }
 
-    const decodedToken = await auth.verifyIdToken(token);
+    const decodedToken = await auth?.verifyIdToken(token);
 
     if (!decodedToken || !decodedToken.exp) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const uid = decodedToken.uid;
-
-    // 🔥 Determine role by checking both collections
-    const doctorRef = db?.collection("doctors").doc(uid);
-    const nurseRef = db?.collection("nurses").doc(uid);
-    const patientRef = db?.collection("patients").doc(uid);
-    let userRef = null;
-
-    const [doctorSnap, nurseSnap, patientSnap] = await Promise.all([
-      doctorRef.get(),
-      nurseRef.get(),
-      patientRef.get(),
-    ]);
-
-    if (doctorSnap.exists) {
-      userRef = doctorRef;
-    } else if (nurseSnap.exists) {
-      userRef = nurseRef;
-    } else if (patientSnap.exists) {
-      userRef = patientRef;
-    } else {
-      return NextResponse.json(
-        { error: "User not found in any collection" },
-        { status: 404 }
-      );
-    }
-
-    let roleJustSet = false;
-    // 🔐 Set role as a custom claim (only if not already set)
-    if (!decodedToken.role || decodedToken.role !== role) {
-      await auth.setCustomUserClaims(uid, { role });
-      roleJustSet = true;
-    }
-
-    // 🍪 Create session cookie
     const expirationTimeMs = decodedToken.exp * 1000;
     const nowMs = Date.now();
     const expiresIn = expirationTimeMs - nowMs;
@@ -72,21 +37,33 @@ export async function POST(req) {
       maxAge: Math.floor(expiresIn / 1000),
     });
 
-    // 💾 Update FCM and metadata
-    const userSnap = await userRef.get();
-    if (userSnap.exists && fcmToken) {
-      await userRef.set(
-        {
-          fcmToken,
-          online: true,
-          lastLogin: new Date(),
-          updatedAt: new Date(),
-        },
-        { merge: true }
-      );
+    // Optional FCM and profile update
+    const uid = decodedToken.uid;
+
+    // 🔐 Ensure correct custom claims
+    if (!decodedToken.role || decodedToken.role !== role) {
+      await auth.setCustomUserClaims(uid, { role });
     }
 
-    return NextResponse.json({ success: true, roleJustSet });
+    // 📝 Only update FCM/status if user is in doctors/nurses collection
+    if (role === "doctor" || role === "nurse") {
+      const userRef = db?.collection(`${role}s`).doc(uid);
+      const userSnap = await userRef.get();
+      if (userSnap.exists) {
+        await userRef.set(
+          {
+            ...userSnap.data(),
+            ...(fcmToken && { fcmToken }),
+            online: true,
+            lastLogin: new Date(),
+            updatedAt: new Date(),
+          },
+          { merge: true }
+        );
+      }
+    }
+
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Session creation error:", err);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -96,24 +73,19 @@ export async function POST(req) {
 export async function DELETE(req) {
   try {
     const cookieStore = await cookies();
-    const sessionCookie = cookieStore.get("session")?.value;
+    const sessionCookie = cookieStore?.get("session")?.value;
 
-    if (sessionCookie) {
-      // Verify session cookie to get UID
-      const decoded = await auth?.verifySessionCookie(sessionCookie, true);
-      const uid = decoded.uid;
-      const role = decoded.role || "patient"; // default fallback
-
-      // Mark user offline
-      const userRef = db.collection(`${role}s`).doc(uid);
-      await userRef.set(
-        {
-          online: false,
-          updatedAt: new Date(),
-        },
-        { merge: true }
+    if (!sessionCookie) {
+      return NextResponse.json(
+        { error: "No session cookie found" },
+        { status: 401 }
       );
     }
+
+    // Verify session cookie and get UID
+    const decodedClaims = await auth?.verifySessionCookie(sessionCookie, true);
+    const uid = decodedClaims.uid;
+    const role = decodedClaims.role;
 
     // Clear session cookie
     cookieStore.set("session", "", {
@@ -123,9 +95,25 @@ export async function DELETE(req) {
       maxAge: 0,
     });
 
+    // Optional: update user's online status
+    if (role) {
+      const userRef = db?.collection(`${role}s`).doc(uid);
+      const userSnap = await userRef.get();
+      if (userSnap.exists) {
+        await userRef.set(
+          {
+            online: false,
+            fcmToken: null,
+            updatedAt: new Date(),
+          },
+          { merge: true }
+        );
+      }
+    }
+
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("Logout error:", err);
-    return NextResponse.json({ error: "Failed to logout" }, { status: 401 });
+    console.error("Session deletion error:", err);
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 }

@@ -32,7 +32,7 @@ const GoogleSignInButton = () => {
     try {
       const result = await signInWithPopup(auth, googleAuth);
       const user = result.user;
-      const token = await user.getIdToken();
+      const token = await user.getIdToken(true);
 
       const messaging = getMessaging();
       let fcmToken = null;
@@ -51,7 +51,7 @@ const GoogleSignInButton = () => {
       await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, fcmToken }),
+        body: JSON.stringify({ token, fcmToken, role }),
       });
 
       toast.success("Logged in successfully", {
