@@ -163,3 +163,7 @@ export const banks = [
   { id: "investec", title: "Investec" },
   { id: "african", title: "African Bank" },
 ];
+
+export const CONSULTATION_FEE = 500;
+export const PLATFORM_FEE = 50;
+export const STAFF_EARNING_PER_CONSULTATION = CONSULTATION_FEE - PLATFORM_FEE;

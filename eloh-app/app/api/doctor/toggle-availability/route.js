@@ -1,19 +1,26 @@
 import { auth, db } from "@/db/server";
 import { NextResponse } from "next/server";
 
-async function verifyUserAndGetRole(token) {
+/**
+ * Verifies the Firebase session token and determines user role + doc.
+ * Returns: { uid, role, doc: Firebase DocumentSnapshot }
+ */
+async function verifyUserAndGetDoc(token) {
   try {
     const decodedToken = await auth.verifySessionCookie(token, true);
+    const { uid } = decodedToken;
 
-    const { uid, role } = decodedToken;
+    const doctorRef = db.collection("doctors").doc(uid);
+    const doctorDoc = await doctorRef.get();
+    if (doctorDoc.exists) return { uid, role: "doctor", doc: doctorDoc };
 
-    if (!["doctor", "nurse"].includes(role)) {
-      throw new Error("Invalid role");
-    }
+    const nurseRef = db.collection("nurses").doc(uid);
+    const nurseDoc = await nurseRef.get();
+    if (nurseDoc.exists) return { uid, role: "nurse", doc: nurseDoc };
 
-    return { uid, role };
+    throw new Error("User not found in doctor or nurse collection");
   } catch (err) {
-    console.error("Token verification failed:", err);
+    console.error("Token verification failed:", err.message);
     throw new Error("Unauthorized");
   }
 }
@@ -27,17 +34,11 @@ export async function GET(req) {
     if (!token)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { uid, role } = await verifyUserAndGetRole(token);
-
-    const userRef = db.collection(`${role}s`).doc(uid);
-    const snapshot = await userRef.get();
-
-    if (!snapshot.exists) {
-      return NextResponse.json({ error: `${role} not found` }, { status: 404 });
-    }
+    const { role, doc } = await verifyUserAndGetDoc(token);
 
     return NextResponse.json({
-      available: snapshot.data()?.available ?? false,
+      available: doc.data()?.available ?? false,
+      user: { id: doc.id, ...doc.data() },
     });
   } catch (err) {
     return NextResponse.json(
@@ -56,18 +57,12 @@ export async function POST(req) {
     if (!token)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { uid, role } = await verifyUserAndGetRole(token);
+    const { uid, role, doc } = await verifyUserAndGetDoc(token);
 
-    const userRef = db.collection(`${role}s`).doc(uid);
-    const docSnap = await userRef.get();
-
-    if (!docSnap.exists) {
-      return NextResponse.json({ error: `${role} not found` }, { status: 404 });
-    }
-
-    const currentAvailability = docSnap.data()?.available ?? false;
+    const currentAvailability = doc.data()?.available ?? false;
     const newAvailability = !currentAvailability;
 
+    const userRef = db?.collection(`${role}s`).doc(uid);
     await userRef.update({ available: newAvailability });
 
     return NextResponse.json({
@@ -75,12 +70,13 @@ export async function POST(req) {
         role.charAt(0).toUpperCase() + role.slice(1)
       } availability updated`,
       available: newAvailability,
+      user: { id: doc.id, ...doc.data(), available: newAvailability },
     });
   } catch (error) {
-    console.error("Availability update error:", error);
+    console.error("Availability update error:", error.message);
     return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
+      { error: error.message || "Internal Server Error" },
+      { status: error.message === "Unauthorized" ? 401 : 500 }
     );
   }
 }

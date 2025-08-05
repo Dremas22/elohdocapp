@@ -1,7 +1,7 @@
 "use client";
+
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
-import { FaDownload, FaHeartbeat, FaTimes } from "react-icons/fa";
-import { MdCloseFullscreen } from "react-icons/md";
+import { FaDownload, FaHeartbeat, FaTimes, } from "react-icons/fa";
 import DownloadButton from "./DownloadButton";
 import { convertOKLCHtoRGB } from "@/lib/convertOKLCHtoRGB";
 import html2canvas from "html2canvas";
@@ -142,13 +142,12 @@ const NotePreview = ({
         <div className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm pointer-events-auto flex justify-center items-center">
           <div className="relative bg-white rounded-xl shadow-xl p-6 h-[80vh] w-full mx-4 mt-10 overflow-auto">
             <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-lg sm:text-2xl"
+              title="Close full medical record view"
               onClick={() => setShowFullRecord(false)}
-              aria-label="Close full medical record"
+              className="absolute top-0.5 right-2 text-gray-400 hover:text-[#023e8a] text-2xl font-bold cursor-pointer"
             >
               <FaTimes />
             </button>
-
             <FullMedicalRecords
               medicalHistory={medicalHistory}
               socialHistory={socialHistory}
@@ -164,6 +163,15 @@ const NotePreview = ({
         aria-labelledby="note-preview-title"
         className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white mt-17 p-5 sm:p-8 rounded-2xl shadow-xl relative border border-gray-200"
       >
+        <button
+          onClick={onClose}
+          title="Close preview"
+          aria-label="Close preview"
+          className="absolute top-0.5 right-2 text-gray-400 hover:text-[#023e8a] text-2xl font-bold cursor-pointer"
+        >
+          <FaTimes />
+        </button>
+
         <div ref={previewRef}>
           {/* Header */}
           <div className="flex justify-between items-center border-b pb-4 mb-6 border-gray-200">
@@ -303,11 +311,14 @@ const NotePreview = ({
         <div className="flex justify-end gap-3 mt-6">
           {noteType === "generalNotes" && (
             <button
+              aria-label="view"
+              title="View full patient medical record"
               onClick={handleViewFullRecord}
               className="flex items-center gap-2 bg-[#03045e] text-white py-2 px-4 text-sm sm:text-base font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
             >
               View Medical Record
             </button>
+
           )}
           <DownloadButton
             className="min-w-24 flex items-center justify-center gap-2 px-4 py-2"

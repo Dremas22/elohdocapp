@@ -4,13 +4,12 @@ import { useState, useEffect } from "react";
 import { FiUser, FiCalendar, FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { IoCloseCircleSharp } from "react-icons/io5";
 import { FaMoneyCheckAlt } from "react-icons/fa";
-import Calendar from "@/app/dashboard/doctor/calendar";
+import Calendar from "@/components/calendar";
 import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
 import ToggleButton from "./availabilityBtn";
-import useCurrentUser from "@/hooks/useCurrentUser";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
@@ -38,10 +37,10 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               onClick={onClick}
               disabled={isDisabled}
               className={`relative flex flex-col items-center justify-center gap-1
-                rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1
+                rounded-xl text-xs md:pl-29 sm:pr-29 font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1
                 transition-all duration-200 ease-in-out cursor-pointer
                 ${compact ? "h-20 w-20" : "w-36 h-20"}
-                bg-[#03045e]/90 hover:bg-[#023e8a] text-white
+                bg-[#03045e]/90 hover:bg-[#023e8a] text-white 
                 ${isDisabled ? "!cursor-not-allowed" : ""}
                 ${customClass || ""}
               `}
@@ -49,10 +48,8 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               type="button"
             >
               <span
-
                 className={`flex items-center justify-center ${isDisabled ? "text-gray-600" : "text-white"
                   }`}
-
               >
                 {icon}
               </span>
@@ -62,7 +59,7 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
                 </span>
               )}
               {hasNotification && notificationCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white">
+                <span className="absolute bottom-70 scale-150 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white cursor-pointer">
                   {notificationCount}
                 </span>
               )}
@@ -89,9 +86,9 @@ const DoctorSidebarMenu = ({
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Desktop sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isAvailable, setIsAvailable] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false); // Mobile toggle
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
@@ -106,6 +103,7 @@ const DoctorSidebarMenu = ({
 
   useEffect(() => {
     const fetchAvailability = async () => {
+      setFetching(true);
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_URL}/api/doctor/toggle-availability`
@@ -124,7 +122,6 @@ const DoctorSidebarMenu = ({
     fetchAvailability();
   }, []);
 
-  // Toggle availability on backend
   const handleToggle = async () => {
     setFetching(true);
     try {
@@ -132,6 +129,7 @@ const DoctorSidebarMenu = ({
         `${process.env.NEXT_PUBLIC_URL}/api/doctor/toggle-availability`,
         {
           method: "POST",
+          credentials: "include",
         }
       );
 
@@ -155,6 +153,7 @@ const DoctorSidebarMenu = ({
         `${process.env.NEXT_PUBLIC_URL}/api/users/update`,
         {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ role: userDoc.role, data: updatedData }),
         }
@@ -190,7 +189,6 @@ const DoctorSidebarMenu = ({
 
   return (
     <>
-      {/* Notification Modal */}
       {showNotificationModal && (
         <NotificationModal
           payload={notificationPayload}
@@ -198,7 +196,6 @@ const DoctorSidebarMenu = ({
         />
       )}
 
-      {/* Profile Modal */}
       {profileOpen && (
         <ProfileModal
           userDoc={userDoc}
@@ -252,31 +249,29 @@ const DoctorSidebarMenu = ({
         )}
       </div>
 
-      {/* ✅ Floating Mobile Toggle Button with Arrow */}
-      <button
-        className="lg:hidden fixed bottom-3 right-4 z-50 bg-[#03045e] text-white rounded-full p-1 shadow-lg"
-        onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-      >
-        {mobileSidebarOpen ? (
-          <FiChevronDown className="h-6 w-6" />
-        ) : (
-          <FiChevronUp className="h-6 w-6" />
-        )}
-      </button>
+      {/* ✅ Floating Mobile Toggle Button with Tooltip and Cursor Pointer */}
+      <div className="lg:hidden fixed bottom-3 right-4 z-50 group cursor-pointer">
+        <button
+          className="bg-[#03045e] text-white rounded-full p-1 shadow-lg"
+          onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+        >
+          {mobileSidebarOpen ? (
+            <FiChevronDown className="h-6 w-6" />
+          ) : (
+            <FiChevronUp className="h-6 w-6" />
+          )}
+        </button>
+        <div className="absolute bottom-full right-1/2 translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          {mobileSidebarOpen ? "Hide actions" : "Show actions"}
+        </div>
+      </div>
 
-      {/* ✅ Mobile Sidebar with Slide Animation */}
+      {/* Mobile Sidebar */}
       <div
-        className={`
-          lg:hidden fixed bottom-0 right-0 left-0 z-40 sm:h-[38vh] h-[24vh]
-          px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5
-          transition-transform duration-500 ease-in-out bg-gray-900/20
-
-          ${mobileSidebarOpen
-            ? "translate-y-0 opacity-100"
-            : "translate-y-full opacity-0 pointer-events-none"
-
-          }
-        `}
+        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 md:h-[20vh] sm:h-[38vh] h-[24vh] md:px-5 px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5 transition-transform duration-500 ease-in-out bg-gray-900/20 ${mobileSidebarOpen
+          ? "translate-y-0 opacity-100"
+          : "translate-y-full opacity-0 pointer-events-none"
+          }`}
       >
         <ActionButtons
           buttons={actionButtons}
@@ -291,17 +286,19 @@ const DoctorSidebarMenu = ({
           </label>
           <ToggleButton
             checked={isAvailable}
-            onChange={() => setIsAvailable(!isAvailable)}
+            onChange={handleToggle}
+            fetching={fetching}
           />
         </div>
       </div>
 
       {/* Calendar Drawer */}
       <div
-        className={`fixed top-24 right-0 h-[calc(100vh-6rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
           }`}
       >
         <button
+          title="Close Calendar"
           onClick={() => setCalendarOpen(false)}
           className="absolute pt-51.5 scale-200 right-1.5 text-red-600 text-sm hover:underline z-50"
         >

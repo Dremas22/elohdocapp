@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { auth, db } from "@/db/client";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
+
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
 import NurseDashboardNavbar from "@/app/dashboard/nurse/nurseNav";
 import NurseSidebarMenu from "./nurseSidebar"; // New sidebar component
@@ -26,19 +27,17 @@ const NurseCollectionViewer = () => {
   const patientRecordsRef = useRef(null);
 
   useEffect(() => {
-    const fetchUserDataAndPatients = async () => {
-      const user = auth.currentUser;
-
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (!user) {
         setLoading(false);
         return;
       }
 
-      try {
-        const userId = user.uid;
-        const nurseRef = doc(db, "nurses", userId);
-        const nurseSnap = await getDoc(nurseRef);
+      const userId = user?.uid;
+      const nurseRef = doc(db, "nurses", userId);
 
+      // Set up real-time listener on nurse document
+      const unsubscribeDoc = onSnapshot(nurseRef, async (nurseSnap) => {
         if (nurseSnap.exists()) {
           const userDataRaw = nurseSnap.data();
           const userData = {
@@ -48,28 +47,36 @@ const NurseCollectionViewer = () => {
           };
           setUserDoc(userData);
         }
+      });
 
-        const patientsSnap = await getDocs(collection(db, "patients"));
-        const patientsList = patientsSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: convertTimestamp(doc.data().createdAt),
-          updatedAt: convertTimestamp(doc.data().updatedAt),
-        }));
+      // Fetch all patients once
+      const fetchPatients = async () => {
+        try {
+          const patientsSnap = await getDocs(collection(db, "patients"));
+          const patientsList = patientsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: convertTimestamp(doc.data().createdAt),
+            updatedAt: convertTimestamp(doc.data().updatedAt),
+          }));
+          setPatients(patientsList);
+        } catch (err) {
+          console.error("Error fetching patients:", err);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-        setPatients(patientsList);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+      fetchPatients();
 
-      setLoading(false);
-    };
-
-    const unsubscribe = auth.onAuthStateChanged(() => {
-      fetchUserDataAndPatients();
+      return () => {
+        unsubscribeDoc();
+      };
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+    };
   }, []);
 
   // Handle patient search by name or ID
@@ -92,7 +99,7 @@ const NurseCollectionViewer = () => {
     return (
       <>
         <NurseDashboardNavbar />
-        <div className="flex items-center justify-center h-screen bg-gray-50 pt-16">
+        <div className="flex items-center justify-center h-screen bg-gray-950 pt-16">
           <div className="text-center text-gray-600">Loading dashboard...</div>
         </div>
       </>
@@ -101,10 +108,10 @@ const NurseCollectionViewer = () => {
 
   if (!userDoc) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20">
+      <div className="min-h-screen bg-gray-950 pt-20">
         <NurseDashboardNavbar />
         <div className="flex items-center justify-center h-full">
-          <div className="text-center text-gray-600">
+          <div className="text-center text-gray-50">
             <p className="text-lg font-medium">No user data found.</p>
             <p className="text-sm mt-1">
               Please make sure your account is registered correctly.
@@ -138,7 +145,7 @@ const NurseCollectionViewer = () => {
         </aside>
 
         {/* Main Content */}
-        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
+        <main className="w-full lg:w-3/4 p-6 md:pl-15 flex flex-col items-center justify-start text-center bg-transparent">
           {isVerified === true ? (
             <>
               <h1 className="bg-gradient-to-r from-teal-300 via-blue-400 to-purple-500 bg-clip-text text-transparent font-extrabold text-4xl sm:text-5xl md:text-6xl leading-tight mt-10 mb-10">
@@ -162,7 +169,7 @@ const NurseCollectionViewer = () => {
                       Earnings
                     </h2>
 
-                    <Earnings />
+                    <Earnings role="nurse" data={userDoc} />
                   </div>
                 </div>
               )}
@@ -218,7 +225,7 @@ const NurseCollectionViewer = () => {
               </div>
             </>
           ) : isVerified === false ? (
-            <div className="text-gray-600 text-center">
+            <div className="text-gray-400 text-center">
               <h2 className="text-lg font-semibold mb-2">
                 Verification Pending
               </h2>

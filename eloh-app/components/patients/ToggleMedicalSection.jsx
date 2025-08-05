@@ -22,11 +22,12 @@ const ToggleMedicalSection = ({ medicalHistory }) => {
           return (
             <button
               key={key}
+              title={`View ${sectionTitles[key]}`}
               onClick={() => setActiveToggle(key)}
-              className={`w-full sm:w-auto px-4 py-2 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200
+              className={`w-full sm:w-auto px-4 py-2 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 cursor-pointer
                 ${isActive
-                  ? "bg-[#03045e] text-white shadow-[0_4px_#999] active:shadow-[0_2px_#666] "
-                  : "bg-gray-100 text-gray-800 hover:bg-[#0077b6] hover:text-white shadow-[0_4px_#999] active:shadow-[0_2px_#666] "
+                  ? "bg-[#03045e] text-white shadow-[0_4px_#999] active:shadow-[0_2px_#666]"
+                  : "bg-gray-100 text-gray-800 hover:bg-[#0077b6] hover:text-white shadow-[0_4px_#999] active:shadow-[0_2px_#666]"
                 }
               `}
             >

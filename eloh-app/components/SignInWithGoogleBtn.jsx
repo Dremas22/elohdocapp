@@ -9,22 +9,30 @@ import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import SignInOrSignUpForm from "./signInOrSignUpForm";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { handleAuthAction } from "@/lib/session-signout";
 
+/**
+ * GoogleSignInButton component
+ *
+ * Provides Google Sign-In and fallback form for email/password.
+ */
 const GoogleSignInButton = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const role = searchParams.get("role") || "doctor";
+  const role = searchParams.get("role") || "patient";
   const [isLoading, setIsLoading] = useState(false);
 
   const capitalizedRole =
     role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
 
   const handleSignIn = async () => {
+    await handleAuthAction(setIsLoading);
     setIsLoading(true);
     try {
       const result = await signInWithPopup(auth, googleAuth);
       const user = result.user;
-      const token = await user.getIdToken();
+      const token = await user.getIdToken(true);
 
       const messaging = getMessaging();
       let fcmToken = null;
@@ -43,7 +51,7 @@ const GoogleSignInButton = () => {
       await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, fcmToken }),
+        body: JSON.stringify({ token, fcmToken, role }),
       });
 
       toast.success("Logged in successfully", {
@@ -67,32 +75,52 @@ const GoogleSignInButton = () => {
   return (
     <div className="fixed inset-0 w-screen h-screen overflow-hidden bg-gradient-to-br from-[#dbeafe] via-white to-[#caf0f8]">
       {/* Animated glowing blobs */}
-      <div className="absolute w-80 h-80 bg-blue-200 rounded-full blur-[100px] top-10 left-10 opacity-30 animate-pulse" />
-      <div className="absolute w-[420px] h-[420px] bg-blue-400 rounded-full blur-[140px] bottom-20 right-10 opacity-20 animate-pulse" />
-      <div className="absolute w-72 h-72 bg-blue-300 rounded-full blur-[120px] top-1/2 left-[10%] opacity-20 animate-pulse" />
+      <div
+        title="Decorative background"
+        className="absolute w-80 h-80 bg-blue-200 rounded-full blur-[100px] top-10 left-10 opacity-30 animate-pulse"
+      />
+      <div
+        title="Decorative background"
+        className="absolute w-[420px] h-[420px] bg-blue-400 rounded-full blur-[140px] bottom-20 right-10 opacity-20 animate-pulse"
+      />
+      <div
+        title="Decorative background"
+        className="absolute w-72 h-72 bg-blue-300 rounded-full blur-[120px] top-1/2 left-[10%] opacity-20 animate-pulse"
+      />
 
       {/* Frosted glass overlay */}
-      <div className="absolute inset-0 backdrop-blur-md bg-white/20 z-0" />
+      <div
+        title="Glass blur effect overlay"
+        className="absolute inset-0 backdrop-blur-md bg-white/20 z-0"
+      />
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center justify-start pt-15 px-4 text-center h-full">
-        <h2 className="text-3xl md:text-4xl font-bold text-[#03045e] mb-6">
+        <h2
+          className="text-3xl md:text-4xl font-bold text-[#03045e] mb-6"
+          title={`Sign in as a ${capitalizedRole}`}
+        >
           {capitalizedRole} Sign-In
         </h2>
 
-        <p className="text-gray-700 text-lg mb-8 max-w-md">
+        <p
+          className="text-gray-700 text-lg mb-8 max-w-md"
+          title="Use your ElohDoc credentials to log in"
+        >
           Please sign in to your ElohDoc account to continue.
         </p>
 
         <button
           onClick={handleSignIn}
           disabled={isLoading}
+          title="Sign in using your Google account"
           className="bg-[#03045e] hover:bg-[#0077b6] text-white mb-5 flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer"
         >
           <FcGoogle size={22} />
           {isLoading ? "Signing in..." : "Sign In with Google"}
         </button>
-        <div>
+
+        <div title="Sign in using email and password instead">
           <SignInOrSignUpForm role={role} />
         </div>
       </div>

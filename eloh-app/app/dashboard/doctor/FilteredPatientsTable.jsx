@@ -23,6 +23,7 @@ const FilteredPatientsTable = ({
             {patients.map((patient, idx) => (
               <tr
                 key={idx}
+                title="Click to view patient records"
                 className="hover:bg-white/50 hover:text-black transition cursor-pointer"
                 onClick={() => {
                   setSelectedPatient(patient);

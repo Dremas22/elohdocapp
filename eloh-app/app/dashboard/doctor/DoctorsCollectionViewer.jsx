@@ -9,8 +9,10 @@ import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
 import { FiX } from "react-icons/fi";
 import Link from "next/link";
 import Earnings from "./doctorEarnings";
+import { db } from "@/db/client";
+import { doc, onSnapshot } from "firebase/firestore";
 
-const DoctorsCollectionViewer = ({ userDoc, patients }) => {
+const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
   // State to manage search/filter and modals
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [query, setQuery] = useState("");
@@ -18,6 +20,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   const [showEarnings, setShowEarnings] = useState(false);
   const [openViewPatientRecords, setOpenViewPatientRecords] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [userDocState, setUserDoc] = useState(userDoc || {});
 
   // Ref for scrolling to patient record viewer
   const patientRecordsRef = useRef(null);
@@ -28,6 +31,22 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
       patientRecordsRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [openViewPatientRecords]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const unsubscribe = onSnapshot(doc(db, "doctors", userId), (docSnap) => {
+      if (docSnap.exists()) {
+        const updatedData = docSnap.data();
+        setUserDoc((prev) => ({
+          ...prev,
+          ...updatedData,
+        }));
+      }
+    });
+
+    return () => unsubscribe();
+  }, [userId]);
 
   // Handle patient search by name or ID
   const handleSearch = (query) => {
@@ -46,7 +65,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
   };
 
   // Show fallback if user document is missing
-  if (!userDoc) {
+  if (!userDocState) {
     return (
       <div className="min-h-screen bg-gray-50 pt-20">
         {/* Navbar fallback (could be updated to a generic navbar) */}
@@ -68,7 +87,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
     );
   }
 
-  const { practiceNumber, isVerified } = userDoc;
+  const { practiceNumber, isVerified } = userDocState;
 
   return (
     <div className="min-h-screen flex flex-col pt-18 relative overflow-hidden">
@@ -82,13 +101,13 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
           <SidebarMenu
             practiceNumber={practiceNumber}
             isVerified={isVerified}
-            userDoc={userDoc}
+            userDoc={userDocState}
             setShowEarnings={setShowEarnings}
           />
         </aside>
 
         {/* Main Content Area */}
-        <main className="w-full lg:w-3/4 flex flex-col items-center text-center bg-transparent overflow-y-auto">
+        <main className="w-full lg:w-3/4 flex flex-col items-center md:pl-10 text-center bg-transparent overflow-y-auto">
           {isVerified === true ? (
             <>
               {/* Sticky Welcome Banner */}
@@ -101,21 +120,23 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
               {/* Earnings Modal */}
               {showEarnings && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-md z-50 flex items-center justify-center px-4">
-                  <div className="bg-white rounded-xl text-black p-6 w-full max-w-4xl shadow-lg relative border-t-8 border-[#0d6efd]">
+                  <div className="bg-white rounded-xl text-black p-6 w-full max-w-4xl cursor-pointer shadow-lg relative border-t-8 border-[#0d6efd]">
                     {/* Close button */}
                     <button
                       onClick={() => setShowEarnings(false)}
-                      className="absolute top-3 right-4 text-gray-600 hover:text-red-600 text-xl"
+                      className="absolute top-3 right-4 text-gray-600 hover:text-red-600 text-xl cursor-pointer"
                       aria-label="Close Earnings Modal"
                     >
                       <FiX />
                     </button>
 
+
+
                     <h2 className="text-2xl font-bold mb-5 text-[#0d6efd] text-center">
                       Earnings
                     </h2>
 
-                    <Earnings />
+                    <Earnings role="doctor" data={userDocState} />
                   </div>
                 </div>
               )}
@@ -165,7 +186,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients }) => {
                 <SidebarMenu
                   practiceNumber={practiceNumber}
                   isVerified={isVerified}
-                  userDoc={userDoc}
+                  userDoc={userDocState}
                   setShowEarnings={setShowEarnings}
                   compact
                 />
