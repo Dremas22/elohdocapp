@@ -216,8 +216,10 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
             <label className="block text-sm font-semibold text-gray-700 mb-1">
               Phone Number
             </label>
+
             <div className="flex gap-2">
               <select
+                title="Select your Phone Code"
                 value={phoneCode}
                 onChange={(e) => setPhoneCode(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-md bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#0d6efd]"
@@ -229,6 +231,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
                 ))}
               </select>
               <input
+                title="Update Phone Number (9 digits)"
                 type="tel"
                 value={localNumber}
                 maxLength={9}
@@ -257,6 +260,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
                   Country
                 </label>
                 <select
+                  title="Select your country"
                   value={location.country}
                   onChange={(e) =>
                     handleLocationChange("country", e.target.value)
@@ -282,6 +286,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
                   City
                 </label>
                 <input
+                  title="Update City Name"
                   type="text"
                   value={location.city}
                   onChange={(e) => handleLocationChange("city", e.target.value)}
@@ -299,6 +304,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
                   Address Line
                 </label>
                 <input
+                  title="Update Address"
                   type="text"
                   value={location.addressLine}
                   onChange={(e) =>
@@ -363,6 +369,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
                         Choose Image
                       </label>
                       <input
+                        title="Update Profile"
                         ref={fileInputRef}
                         id="profileImageInput"
                         type="file"
@@ -389,6 +396,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
                     Account Holder Name
                   </label>
                   <input
+                    title="Update Account Holder's Name"
                     type="text"
                     value={bankingDetails.accountName}
                     onChange={(e) =>
@@ -411,6 +419,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
                     Bank Name
                   </label>
                   <select
+                    title="Select Bank Name"
                     value={bankingDetails.bank}
                     onChange={(e) =>
                       setBankingDetails((prev) => ({
@@ -439,6 +448,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
                     Account Number
                   </label>
                   <input
+                    title="Update Account Number"
                     type="text"
                     value={bankingDetails.accountNumber}
                     maxLength={20}
@@ -463,23 +473,24 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
 
         <div className="mt-6 flex justify-end space-x-3">
           <button
+            title="Cancel changes"
             onClick={onClose}
             className="px-4 bg-[#03045e] text-white py-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
             Cancel
           </button>
           <button
+            title="Save changes"
             onClick={handleDbSave}
             className="bg-[#03045e] text-white py-3 px-5 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
             {loading ? "Saving..." : "Save"}
           </button>
           <button
+            title="delete account"
             type="button"
             onClick={handleDeleteAccount}
             className="bg-[#5e0303] text-white py-3 px-5 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#8a0202] transition-all duration-200 ease-in-out cursor-pointer"
-            aria-label="Delete_Account"
-            title="Delete Account"
           >
             Delete Account
           </button>
