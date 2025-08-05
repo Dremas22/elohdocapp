@@ -99,7 +99,7 @@ const NurseCollectionViewer = () => {
     return (
       <>
         <NurseDashboardNavbar />
-        <div className="flex items-center justify-center h-screen bg-gray-50 pt-16">
+        <div className="flex items-center justify-center h-screen bg-gray-950 pt-16">
           <div className="text-center text-gray-600">Loading dashboard...</div>
         </div>
       </>
@@ -108,10 +108,10 @@ const NurseCollectionViewer = () => {
 
   if (!userDoc) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20">
+      <div className="min-h-screen bg-gray-950 pt-20">
         <NurseDashboardNavbar />
         <div className="flex items-center justify-center h-full">
-          <div className="text-center text-gray-600">
+          <div className="text-center text-gray-50">
             <p className="text-lg font-medium">No user data found.</p>
             <p className="text-sm mt-1">
               Please make sure your account is registered correctly.
@@ -145,7 +145,7 @@ const NurseCollectionViewer = () => {
         </aside>
 
         {/* Main Content */}
-        <main className="w-full lg:w-3/4 p-6 flex flex-col items-center justify-start text-center bg-transparent">
+        <main className="w-full lg:w-3/4 p-6 md:pl-15 flex flex-col items-center justify-start text-center bg-transparent">
           {isVerified === true ? (
             <>
               <h1 className="bg-gradient-to-r from-teal-300 via-blue-400 to-purple-500 bg-clip-text text-transparent font-extrabold text-4xl sm:text-5xl md:text-6xl leading-tight mt-10 mb-10">
@@ -225,7 +225,7 @@ const NurseCollectionViewer = () => {
               </div>
             </>
           ) : isVerified === false ? (
-            <div className="text-gray-600 text-center">
+            <div className="text-gray-400 text-center">
               <h2 className="text-lg font-semibold mb-2">
                 Verification Pending
               </h2>

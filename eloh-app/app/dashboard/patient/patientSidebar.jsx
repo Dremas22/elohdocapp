@@ -196,17 +196,30 @@ const PatientSidebarMenu = ({
         />
       </div>
 
-      {/* Floating Mobile Toggle Button */}
-      <button
-        className="lg:hidden fixed bottom-3 right-4 z-50 bg-[#03045e] text-white rounded-full p-1 shadow-lg"
-        onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-      >
-        {mobileSidebarOpen ? (
-          <FiChevronDown className="h-6 w-6" />
-        ) : (
-          <FiChevronUp className="h-6 w-6" />
-        )}
-      </button>
+      {/* Mobile Sidebar Toggle Button with Icon and Text */}
+      <div className="lg:hidden fixed bottom-1 -right-2 z-50 group cursor-pointer flex items-center space-x-2 bg-blue-300/20 text-white rounded-full px-2 py-2 shadow-sm select-none scale-80 backdrop-blur-sm">
+        <button
+          onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+          title={mobileSidebarOpen ? "Hide menu options" : "Show menu options"}
+          className="flex items-center gap-2 focus:outline-none"
+          aria-expanded={mobileSidebarOpen}
+          aria-controls="mobile-sidebar-actions"
+          type="button"
+        >
+          {mobileSidebarOpen ? (
+            <>
+              <FiChevronDown className="h-6 w-6" />
+              <span className="text-sm font-semibold">Hide menu</span>
+            </>
+          ) : (
+            <>
+              <FiChevronUp className="h-6 w-6" />
+              <span className="text-sm font-semibold">Show menu</span>
+            </>
+          )}
+        </button>
+      </div>
+
 
       {/* Slide-up Mobile Sidebar */}
       <div

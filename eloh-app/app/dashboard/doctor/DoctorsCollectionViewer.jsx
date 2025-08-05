@@ -120,15 +120,17 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
               {/* Earnings Modal */}
               {showEarnings && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-md z-50 flex items-center justify-center px-4">
-                  <div className="bg-white rounded-xl text-black p-6 w-full max-w-4xl shadow-lg relative border-t-8 border-[#0d6efd]">
+                  <div className="bg-white rounded-xl text-black p-6 w-full max-w-4xl cursor-pointer shadow-lg relative border-t-8 border-[#0d6efd]">
                     {/* Close button */}
                     <button
                       onClick={() => setShowEarnings(false)}
-                      className="absolute top-3 right-4 text-gray-600 hover:text-red-600 text-xl"
+                      className="absolute top-3 right-4 text-gray-600 hover:text-red-600 text-xl cursor-pointer"
                       aria-label="Close Earnings Modal"
                     >
                       <FiX />
                     </button>
+
+
 
                     <h2 className="text-2xl font-bold mb-5 text-[#0d6efd] text-center">
                       Earnings
