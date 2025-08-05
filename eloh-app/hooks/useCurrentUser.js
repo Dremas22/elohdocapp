@@ -47,8 +47,8 @@ const useCurrentUser = () => {
     return () => unsubscribe();
   }, []);
 
-  const createSession = async (user) => {
-    if (!user) return;
+  const createSession = async (user, role) => {
+    if (!user || !role) return;
     const token = await user?.getIdToken();
 
     let fcmToken = null;
@@ -61,12 +61,18 @@ const useCurrentUser = () => {
       console.error("Unable to retrieve FCM token", err);
     }
 
-    await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
       method: "POST",
-      credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, fcmToken }),
+      body: JSON.stringify({ token, fcmToken, role }),
     });
+
+    const data = await res.json();
+    console.log(data, "DATA_XXX");
+    // Force refresh token if role was just set
+    if (data?.roleJustSet) {
+      await user?.getIdToken(true); // ⬅️ Forces the new custom claim
+    }
   };
 
   const handleRegister = async (email, password, role) => {
@@ -78,7 +84,7 @@ const useCurrentUser = () => {
         password
       );
       const user = result.user;
-      await createSession(user);
+      await createSession(user, role);
 
       toast.success("Registered successfully", {
         icon: <AiOutlineCheckCircle className="text-green-600 text-xl" />,
@@ -98,7 +104,7 @@ const useCurrentUser = () => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       const user = result.user;
-      await createSession(user);
+      await createSession(user, role);
 
       toast.success("Logged in successfully", {
         icon: <AiOutlineCheckCircle className="text-green-600 text-xl" />,

@@ -22,7 +22,7 @@ const PatientDashboard = () => {
 
   useEffect(() => {
     if (!loading && currentUser?.uid) {
-      const userRef = doc(db, "patients", currentUser.uid);
+      const userRef = doc(db, "patients", currentUser?.uid);
 
       const unsubscribe = onSnapshot(
         userRef,
