@@ -29,8 +29,8 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
     if (!currentUser?.uid) return;
 
     const patientRef = doc(db, "patients", currentUser?.uid);
-    let unsubDoctors = () => { };
-    let unsubNurses = () => { };
+    let unsubDoctors = () => {};
+    let unsubNurses = () => {};
 
     const unsubPatient = onSnapshot(
       patientRef,
