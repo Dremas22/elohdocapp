@@ -5,14 +5,11 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import {
   collection,
   doc,
-  getDoc,
-  getDocs,
   onSnapshot,
   query,
   where,
 } from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
-import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import { useEffect, useState } from "react";
 import ViewMedicalRecords from "../viewMedicalRecords";
 import StaffScroller from "./StaffController";
 
@@ -23,14 +20,13 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   const [nurses, setNurses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const scrollRef = useRef(null);
 
   useEffect(() => {
     if (!currentUser?.uid) return;
 
-    const patientRef = doc(db, "patients", currentUser?.uid);
-    let unsubDoctors = () => {};
-    let unsubNurses = () => {};
+    const patientRef = doc(db, "patients", currentUser.uid);
+    let unsubDoctors = () => { };
+    let unsubNurses = () => { };
 
     const unsubPatient = onSnapshot(
       patientRef,
@@ -46,8 +42,6 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
 
         setIsLoading(true);
         setError(null);
-
-        // Unsubscribe previous listeners
         unsubDoctors();
         unsubNurses();
 
@@ -56,21 +50,9 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             collection(db, "doctors"),
             where("available", "==", true)
           );
-
-          unsubDoctors = onSnapshot(
-            doctorQuery,
-            (snapshot) => {
-              const docs = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-              }));
-              setDoctors(docs);
-            },
-            (err) => {
-              console.error("Doctor snapshot error:", err);
-              setDoctors([]);
-            }
-          );
+          unsubDoctors = onSnapshot(doctorQuery, (snapshot) => {
+            setDoctors(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+          });
         }
 
         if (consultationType === "nurse" || consultationType === "all") {
@@ -78,21 +60,9 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             collection(db, "nurses"),
             where("available", "==", true)
           );
-
-          unsubNurses = onSnapshot(
-            nurseQuery,
-            (snapshot) => {
-              const docs = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-              }));
-              setNurses(docs);
-            },
-            (err) => {
-              console.error("Nurse snapshot error:", err);
-              setNurses([]);
-            }
-          );
+          unsubNurses = onSnapshot(nurseQuery, (snapshot) => {
+            setNurses(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+          });
         }
 
         setIsLoading(false);
@@ -104,22 +74,12 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
       }
     );
 
-    // Cleanup all listeners
     return () => {
       unsubPatient();
       unsubDoctors();
       unsubNurses();
     };
   }, [currentUser?.uid]);
-
-  const scroll = (direction) => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({
-        left: direction === "right" ? 320 : -320,
-        behavior: "smooth",
-      });
-    }
-  };
 
   const fullName = currentUser?.displayName || `Unknown-user_${Date.now()}`;
 
@@ -134,15 +94,11 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
           body: JSON.stringify({ doctorId, patientId }),
         }
       );
-
       const data = await res.json();
-      if (!res.ok) {
-        console.error("Failed to send notification:", data.error);
-        alert(`Error: ${data.error}`);
-      }
+      if (!res.ok) throw new Error(data.error);
     } catch (error) {
       console.error("Notification error:", error);
-      alert("Something went wrong while sending the notification.");
+      alert("Failed to send notification.");
     }
   };
 
@@ -154,9 +110,6 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
     );
   }
 
-  const totalStaff = doctors.length + nurses.length;
-  const showArrows = totalStaff >= 4;
-
   return (
     <div className="w-full min-h-screen bg-gray-950">
       <div className="max-w-screen-xl mx-auto px-4 pt-5">
@@ -166,8 +119,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             Virtual Medical Consultations
           </h1>
           <p className="mt-6 max-w-xl text-gray-300 sm:text-xl">
-            Connect with licensed medical professionals through secure video
-            consultations from the comfort of your home.
+            Connect with licensed medical professionals through secure video consultations from home.
           </p>
         </div>
 
@@ -200,47 +152,17 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         )}
 
         {isLoading ? (
-          <p className="text-center text-gray-500 mt-20">
-            Loading doctors & nurses...
-          </p>
+          <p className="text-center text-gray-500 mt-20">Loading doctors & nurses...</p>
         ) : error ? (
-          <p className="text-red-600 text-center mt-20 font-semibold">
-            {error}
-          </p>
+          <p className="text-red-600 text-center mt-20 font-semibold">{error}</p>
         ) : doctors.length === 0 && nurses.length === 0 ? (
-          <p className="text-gray-600 text-center mt-20 italic">
-            No Staff available
-          </p>
+          <p className="text-gray-600 text-center mt-20 italic">No Staff available</p>
         ) : (
-          <div className="relative mt-10">
-            {/* Conditionally show scroll buttons */}
-            {showArrows && (
-              <>
-                <button
-                  onClick={() => scroll("left")}
-                  title="Scroll left"
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
-                >
-                  <FaArrowLeft />
-                </button>
-                <button
-                  onClick={() => scroll("right")}
-                  title="Scroll right"
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
-                >
-                  <FaArrowRight />
-                </button>
-              </>
-            )}
-
-            {/* Scrollable Cards */}
-            <StaffScroller
-              doctors={doctors}
-              nurses={nurses}
-              sendNotificationToDoctor={sendNotificationToDoctor}
-              ref={scrollRef}
-            />
-          </div>
+          <StaffScroller
+            doctors={doctors}
+            nurses={nurses}
+            sendNotificationToDoctor={sendNotificationToDoctor}
+          />
         )}
       </div>
     </div>
