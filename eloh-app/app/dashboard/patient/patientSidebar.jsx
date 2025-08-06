@@ -196,7 +196,7 @@ const PatientSidebarMenu = ({
         />
       </div>
 
-      {/* Mobile Sidebar Toggle Button with Icon and Text */}
+      {/* Mobile Sidebar Toggle Button */}
       <div className="lg:hidden fixed bottom-1 -right-2 z-50 group cursor-pointer flex items-center space-x-2 bg-blue-300/20 text-white rounded-full px-2 py-2 shadow-sm select-none scale-80 backdrop-blur-sm">
         <button
           onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
