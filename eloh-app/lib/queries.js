@@ -215,13 +215,28 @@ export function serializeData(obj) {
   }
 
   if (typeof obj === "object") {
+    // Convert Firestore timestamp object
     if (obj._seconds !== undefined && obj._nanoseconds !== undefined) {
       return new Date(obj._seconds * 1000).toISOString();
     }
 
     const result = {};
     for (const key in obj) {
-      result[key] = serializeData(obj[key]);
+      let value = obj[key];
+
+      // If it's one of the note arrays, sort by createdAt
+      if (
+        Array.isArray(value) &&
+        ["sickNotes", "prescriptions", "generalNotes"].includes(key)
+      ) {
+        value = [...value].sort((a, b) => {
+          const aDate = new Date(a?.createdAt?._seconds * 1000 || a?.createdAt);
+          const bDate = new Date(b?.createdAt?._seconds * 1000 || b?.createdAt);
+          return bDate - aDate;
+        });
+      }
+
+      result[key] = serializeData(value);
     }
     return result;
   }

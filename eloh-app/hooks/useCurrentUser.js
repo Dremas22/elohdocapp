@@ -68,7 +68,7 @@ const useCurrentUser = () => {
     });
 
     const data = await res.json();
-    console.log(data, "DATA_XXX");
+
     // Force refresh token if role was just set
     if (data?.roleJustSet) {
       await user?.getIdToken(true); // ⬅️ Forces the new custom claim
