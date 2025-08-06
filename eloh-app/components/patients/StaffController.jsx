@@ -5,7 +5,11 @@ import DoctorsList from "./cards/DoctorsList";
 import NursesList from "./cards/NursesList";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
-const StaffScroller = ({ doctors = [], nurses = [], sendNotificationToDoctor }) => {
+const StaffScroller = ({
+  doctors = [],
+  nurses = [],
+  sendNotificationToDoctor,
+}) => {
   const scrollRef = useRef(null);
 
   const getDefaultView = () => {
@@ -62,28 +66,32 @@ const StaffScroller = ({ doctors = [], nurses = [], sendNotificationToDoctor }) 
           <button
             title="View available doctors"
             onClick={() => setView("doctors")}
-            className={`bg-[#03045e] text-white py-1 px-2 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${view === "doctors"
-              }`}
+            className={`bg-[#03045e] text-white py-1 px-2 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${
+              view === "doctors"
+            }`}
           >
             View Doctors
           </button>
           <button
             title="View available nurses"
             onClick={() => setView("nurses")}
-            className={`bg-[#03045e] text-white py-1 px-2 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${view === "nurses"
-              }`}
+            className={`bg-[#03045e] text-white py-1 px-2 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${
+              view === "nurses"
+            }`}
           >
             View Nurses
           </button>
         </div>
       )}
 
-      <h2 className="text-2xl font-semibold text-center mt-10 mb-4 text-white">
-        Available {view[0].toUpperCase() + view.slice(1)}
-      </h2>
+      {(doctors.length > 0 || nurses.length > 0) && (
+        <h2 className="text-2xl font-semibold text-center mt-10 mb-4 text-white">
+          Available {view[0].toUpperCase() + view.slice(1)}
+        </h2>
+      )}
 
       {/* Scroll Arrows - show only if enough staff */}
-      {(doctors.length + nurses.length) >= 4 && (
+      {doctors.length + nurses.length >= 4 && (
         <>
           <button
             onClick={() => scroll("left")}
