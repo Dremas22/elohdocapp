@@ -53,20 +53,14 @@ const StaffScroller = ({
           <button
             title="View available doctors"
             onClick={() => setView("doctors")}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${view === "doctors"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
+            className={`bg-[#03045e] text-white py-1 px-2 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${view === "doctors"}`}
           >
             View Doctors
           </button>
           <button
             title="View available nurses"
             onClick={() => setView("nurses")}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${view === "nurses"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
+            className={`bg-[#03045e] text-white py-1 px-2 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${view === "nurses"}`}
           >
             View Nurses
           </button>
