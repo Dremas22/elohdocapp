@@ -17,7 +17,7 @@ import { toast } from "react-toastify";
 import { ControlBar } from "@livekit/components-react";
 import handleMeetingEnd from "@/lib/postMeetingUpdates";
 import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
-import { db } from "@/db/client";
+import { db, auth } from "@/db/client";
 
 /**
  * MeetingRoom component handles the video consultation logic for doctors and patients.
@@ -39,28 +39,14 @@ const MeetingRoom = () => {
   const [token, setToken] = useState("");
   const [hasJoined, setHasJoined] = useState(false);
   const [meetingClosing, setMeetingClosing] = useState(false);
+  const [patientName, setPatientName] = useState("");
   const router = useRouter();
   const hasAlreadyHandledEnd = useRef(false);
+  const [userRole, setUserRole] = useState("");
 
-  // // Firestore doc to track if the consultation has ended
+  // Firestore doc to track if the consultation has ended
   const consultationDocRef = doc(db, "consultations", room);
-
-  // // Listen for consultation end triggered by the other party
-  // useEffect(() => {
-  //   const unsubscribe = onSnapshot(consultationDocRef, (docSnap) => {
-  //     const data = docSnap.data();
-  //     if (data?.consultationEnded && !hasAlreadyHandledEnd.current) {
-  //       hasAlreadyHandledEnd.current = true;
-  //       if (isDoctor) {
-  //         router.push(`/dashboard/${data.staffRole || "doctor"}`);
-  //       } else {
-  //         router.back();
-  //       }
-  //     }
-  //   });
-
-  //   return () => unsubscribe();
-  // }, [room, isDoctor]);
+  const patientDocRef = doc(db, "patients", patientId);
 
   const [roomInstance] = useState(
     () =>
@@ -70,11 +56,37 @@ const MeetingRoom = () => {
       })
   );
 
+  useEffect(() => {
+    const unsub = onSnapshot(consultationDocRef, (docSnap) => {
+      const ended = docSnap.data()?.consultationEnded;
+      if (ended && !hasAlreadyHandledEnd.current) {
+        hasAlreadyHandledEnd.current = true;
+        if (isDoctor) {
+          router.push(`/dashboard/${docSnap.data()?.role || "doctor"}`);
+        } else {
+          router.back();
+        }
+      }
+    });
+
+    return () => unsub();
+  }, [consultationDocRef, isDoctor]);
+
+  useEffect(() => {
+    const getPatientName = async () => {
+      const patientDoc = await getDoc(patientDocRef);
+      setPatientName(patientDoc?.data().fullName);
+      const idTokenResult = await currentUser?.getIdTokenResult();
+      setUserRole(idTokenResult?.claims?.role);
+    };
+    getPatientName();
+  }, [patientId, currentUser?.uid]);
+
   const isMobile = useIsMobile();
 
   const name = useMemo(() => {
     if (loading) return null;
-    return currentUser?.displayName || `Guest_${Date.now()}`;
+    return currentUser?.displayName || patientName || currentUser?.email;
   }, [currentUser, loading]);
 
   const encodedName = encodeURIComponent(name || "");
@@ -134,35 +146,40 @@ const MeetingRoom = () => {
 
     if (!confirmed) return;
 
+    // Prevent double execution
+    if (hasAlreadyHandledEnd.current) return;
+    hasAlreadyHandledEnd.current = true;
+
     try {
-      // hasAlreadyHandledEnd.current = true;
       setMeetingClosing(true);
 
       // Check if it's already been ended by someone else
       const existingDoc = await getDoc(consultationDocRef);
-      if (existingDoc.exists() && existingDoc.data()?.consultationEnded) return;
-
-      const staffRole = await handleMeetingEnd(patientId, doctorId);
-
-      if (!staffRole) {
-        toast.error("Failed to track meeting end. Please try again.");
+      if (existingDoc.exists() && existingDoc.data()?.consultationEnded) {
         return;
       }
 
-      // Mark the consultation as ended in Firestore
-      await setDoc(consultationDocRef, {
-        consultationEnded: true,
-        endedAt: new Date(),
-        staffRole,
-      });
+      const staffRole = await handleMeetingEnd(doctorId, patientId);
 
+      // Mark the consultation as ended in Firestore
+      await setDoc(
+        consultationDocRef,
+        {
+          consultationEnded: true,
+          endedAt: new Date(),
+          staffRole: staffRole,
+        },
+        { merge: true }
+      );
+
+      // Navigate based on role
       if (isDoctor) {
-        router.push(`/dashboard/${staffRole}`);
+        router.push(`/dashboard/${userRole}`);
       } else {
         router.back();
       }
     } catch (e) {
-      console.error("Meeting end error:", e);
+      console.error("Meeting end error:");
       toast.error("Something went wrong while ending the meeting.");
     } finally {
       setMeetingClosing(false);

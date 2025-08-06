@@ -11,6 +11,7 @@ import { db } from "@/db/client";
 import { doc, onSnapshot } from "firebase/firestore";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { convertTimestamp } from "@/lib/convertFirebaseDate";
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -69,8 +70,24 @@ const PatientDashboard = () => {
         if (!snapshot.exists()) {
           setUserDoc(null);
         } else {
-          setUserDoc({ id: snapshot.id, ...snapshot.data() });
+          const data = snapshot.data();
+
+          const noteTypes = ["sickNotes", "prescriptions", "generalNotes"];
+          if (data?.medicalHistory) {
+            noteTypes.forEach((type) => {
+              if (Array.isArray(data?.medicalHistory[type])) {
+                data?.medicalHistory[type].sort((a, b) => {
+                  const aDate = convertTimestamp(a.createdAt);
+                  const bDate = convertTimestamp(b.createdAt);
+                  return new Date(bDate) - new Date(aDate); // descending
+                });
+              }
+            });
+          }
+
+          setUserDoc({ id: snapshot.id, ...data });
         }
+
         setUserLoading(false);
       },
       (error) => {
