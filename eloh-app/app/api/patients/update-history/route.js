@@ -36,20 +36,30 @@ export async function POST(request) {
       );
     }
 
-    // 🔍 Verify doctor
-    const doctorRef = db?.collection("doctors").doc(roomID);
-    const doctorSnap = await doctorRef.get();
+    // 🔍 Verify staff (could be doctor or nurse)
+    let staffRef = db.collection("doctors").doc(roomID);
+    let staffSnap = await staffRef.get();
 
-    if (!doctorSnap.exists) {
+    let staffRole = "doctor";
+
+    // If not found in doctors, try nurses
+    if (!staffSnap.exists) {
+      staffRef = db.collection("nurses").doc(roomID);
+      staffSnap = await staffRef.get();
+      staffRole = "nurse";
+    }
+
+    // Still not found? Return 404
+    if (!staffSnap.exists) {
       return NextResponse.json(
-        { error: "Doctor not found (invalid roomID)" },
+        { error: "Staff not found (invalid roomID)" },
         { status: 404 }
       );
     }
 
-    const doctorData = doctorSnap.data();
+    const staffData = staffSnap.data();
 
-    if (doctorData.userId !== uid) {
+    if (staffData.userId !== uid) {
       return NextResponse.json(
         { error: "Forbidden: Doctor authentication mismatch" },
         { status: 403 }
@@ -73,11 +83,11 @@ export async function POST(request) {
 
     // 📝 Build new note (string or object)
     const newNote = {
-      doctorName: doctorData.fullName,
+      doctorName: staffData.fullName,
       patientName: patientData.fullName,
-      practiceNumber: doctorData.practiceNumber,
-      doctorEmail: doctorData.email,
-      phoneNumber: doctorData.phoneNumber,
+      practiceNumber: staffData.practiceNumber,
+      doctorEmail: staffData.email,
+      phoneNumber: staffData.phoneNumber,
       content: noteContent,
       createdAt: new Date(),
     };
