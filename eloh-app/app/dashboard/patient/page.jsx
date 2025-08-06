@@ -44,7 +44,7 @@ const PatientDashboard = () => {
               : (consultations.doctor || 0) >= 1 ||
                 (consultations.nurse || 0) >= 1;
 
-          if (hasConsultations) {
+          if (hasConsultations && type !== "none") {
             setShowChat(false);
             if (!toastShown.current) {
               toast.info(
