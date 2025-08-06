@@ -3,6 +3,7 @@
 const Earnings = ({ data }) => {
   const numberOfConsultations = data?.numberOfConsultations ?? 0;
   const earnings = data?.earnings ?? 0;
+  const totalPlatformFees = data?.totalPlatformFees ?? 0;
   return (
     <div className="text-[#66e4ff] flex flex-col md:flex-row items-center justify-center gap-8 p-8 w-auto md:w-full">
       {/* Consultations Card */}
@@ -33,6 +34,10 @@ const Earnings = ({ data }) => {
         </h2>
         <p className="mt-2 text-sm text-[#a0cfff]">
           Based on completed consultations
+        </p>
+        {/* Subtle platform fee line */}
+        <p className="mt-1 text-xs text-[#88c2ff] italic">
+          Platform fees deducted: R {totalPlatformFees.toFixed(2)}
         </p>
       </div>
     </div>
