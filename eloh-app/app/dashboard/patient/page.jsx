@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Chat from "@/components/Chat";
 import PatientMeetingSetup from "@/components/patients/PatientMeetingSetup";
 import PatientDashboardNavbar from "@/app/dashboard/patient/patientNav";
@@ -12,6 +12,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
+import { MdInfo } from "react-icons/md";
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -20,10 +21,11 @@ const PatientDashboard = () => {
   const [userLoading, setUserLoading] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [mode, setMode] = useState("general-notes");
+  const toastShown = useRef(false);
 
   useEffect(() => {
     if (!loading && currentUser?.uid) {
-      const userRef = doc(db, "patients", currentUser?.uid);
+      const userRef = doc(db, "patients", currentUser.uid);
 
       const unsubscribe = onSnapshot(
         userRef,
@@ -43,10 +45,29 @@ const PatientDashboard = () => {
                 (consultations.nurse || 0) >= 1;
 
           if (hasConsultations) {
-            toast.info(
-              "You already have consultations available. Redirecting..."
-            );
             setShowChat(false);
+            if (!toastShown.current) {
+              toast.info(
+                <div className="flex items-start gap-3 w-full max-w-[90vw] lg:max-w-[70vw]">
+                  <div className="text-sm leading-relaxed text-blue-900">
+                    You already have consultations available. Redirecting...
+                  </div>
+                </div>,
+                {
+                  position: "top-center",
+                  icon: <MdInfo className="text-blue-600 mt-1" size={24} />,
+                  autoClose: 6000,
+                  hideProgressBar: false,
+                  theme: "light",
+                }
+              );
+              toastShown.current = true;
+            }
+          } else {
+            // TODO: Remember to comment out the line below
+            // setShowChat(true); // Always enable chat if no consultations
+
+            console.log("No consultations available");
           }
         },
         (error) => {
