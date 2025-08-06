@@ -70,7 +70,8 @@ export async function POST(req) {
     consultations[staffRole] -= 1;
 
     // Adjust consultationType if needed
-    let consultationType = patientData.consultationType || "all";
+    let consultationType = patientData.consultationType || "none";
+
     if (
       consultationType === "all" &&
       consultations.doctor === 0 &&
@@ -83,6 +84,12 @@ export async function POST(req) {
       consultations.doctor > 0
     ) {
       consultationType = "doctor";
+    } else if (
+      consultationType === "all" &&
+      consultations.nurse === 0 &&
+      consultations.doctor === 0
+    ) {
+      consultationType = "none";
     }
 
     // Update patient consultations & consultationType
