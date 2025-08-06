@@ -156,7 +156,15 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         ) : error ? (
           <p className="text-red-600 text-center mt-20 font-semibold">{error}</p>
         ) : doctors.length === 0 && nurses.length === 0 ? (
-          <p className="text-gray-600 text-center mt-20 italic">No Staff available</p>
+          <div className="text-center mt-20 text-gray-600">
+            <p className="italic mb-2">No consultation staff available because no payment has been made.</p>
+            <a
+              href="/patient/payments"
+              className="text-blue-600 underline hover:text-blue-800 font-medium"
+            >
+              Make a payment to continue
+            </a>
+          </div>
         ) : (
           <StaffScroller
             doctors={doctors}
