@@ -19,14 +19,6 @@ const FilteredPatientsTable = ({
     startIndex + ITEMS_PER_PAGE
   );
 
-  // const handlePrevious = () => {
-  //   if (currentPage > 1) setCurrentPage(currentPage - 1);
-  // };
-
-  // const handleNext = () => {
-  //   if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  // };
-
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
@@ -101,22 +93,20 @@ const FilteredPatientsTable = ({
             <button
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className={`px-4 py-2 text-sm rounded ${
-                currentPage === 1
-                  ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
+              className={`py-2 px-3 text-sm sm:text-md font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer ${currentPage === 1
+                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                : "bg-[#03045e] text-white hover:bg-[#023e8a]"
+                }`}
             >
               Previous
             </button>
             <button
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className={`px-4 py-2 text-sm rounded ${
-                currentPage === totalPages
-                  ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
+              className={`py-2 px-3 text-sm sm:text-md font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer ${currentPage === totalPages
+                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                : "bg-[#03045e] text-white hover:bg-[#023e8a]"
+                }`}
             >
               Next
             </button>
@@ -128,11 +118,10 @@ const FilteredPatientsTable = ({
               <button
                 key={page}
                 onClick={() => goToPage(page)}
-                className={`px-3 py-1 text-sm rounded ${
-                  page === currentPage
-                    ? "bg-white text-black font-semibold"
-                    : "bg-white/10 text-white hover:bg-white/20"
-                }`}
+                className={`px-3 py-1 text-sm rounded ${page === currentPage
+                  ? "bg-white text-black font-semibold"
+                  : "bg-white/10 text-white hover:bg-white/20"
+                  }`}
               >
                 {page}
               </button>
