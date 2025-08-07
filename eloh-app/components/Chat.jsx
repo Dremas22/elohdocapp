@@ -45,6 +45,19 @@ const Chat = ({ setShowChat }) => {
   }, [currentUser?.uid]);
 
   useEffect(() => {
+  if (!loading && currentUser && messages.length === 0) {
+    setMessages([
+      {
+        role: "assistant",
+        content:
+          "Hi, I am Elohdoc app, your doctor assistant. What's the matter with your health?",
+      },
+    ]);
+  }
+}, [currentUser, loading]);
+
+
+  useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop =
         chatContainerRef.current.scrollHeight;
@@ -121,7 +134,7 @@ const Chat = ({ setShowChat }) => {
     <div className="flex flex-col h-[90vh] max-h-screen w-full bg-gradient-to-br from-[#cce7ff] via-[#99d6ff] to-[#66b3ff]">
       {/* Navbar */}
       <nav className="w-full h-16 bg-[#003b5c] text-white flex items-center justify-between px-6 shadow-md z-50">
-        <div className="text-lg font-bold">Elohdoc Chat</div>
+        <div className="text-lg font-bold">Elohdoc Assistant</div>
       </nav>
 
       {/* Chat Area */}
