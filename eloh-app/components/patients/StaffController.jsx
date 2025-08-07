@@ -66,18 +66,16 @@ const StaffScroller = ({
           <button
             title="View available doctors"
             onClick={() => setView("doctors")}
-            className={`bg-[#03045e] text-white py-1 px-2 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${
-              view === "doctors"
-            }`}
+            className={`bg-[#03045e] text-white py-2 px-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${view === "doctors"
+              }`}
           >
             View Doctors
           </button>
           <button
             title="View available nurses"
             onClick={() => setView("nurses")}
-            className={`bg-[#03045e] text-white py-1 px-2 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${
-              view === "nurses"
-            }`}
+            className={`bg-[#03045e] text-white py-2 px-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${view === "nurses"
+              }`}
           >
             View Nurses
           </button>
