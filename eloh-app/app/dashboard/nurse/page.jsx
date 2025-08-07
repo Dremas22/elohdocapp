@@ -2,7 +2,7 @@ import NurseCollectionViewer from "./NurseCollectionViewer";
 import { auth, db } from "@/db/server";
 import { serializeData } from "@/lib/queries";
 import { cookies } from "next/headers";
-import Link from "next/link";
+import { redirect } from "next/navigation";
 
 const NurseDashboardPage = async () => {
   const cookieStore = await cookies();
@@ -19,17 +19,7 @@ const NurseDashboardPage = async () => {
     const nurseSnap = await db.collection("nurses").doc(uid).get();
 
     if (!nurseSnap.exists) {
-      return (
-        <div className="text-center mt-20 text-gray-700 space-y-4">
-          <p className="text-lg font-medium">Nurse not registered</p>
-          <Link
-            href="/"
-            className="inline-block text-blue-600 hover:underline font-semibold"
-          >
-            Register
-          </Link>
-        </div>
-      );
+      redirect("/");
     }
 
     const rawNurseData = nurseSnap.data();

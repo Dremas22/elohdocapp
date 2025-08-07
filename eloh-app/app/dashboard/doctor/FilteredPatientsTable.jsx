@@ -1,11 +1,31 @@
 "use client";
 
+import { useState } from "react";
+
+const ITEMS_PER_PAGE = 5;
+
 const FilteredPatientsTable = ({
   patients,
   setOpenViewPatientRecords,
   setSelectedPatient,
 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
   if (!patients?.length) return null;
+
+  const totalPages = Math.ceil(patients.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const visiblePatients = patients.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
+
+  const handlePrevious = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
 
   return (
     <div className="mt-8 w-full overflow-x-auto">
@@ -20,7 +40,7 @@ const FilteredPatientsTable = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-white/10">
-            {patients.map((patient, idx) => (
+            {visiblePatients.map((patient, idx) => (
               <tr
                 key={idx}
                 title="Click to view patient records"
@@ -46,7 +66,7 @@ const FilteredPatientsTable = ({
 
         {/* Mobile Card View */}
         <div className="sm:hidden divide-y divide-white/10">
-          {patients.map((patient, idx) => (
+          {visiblePatients.map((patient, idx) => (
             <div
               key={idx}
               className="p-4 cursor-pointer hover:bg-white/20 transition"
@@ -68,6 +88,34 @@ const FilteredPatientsTable = ({
               </div>
             </div>
           ))}
+        </div>
+        {/* Pagination Controls */}
+        <div className="flex items-center justify-between p-4 border-t border-white/10 bg-black/10">
+          <button
+            onClick={handlePrevious}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 text-sm rounded ${
+              currentPage === 1
+                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
+          >
+            Previous
+          </button>
+          <span className="text-sm text-gray-200">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={handleNext}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 text-sm rounded ${
+              currentPage === totalPages
+                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>
