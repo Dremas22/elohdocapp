@@ -19,12 +19,18 @@ const FilteredPatientsTable = ({
     startIndex + ITEMS_PER_PAGE
   );
 
-  const handlePrevious = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
+  // const handlePrevious = () => {
+  //   if (currentPage > 1) setCurrentPage(currentPage - 1);
+  // };
 
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  // const handleNext = () => {
+  //   if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  // };
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   return (
@@ -89,33 +95,49 @@ const FilteredPatientsTable = ({
             </div>
           ))}
         </div>
-        {/* Pagination Controls */}
-        <div className="flex items-center justify-between p-4 border-t border-white/10 bg-black/10">
-          <button
-            onClick={handlePrevious}
-            disabled={currentPage === 1}
-            className={`px-4 py-2 text-sm rounded ${
-              currentPage === 1
-                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
-          >
-            Previous
-          </button>
-          <span className="text-sm text-gray-200">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={handleNext}
-            disabled={currentPage === totalPages}
-            className={`px-4 py-2 text-sm rounded ${
-              currentPage === totalPages
-                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
-          >
-            Next
-          </button>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 p-4 border-t border-white/10 bg-black/10">
+          {/* Prev / Next */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 text-sm rounded ${
+                currentPage === 1
+                  ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 text-sm rounded ${
+                currentPage === totalPages
+                  ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
+            >
+              Next
+            </button>
+          </div>
+
+          {/* Page Numbers */}
+          <div className="flex gap-1 flex-wrap justify-center sm:justify-start mt-2 sm:mt-0">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => goToPage(page)}
+                className={`px-3 py-1 text-sm rounded ${
+                  page === currentPage
+                    ? "bg-white text-black font-semibold"
+                    : "bg-white/10 text-white hover:bg-white/20"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
