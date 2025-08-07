@@ -2,17 +2,44 @@
 
 import { db } from "@/db/client";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import {
-  collection,
-  doc,
-  onSnapshot,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import ViewMedicalRecords from "../viewMedicalRecords";
 import StaffScroller from "./StaffController";
+import Link from "next/link";
 
+/**
+ * @file PatientMeetingSetup.jsx
+ * @description
+ * This React component manages the logic and UI for setting up a virtual consultation
+ * session for a patient. It handles fetching available doctors or nurses based on the
+ * patient's consultation type (doctor, nurse, or all), displays medical records,
+ * handles notifications, and allows users to initiate or join a consultation.
+ *
+ * The component relies on Firebase Firestore for real-time updates of staff availability,
+ * and uses user authentication to identify the current patient. It also displays
+ * conditional UI based on the user's status, loading state, or payment completion.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {("view" | "edit")} props.mode - The current mode for medical record view/edit
+ * @param {boolean} props.noteOpen - Flag to determine if medical records should be shown
+ * @param {Object} props.userDoc - Firestore user document for the patient
+ * @param {Function} props.setNoteOpen - State setter to toggle medical records view
+ *
+ * @returns {React.ReactElement} The rendered component
+ *
+ * @example
+ * <PatientMeetingSetup
+ *   mode="view"
+ *   noteOpen={true}
+ *   userDoc={userData}
+ *   setNoteOpen={setNoteOpen}
+ * />
+ *
+ * @todo Improve error handling granularity for Firestore reads
+ * @todo Abstract Firestore logic to a custom hook for better reusability
+ */
 const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   const { currentUser, loading } = useCurrentUser();
   const [roomID, setRoomID] = useState("");
@@ -25,8 +52,8 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
     if (!currentUser?.uid) return;
 
     const patientRef = doc(db, "patients", currentUser.uid);
-    let unsubDoctors = () => { };
-    let unsubNurses = () => { };
+    let unsubDoctors = () => {};
+    let unsubNurses = () => {};
 
     const unsubPatient = onSnapshot(
       patientRef,
@@ -51,7 +78,9 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             where("available", "==", true)
           );
           unsubDoctors = onSnapshot(doctorQuery, (snapshot) => {
-            setDoctors(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+            setDoctors(
+              snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+            );
           });
         }
 
@@ -61,7 +90,9 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             where("available", "==", true)
           );
           unsubNurses = onSnapshot(nurseQuery, (snapshot) => {
-            setNurses(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+            setNurses(
+              snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+            );
           });
         }
 
@@ -119,7 +150,8 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             Virtual Medical Consultations
           </h1>
           <p className="mt-6 max-w-xl text-gray-300 sm:text-xl">
-            Connect with licensed medical professionals through secure video consultations from home.
+            Connect with licensed medical professionals through secure video
+            consultations from home.
           </p>
         </div>
 
@@ -152,18 +184,24 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         )}
 
         {isLoading ? (
-          <p className="text-center text-gray-500 mt-20">Loading doctors & nurses...</p>
+          <p className="text-center text-gray-500 mt-20">
+            Loading doctors & nurses...
+          </p>
         ) : error ? (
-          <p className="text-red-600 text-center mt-20 font-semibold">{error}</p>
+          <p className="text-red-600 text-center mt-20 font-semibold">
+            {error}
+          </p>
         ) : doctors.length === 0 && nurses.length === 0 ? (
           <div className="text-center mt-20 text-gray-600">
-            <p className="italic mb-2">No consultation staff available because no payment has been made.</p>
-            <a
-              href="/patient/payments"
+            <p className="italic mb-2">
+              No consultation staff available because no payment has been made.
+            </p>
+            <Link
+              href="/payment"
               className="text-blue-600 underline hover:text-blue-800 font-medium"
             >
               Make a payment to continue
-            </a>
+            </Link>
           </div>
         ) : (
           <StaffScroller
