@@ -55,12 +55,13 @@ export async function POST(request) {
       userDoc.available = true;
     } else if (role === "patient") {
       userDoc.isActive = true;
+      userDoc.fcmToken = null;
     }
 
     await userDocRef.set(userDoc);
 
     if (role === "doctor" || role === "nurse") {
-      await auth.setCustomUserClaims(userId, { role }); // use role from data
+      await auth?.setCustomUserClaims(userId, { role }); // use role from data
     }
 
     return NextResponse.json(

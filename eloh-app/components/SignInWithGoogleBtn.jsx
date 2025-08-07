@@ -1,7 +1,6 @@
 "use client";
 
 import { signInWithPopup } from "firebase/auth";
-import { getMessaging, getToken } from "firebase/messaging";
 import { useRouter, useSearchParams } from "next/navigation";
 import { auth, googleAuth } from "@/db/client";
 import { useState } from "react";
@@ -9,8 +8,8 @@ import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import SignInOrSignUpForm from "./signInOrSignUpForm";
-import useCurrentUser from "@/hooks/useCurrentUser";
 import { handleAuthAction } from "@/lib/session-signout";
+import { getFCMToken } from "@/lib/getFCMToken";
 
 /**
  * GoogleSignInButton component
@@ -34,19 +33,8 @@ const GoogleSignInButton = () => {
       const user = result.user;
       const token = await user.getIdToken(true);
 
-      const messaging = getMessaging();
-      let fcmToken = null;
-      try {
-        fcmToken = await getToken(messaging, {
-          vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
-        });
-      } catch (err) {
-        toast.error("Unable to get FCM token", {
-          position: "top-center",
-          autoClose: 5000,
-          icon: <AiOutlineCloseCircle className="text-red-600 text-xl" />,
-        });
-      }
+      // 🟢 Now safely get FCM token
+      const fcmToken = await getFCMToken();
 
       await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
         method: "POST",
@@ -59,6 +47,7 @@ const GoogleSignInButton = () => {
         autoClose: 3000,
         icon: <AiOutlineCheckCircle className="text-green-600 text-xl" />,
       });
+
       router.push(`/onboarding/${role}`);
     } catch (error) {
       console.error("Sign-in error:", error);

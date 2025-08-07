@@ -52,8 +52,6 @@ export async function POST(req) {
       if (userSnap.exists) {
         await userRef.set(
           {
-            ...userSnap.data(),
-            ...(fcmToken && { fcmToken }),
             online: true,
             lastLogin: new Date(),
             updatedAt: new Date(),
@@ -82,20 +80,11 @@ export async function DELETE(req) {
       );
     }
 
-    // Verify session cookie and get UID
+    // Verify and decode the session
     const decodedClaims = await auth?.verifySessionCookie(sessionCookie, true);
-    const uid = decodedClaims.uid;
-    const role = decodedClaims.role;
+    const { uid, role } = decodedClaims;
 
-    // Clear session cookie
-    cookieStore.set("session", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 0,
-    });
-
-    // Optional: update user's online status
+    // Update Firestore: mark user offline and remove FCM token
     if (role) {
       const userRef = db?.collection(`${role}s`).doc(uid);
       const userSnap = await userRef.get();
@@ -103,7 +92,6 @@ export async function DELETE(req) {
         await userRef.set(
           {
             online: false,
-            fcmToken: null,
             updatedAt: new Date(),
           },
           { merge: true }
@@ -111,7 +99,16 @@ export async function DELETE(req) {
       }
     }
 
-    return NextResponse.json({ success: true });
+    // Prepare response and clear the session cookie
+    const response = NextResponse.json({ success: true });
+    response.cookies.set("session", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 0, // Expire immediately
+    });
+
+    return response;
   } catch (err) {
     console.error("Session deletion error:", err);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

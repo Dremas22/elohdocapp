@@ -1,4 +1,4 @@
-import { STAFF_EARNING_PER_CONSULTATION } from "@/constants";
+import { PLATFORM_FEE, STAFF_EARNING_PER_CONSULTATION } from "@/constants";
 import { auth, db } from "@/db/server";
 import { NextResponse } from "next/server";
 
@@ -42,6 +42,7 @@ export async function POST(req) {
       earnings: (staffData.earnings || 0) + STAFF_EARNING_PER_CONSULTATION,
       numberOfConsultations: (staffData.numberOfConsultations || 0) + 1,
       earningsUpdatedAt: new Date(),
+      totalPlatformFees: (staffData.totalPlatformFees || 0) + PLATFORM_FEE,
     });
 
     // Fetch patient doc
