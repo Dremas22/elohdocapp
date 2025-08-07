@@ -1,8 +1,9 @@
 import { auth, db } from "@/db/server";
 import { cookies } from "next/headers";
 import DoctorsCollectionViewer from "./DoctorsCollectionViewer";
-import Link from "next/link";
 import { serializeData } from "@/lib/queries";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 
 const DoctorsDashboard = async () => {
   const cookieStore = await cookies();
@@ -19,17 +20,7 @@ const DoctorsDashboard = async () => {
     const doctorSnap = await db.collection("doctors").doc(uid).get();
 
     if (!doctorSnap.exists) {
-      return (
-        <div className="text-center mt-20 text-gray-700 space-y-4">
-          <p className="text-lg font-medium">Doctor not registered</p>
-          <Link
-            href="/"
-            className="inline-block text-blue-600 hover:underline font-semibold"
-          >
-            Register
-          </Link>
-        </div>
-      );
+      redirect("/");
     }
 
     const rawDoctorData = doctorSnap.data();
@@ -56,8 +47,25 @@ const DoctorsDashboard = async () => {
       </div>
     );
   } catch (error) {
-    console.error("Error in DoctorsDashboard:", error);
-    return <p className="text-center mt-20 text-red-600">Server Error</p>;
+    console.error("Error in DoctorsDashboard:", error?.message);
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+        <h1 className="text-2xl font-semibold text-red-600 mb-2">
+          Something went wrong
+        </h1>
+        <p className="text-gray-600 mb-6 text-center">
+          We encountered a server error while loading your dashboard.
+        </p>
+        <div className="flex gap-4">
+          <Link
+            href="/"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          >
+            Go to Homepage
+          </Link>
+        </div>
+      </div>
+    );
   }
 };
 
