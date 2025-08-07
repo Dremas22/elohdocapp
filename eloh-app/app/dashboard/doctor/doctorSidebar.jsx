@@ -9,7 +9,7 @@ import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
-import ToggleButton from "./availabilityBtn";
+import DoctorToggleButton from "./doctorToggleBtn";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
@@ -87,9 +87,7 @@ const DoctorSidebarMenu = ({
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isAvailable, setIsAvailable] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onMessage(messaging, (payload) => {
@@ -100,51 +98,6 @@ const DoctorSidebarMenu = ({
 
     return () => unsubscribe();
   }, []);
-
-  useEffect(() => {
-    const fetchAvailability = async () => {
-      setFetching(true);
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_URL}/api/doctor/toggle-availability`
-        );
-        const data = await res.json();
-        if (res.ok) {
-          setIsAvailable(data.available || false);
-        }
-      } catch (err) {
-        console.error("Failed to fetch availability:", err);
-      } finally {
-        setFetching(false);
-      }
-    };
-
-    fetchAvailability();
-  }, []);
-
-  const handleToggle = async () => {
-    setFetching(true);
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/doctor/toggle-availability`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
-
-      const data = await res.json();
-      if (res.ok) {
-        setIsAvailable(data.available);
-      } else {
-        console.error("Error:", data.error);
-      }
-    } catch (err) {
-      console.error("Toggle failed:", err);
-    } finally {
-      setFetching(false);
-    }
-  };
 
   const handleProfileSave = async (updatedData) => {
     setProfileLoading(true);
@@ -223,7 +176,7 @@ const DoctorSidebarMenu = ({
 
         {isVerified === true && (
           <>
-            <div className="text-center font-bold text-sm text-[#66e4ff] mb-10">
+            <div className="text-center font-bold text-sm text-gray-300 mb-10">
               <div>Practice Number</div>
               <div>{practiceNumber || "N/A"}</div>
             </div>
@@ -236,14 +189,7 @@ const DoctorSidebarMenu = ({
             />
 
             <div className="mt-6 flex flex-col items-center">
-              <label className="mb-2 text-sm text-[#a0cfff] select-none">
-                {isAvailable ? "Available" : "Unavailable"}
-              </label>
-              <ToggleButton
-                checked={isAvailable}
-                onChange={handleToggle}
-                fetching={fetching}
-              />
+              <DoctorToggleButton />
             </div>
           </>
         )}
@@ -287,16 +233,7 @@ const DoctorSidebarMenu = ({
           compact={true}
         />
 
-        <div className="flex items-center gap-3">
-          <label className="text-sm text-[#a0cfff] select-none">
-            {isAvailable ? "Available" : "Unavailable"}
-          </label>
-          <ToggleButton
-            checked={isAvailable}
-            onChange={handleToggle}
-            fetching={fetching}
-          />
-        </div>
+        <DoctorToggleButton />
       </div>
 
       {/* Calendar Drawer */}
