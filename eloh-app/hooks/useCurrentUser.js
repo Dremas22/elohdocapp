@@ -9,8 +9,8 @@ import { auth } from "@/db/client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { getMessaging, getToken } from "firebase/messaging";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
+import { getFCMToken } from "@/lib/getFCMToken";
 
 /**
  * useCurrentUser hook for managing Firebase authentication and session handling.
@@ -49,29 +49,29 @@ const useCurrentUser = () => {
 
   const createSession = async (user, role) => {
     if (!user || !role) return;
-    const token = await user?.getIdToken();
 
-    let fcmToken = null;
-    try {
-      const messaging = getMessaging();
-      fcmToken = await getToken(messaging, {
-        vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
-      });
-    } catch (err) {
-      console.error("Unable to retrieve FCM token", err);
-    }
+    const token = await user.getIdToken();
+    const fcmToken = await getFCMToken();
 
+    // ✅ Only now, safely create the session
     const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token, fcmToken, role }),
     });
 
+    if (!res.ok) {
+      const error = await res.text();
+      console.error("Session creation failed:", error);
+      toast.error("Could not create session. Please try again.");
+      return;
+    }
+
     const data = await res.json();
 
-    // Force refresh token if role was just set
+    // 🔄 Force token refresh if needed
     if (data?.roleJustSet) {
-      await user?.getIdToken(true); // ⬅️ Forces the new custom claim
+      await user.getIdToken(true);
     }
   };
 

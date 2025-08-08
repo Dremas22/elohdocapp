@@ -5,6 +5,7 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { doctorCategories, phoneCodes } from "@/constants";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { getFCMToken } from "@/lib/getFCMToken";
 
 const DoctorsRegistrationForm = () => {
   const { loading, currentUser } = useCurrentUser();
@@ -83,6 +84,8 @@ const DoctorsRegistrationForm = () => {
     if (Object.keys(validationErrors).length !== 0) return;
     setSubmitting(true);
 
+    const fcmToken = await getFCMToken();
+
     try {
       const { phoneCode, ...cleanFormData } = formData;
       const combinedPhoneNumber = `${phoneCode}${formData.phoneNumber}`;
@@ -94,6 +97,7 @@ const DoctorsRegistrationForm = () => {
         photoUrl: currentUser?.photoURL,
         email: currentUser?.email,
         role: "doctor",
+        fcmToken: fcmToken || null,
       };
 
       const response = await fetch(
