@@ -49,23 +49,39 @@ const DoctorsDashboard = async () => {
   } catch (error) {
     console.error("Error in DoctorsDashboard:", error?.message);
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
-        <h1 className="text-2xl font-semibold text-red-600 mb-2">
-          Something went wrong
-        </h1>
-        <p className="text-gray-600 mb-6 text-center">
-          We encountered a server error while loading your dashboard.
-        </p>
-        <div className="flex gap-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 px-4 py-12">
+        <div className="bg-white shadow-xl rounded-2xl p-10 max-w-2xl w-full text-center border border-red-200">
+          <div className="mb-4">
+            <svg
+              className="mx-auto w-12 h-12 text-red-500"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v3m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-red-600 mb-2">
+            Something went wrong
+          </h1>
+          <p className="text-gray-600 mb-6">
+            We encountered a server error while loading your dashboard. Please try again later.
+          </p>
           <Link
             href="/"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            className="bg-[#03045e] text-white py-3 px-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
             Go to Homepage
           </Link>
         </div>
       </div>
     );
+
   }
 };
 
