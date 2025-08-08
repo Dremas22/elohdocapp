@@ -20,8 +20,8 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
     if (!currentUser?.uid) return;
 
     const patientRef = doc(db, "patients", currentUser.uid);
-    let unsubDoctors = () => { };
-    let unsubNurses = () => { };
+    let unsubDoctors = () => {};
+    let unsubNurses = () => {};
 
     const unsubPatient = onSnapshot(
       patientRef,
@@ -129,7 +129,6 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         </div>
       </div>
 
-
       <div className="max-w-screen-xl mx-auto px-4 pt-20">
         {/* Header */}
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
@@ -169,7 +168,6 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             />
           </div>
         )}
-
         {isLoading ? (
           <p className="text-center text-gray-500 mt-20">
             Loading doctors & nurses...
@@ -178,7 +176,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
           <p className="text-red-600 text-center mt-20 font-semibold">
             {error}
           </p>
-        ) : doctors.length === 0 && nurses.length === 0 ? (
+        ) : doctor === 0 && nurse === 0 ? (
           <div className="text-center mt-20 text-gray-600">
             <p className="italic mb-2">
               No consultation staff available because no payment has been made.
@@ -191,11 +189,25 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             </Link>
           </div>
         ) : (
-          <StaffScroller
-            doctors={doctors}
-            nurses={nurses}
-            sendNotificationToDoctor={sendNotificationToDoctor}
-          />
+          <>
+            {doctor > 0 && doctors.length === 0 && (
+              <div className="text-center mt-10 text-yellow-500">
+                <p className="italic">No available doctors at the moment.</p>
+              </div>
+            )}
+
+            {nurse > 0 && nurses.length === 0 && (
+              <div className="text-center mt-10 text-yellow-500">
+                <p className="italic">No available nurses at the moment.</p>
+              </div>
+            )}
+
+            <StaffScroller
+              doctors={doctors}
+              nurses={nurses}
+              sendNotificationToDoctor={sendNotificationToDoctor}
+            />
+          </>
         )}
       </div>
     </div>
