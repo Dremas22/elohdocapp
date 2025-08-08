@@ -18,8 +18,7 @@ export async function POST(req) {
     if (decodedToken.role !== "patient") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
-    // doc(db, , staffId)
-    // Staff doc refs for doctors and nurses
+
     let staffRef = db?.collection("doctors").doc(staffId);
     let staffSnap = await staffRef.get();
 
@@ -86,9 +85,11 @@ export async function POST(req) {
     ) {
       consultationType = "doctor";
     } else if (
-      consultationType === "all" &&
-      consultations.nurse === 0 &&
-      consultations.doctor === 0
+      consultationType === "all" ||
+      consultationType === "doctor" ||
+      (consultationType === "nurse" &&
+        consultations.nurse === 0 &&
+        consultations.doctor === 0)
     ) {
       consultationType = "none";
     }
