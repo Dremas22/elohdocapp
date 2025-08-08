@@ -6,6 +6,7 @@ import {
   RoomAudioRenderer,
   useTracks,
   RoomContext,
+  ControlBar,
 } from "@livekit/components-react";
 import { Room, Track } from "livekit-client";
 import "@livekit/components-styles";
@@ -14,18 +15,12 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { useRouter, useSearchParams } from "next/navigation";
 import RichTextEditor from "@/components/editor/TextEditor";
 import { toast } from "react-toastify";
-import { ControlBar } from "@livekit/components-react";
 import handleMeetingEnd from "@/lib/postMeetingUpdates";
 import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
-import { db, auth } from "@/db/client";
+import { db } from "@/db/client";
+import PatientCloseMeetingButton from "./PatientCloseMeetingButton";
+import StaffCloseMeetingButton from "./StaffCloseMeetingButton";
 
-/**
- * MeetingRoom component handles the video consultation logic for doctors and patients.
- * It connects users to a LiveKit room, displays video feeds, and enables doctors to write notes.
- * It also manages session ending logic through Firestore and client-side hooks.
- *
- * @component
- */
 const MeetingRoom = () => {
   const { currentUser, loading } = useCurrentUser();
   const searchParams = useSearchParams();
@@ -44,7 +39,6 @@ const MeetingRoom = () => {
   const hasAlreadyHandledEnd = useRef(false);
   const [userRole, setUserRole] = useState("");
 
-  // Firestore doc to track if the consultation has ended
   const consultationDocRef = doc(db, "consultations", room);
   const patientDocRef = doc(db, "patients", patientId);
 
@@ -68,7 +62,6 @@ const MeetingRoom = () => {
         }
       }
     });
-
     return () => unsub();
   }, [consultationDocRef, isDoctor]);
 
@@ -97,7 +90,6 @@ const MeetingRoom = () => {
       return;
     }
 
-    // 🔄 Reset consultationEnded to false on join
     await setDoc(
       consultationDocRef,
       {
@@ -106,6 +98,7 @@ const MeetingRoom = () => {
       },
       { merge: true }
     );
+
     try {
       const resp = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/token?room=${room}&username=${encodedName}`
@@ -146,14 +139,12 @@ const MeetingRoom = () => {
 
     if (!confirmed) return;
 
-    // Prevent double execution
     if (hasAlreadyHandledEnd.current) return;
     hasAlreadyHandledEnd.current = true;
 
     try {
       setMeetingClosing(true);
 
-      // Check if it's already been ended by someone else
       const existingDoc = await getDoc(consultationDocRef);
       if (existingDoc.exists() && existingDoc.data()?.consultationEnded) {
         return;
@@ -161,7 +152,6 @@ const MeetingRoom = () => {
 
       const staffRole = await handleMeetingEnd(doctorId, patientId);
 
-      // Mark the consultation as ended in Firestore
       await setDoc(
         consultationDocRef,
         {
@@ -172,14 +162,13 @@ const MeetingRoom = () => {
         { merge: true }
       );
 
-      // Navigate based on role
       if (isDoctor) {
         router.push(`/dashboard/${userRole}`);
       } else {
         router.back();
       }
     } catch (e) {
-      console.error("Meeting end error:");
+      console.error("Meeting end error:", e);
       toast.error("Something went wrong while ending the meeting.");
     } finally {
       setMeetingClosing(false);
@@ -205,14 +194,12 @@ const MeetingRoom = () => {
         </div>
       ) : (
         <>
-          {/* 🎥 Video Section */}
           <RoomContext.Provider value={roomInstance}>
             <div
               data-lk-theme="default"
               className={`${isDoctor ? (isMobile ? "w-full h-1/2" : "flex-[0.6]") : "flex-1"
                 } bg-[#788588] border-r border-[#788588] overflow-hidden relative flex flex-col`}
             >
-              {/* Top Bar */}
               <header className="bg-gray-300 text-white py-2 px-4 font-semibold text-lg shadow flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="relative flex h-3 w-3">
@@ -223,31 +210,34 @@ const MeetingRoom = () => {
                     Live Consultation
                   </span>
                 </div>
-                <button
-                  onClick={handleClose}
-                  className="flex items-center gap-2 bg-[#03045e] text-gray-200 py-2 px-4 text-sm sm:text-base font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-                  disabled={meetingClosing}
-                >
-                  <span>Close</span>
-                </button>
-
-
               </header>
 
               <div className="flex-1">
                 <MyVideoConference isDoctor={isDoctor} isMobile={isMobile} />
               </div>
 
-              {/* ControlBar */}
               <div className="bg-gray-950">
                 <ControlBar />
               </div>
 
               <RoomAudioRenderer />
+
+              {/* 🔴 Conditional Close Buttons */}
+              {isPatient && (
+                <PatientCloseMeetingButton
+                  onClick={handleClose}
+                  disabled={meetingClosing}
+                />
+              )}
+              {isDoctor && (
+                <StaffCloseMeetingButton
+                  onClick={handleClose}
+                  disabled={meetingClosing}
+                />
+              )}
             </div>
           </RoomContext.Provider>
 
-          {/* 📝 Notes Section */}
           {typeof isDoctor === "undefined" ? (
             <div className="flex-[0.4] min-w-[400px] h-full bg-white border-l border-[#90e0ef] shadow-inner flex items-center justify-center">
               <p className="text-[#0077b6] text-lg">Preparing your editor...</p>
@@ -267,6 +257,7 @@ const MeetingRoom = () => {
           ) : null}
         </>
       )}
+
       {meetingClosing && (
         <div className="absolute inset-0 bg-black bg-opacity-50 z-[99999] flex flex-col items-center justify-center text-white">
           <div className="text-2xl font-semibold animate-pulse mb-4">
@@ -279,7 +270,6 @@ const MeetingRoom = () => {
   );
 };
 
-// 🔍 Detect Mobile Device
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -287,8 +277,7 @@ function useIsMobile() {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
-
-    handleResize(); // check on load
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -296,7 +285,6 @@ function useIsMobile() {
   return isMobile;
 }
 
-// 🔁 Render Participant Tiles
 function MyVideoConference({ isDoctor, isMobile }) {
   const tracks = useTracks(
     [
@@ -307,15 +295,12 @@ function MyVideoConference({ isDoctor, isMobile }) {
   );
 
   const visibleTracks = useMemo(() => {
-    // On mobile, if doctor: only show patient’s video (not self)
     if (isMobile && isDoctor) {
       return tracks.filter(
         (t) =>
           !t.participant.isLocal && t.publication?.kind === Track.Kind.Video
       );
     }
-
-    // For patients, or on desktop: show all
     return tracks;
   }, [tracks, isDoctor, isMobile]);
 

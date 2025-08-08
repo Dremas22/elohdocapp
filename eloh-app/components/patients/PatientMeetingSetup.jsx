@@ -20,8 +20,8 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
     if (!currentUser?.uid) return;
 
     const patientRef = doc(db, "patients", currentUser.uid);
-    let unsubDoctors = () => {};
-    let unsubNurses = () => {};
+    let unsubDoctors = () => { };
+    let unsubNurses = () => { };
 
     const unsubPatient = onSnapshot(
       patientRef,
@@ -104,38 +104,38 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
 
   if (loading || !currentUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center text-white bg-gray-900 px-4">
         Loading user info...
       </div>
     );
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-950 relative">
-      {/* Consultations Remaining Box - Top Right */}
-      <div className="absolute top-2 right-2">
+    <div className="w-full min-h-screen bg-gray-950 relative pb-10">
+      {/* Consultations Remaining Box */}
+      <div className="w-full flex justify-center sm:justify-end px-4 pt-4">
         <div className="bg-gradient-to-br from-[#0b2345] to-[#123158] p-4 rounded-2xl shadow-2xl w-full max-w-xs text-center transform transition-transform duration-300 hover:scale-100 hover:shadow-[#0d6efd]/50 cursor-default">
-          <h2 className="text-sm font-semibold mb-2 tracking-wide text-[#66e4ff] drop-shadow-md">
+          <h2 className="text-sm font-bold mb-2 tracking-wide text-gray-200 drop-shadow-md">
             Consultations Remaining
           </h2>
           <div className="text-white text-sm flex justify-center gap-x-6">
             <p>
-              Doctor: <span className="font-bold text-[#66e4ff]">{doctor}</span>
+              Doctor: <span className="font-bold text-gray-300">{doctor}</span>
             </p>
             <p>
-              Nurse: <span className="font-bold text-[#66e4ff]">{nurse}</span>
+              Nurse: <span className="font-bold text-gray-300">{nurse}</span>
             </p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-screen-xl mx-auto px-4 pt-20">
+      <div className="max-w-screen-xl mx-auto px-4 pt-2">
         {/* Header */}
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-          <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text font-extrabold text-transparent text-4xl">
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto px-2">
+          <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text font-extrabold text-transparent text-3xl sm:text-4xl leading-tight">
             Virtual Medical Consultations
           </h1>
-          <p className="mt-6 max-w-xl text-gray-300 sm:text-xl">
+          <p className="mt-4 sm:mt-6 max-w-xl text-gray-300 text-base sm:text-xl">
             Connect with licensed medical professionals through secure video
             consultations from home.
           </p>
@@ -147,13 +147,13 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             type="text"
             readOnly
             value={fullName}
-            className="border rounded-md px-4 py-2 text-black bg-gray-100 cursor-not-allowed"
+            className="border rounded-md px-4 py-2 text-black bg-gray-100 cursor-not-allowed w-full mb-2"
           />
           <input
             type="text"
             value={roomID}
             onChange={(e) => setRoomID(e.target.value)}
-            className="border rounded-md px-4 py-2 text-black bg-white"
+            className="border rounded-md px-4 py-2 text-black bg-white w-full"
             placeholder="Room ID"
           />
         </div>
@@ -168,8 +168,10 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             />
           </div>
         )}
+
+        {/* Loading/Error/Empty State */}
         {isLoading ? (
-          <p className="text-center text-gray-500 mt-20">
+          <p className="text-center text-gray-400 mt-20 text-sm sm:text-base">
             Loading doctors & nurses...
           </p>
         ) : error ? (
@@ -177,7 +179,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             {error}
           </p>
         ) : doctor === 0 && nurse === 0 ? (
-          <div className="text-center mt-20 text-gray-600">
+          <div className="text-center mt-10 text-gray-600 text-sm sm:text-base">
             <p className="italic mb-2">
               No consultation staff available because no payment has been made.
             </p>
@@ -191,13 +193,13 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         ) : (
           <>
             {doctor > 0 && doctors.length === 0 && (
-              <div className="text-center mt-10 text-yellow-500">
+              <div className="text-center text-yellow-500 text-sm sm:text-base">
                 <p className="italic">No available doctors at the moment.</p>
               </div>
             )}
 
             {nurse > 0 && nurses.length === 0 && (
-              <div className="text-center mt-10 text-yellow-500">
+              <div className="text-center text-yellow-500 text-sm sm:text-base">
                 <p className="italic">No available nurses at the moment.</p>
               </div>
             )}
