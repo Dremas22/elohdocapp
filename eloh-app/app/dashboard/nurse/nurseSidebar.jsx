@@ -253,7 +253,7 @@ const NurseSidebarMenu = ({
         {isVerified === true && (
           <>
             {/* Practice Number */}
-            <div className="text-center font-bold text-sm text-[#66e4ff] mb-10">
+            <div className="text-center font-bold text-sm text-gray-300 mb-10">
               <div>Practice Number</div>
               <div>{practiceNumber || "N/A"}</div>
             </div>
@@ -278,7 +278,7 @@ const NurseSidebarMenu = ({
         )}
       </div>
 
-      {/* Mobile Sidebar Toggle Button with Icon and Text */}
+      {/* Mobile Sidebar Toggle Button*/}
       <div className="lg:hidden fixed bottom-1 -right-1 z-50 group cursor-pointer flex items-center space-x-2 text-white rounded-full px-2 py-2 shadow-sm select-none scale-80 backdrop-blur-sm bg-blue-800/40">
         <button
           onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}

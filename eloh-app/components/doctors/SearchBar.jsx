@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 const SearchBar = ({
   onSearch,
@@ -26,11 +26,11 @@ const SearchBar = ({
   }, [debouncedQuery]);
 
   return (
-    <div className="w-full max-w-2xl mx-auto my-4 flex items-center justify-center">
+    <div className="w-full max-w-2xl mx-auto my-2 flex items-center justify-center">
       <input
         type="text"
-        placeholder="Search by full name or ID number..."
-        title="Search for patients by full name"
+        placeholder="Search by Full name, ID number or Email..."
+        title="Search for patients by Full name, ID number or Email"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"

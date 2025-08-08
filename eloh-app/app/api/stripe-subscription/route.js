@@ -83,10 +83,18 @@ export async function GET(req) {
       consultationData.consultations
     );
 
-    const newType =
-      !existingType || existingType === consultationData.type
-        ? consultationData.type
-        : "all";
+    let newType;
+    if (updatedConsultations.doctor === 0 && updatedConsultations.nurse === 0) {
+      newType = "none";
+    } else if (
+      !existingType ||
+      existingType === consultationData.type ||
+      existingType === "none"
+    ) {
+      newType = consultationData.type;
+    } else {
+      newType = "all";
+    }
 
     const updates = {
       consultationType: newType,
@@ -162,10 +170,18 @@ export async function POST(req) {
       consultationData.consultations
     );
 
-    const newType =
-      !existingType || existingType === consultationData.type
-        ? consultationData.type
-        : "all";
+    let newType;
+    if (updatedConsultations.doctor === 0 && updatedConsultations.nurse === 0) {
+      newType = "none";
+    } else if (
+      !existingType ||
+      existingType === consultationData.type ||
+      existingType === "none"
+    ) {
+      newType = consultationData.type;
+    } else {
+      newType = "all";
+    }
 
     const updates = {
       consultationType: newType,

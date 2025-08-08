@@ -1,11 +1,29 @@
 "use client";
 
+import { useState } from "react";
+
+const ITEMS_PER_PAGE = 5;
+
 const FilteredPatientsTable = ({
   patients,
   setOpenViewPatientRecords,
   setSelectedPatient,
 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
   if (!patients?.length) return null;
+
+  const totalPages = Math.ceil(patients.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const visiblePatients = patients.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div className="mt-8 w-full overflow-x-auto">
@@ -20,7 +38,7 @@ const FilteredPatientsTable = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-white/10">
-            {patients.map((patient, idx) => (
+            {visiblePatients.map((patient, idx) => (
               <tr
                 key={idx}
                 title="Click to view patient records"
@@ -46,7 +64,7 @@ const FilteredPatientsTable = ({
 
         {/* Mobile Card View */}
         <div className="sm:hidden divide-y divide-white/10">
-          {patients.map((patient, idx) => (
+          {visiblePatients.map((patient, idx) => (
             <div
               key={idx}
               className="p-4 cursor-pointer hover:bg-white/20 transition"
@@ -68,6 +86,47 @@ const FilteredPatientsTable = ({
               </div>
             </div>
           ))}
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 p-4 border-t border-white/10 bg-black/10">
+          {/* Prev / Next */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`py-2 px-3 text-sm sm:text-md font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer ${currentPage === 1
+                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                : "bg-[#03045e] text-white hover:bg-[#023e8a]"
+                }`}
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`py-2 px-3 text-sm sm:text-md font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer ${currentPage === totalPages
+                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                : "bg-[#03045e] text-white hover:bg-[#023e8a]"
+                }`}
+            >
+              Next
+            </button>
+          </div>
+
+          {/* Page Numbers */}
+          <div className="flex gap-1 flex-wrap justify-center sm:justify-start mt-2 sm:mt-0">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => goToPage(page)}
+                className={`px-3 py-1 text-sm rounded ${page === currentPage
+                  ? "bg-white text-black font-semibold"
+                  : "bg-white/10 text-white hover:bg-white/20"
+                  }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

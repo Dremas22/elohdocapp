@@ -58,7 +58,8 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
     const filtered = patients?.filter(
       (p) =>
         p.fullName?.toLowerCase().includes(query.toLowerCase()) ||
-        p.idNumber?.toLowerCase().includes(query.toLowerCase())
+        p.idNumber?.toLowerCase().includes(query.toLowerCase()) ||
+        p.email?.toLowerCase().includes(query.toLowerCase())
     );
 
     setFilteredPatients(filtered);
@@ -107,7 +108,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
         </aside>
 
         {/* Main Content Area */}
-        <main className="w-full lg:w-3/4 flex flex-col items-center md:pl-10 text-center bg-transparent overflow-y-auto">
+        <main className="w-full lg:w-3/4 flex flex-col items-center md:pl-15 lg:pl-10 text-center bg-transparent overflow-y-auto">
           {isVerified === true ? (
             <>
               {/* Sticky Welcome Banner */}
@@ -130,8 +131,6 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
                       <FiX />
                     </button>
 
-
-
                     <h2 className="text-2xl font-bold mb-5 text-[#0d6efd] text-center">
                       Earnings
                     </h2>
@@ -142,7 +141,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
               )}
 
               {/* Search Bar */}
-              <div className="mt-8 w-full max-w-3xl px-4">
+              <div className="mt-6 w-full max-w-3xl px-4">
                 <SearchBar
                   onSearch={handleSearch}
                   query={query}

@@ -2,19 +2,11 @@
 
 import { db } from "@/db/client";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  onSnapshot,
-  query,
-  where,
-} from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
-import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import ViewMedicalRecords from "../viewMedicalRecords";
 import StaffScroller from "./StaffController";
+import Link from "next/link";
 
 const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   const { currentUser, loading } = useCurrentUser();
@@ -23,14 +15,13 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   const [nurses, setNurses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const scrollRef = useRef(null);
 
   useEffect(() => {
     if (!currentUser?.uid) return;
 
-    const patientRef = doc(db, "patients", currentUser?.uid);
-    let unsubDoctors = () => {};
-    let unsubNurses = () => {};
+    const patientRef = doc(db, "patients", currentUser.uid);
+    let unsubDoctors = () => { };
+    let unsubNurses = () => { };
 
     const unsubPatient = onSnapshot(
       patientRef,
@@ -46,8 +37,6 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
 
         setIsLoading(true);
         setError(null);
-
-        // Unsubscribe previous listeners
         unsubDoctors();
         unsubNurses();
 
@@ -56,21 +45,11 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             collection(db, "doctors"),
             where("available", "==", true)
           );
-
-          unsubDoctors = onSnapshot(
-            doctorQuery,
-            (snapshot) => {
-              const docs = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-              }));
-              setDoctors(docs);
-            },
-            (err) => {
-              console.error("Doctor snapshot error:", err);
-              setDoctors([]);
-            }
-          );
+          unsubDoctors = onSnapshot(doctorQuery, (snapshot) => {
+            setDoctors(
+              snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+            );
+          });
         }
 
         if (consultationType === "nurse" || consultationType === "all") {
@@ -78,21 +57,11 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             collection(db, "nurses"),
             where("available", "==", true)
           );
-
-          unsubNurses = onSnapshot(
-            nurseQuery,
-            (snapshot) => {
-              const docs = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-              }));
-              setNurses(docs);
-            },
-            (err) => {
-              console.error("Nurse snapshot error:", err);
-              setNurses([]);
-            }
-          );
+          unsubNurses = onSnapshot(nurseQuery, (snapshot) => {
+            setNurses(
+              snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+            );
+          });
         }
 
         setIsLoading(false);
@@ -104,7 +73,6 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
       }
     );
 
-    // Cleanup all listeners
     return () => {
       unsubPatient();
       unsubDoctors();
@@ -112,16 +80,8 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
     };
   }, [currentUser?.uid]);
 
-  const scroll = (direction) => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({
-        left: direction === "right" ? 320 : -320,
-        behavior: "smooth",
-      });
-    }
-  };
-
   const fullName = currentUser?.displayName || `Unknown-user_${Date.now()}`;
+  const { doctor, nurse } = userDoc?.consultations ?? { doctor: 0, nurse: 0 };
 
   const sendNotificationToDoctor = async (doctorId, patientId) => {
     try {
@@ -134,40 +94,50 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
           body: JSON.stringify({ doctorId, patientId }),
         }
       );
-
       const data = await res.json();
-      if (!res.ok) {
-        console.error("Failed to send notification:", data.error);
-        alert(`Error: ${data.error}`);
-      }
+      if (!res.ok) throw new Error(data.error);
     } catch (error) {
       console.error("Notification error:", error);
-      alert("Something went wrong while sending the notification.");
+      alert("Failed to send notification.");
     }
   };
 
   if (loading || !currentUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center text-white bg-gray-900 px-4">
         Loading user info...
       </div>
     );
   }
 
-  const totalStaff = doctors.length + nurses.length;
-  const showArrows = totalStaff >= 4;
-
   return (
-    <div className="w-full min-h-screen bg-gray-950">
-      <div className="max-w-screen-xl mx-auto px-4 pt-5">
+    <div className="w-full min-h-screen bg-gray-950 relative pb-10">
+      {/* Consultations Remaining Box */}
+      <div className="w-full flex justify-center sm:justify-end px-4 pt-4">
+        <div className="bg-gradient-to-br from-[#0b2345] to-[#123158] p-4 rounded-2xl shadow-2xl w-full max-w-xs text-center transform transition-transform duration-300 hover:scale-100 hover:shadow-[#0d6efd]/50 cursor-default">
+          <h2 className="text-sm font-bold mb-2 tracking-wide text-gray-200 drop-shadow-md">
+            Consultations Remaining
+          </h2>
+          <div className="text-white text-sm flex justify-center gap-x-6">
+            <p>
+              Doctor: <span className="font-bold text-gray-300">{doctor}</span>
+            </p>
+            <p>
+              Nurse: <span className="font-bold text-gray-300">{nurse}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-screen-xl mx-auto px-4 pt-2">
         {/* Header */}
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-          <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text font-extrabold text-transparent text-4xl">
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto px-2">
+          <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text font-extrabold text-transparent text-3xl sm:text-4xl leading-tight">
             Virtual Medical Consultations
           </h1>
-          <p className="mt-6 max-w-xl text-gray-300 sm:text-xl">
+          <p className="mt-4 sm:mt-6 max-w-xl text-gray-300 text-base sm:text-xl">
             Connect with licensed medical professionals through secure video
-            consultations from the comfort of your home.
+            consultations from home.
           </p>
         </div>
 
@@ -177,13 +147,13 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             type="text"
             readOnly
             value={fullName}
-            className="border rounded-md px-4 py-2 text-black bg-gray-100 cursor-not-allowed"
+            className="border rounded-md px-4 py-2 text-black bg-gray-100 cursor-not-allowed w-full mb-2"
           />
           <input
             type="text"
             value={roomID}
             onChange={(e) => setRoomID(e.target.value)}
-            className="border rounded-md px-4 py-2 text-black bg-white"
+            className="border rounded-md px-4 py-2 text-black bg-white w-full"
             placeholder="Room ID"
           />
         </div>
@@ -199,48 +169,47 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
           </div>
         )}
 
+        {/* Loading/Error/Empty State */}
         {isLoading ? (
-          <p className="text-center text-gray-500 mt-20">
+          <p className="text-center text-gray-400 mt-20 text-sm sm:text-base">
             Loading doctors & nurses...
           </p>
         ) : error ? (
           <p className="text-red-600 text-center mt-20 font-semibold">
             {error}
           </p>
-        ) : doctors.length === 0 && nurses.length === 0 ? (
-          <p className="text-gray-600 text-center mt-20 italic">
-            No Staff available
-          </p>
+        ) : doctor === 0 && nurse === 0 ? (
+          <div className="text-center mt-10 text-gray-600 text-sm sm:text-base">
+            <p className="italic mb-2">
+              No consultation staff available because no payment has been made.
+            </p>
+            <Link
+              href="/payment"
+              className="text-blue-600 underline hover:text-blue-800 font-medium"
+            >
+              Make a payment to continue
+            </Link>
+          </div>
         ) : (
-          <div className="relative mt-10">
-            {/* Conditionally show scroll buttons */}
-            {showArrows && (
-              <>
-                <button
-                  onClick={() => scroll("left")}
-                  title="Scroll left"
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
-                >
-                  <FaArrowLeft />
-                </button>
-                <button
-                  onClick={() => scroll("right")}
-                  title="Scroll right"
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
-                >
-                  <FaArrowRight />
-                </button>
-              </>
+          <>
+            {doctor > 0 && doctors.length === 0 && (
+              <div className="text-center text-yellow-500 text-sm sm:text-base">
+                <p className="italic">No available doctors at the moment.</p>
+              </div>
             )}
 
-            {/* Scrollable Cards */}
+            {nurse > 0 && nurses.length === 0 && (
+              <div className="text-center text-yellow-500 text-sm sm:text-base">
+                <p className="italic">No available nurses at the moment.</p>
+              </div>
+            )}
+
             <StaffScroller
               doctors={doctors}
               nurses={nurses}
               sendNotificationToDoctor={sendNotificationToDoctor}
-              ref={scrollRef}
             />
-          </div>
+          </>
         )}
       </div>
     </div>

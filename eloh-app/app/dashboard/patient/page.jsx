@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Chat from "@/components/Chat";
 import PatientMeetingSetup from "@/components/patients/PatientMeetingSetup";
 import PatientDashboardNavbar from "@/app/dashboard/patient/patientNav";
@@ -11,6 +11,8 @@ import { db } from "@/db/client";
 import { doc, onSnapshot } from "firebase/firestore";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { convertTimestamp } from "@/lib/convertFirebaseDate";
+import { MdInfo } from "react-icons/md";
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -19,10 +21,11 @@ const PatientDashboard = () => {
   const [userLoading, setUserLoading] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [mode, setMode] = useState("general-notes");
+  const toastShown = useRef(false);
 
   useEffect(() => {
     if (!loading && currentUser?.uid) {
-      const userRef = doc(db, "patients", currentUser?.uid);
+      const userRef = doc(db, "patients", currentUser.uid);
 
       const unsubscribe = onSnapshot(
         userRef,
@@ -37,22 +40,37 @@ const PatientDashboard = () => {
             type === "doctor"
               ? (consultations.doctor || 0) >= 1
               : type === "nurse"
-              ? (consultations.nurse || 0) >= 1
-              : (consultations.doctor || 0) >= 1 ||
+                ? (consultations.nurse || 0) >= 1
+                : (consultations.doctor || 0) >= 1 ||
                 (consultations.nurse || 0) >= 1;
 
-          if (hasConsultations) {
-            toast.info(
-              "You already have consultations available. Redirecting..."
-            );
+          if (hasConsultations && type !== "none") {
             setShowChat(false);
+            if (!toastShown.current) {
+              toast.info(
+                <div className="flex items-start gap-3 w-full max-w-[90vw] lg:max-w-[70vw]">
+                  <div className="text-sm leading-relaxed text-blue-900">
+                    You already have consultations available. Redirecting...
+                  </div>
+                </div>,
+                {
+                  position: "top-center",
+                  icon: <MdInfo className="text-blue-600 mt-1" size={24} />,
+                  autoClose: 6000,
+                  hideProgressBar: false,
+                  theme: "light",
+                }
+              );
+              toastShown.current = true;
+            }
+          } else {
+            console.log("No consultations available");
           }
         },
         (error) => {
           console.error("Real-time consultations error:", error);
         }
       );
-
       return () => unsubscribe(); // Clean up listener
     }
   }, [currentUser?.uid, loading]);
@@ -69,8 +87,24 @@ const PatientDashboard = () => {
         if (!snapshot.exists()) {
           setUserDoc(null);
         } else {
-          setUserDoc({ id: snapshot.id, ...snapshot.data() });
+          const data = snapshot.data();
+
+          const noteTypes = ["sickNotes", "prescriptions", "generalNotes"];
+          if (data?.medicalHistory) {
+            noteTypes.forEach((type) => {
+              if (Array.isArray(data?.medicalHistory[type])) {
+                data?.medicalHistory[type].sort((a, b) => {
+                  const aDate = convertTimestamp(a.createdAt);
+                  const bDate = convertTimestamp(b.createdAt);
+                  return new Date(bDate) - new Date(aDate); // descending
+                });
+              }
+            });
+          }
+
+          setUserDoc({ id: snapshot.id, ...data });
         }
+
         setUserLoading(false);
       },
       (error) => {

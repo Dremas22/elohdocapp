@@ -23,15 +23,15 @@ const SignInOrSignUpForm = ({ role: selectedRole }) => {
     const { email, password, confirmPassword } = data;
 
     if (!email) {
-      errors.email = "Email is required.";
+      errors.email = "Please enter your email address.";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = "Invalid email format.";
+      errors.email = " (e.g. yourname@example.com).";
     }
 
     if (!password) {
-      errors.password = "Password is required.";
+      errors.password = "Please enter your password to continue.";
     } else if (password.length < 6) {
-      errors.password = "Password must be at least 6 characters.";
+      errors.password = "Your password should be at least 6 characters long.";
     }
 
     if (activeForm === "signup") {

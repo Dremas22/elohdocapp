@@ -40,7 +40,7 @@ export const POST = async (req) => {
       return NextResponse.json({ error: "Patient not found" }, { status: 404 });
     }
 
-    const medicalHistory = patientDoc.data().medicalHistory || {};
+    const medicalHistory = patientDoc?.data()?.medicalHistory || {};
 
     // Define allowed note types
     const noteTypes = ["sickNotes", "prescriptions", "generalNotes"];

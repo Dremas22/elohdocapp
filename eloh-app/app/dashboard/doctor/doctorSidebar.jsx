@@ -9,7 +9,7 @@ import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
-import ToggleButton from "./availabilityBtn";
+import DoctorToggleButton from "./doctorToggleBtn";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
@@ -87,9 +87,7 @@ const DoctorSidebarMenu = ({
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isAvailable, setIsAvailable] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onMessage(messaging, (payload) => {
@@ -100,51 +98,6 @@ const DoctorSidebarMenu = ({
 
     return () => unsubscribe();
   }, []);
-
-  useEffect(() => {
-    const fetchAvailability = async () => {
-      setFetching(true);
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_URL}/api/doctor/toggle-availability`
-        );
-        const data = await res.json();
-        if (res.ok) {
-          setIsAvailable(data.available || false);
-        }
-      } catch (err) {
-        console.error("Failed to fetch availability:", err);
-      } finally {
-        setFetching(false);
-      }
-    };
-
-    fetchAvailability();
-  }, []);
-
-  const handleToggle = async () => {
-    setFetching(true);
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/doctor/toggle-availability`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
-
-      const data = await res.json();
-      if (res.ok) {
-        setIsAvailable(data.available);
-      } else {
-        console.error("Error:", data.error);
-      }
-    } catch (err) {
-      console.error("Toggle failed:", err);
-    } finally {
-      setFetching(false);
-    }
-  };
 
   const handleProfileSave = async (updatedData) => {
     setProfileLoading(true);
@@ -223,7 +176,7 @@ const DoctorSidebarMenu = ({
 
         {isVerified === true && (
           <>
-            <div className="text-center font-bold text-sm text-[#66e4ff] mb-10">
+            <div className="text-center font-bold text-sm text-gray-300 mb-10">
               <div>Practice Number</div>
               <div>{practiceNumber || "N/A"}</div>
             </div>
@@ -236,39 +189,39 @@ const DoctorSidebarMenu = ({
             />
 
             <div className="mt-6 flex flex-col items-center">
-              <label className="mb-2 text-sm text-[#a0cfff] select-none">
-                {isAvailable ? "Available" : "Unavailable"}
-              </label>
-              <ToggleButton
-                checked={isAvailable}
-                onChange={handleToggle}
-                fetching={fetching}
-              />
+              <DoctorToggleButton />
             </div>
           </>
         )}
       </div>
 
-      {/* ✅ Floating Mobile Toggle Button with Tooltip and Cursor Pointer */}
-      <div className="lg:hidden fixed bottom-3 right-4 z-50 group cursor-pointer">
+      {/* Mobile Sidebar Toggle Button */}
+      <div className="lg:hidden fixed bottom-1 -right-1 z-50 group cursor-pointer flex items-center space-x-2 text-white rounded-full px-2 py-2 shadow-sm select-none scale-80 backdrop-blur-sm bg-blue-800/40">
         <button
-          className="bg-[#03045e] text-white rounded-full p-1 shadow-lg"
           onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+          title={mobileSidebarOpen ? "Hide menu options" : "Show menu options"}
+          className="flex items-center gap-1 focus:outline-none"
+          aria-expanded={mobileSidebarOpen}
+          aria-controls="mobile-sidebar-actions"
+          type="button"
         >
           {mobileSidebarOpen ? (
-            <FiChevronDown className="h-6 w-6" />
+            <>
+              <FiChevronDown className="h-6 w-6" />
+              <span className="text-sm font-semibold">Hide menu</span>
+            </>
           ) : (
-            <FiChevronUp className="h-6 w-6" />
+            <>
+              <FiChevronUp className="h-6 w-6" />
+              <span className="text-sm font-semibold">Show menu</span>
+            </>
           )}
         </button>
-        <div className="absolute bottom-full right-1/2 translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-black rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-          {mobileSidebarOpen ? "Hide actions" : "Show actions"}
-        </div>
       </div>
 
       {/* Mobile Sidebar */}
       <div
-        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 md:h-[20vh] sm:h-[38vh] h-[24vh] md:px-5 px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5 transition-transform duration-500 ease-in-out bg-gray-900/20 ${mobileSidebarOpen
+        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 md:h-[22vh] sm:h-[38vh] h-[24vh] md:px-5 px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5 transition-transform duration-500 ease-in-out bg-gray-900/20 ${mobileSidebarOpen
           ? "translate-y-0 opacity-100"
           : "translate-y-full opacity-0 pointer-events-none"
           }`}
@@ -280,16 +233,7 @@ const DoctorSidebarMenu = ({
           compact={true}
         />
 
-        <div className="flex items-center gap-3">
-          <label className="text-sm text-[#a0cfff] select-none">
-            {isAvailable ? "Available" : "Unavailable"}
-          </label>
-          <ToggleButton
-            checked={isAvailable}
-            onChange={handleToggle}
-            fetching={fetching}
-          />
-        </div>
+        <DoctorToggleButton />
       </div>
 
       {/* Calendar Drawer */}

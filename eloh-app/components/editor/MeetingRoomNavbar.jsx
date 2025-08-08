@@ -21,17 +21,28 @@ const MeetingRoomNavbar = ({ mode, setMode, doctorId }) => {
     const fetchDoctorData = async () => {
       setLoading(true);
       try {
-        const docRef = doc(db, "doctors", doctorId);
-        const docSnap = await getDoc(docRef);
+        // Try to fetch from doctors collection
+        let docRef = doc(db, "doctors", doctorId);
+        let docSnap = await getDoc(docRef);
+
+        let staffRole = "doctor";
+
+        // If not found in doctors, try nurses
+        if (!docSnap.exists()) {
+          docRef = doc(db, "nurses", doctorId);
+          docSnap = await getDoc(docRef);
+          staffRole = "nurse";
+        }
 
         if (docSnap.exists()) {
-          setDoctorData(docSnap.data());
+          setDoctorData({ ...docSnap.data(), role: staffRole });
         } else {
-          console.warn("No such doctor found!");
+          console.warn("No such doctor or nurse found!");
           setDoctorData(null);
         }
       } catch (error) {
-        console.error("Error fetching doctor data:", error);
+        console.error("Error fetching staff data:", error);
+        setDoctorData(null);
       } finally {
         setLoading(false);
       }
@@ -49,8 +60,8 @@ const MeetingRoomNavbar = ({ mode, setMode, doctorId }) => {
             key={m.id}
             onClick={() => setMode(m.id)}
             className={`w-full sm:w-36 py-3 px-8 text-base font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center ${mode === m.id
-              ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
-              : "bg-[#506f95] text-white hover:bg-[#023e8a]"
+                ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
+                : "bg-[#506f95] text-white hover:bg-[#023e8a]"
               }`}
           >
             {m.label}

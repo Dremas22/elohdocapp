@@ -22,12 +22,15 @@ const SaveStripePayment = () => {
         .then((data) => {
           if (data.success) {
             toast.success(
-              "✅ Payment saved to DB. Please refresh the page to see your updated consultations.",
-              { duration: 8000 }
+              "🎉 Payment successful! Your consultations has been updated.",
+              {
+                duration: 8000,
+              }
             );
+
             sessionStorage.setItem(`shown-toast-${sessionId}`, "true");
           } else {
-            console.error("⚠️ Could not save payment");
+            toast.error("⚠️ Payment failed to save. Please try again.");
           }
         });
     }
