@@ -120,10 +120,11 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
           <input
+            title="Select the prescription date"
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className={`w-full px-3 py-2 text-black rounded-md border ${fieldErrors.date ? "border-red-500" : "border-gray-300"}`}
+            className={`w-full px-3 py-2 text-black rounded-md border cursor-pointer ${fieldErrors.date ? "border-red-500" : "border-gray-300"}`}
           />
           {fieldErrors.date && (
             <p className="text-red-600 text-xs mt-1">{fieldErrors.date}</p>
@@ -136,6 +137,7 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
             {medications.map((med, index) => (
               <div key={index} className="flex gap-2 items-center">
                 <input
+                  title={`Enter medication ${index + 1}`}
                   type="text"
                   value={med}
                   onChange={(e) => handleMedicationChange(index, e.target.value)}
@@ -143,24 +145,25 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
                   placeholder="e.g. Amoxicillin 500mg"
                 />
                 <button
+                  title="Remove this medication"
                   type="button"
                   onClick={() => handleRemoveMedication(index)}
-                  className="text-red-600 font-bold text-xl leading-none px-3 py-1 -ml-11"
+                  className="text-red-600 font-bold text-xl leading-none px-3 py-1 -ml-11 cursor-pointer"
                   aria-label={`Remove medication ${index + 1}`}
                 >
                   ✕
                 </button>
               </div>
             ))}
-
           </div>
           {fieldErrors.medications && (
             <p className="text-red-600 text-xs mt-1 mb-2">{fieldErrors.medications}</p>
           )}
           <button
+            title="Add a new medication field"
             type="button"
             onClick={handleAddMedication}
-            className="text-blue-600 text-sm font-medium hover:underline"
+            className="text-blue-600 text-sm font-medium hover:underline cursor-pointer"
           >
             + Add Medication
           </button>
@@ -169,6 +172,7 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Instructions</label>
           <textarea
+            title="Enter instructions for the prescribed medications"
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
             rows={3}
@@ -183,15 +187,14 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
       <div className="flex items-center justify-between gap-4">
         {!signature && !showSignaturePad && (
           <button
+            title="Open signature pad to sign this prescription"
             onClick={() => setShowSignaturePad(true)}
-            className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow active:translate-y-1 hover:bg-[#023e8a] transition cursor-pointer"
             style={{ minWidth: "120px" }}
           >
             Sign Here
           </button>
         )}
-
-
       </div>
 
       {showSignaturePad && (
@@ -205,8 +208,9 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
         <div className="mt-4">
           <img src={signature} alt="Doctor signature" className="mb-2 border max-w-full sm:max-w-xs" />
           <button
+            title="Remove signature and sign again"
             onClick={() => setSignature(null)}
-            className="bg-red-600 text-white shadow-[0_4px_#999] active:shadow-[0_2px_#666] py-2 px-4 text-sm rounded-lg hover:bg-red-700 transition w-full sm:w-auto"
+            className="bg-red-600 text-white py-2 px-4 text-sm rounded-lg hover:bg-red-700 transition w-full sm:w-auto cursor-pointer"
           >
             Remove Signature
           </button>
@@ -220,9 +224,10 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
       {successMessage && <p className="text-green-700 text-sm font-semibold mt-2">{successMessage}</p>}
 
       <button
+        title="Submit and save prescription"
         onClick={handleSubmit}
         disabled={submitting}
-        className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+        className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow active:translate-y-1 hover:bg-[#023e8a] transition cursor-pointer"
         style={{ minWidth: "120px" }}
       >
         {submitting ? "Submitting..." : "Submit"}
@@ -231,8 +236,9 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
       {showPreview && (
         <div className="flex justify-center pt-4">
           <button
+            title="View submitted prescription preview"
             onClick={handlePreview}
-            className="w-full sm:w-auto bg-[#03045e] text-white py-3 px-2 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            className="w-full sm:w-auto bg-[#03045e] text-white py-3 px-2 text-sm sm:text-lg font-semibold rounded-xl shadow active:translate-y-1 hover:bg-[#023e8a] transition cursor-pointer"
           >
             {isLoading ? "Loading Preview..." : "Preview"}
           </button>
