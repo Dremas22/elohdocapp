@@ -216,25 +216,26 @@ const MeetingRoom = () => {
                 <MyVideoConference isDoctor={isDoctor} isMobile={isMobile} />
               </div>
 
-              <div className="bg-gray-950">
+              <div className="bg-gray-950 relative">
                 <ControlBar />
+
+                {/* 🔴 Conditional Close Buttons inside ControlBar wrapper */}
+                {isPatient && (
+                  <PatientCloseMeetingButton
+                    onClick={handleClose}
+                    disabled={meetingClosing}
+                  />
+                )}
+                {isDoctor && (
+                  <StaffCloseMeetingButton
+                    onClick={handleClose}
+                    disabled={meetingClosing}
+                  />
+                )}
               </div>
 
               <RoomAudioRenderer />
 
-              {/* 🔴 Conditional Close Buttons */}
-              {isPatient && (
-                <PatientCloseMeetingButton
-                  onClick={handleClose}
-                  disabled={meetingClosing}
-                />
-              )}
-              {isDoctor && (
-                <StaffCloseMeetingButton
-                  onClick={handleClose}
-                  disabled={meetingClosing}
-                />
-              )}
             </div>
           </RoomContext.Provider>
 
