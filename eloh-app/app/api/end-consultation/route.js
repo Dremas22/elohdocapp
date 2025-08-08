@@ -1,4 +1,4 @@
-import { STAFF_EARNING_PER_CONSULTATION } from "@/constants";
+import { PLATFORM_FEE, STAFF_EARNING_PER_CONSULTATION } from "@/constants";
 import { auth, db } from "@/db/server";
 import { NextResponse } from "next/server";
 
@@ -18,8 +18,7 @@ export async function POST(req) {
     if (decodedToken.role !== "patient") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
-    // doc(db, , staffId)
-    // Staff doc refs for doctors and nurses
+
     let staffRef = db?.collection("doctors").doc(staffId);
     let staffSnap = await staffRef.get();
 
@@ -42,6 +41,7 @@ export async function POST(req) {
       earnings: (staffData.earnings || 0) + STAFF_EARNING_PER_CONSULTATION,
       numberOfConsultations: (staffData.numberOfConsultations || 0) + 1,
       earningsUpdatedAt: new Date(),
+      totalPlatformFees: (staffData.totalPlatformFees || 0) + PLATFORM_FEE,
     });
 
     // Fetch patient doc
@@ -85,9 +85,11 @@ export async function POST(req) {
     ) {
       consultationType = "doctor";
     } else if (
-      consultationType === "all" &&
-      consultations.nurse === 0 &&
-      consultations.doctor === 0
+      consultationType === "all" ||
+      consultationType === "doctor" ||
+      (consultationType === "nurse" &&
+        consultations.nurse === 0 &&
+        consultations.doctor === 0)
     ) {
       consultationType = "none";
     }
