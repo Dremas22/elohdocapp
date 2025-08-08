@@ -23,7 +23,6 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
   const [showPreview, setShowPreview] = useState(false);
   const [openPreview, setOpenPreview] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
   const [previewData, setPreviewData] = useState(null);
 
   const handleSignatureSave = (dataUrl) => {
@@ -58,25 +57,23 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
     if (success) setShowPreview(true);
   };
 
-  const handlePreview = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/get-latest-note`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ patientId, noteType: "sickNotes" }),
-        }
-      );
-      const data = await response.json();
-      setPreviewData(data?.note);
-      setOpenPreview(true);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
+  const handlePreview = () => {
+    const note = {
+      doctorName: doctorId?.displayName || "Dr. Name",
+      doctorEmail: doctorId?.email || "email@example.com",
+      phoneNumber: doctorId?.phoneNumber || "000-000-0000",
+      practiceNumber: doctorId?.practiceNumber || "PRAC123456",
+      patientName: patientData?.fullName || "__________",
+      createdAt: new Date(),
+      content: {
+        startDate,
+        endDate,
+        reason,
+      },
+    };
+
+    setPreviewData(note);
+    setOpenPreview(true);
   };
 
   return (
@@ -85,12 +82,14 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
         <NotePreview
           previewData={previewData}
           noteType="sickNotes"
-          isLoading={isLoading}
+          isLoading={false}
+          onClose={() => setOpenPreview(false)}
+          signature={signature}
           patientId={patientId}
         />
       )}
-      <h2 className="text-xl font-semibold text-[#03045e]">Sick Note</h2>
 
+      <h2 className="text-xl font-semibold text-[#03045e]">Sick Note</h2>
       <p><strong>Patient Name:</strong> {patientData?.fullName}</p>
 
       <div className="bg-gray-100 p-4 rounded-md border border-gray-300 space-y-4">
@@ -100,8 +99,9 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
             id="start-date"
             type="date"
             value={startDate}
+            title="Select the first day the patient will be absent"
             onChange={(e) => setStartDate(e.target.value)}
-            className="rounded-md px-3 py-2 w-full border border-gray-300"
+            className="rounded-md px-3 py-2 w-full border border-gray-300 cursor-pointer"
           />
           {fieldErrors.startDate && (
             <p className="text-sm text-red-600 mt-1">{fieldErrors.startDate}</p>
@@ -114,8 +114,9 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
             id="end-date"
             type="date"
             value={endDate}
+            title="Select the last day the patient will be absent"
             onChange={(e) => setEndDate(e.target.value)}
-            className="rounded-md px-3 py-2 w-full border border-gray-300"
+            className="rounded-md px-3 py-2 w-full border border-gray-300 cursor-pointer"
           />
           {fieldErrors.endDate && (
             <p className="text-sm text-red-600 mt-1">{fieldErrors.endDate}</p>
@@ -129,6 +130,7 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
           id="reason"
           rows={3}
           value={reason}
+          title="Write a brief explanation of the patient's medical condition"
           onChange={(e) => setReason(e.target.value)}
           className="w-full rounded-md px-3 py-2 resize-none border border-gray-300"
           placeholder="Enter reason for absence"
@@ -138,14 +140,21 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
         )}
       </div>
 
-      <p><strong>Recommended Rest Period:</strong> {startDate || "---"} to {endDate || "---"}</p>
+      <p>
+        <strong>Recommended Rest Period:</strong> {startDate || "---"} to {endDate || "---"}
+      </p>
 
       <div>
         <p className="font-semibold mb-2">Doctor’s Signature</p>
         {signature ? (
           <>
-            <img src={signature} alt="Doctor signature" className="mb-2 border max-w-xs" />
+            <img
+              src={signature}
+              alt="Doctor signature"
+              className="mb-2 border max-w-xs"
+            />
             <button
+              title="Remove current signature"
               onClick={() => setSignature(null)}
               className="bg-red-600 text-white py-2 px-4 text-sm rounded shadow hover:bg-red-700 transition"
             >
@@ -169,35 +178,34 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
       {successMessage && <p className="text-sm text-green-700 font-semibold">{successMessage}</p>}
 
       <div className="flex flex-wrap justify-between items-center gap-4 pt-4">
-        <div className="flex-1">
-          {!signature && !showSignaturePad && (
-            <button
-              onClick={() => setShowSignaturePad(true)}
-              className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-            >
-              Sign Here
-            </button>
-          )}
-        </div>
-
-        <div className="flex-1 text-right">
+        {!signature && !showSignaturePad && (
           <button
-            onClick={handleSubmit}
-            disabled={submitting}
-            className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            title="Open signature pad to sign the note"
+            onClick={() => setShowSignaturePad(true)}
+            className="bg-[#03045e] text-white py-3 px-5 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer w-full sm:w-auto"
           >
-            {submitting ? "Submitting..." : "Submit"}
+            Sign Here
           </button>
-        </div>
+        )}
+
+        <button
+          title="Submit this sick note to save"
+          onClick={handleSubmit}
+          disabled={submitting}
+          className="bg-[#03045e] text-white py-3 px-5 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer w-full sm:w-auto"
+        >
+          {submitting ? "Submitting..." : "Submit"}
+        </button>
       </div>
 
       {showPreview && (
         <div className="pt-4">
           <button
+            title="Preview your completed note"
             onClick={handlePreview}
-            className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            className="bg-[#03045e] text-white py-3 px-5 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer w-full sm:w-auto"
           >
-            {isLoading ? "Loading Preview..." : "Preview"}
+            Preview
           </button>
         </div>
       )}

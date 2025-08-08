@@ -35,20 +35,23 @@ const SignaturePad = ({ onSave, onCancel }) => {
 
       <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-4">
         <button
+          title="Clear your current signature"
           onClick={handleClear}
           className="bg-[#03045e] text-white py-3 px-6 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer w-full sm:w-auto"
         >
           Clear
         </button>
         <button
+          title="Save this signature"
           onClick={handleSave}
           className="bg-[#03045e] text-white py-3 px-6 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer w-full sm:w-auto"
         >
           Save
         </button>
         <button
+          title="Cancel and close the signature pad"
           onClick={onCancel}
-          className=" bg-[#5e0303] text-white py-3 px-6 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#8a0202] transition-all duration-200 ease-in-out cursor-pointer w-full sm:w-auto"
+          className="bg-[#5e0303] text-white py-3 px-6 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#8a0202] transition-all duration-200 ease-in-out cursor-pointer w-full sm:w-auto"
         >
           Cancel
         </button>
