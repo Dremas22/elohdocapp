@@ -113,6 +113,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   }, [currentUser?.uid]);
 
   const fullName = currentUser?.displayName || `Unknown-user_${Date.now()}`;
+  const { doctor, nurse } = userDoc?.consultations ?? { doctor: 0, nurse: 0 };
 
   const sendNotificationToDoctor = async (doctorId, patientId) => {
     try {
@@ -143,6 +144,18 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
 
   return (
     <div className="w-full min-h-screen bg-gray-950">
+      {/* Consultations Left */}
+      <div className="flex justify-end px-4 pt-4">
+        <div className="bg-gray-800 text-white text-sm px-4 py-2 rounded-lg shadow flex gap-4">
+          <p>
+            Doctor: <span className="font-semibold">{doctor}</span>
+          </p>
+          <p>
+            Nurse: <span className="font-semibold">{nurse}</span>
+          </p>
+        </div>
+      </div>
+
       <div className="max-w-screen-xl mx-auto px-4 pt-5">
         {/* Header */}
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
