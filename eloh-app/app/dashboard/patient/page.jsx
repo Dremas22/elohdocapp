@@ -40,8 +40,8 @@ const PatientDashboard = () => {
             type === "doctor"
               ? (consultations.doctor || 0) >= 1
               : type === "nurse"
-              ? (consultations.nurse || 0) >= 1
-              : (consultations.doctor || 0) >= 1 ||
+                ? (consultations.nurse || 0) >= 1
+                : (consultations.doctor || 0) >= 1 ||
                 (consultations.nurse || 0) >= 1;
 
           if (hasConsultations && type !== "none") {
@@ -64,9 +64,6 @@ const PatientDashboard = () => {
               toastShown.current = true;
             }
           } else {
-            // TODO: Remember to comment out the line below
-            // setShowChat(true); // Always enable chat if no consultations
-
             console.log("No consultations available");
           }
         },
@@ -74,7 +71,6 @@ const PatientDashboard = () => {
           console.error("Real-time consultations error:", error);
         }
       );
-
       return () => unsubscribe(); // Clean up listener
     }
   }, [currentUser?.uid, loading]);

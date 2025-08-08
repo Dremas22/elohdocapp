@@ -8,38 +8,6 @@ import ViewMedicalRecords from "../viewMedicalRecords";
 import StaffScroller from "./StaffController";
 import Link from "next/link";
 
-/**
- * @file PatientMeetingSetup.jsx
- * @description
- * This React component manages the logic and UI for setting up a virtual consultation
- * session for a patient. It handles fetching available doctors or nurses based on the
- * patient's consultation type (doctor, nurse, or all), displays medical records,
- * handles notifications, and allows users to initiate or join a consultation.
- *
- * The component relies on Firebase Firestore for real-time updates of staff availability,
- * and uses user authentication to identify the current patient. It also displays
- * conditional UI based on the user's status, loading state, or payment completion.
- *
- * @component
- * @param {Object} props - Component props
- * @param {("view" | "edit")} props.mode - The current mode for medical record view/edit
- * @param {boolean} props.noteOpen - Flag to determine if medical records should be shown
- * @param {Object} props.userDoc - Firestore user document for the patient
- * @param {Function} props.setNoteOpen - State setter to toggle medical records view
- *
- * @returns {React.ReactElement} The rendered component
- *
- * @example
- * <PatientMeetingSetup
- *   mode="view"
- *   noteOpen={true}
- *   userDoc={userData}
- *   setNoteOpen={setNoteOpen}
- * />
- *
- * @todo Improve error handling granularity for Firestore reads
- * @todo Abstract Firestore logic to a custom hook for better reusability
- */
 const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   const { currentUser, loading } = useCurrentUser();
   const [roomID, setRoomID] = useState("");
@@ -52,8 +20,8 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
     if (!currentUser?.uid) return;
 
     const patientRef = doc(db, "patients", currentUser.uid);
-    let unsubDoctors = () => {};
-    let unsubNurses = () => {};
+    let unsubDoctors = () => { };
+    let unsubNurses = () => { };
 
     const unsubPatient = onSnapshot(
       patientRef,
@@ -143,20 +111,26 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-950">
-      {/* Consultations Left */}
-      <div className="flex justify-end px-4 pt-4">
-        <div className="bg-gray-800 text-white text-sm px-4 py-2 rounded-lg shadow flex gap-4">
-          <p>
-            Doctor: <span className="font-semibold">{doctor}</span>
-          </p>
-          <p>
-            Nurse: <span className="font-semibold">{nurse}</span>
-          </p>
+    <div className="w-full min-h-screen bg-gray-950 relative">
+      {/* Consultations Remaining Box - Top Right */}
+      <div className="absolute top-2 right-2">
+        <div className="bg-gradient-to-br from-[#0b2345] to-[#123158] p-4 rounded-2xl shadow-2xl w-full max-w-xs text-center transform transition-transform duration-300 hover:scale-100 hover:shadow-[#0d6efd]/50 cursor-default">
+          <h2 className="text-sm font-semibold mb-2 tracking-wide text-[#66e4ff] drop-shadow-md">
+            Consultations Remaining
+          </h2>
+          <div className="text-white text-sm flex justify-center gap-x-6">
+            <p>
+              Doctor: <span className="font-bold text-[#66e4ff]">{doctor}</span>
+            </p>
+            <p>
+              Nurse: <span className="font-bold text-[#66e4ff]">{nurse}</span>
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-screen-xl mx-auto px-4 pt-5">
+
+      <div className="max-w-screen-xl mx-auto px-4 pt-20">
         {/* Header */}
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
           <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text font-extrabold text-transparent text-4xl">
