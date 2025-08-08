@@ -72,12 +72,19 @@ const DoctorsDashboard = async () => {
           <p className="text-gray-600 mb-6">
             We encountered a server error while loading your dashboard. Please try again later.
           </p>
-          <Link
-            href="/"
-            className="bg-[#03045e] text-white py-3 px-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-          >
-            Go to Homepage
-          </Link>
+          <div className="relative group inline-block">
+            <Link
+              href="/"
+              className="bg-[#03045e] text-white py-3 px-3 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            >
+              Go to Homepage
+            </Link>
+
+            <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              Return to the homepage
+            </span>
+          </div>
+
         </div>
       </div>
     );
