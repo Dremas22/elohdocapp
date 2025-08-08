@@ -62,7 +62,7 @@ const StaffScroller = ({
     <div className="w-full relative">
       {/* Toggle Buttons */}
       {doctors.length > 0 && nurses.length > 0 && (
-        <div className="flex justify-center mb-4 space-x-4">
+        <div className="flex justify-center sm:mb-4 space-x-4">
           <button
             title="View available doctors"
             onClick={() => setView("doctors")}
@@ -83,7 +83,7 @@ const StaffScroller = ({
       )}
 
       {(doctors.length > 0 || nurses.length > 0) && (
-        <h2 className="text-2xl font-semibold text-center mt-10 mb-4 text-white">
+        <h2 className="text-2xl font-semibold text-center mt-5 sm:mt-10  text-white">
           Available {view[0].toUpperCase() + view.slice(1)}
         </h2>
       )}

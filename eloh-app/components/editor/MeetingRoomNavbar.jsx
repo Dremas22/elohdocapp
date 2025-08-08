@@ -59,11 +59,10 @@ const MeetingRoomNavbar = ({ mode, setMode, doctorId }) => {
           <button
             key={m.id}
             onClick={() => setMode(m.id)}
-            className={`w-full sm:w-36 py-3 px-8 text-base font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center ${
-              mode === m.id
+            className={`w-full sm:w-36 py-3 px-8 text-base font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer flex items-center justify-center ${mode === m.id
                 ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
                 : "bg-[#506f95] text-white hover:bg-[#023e8a]"
-            }`}
+              }`}
           >
             {m.label}
           </button>
