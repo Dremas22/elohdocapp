@@ -84,13 +84,7 @@ export async function POST(req) {
       consultations.doctor > 0
     ) {
       consultationType = "doctor";
-    } else if (
-      consultationType === "all" ||
-      consultationType === "doctor" ||
-      (consultationType === "nurse" &&
-        consultations.nurse === 0 &&
-        consultations.doctor === 0)
-    ) {
+    } else if (consultations.doctor === 0 && consultations.nurse === 0) {
       consultationType = "none";
     }
 
