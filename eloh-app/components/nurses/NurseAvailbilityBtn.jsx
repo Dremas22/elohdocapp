@@ -13,7 +13,7 @@ const ToggleButton = ({ isAvailable, fetching, onChange }) => {
   return (
     <div className="flex flex-col items-center gap-1 relative">
       {/* Status Label */}
-      <span className="mb-1 text-sm text-[#a0cfff] select-none">
+      <span className="mb-1 text-sm text-gray-300 select-none">
         {isAvailable ? "Available" : "Unavailable"}
       </span>
 

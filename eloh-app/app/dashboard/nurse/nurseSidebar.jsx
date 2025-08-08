@@ -253,7 +253,7 @@ const NurseSidebarMenu = ({
         {isVerified === true && (
           <>
             {/* Practice Number */}
-            <div className="text-center font-bold text-sm text-[#66e4ff] mb-10">
+            <div className="text-center font-bold text-sm text-gray-300 mb-10">
               <div>Practice Number</div>
               <div>{practiceNumber || "N/A"}</div>
             </div>
