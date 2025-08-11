@@ -114,7 +114,6 @@ const StaffScroller = ({ doctors = [], nurses = [], sendNotificationToDoctor }) 
       {(doctors.length > 0 || nurses.length > 0) && (
         <h2 className="sm:text-2xl text-xl font-semibold text-center mt-2 sm:mt-10">
           Available {view[0].toUpperCase() + view.slice(1)}{" "}
-          {selectedCategory !== "all" ? `- ${categories.find((c) => c.id === selectedCategory)?.title}` : ""}
         </h2>
       )}
 
