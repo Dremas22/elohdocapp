@@ -10,7 +10,6 @@ import Step4Allergies from "./forms/Step4Allergies";
 import Step5MedicalHistory from "./forms/Step5MedicalHistory";
 import { validateStep } from "@/utils/validateForm";
 import ProgressBar from "./ProgressBar";
-import { getFCMToken } from "@/lib/getFCMToken";
 
 const steps = [
   Step1BasicInfo,
@@ -105,7 +104,7 @@ const PatientsRegistrationForm = () => {
     if (Object.keys(finalErrors).length > 0) return;
 
     setSubmitting(true);
-    const fcmToken = await getFCMToken();
+
     try {
       const payload = {
         ...formData,
@@ -114,7 +113,6 @@ const PatientsRegistrationForm = () => {
         fullName: currentUser?.displayName || formData.fullName,
         email: currentUser?.email,
         role: "patient",
-        fcmToken: fcmToken || null,
       };
 
       const res = await fetch(
