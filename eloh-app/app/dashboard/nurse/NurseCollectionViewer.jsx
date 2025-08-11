@@ -130,7 +130,7 @@ const NurseCollectionViewer = () => {
   const { practiceNumber, isVerified } = userDoc;
 
   return (
-    <div className="min-h-screen flex flex-col pt-18 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col pt-12 relative overflow-hidden">
       <NurseDashboardNavbar />
 
       <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
@@ -155,7 +155,7 @@ const NurseCollectionViewer = () => {
               {/* Earnings Modal */}
               {showEarnings && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-md z-50 flex items-center justify-center px-4">
-                  <div className="bg-white rounded-xl text-black p-6 w-full max-w-4xl shadow-lg relative border-t-8 border-[#0d6efd]">
+                  <div className="bg-white rounded-xl text-black p-8 w-full max-w-4xl shadow-lg relative border-t-8 border-[#0d6efd]">
                     {/* Close button */}
                     <button
                       onClick={() => setShowEarnings(false)}
@@ -238,7 +238,10 @@ const NurseCollectionViewer = () => {
               <h2 className="text-lg font-semibold mb-2">
                 Verification Declined
               </h2>
-              <p>Please contact support to verify your practice information.</p>
+              <p>
+                We could not verify your account. Please ensure your practice
+                number is registered or contact support for help.
+              </p>
             </div>
           )}
         </main>
