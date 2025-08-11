@@ -113,7 +113,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   return (
     <div className="w-full min-h-screen bg-gray-950 relative pb-10">
       {/* Consultations Remaining Box */}
-      <div className="w-full flex justify-center sm:justify-end px-4 pt-4">
+      <div className="w-full flex justify-center sm:justify-end px-4 pt-1">
         <div className="bg-gradient-to-br from-[#0b2345] to-[#123158] p-4 rounded-2xl shadow-2xl w-full max-w-xs text-center transform transition-transform duration-300 hover:scale-100 hover:shadow-[#0d6efd]/50 cursor-default">
           <h2 className="text-sm font-bold mb-2 tracking-wide text-gray-200 drop-shadow-md">
             Consultations Remaining
@@ -129,13 +129,13 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         </div>
       </div>
 
-      <div className="max-w-screen-xl mx-auto px-4 pt-2">
+      <div className="max-w-screen-xl mx-auto px-4 sm:pt-2 pt-1">
         {/* Header */}
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto px-2">
           <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text font-extrabold text-transparent text-3xl sm:text-4xl leading-tight">
             Virtual Medical Consultations
           </h1>
-          <p className="mt-4 sm:mt-6 max-w-xl text-gray-300 text-base sm:text-xl">
+          <p className="mt-3 sm:mt-6 max-w-xl text-gray-300 text-base sm:text-xl">
             Connect with licensed medical professionals through secure video
             consultations from home.
           </p>
@@ -147,7 +147,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             type="text"
             readOnly
             value={fullName}
-            className="border rounded-md px-4 py-2 text-black bg-gray-100 cursor-not-allowed w-full mb-2"
+            className="border rounded-md px-4 py-2 text-black bg-gray-100 cursor-not-allowed w-full sm:mb-2"
           />
           <input
             type="text"
@@ -180,7 +180,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
           </p>
         ) : doctor === 0 && nurse === 0 ? (
           <div className="text-center mt-10 text-gray-600 text-sm sm:text-base">
-            <p className="italic mb-2">
+            <p className="">
               No consultation staff available because no payment has been made.
             </p>
             <Link
