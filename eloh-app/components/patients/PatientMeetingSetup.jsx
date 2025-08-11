@@ -8,6 +8,40 @@ import ViewMedicalRecords from "../viewMedicalRecords";
 import StaffScroller from "./StaffController";
 import Link from "next/link";
 
+/**
+ * PatientMeetingSetup component
+ *
+ * This component sets up and manages virtual medical consultation sessions for patients.
+ * It fetches available doctors and nurses in real-time based on the patient's consultation type,
+ * displays consultation credits remaining, and shows medical records if requested.
+ * It also allows notifying doctors when a patient requests a consultation.
+ *
+ * Props:
+ * @param {string} mode - Mode of operation, e.g., which staff category to display
+ * @param {boolean} noteOpen - Flag indicating if the medical records view is open
+ * @param {Object} userDoc - Current patient document containing consultation data and other details
+ * @param {Function} setNoteOpen - Setter function to toggle the medical records view
+ *
+ * State:
+ * - roomID: ID for the virtual consultation room (currently unused in UI)
+ * - doctors: List of available doctors filtered by availability and consultation type
+ * - nurses: List of available nurses filtered similarly
+ * - isLoading: Loading state while fetching doctors/nurses
+ * - error: Stores any error messages during fetching
+ *
+ * Effects:
+ * - Subscribes to the current patient's Firestore document to retrieve consultation type,
+ *   then sets up real-time listeners for available doctors and nurses accordingly.
+ * - Cleans up all listeners on unmount or user change.
+ *
+ * Features:
+ * - Displays consultations remaining (doctor and nurse counts)
+ * - Conditionally renders medical records view if requested
+ * - Handles loading, error, and empty states gracefully
+ * - Provides a clickable link to the payment page if no consultation credits remain
+ * - Integrates a StaffScroller component to show available staff and handle notifications
+ */
+
 const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   const { currentUser, loading } = useCurrentUser();
   const [roomID, setRoomID] = useState("");
@@ -83,6 +117,11 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   const fullName = currentUser?.displayName || `Unknown-user_${Date.now()}`;
   const { doctor, nurse } = userDoc?.consultations ?? { doctor: 0, nurse: 0 };
 
+  /**
+   * Sends a notification request to the specified doctor about a patient's consultation.
+   * @param {string} doctorId - The ID of the doctor to notify
+   * @param {string} patientId - The ID of the patient requesting consultation
+   */
   const sendNotificationToDoctor = async (doctorId, patientId) => {
     try {
       const res = await fetch(
@@ -175,20 +214,23 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             Loading doctors & nurses...
           </p>
         ) : error ? (
-          <p className="text-red-600 text-center mt-20 font-semibold">
-            {error}
-          </p>
+          <p className="text-red-600 text-center mt-20 font-semibold">{error}</p>
         ) : doctor === 0 && nurse === 0 ? (
           <div className="text-center mt-10 text-gray-600 text-sm sm:text-base">
             <p className="italic mb-2">
               No consultation staff available because no payment has been made.
             </p>
-            <Link
-              href="/payment"
-              className="text-blue-600 underline hover:text-blue-800 font-medium"
-            >
-              Make a payment to continue
-            </Link>
+            <span>
+              Make a{" "}
+              <Link
+                href="/payment"
+                title="Go to payment page"
+                className="text-blue-600 underline hover:text-blue-800 font-medium"
+              >
+                payment
+              </Link>{" "}
+              to continue
+            </span>
           </div>
         ) : (
           <>
@@ -203,7 +245,6 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
                 <p className="italic">No available nurses at the moment.</p>
               </div>
             )}
-
             <StaffScroller
               doctors={doctors}
               nurses={nurses}
