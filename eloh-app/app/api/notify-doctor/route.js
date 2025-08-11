@@ -45,22 +45,37 @@ export async function POST(req) {
 
     const patientName = patientData?.fullName || "A patient";
 
-    await getMessaging().send({
-      token: fcmToken,
-      notification: {
-        title: "New Consultation Request",
-        body: `${patientName} wants to start a video consultation.\nJoin here: ${process.env.NEXT_PUBLIC_URL}/room?staffId=${doctorId}&patientId=${patientId}`,
-      },
-      data: {
-        roomId: doctorId,
-        patientId,
-      },
-      webpush: {
-        fcmOptions: {
-          link: `${process.env.NEXT_PUBLIC_URL}/room?staffId=${doctorId}&patientId=${patientId}`,
+    try {
+      await getMessaging().send({
+        token: fcmToken,
+        notification: {
+          title: "New Consultation Request",
+          body: `${patientName} wants to start a video consultation.\nJoin here: ${process.env.NEXT_PUBLIC_URL}/room?staffId=${doctorId}&patientId=${patientId}`,
         },
-      },
-    });
+        data: {
+          roomId: doctorId,
+          patientId,
+        },
+        webpush: {
+          fcmOptions: {
+            link: `${process.env.NEXT_PUBLIC_URL}/room?staffId=${doctorId}&patientId=${patientId}`,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error sending notification:", error);
+
+      // Remove invalid tokens to prevent future errors
+      if (
+        error.code === "messaging/registration-token-not-registered" ||
+        error.code === "messaging/invalid-registration-token"
+      ) {
+        await userDoc.ref.update({ fcmToken: null });
+      } else {
+        // Re-throw unexpected errors to be handled by outer catch
+        throw error;
+      }
+    }
 
     return NextResponse.json(
       { message: "Notification sent", patient: patientData },
