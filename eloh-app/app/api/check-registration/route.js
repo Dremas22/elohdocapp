@@ -12,7 +12,13 @@ export async function GET(request) {
     const uid = decoded.uid;
 
     // Check user role collections and return first match with role
-    const collections = ["doctors", "nurses", "patients"];
+    const collections = [
+      "doctors",
+      "nurses",
+      "patients",
+      "drivers",
+      "customers",
+    ];
 
     for (const collection of collections) {
       const docSnap = await db.collection(collection).doc(uid).get();
