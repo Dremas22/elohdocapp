@@ -6,7 +6,11 @@ import NursesList from "./cards/NursesList";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { doctorCategories, nurseCategories } from "@/constants/index";
 
-const StaffScroller = ({ doctors = [], nurses = [], sendNotificationToDoctor }) => {
+const StaffScroller = ({
+  doctors = [],
+  nurses = [],
+  sendNotificationToDoctor,
+}) => {
   const scrollRef = useRef(null);
 
   const getDefaultView = () => {
@@ -24,24 +28,28 @@ const StaffScroller = ({ doctors = [], nurses = [], sendNotificationToDoctor }) 
   }, [doctors, nurses]);
 
   const categories = useMemo(() => {
-    if (view === "doctors") return [{ id: "all", title: "All" }, ...doctorCategories];
-    if (view === "nurses") return [{ id: "all", title: "All" }, ...nurseCategories];
+    if (view === "doctors")
+      return [{ id: "all", title: "All" }, ...doctorCategories];
+    if (view === "nurses")
+      return [{ id: "all", title: "All" }, ...nurseCategories];
     return [];
   }, [view]);
 
   const filteredStaff = useMemo(() => {
     const staff = view === "doctors" ? doctors : nurses;
 
-    if (selectedCategory === "all") return staff;
+    if (selectedCategory.toLowerCase() === "all") return staff;
 
-    return staff.filter(person => {
-      if (Array.isArray(person.categories)) {
-        return person.categories.includes(selectedCategory);
-      }
-      if (typeof person.category === "string") {
-        return person.category === selectedCategory;
-      }
-      return false;
+    return staff.filter((person) => {
+      const categories = Array.isArray(person.category)
+        ? person.category
+        : typeof person.category === "string"
+        ? [person.category]
+        : [];
+
+      return categories.some(
+        (cat) => cat.toLowerCase() === selectedCategory.toLowerCase()
+      );
     });
   }, [doctors, nurses, view, selectedCategory]);
 
@@ -53,7 +61,10 @@ const StaffScroller = ({ doctors = [], nurses = [], sendNotificationToDoctor }) 
 
   const scroll = (dir) => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: dir === "right" ? 320 : -320, behavior: "smooth" });
+      scrollRef.current.scrollBy({
+        left: dir === "right" ? 320 : -320,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -70,8 +81,9 @@ const StaffScroller = ({ doctors = [], nurses = [], sendNotificationToDoctor }) 
               setView("doctors");
               setSelectedCategory("all");
             }}
-            className={`bg-[#03045e] py-2 px-3 rounded-xl font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition duration-200 ${view === "doctors" ? "opacity-100" : "opacity-60"
-              }`}
+            className={`bg-[#03045e] py-2 px-3 rounded-xl font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition duration-200 ${
+              view === "doctors" ? "opacity-100" : "opacity-60"
+            }`}
           >
             View Doctors
           </button>
@@ -81,8 +93,9 @@ const StaffScroller = ({ doctors = [], nurses = [], sendNotificationToDoctor }) 
               setView("nurses");
               setSelectedCategory("all");
             }}
-            className={`bg-[#03045e] py-2 px-3 rounded-xl font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition duration-200 ${view === "nurses" ? "opacity-100" : "opacity-60"
-              }`}
+            className={`bg-[#03045e] py-2 px-3 rounded-xl font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition duration-200 ${
+              view === "nurses" ? "opacity-100" : "opacity-60"
+            }`}
           >
             View Nurses
           </button>
@@ -100,7 +113,11 @@ const StaffScroller = ({ doctors = [], nurses = [], sendNotificationToDoctor }) 
               aria-label="Filter staff by category"
             >
               {categories.map((cat) => (
-                <option key={cat.id} value={cat.id} className="bg-gray-950 text-white pl-[50vh] ">
+                <option
+                  key={cat.id}
+                  value={cat.title}
+                  className="bg-gray-950 text-white pl-[50vh] "
+                >
                   {cat.title}
                 </option>
               ))}
@@ -141,16 +158,27 @@ const StaffScroller = ({ doctors = [], nurses = [], sendNotificationToDoctor }) 
       >
         {filteredStaff.length === 0 ? (
           <p className="w-full text-center pt-5 text-gray-300">
-            No {categories.find(c => c.id === selectedCategory)?.title || selectedCategory}s available at this time.
+            No{" "}
+            {categories.find((c) => c.id === selectedCategory)?.title ||
+              selectedCategory}
+            s available at this time.
           </p>
-
         ) : (
           filteredStaff.map((person, idx) => (
-            <div key={person.userId ?? idx} className="snap-start shrink-0 w-[90vw] sm:w-[300px]">
+            <div
+              key={person.userId ?? idx}
+              className="snap-start shrink-0 w-[90vw] sm:w-[300px]"
+            >
               {view === "doctors" ? (
-                <DoctorsList doctors={[person]} sendNotificationToDoctor={sendNotificationToDoctor} />
+                <DoctorsList
+                  doctors={[person]}
+                  sendNotificationToDoctor={sendNotificationToDoctor}
+                />
               ) : (
-                <NursesList nurses={[person]} sendNotificationToDoctor={sendNotificationToDoctor} />
+                <NursesList
+                  nurses={[person]}
+                  sendNotificationToDoctor={sendNotificationToDoctor}
+                />
               )}
             </div>
           ))
