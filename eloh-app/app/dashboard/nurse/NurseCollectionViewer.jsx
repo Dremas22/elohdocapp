@@ -137,7 +137,6 @@ const NurseCollectionViewer = () => {
   return (
     <div className="min-h-screen flex flex-col pt-12 relative overflow-hidden">
       <NurseDashboardNavbar />
-
       <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(100vh-5rem)]">
