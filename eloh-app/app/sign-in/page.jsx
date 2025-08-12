@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 const SignInPage = async ({ searchParams }) => {
   const role = (await searchParams).role;
 
-  if (!["doctor", "nurse", "patient"].includes(role)) {
+  if (!["doctor", "nurse", "patient", "driver", "customer"].includes(role)) {
     redirect("/");
   }
 

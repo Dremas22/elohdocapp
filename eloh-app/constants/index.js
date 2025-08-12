@@ -164,6 +164,17 @@ export const banks = [
   { id: "african", title: "African Bank" },
 ];
 
+export const driverCategories = [
+  { id: "emtb", title: "Emergency Medical Technician - Basic" },
+  { id: "emti", title: "Emergency Medical Technician - Intermediate" },
+  { id: "emt", title: "Emergency Medical Technician" },
+  { id: "aemt", title: "Advanced Emergency Medical Technician" },
+  { id: "ccp", title: "Critical Care Paramedic" },
+  { id: "ffp", title: "Flight Paramedic" },
+  { id: "scp", title: "Specialist Paramedic" },
+  { id: "rescue", title: "Rescue Paramedic" },
+];
+
 export const CONSULTATION_FEE = 500;
 export const PLATFORM_FEE = 50;
 export const STAFF_EARNING_PER_CONSULTATION = CONSULTATION_FEE - PLATFORM_FEE;

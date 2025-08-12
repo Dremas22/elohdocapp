@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
-    const { token, fcmToken, role } = await req.json();
+    const { token, role } = await req.json();
 
     if (!token) {
       return NextResponse.json({ error: "Missing token" }, { status: 400 });
@@ -46,7 +46,7 @@ export async function POST(req) {
     }
 
     // 📝 Only update FCM/status if user is in doctors/nurses collection
-    if (role === "doctor" || role === "nurse") {
+    if (role === "doctor" || role === "nurse" || role === "driver") {
       const userRef = db?.collection(`${role}s`).doc(uid);
       const userSnap = await userRef.get();
       if (userSnap.exists) {

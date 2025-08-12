@@ -27,7 +27,7 @@ export async function POST(request) {
       );
     }
 
-    const validRoles = ["doctor", "nurse", "patient"];
+    const validRoles = ["doctor", "nurse", "patient", "driver", "customer"];
     if (!validRoles.includes(role)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
