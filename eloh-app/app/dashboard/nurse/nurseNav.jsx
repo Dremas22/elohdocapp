@@ -94,11 +94,16 @@ const NurseDashboardNavbar = () => {
           aria-label="Sign Out"
           title="Sign Out"
           disabled={loading}
-          className="bg-[#03045e] text-white py-3 px-3 text-xs md:text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex flex-col items-center justify-center gap-1 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
+          aria-busy={loading}
+          className={`bg-[#03045e] text-white py-3 px-3 text-xs md:text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex items-center justify-center gap-2 cursor-pointer ${loading
+            ? "cursor-not-allowed disabled:bg-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
+            : ""
+            }`}
         >
           {loading ? (
             <>
               <FaSpinner className="w-4 h-4 animate-spin" />
+              <span className="text-[10px] sm:text-xs md:text-sm">Signing Out...</span>
             </>
           ) : (
             <span className="text-[10px] sm:text-xs md:text-sm">Sign Out</span>
