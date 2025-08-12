@@ -27,8 +27,8 @@ export default async function Home() {
         if (role === "doctor") redirect("/dashboard/doctor");
         if (role === "nurse") redirect("/dashboard/nurse");
         if (role === "patient") redirect("/dashboard/patient");
-        if (role === "driver") redirect("/dashboard/drivers");
-        if (role === "customer") redirect("/dashboard/customers");
+        if (role === "driver") redirect("/dashboard/driver");
+        if (role === "customer") redirect("/dashboard/customer");
         if (!collections.includes(role)) redirect("/");
       }
     }
