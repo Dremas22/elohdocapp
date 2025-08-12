@@ -17,6 +17,7 @@ const PayOptions = () => {
   const { currentUser } = useCurrentUser();
 
   const headerRef = useRef(null);
+  const checkoutRef = useRef(null);
 
   const options = [
     { label: "Doctor", value: "doctor" },
@@ -27,10 +28,18 @@ const PayOptions = () => {
     setSelectedOption(optionValue);
     setSelectedPackage(null);
 
-    // Scroll to top of header so user can see context again
+    // Scroll back to the header
     setTimeout(() => {
       headerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 180);
+  };
+
+  const handlePackageSelect = (pkg) => {
+    setSelectedPackage(pkg);
+    // Scroll down to checkout button
+    setTimeout(() => {
+      checkoutRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 150);
   };
 
   const handleCheckout = async () => {
@@ -86,30 +95,17 @@ const PayOptions = () => {
   return (
     <div className="relative w-full h-screen flex flex-col items-center bg-white text-black">
       {/* Glowing blobs */}
-      <div
-        title="Decorative animated background"
-        className="absolute w-52 h-52 sm:w-72 sm:h-72 bg-blue-300 rounded-full blur-[70px] sm:blur-[100px] top-0 left-6 opacity-20 animate-pulse z-0"
-      />
-      <div
-        title="Decorative animated background"
-        className="absolute w-64 h-64 sm:w-96 sm:h-96 bg-blue-200 rounded-full blur-[80px] sm:blur-[100px] top-12 right-0 opacity-15 animate-pulse z-0"
-      />
+      <div className="absolute w-52 h-52 sm:w-72 sm:h-72 bg-blue-300 rounded-full blur-[70px] sm:blur-[100px] top-0 left-6 opacity-20 animate-pulse z-0" />
+      <div className="absolute w-64 h-64 sm:w-96 sm:h-96 bg-blue-200 rounded-full blur-[80px] sm:blur-[100px] top-12 right-0 opacity-15 animate-pulse z-0" />
 
       {/* CONTENT */}
       <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-12 max-w-7xl">
         {/* Header */}
-        <div
-          ref={headerRef}
-          className="text-center space-y-4"
-          title="Page header: Choose your consultation type"
-        >
+        <div ref={headerRef} className="text-center space-y-4">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#03045e]">
             Choose Your Consultation
           </h1>
-          <p
-            className="text-gray-600 max-w-2xl mx-auto text-base sm:text-lg"
-            title="Information about consultation options"
-          >
+          <p className="text-gray-600 max-w-2xl mx-auto text-base sm:text-lg">
             ElohDoc connects patients with qualified doctors and nurses. Select who
             you'd like to consult with and proceed to choose a package.
           </p>
@@ -121,7 +117,6 @@ const PayOptions = () => {
             <button
               key={option.value}
               onClick={() => handleSelect(option.value)}
-              title={`Consult with a ${option.label}`}
               className={`px-6 text-sm sm:text-lg py-3 font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
                 ${selectedOption === option.value
                   ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
@@ -136,19 +131,18 @@ const PayOptions = () => {
         {/* Payment options below */}
         <div className="w-full mt-10 scroll-mt-24">
           {selectedOption === "doctor" && (
-            <PayToDoctor setSelectedPackage={setSelectedPackage} />
+            <PayToDoctor setSelectedPackage={handlePackageSelect} />
           )}
           {selectedOption === "nurse" && (
-            <PayToNurse setSelectedPackage={setSelectedPackage} />
+            <PayToNurse setSelectedPackage={handlePackageSelect} />
           )}
         </div>
 
         {/* Checkout */}
         {selectedPackage && (
-          <div className="mt-10 text-center">
+          <div className="mt-10 text-center" ref={checkoutRef}>
             <button
               onClick={handleCheckout}
-              title={`Proceed to checkout for ${selectedPackage.subscriptionName} at ${selectedPackage.price}`}
               className="bg-[#03045e] text-white py-3 px-10 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
             >
               Proceed to Checkout – {selectedPackage.price}
