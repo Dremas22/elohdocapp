@@ -66,22 +66,26 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
   };
 
   // Show fallback if user document is missing
-  if (!userDocState) {
+  if (!userDoc) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20">
-        {/* Navbar fallback (could be updated to a generic navbar) */}
+      <div className="min-h-screen bg-gray-950 pt-20">
         <PatientDashboardNavbar />
         <div className="flex items-center justify-center h-full">
-          <div className="text-center text-gray-600">
+          <div className="text-center text-blue-600">
             <p className="text-lg font-medium">No user data found.</p>
             <p className="text-sm mt-1">
               Please make sure your account is registered correctly.
             </p>
-            <Link href="/sign-in?role=doctor">
-              <span className="inline-block mt-4 text-blue-600 hover:underline">
-                Go to Sign In
-              </span>
-            </Link>
+            <div className="flex justify-center mt-6">
+              <Link href="/sign-in?role=doctor" passHref>
+                <button
+                  type="button"
+                  className="bg-[#03045e] text-white py-3 px-6 text-xs md:text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex items-center justify-center gap-1 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
+                >
+                  Go to Sign In
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
