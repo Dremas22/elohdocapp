@@ -6,7 +6,7 @@ import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
 
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
 import NurseDashboardNavbar from "@/app/dashboard/nurse/nurseNav";
-import NurseSidebarMenu from "./nurseSidebar"; // New sidebar component
+import NurseSidebarMenu from "./nurseSidebar";
 import Link from "next/link";
 import SearchBar from "@/components/doctors/SearchBar";
 import { FiX } from "react-icons/fi";
@@ -109,7 +109,7 @@ const NurseCollectionViewer = () => {
   if (!userDoc) {
     return (
       <div className="min-h-screen bg-gray-950 pt-20">
-        <PatientDashboardNavbar />
+        <NurseDashboardNavbarDashboardNavbar />
         <div className="flex items-center justify-center h-full">
           <div className="text-center text-blue-600">
             <p className="text-lg font-medium">No user data found.</p>
