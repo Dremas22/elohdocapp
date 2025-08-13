@@ -72,9 +72,9 @@ const PatientOnboarding = () => {
 
           </h1>
           <p className="text-[#000000] text-base sm:text-lg mb-6">
-            Let&apos;s get you set up to access quality healthcare and connect
-            with trusted medical professionals.
+            Complete registration to get you set up to receive quality healthcare and easily connect with trusted medical professionals.
           </p>
+
 
           <div className="space-y-3 text-[#000000] text-sm sm:text-base">
             {[

@@ -74,10 +74,10 @@ const DoctorOnboarding = () => {
           <h1 className="text-4xl md:text-5xl font-extrabold text-[#03045e] mb-6">
             Welcome, Doctor
           </h1>
-          <p className="text-[#000000] text-base md:text-lg mb-6">
-            Let&apos;s complete your onboarding to activate your profile and
-            begin practicing through our digital healthcare ecosystem.
+          <p className="text-gray-700 text-lg leading-relaxed mb-6">
+            Complete your onboarding to activate your profile and begin providing expert medical care through our digital healthcare ecosystem.
           </p>
+
 
           <div className="space-y-4 text-[#000000] text-sm md:text-base">
             {[
