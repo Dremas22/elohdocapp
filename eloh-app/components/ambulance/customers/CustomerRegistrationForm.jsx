@@ -19,6 +19,7 @@ const CustomerRegistrationForm = () => {
   const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
 
+  // Populate form fields from currentUser when available
   useEffect(() => {
     if (currentUser) {
       setFormData((prev) => ({
@@ -30,6 +31,7 @@ const CustomerRegistrationForm = () => {
     }
   }, [currentUser?.uid]);
 
+  // Handle input changes and clear errors for that field
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -42,6 +44,7 @@ const CustomerRegistrationForm = () => {
     }));
   };
 
+  // Validate form inputs before submission
   const validate = () => {
     const newErrors = {};
     if (!formData.fullName.trim()) {
@@ -62,18 +65,19 @@ const CustomerRegistrationForm = () => {
     return newErrors;
   };
 
+  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     setErrors(validationErrors);
 
+    // Prevent submission if validation errors exist
     if (Object.keys(validationErrors).length !== 0) return;
 
     setSubmitting(true);
 
     try {
-      const { phoneCode, certificate, ...cleanFormData } = formData;
-      const combinedPhoneNumber = `${phoneCode}${formData.phoneNumber}`;
+      const combinedPhoneNumber = `${formData.phoneCode}${formData.phoneNumber}`;
 
       const payload = {
         fullName: currentUser?.displayName || formData.fullName,
@@ -99,6 +103,7 @@ const CustomerRegistrationForm = () => {
       } else if (response.status === 201) {
         toast.success("Customer successfully registered");
         await currentUser?.getIdToken(true);
+        // Reset form after success
         setFormData({
           fullName: "",
           email: "",
@@ -118,6 +123,7 @@ const CustomerRegistrationForm = () => {
     }
   };
 
+  // Show loading indicator while user data loads
   if (loading)
     return (
       <p className="text-black text-center py-10 font-medium">Loading...</p>
@@ -149,13 +155,12 @@ const CustomerRegistrationForm = () => {
               value={formData.fullName}
               disabled={!!currentUser?.displayName}
               placeholder="Full Name"
-              className={`w-full px-4 py-3 rounded-lg border ${
-                errors.fullName ? "border-red-500" : "border-gray-300"
-              } ${
-                currentUser?.displayName
+              title="Enter your full name as it appears on your ID"
+              className={`w-full px-4 py-3 rounded-lg border ${errors.fullName ? "border-red-500" : "border-gray-300"
+                } ${currentUser?.displayName
                   ? "bg-gray-100 text-gray-600"
                   : "bg-white text-gray-900"
-              } focus:outline-none`}
+                } focus:outline-none`}
             />
             {errors.fullName && (
               <p className="text-sm text-red-600 mt-1">{errors.fullName}</p>
@@ -169,6 +174,7 @@ const CustomerRegistrationForm = () => {
               name="email"
               value={formData.email}
               disabled
+              title="Your registered email address (cannot be changed)"
               placeholder="Email"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed"
             />
@@ -181,7 +187,8 @@ const CustomerRegistrationForm = () => {
                 name="phoneCode"
                 value={formData.phoneCode}
                 onChange={handleChange}
-                className="w-full sm:w-28 px-3 py-3 rounded-lg border border-gray-300 bg-white text-gray-900"
+                title="Select your country phone code"
+                className="w-full sm:w-28 px-3 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 cursor-pointer"
               >
                 {phoneCodes.map(({ code, label }) => (
                   <option key={label} value={code}>
@@ -196,9 +203,9 @@ const CustomerRegistrationForm = () => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 placeholder="Phone Number"
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.phoneNumber ? "border-red-500" : "border-gray-300"
-                } bg-white text-gray-900`}
+                title="Enter your 9-digit phone number (without country code)"
+                className={`w-full px-4 py-3 rounded-lg border ${errors.phoneNumber ? "border-red-500" : "border-gray-300"
+                  } bg-white text-gray-900`}
                 pattern="^[0-9]{9}$"
               />
             </div>
@@ -208,14 +215,27 @@ const CustomerRegistrationForm = () => {
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-center mt-6">
+        {/* Buttons container */}
+        <div className="flex justify-center mt-6 gap-4">
+          {/* Register Button */}
           <button
             type="submit"
             disabled={loading || submitting}
-            className="bg-[#03045e] hover:bg-[#0077b6] text-white flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out"
+            title="Click to register as a customer"
+            className="bg-[#03045e] hover:bg-[#0077b6] text-white flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-400"
           >
             {submitting ? "Submitting..." : "Register"}
+          </button>
+
+          {/* Cancel Registration Button */}
+          <button
+            type="button"
+            onClick={() => router.push("/ambulance")}
+            className="bg-red-700 hover:bg-red-400 text-gray-100 flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transition-all duration-200 ease-in-out cursor-pointer"
+            title="Cancel registration and go back to ambulance page"
+            disabled={submitting}
+          >
+            Cancel Registration
           </button>
         </div>
       </form>

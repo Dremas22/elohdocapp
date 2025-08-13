@@ -11,6 +11,7 @@ const DriversRegistrationForm = () => {
   const { loading, currentUser } = useCurrentUser();
   const router = useRouter();
 
+  // Form state initialization
   const [formData, setFormData] = useState({
     fullName: currentUser?.displayName || "",
     idNumber: "",
@@ -23,9 +24,12 @@ const DriversRegistrationForm = () => {
     certificate: null,
   });
 
+  // Validation errors state
   const [errors, setErrors] = useState({});
+  // Submission state
   const [submitting, setSubmitting] = useState(false);
 
+  // Update form with current user info when available
   useEffect(() => {
     if (currentUser) {
       setFormData((prev) => ({
@@ -37,10 +41,11 @@ const DriversRegistrationForm = () => {
     }
   }, [currentUser]);
 
+  // Handle input changes for form fields
   const handleChange = (e) => {
     const { name, value, checked, files } = e.target;
 
-    // Handle criminal record checkbox
+    // Criminal record checkbox toggling
     if (name === "hasRecord") {
       setFormData((prev) => ({
         ...prev,
@@ -53,7 +58,7 @@ const DriversRegistrationForm = () => {
       return;
     }
 
-    // Handle criminal record reason
+    // Criminal record reason input
     if (name === "criminalReason") {
       setFormData((prev) => ({
         ...prev,
@@ -62,7 +67,7 @@ const DriversRegistrationForm = () => {
       return;
     }
 
-    // Handle certificate file
+    // Handle certificate file upload
     if (name === "certificate") {
       const file = files[0];
       setFormData((prev) => ({
@@ -76,7 +81,7 @@ const DriversRegistrationForm = () => {
       return;
     }
 
-    // Handle ID number
+    // Handle ID number input separately for validation clearing
     if (name === "idNumber") {
       setFormData((prev) => ({
         ...prev,
@@ -89,7 +94,7 @@ const DriversRegistrationForm = () => {
       return;
     }
 
-    // Handle all other inputs
+    // Handle all other inputs generically
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -100,6 +105,7 @@ const DriversRegistrationForm = () => {
     }));
   };
 
+  // Validate form data before submission
   const validate = () => {
     const newErrors = {};
 
@@ -139,22 +145,24 @@ const DriversRegistrationForm = () => {
     return newErrors;
   };
 
+  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     setErrors(validationErrors);
 
+    // Stop submission if validation errors exist
     if (Object.keys(validationErrors).length !== 0) return;
 
     setSubmitting(true);
     const fcmToken = await getFCMToken();
 
     try {
+      // Prepare form data for API
       const { phoneCode, certificate, ...cleanFormData } = formData;
       const combinedPhoneNumber = `${phoneCode}${formData.phoneNumber}`;
 
-      // TODO: Make sure you save certificate the firebase storage
-      console.log(certificate, "CERTIFICATE");
+      // TODO: Save certificate file to Firebase Storage
 
       const payload = {
         ...cleanFormData,
@@ -167,6 +175,7 @@ const DriversRegistrationForm = () => {
         fcmToken: fcmToken || null,
       };
 
+      // Call backend API to register user
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/register-user`,
         {
@@ -183,6 +192,7 @@ const DriversRegistrationForm = () => {
       } else if (response.status === 201) {
         toast.success("Driver successfully registered");
         await currentUser?.getIdToken(true);
+        // Reset form after successful registration
         setFormData({
           fullName: "",
           idNumber: "",
@@ -205,6 +215,7 @@ const DriversRegistrationForm = () => {
     }
   };
 
+  // Show loading while user data loads
   if (loading)
     return (
       <p className="text-black text-center py-10 font-medium">Loading...</p>
@@ -236,13 +247,13 @@ const DriversRegistrationForm = () => {
               value={formData.fullName}
               disabled={!!currentUser?.displayName}
               placeholder="Full Name"
-              className={`w-full px-4 py-3 rounded-lg border ${
-                errors.fullName ? "border-red-500" : "border-gray-300"
-              } ${
-                currentUser?.displayName
+              title="Enter your full name as shown on your official documents"
+              className={`w-full px-4 py-3 rounded-lg border ${errors.fullName ? "border-red-500" : "border-gray-300"
+                } ${currentUser?.displayName
                   ? "bg-gray-100 text-gray-600"
                   : "bg-white text-gray-900"
-              } focus:outline-none`}
+                } focus:outline-none`}
+              style={{ cursor: currentUser?.displayName ? "not-allowed" : "text" }}
             />
             {errors.fullName && (
               <p className="text-sm text-red-600 mt-1">{errors.fullName}</p>
@@ -258,6 +269,8 @@ const DriversRegistrationForm = () => {
               disabled
               placeholder="Email"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed"
+              title="Your email (auto-filled from login)"
+              style={{ cursor: "not-allowed" }}
             />
           </div>
 
@@ -269,9 +282,10 @@ const DriversRegistrationForm = () => {
               value={formData.idNumber}
               onChange={handleChange}
               placeholder="ID Number"
-              className={`w-full px-4 py-3 rounded-lg border ${
-                errors.idNumber ? "border-red-500" : "border-gray-300"
-              } bg-white text-gray-900`}
+              title="Enter your 13-digit government-issued ID number"
+              className={`w-full px-4 py-3 rounded-lg border ${errors.idNumber ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900`}
+              style={{ cursor: "text" }}
             />
             {errors.idNumber && (
               <p className="text-red-500 text-sm mt-1">{errors.idNumber}</p>
@@ -284,9 +298,10 @@ const DriversRegistrationForm = () => {
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-lg border ${
-                errors.category ? "border-red-500" : "border-gray-300"
-              } bg-white text-gray-900`}
+              title="Select your driver category"
+              className={`w-full px-4 py-3 rounded-lg border ${errors.category ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900 cursor-pointer`}
+              style={{ cursor: "pointer" }}
             >
               <option value="" disabled>
                 Select Category
@@ -309,7 +324,9 @@ const DriversRegistrationForm = () => {
                 name="phoneCode"
                 value={formData.phoneCode}
                 onChange={handleChange}
-                className="w-full sm:w-28 px-3 py-3 rounded-lg border border-gray-300 bg-white text-gray-900"
+                title="Select your phone country code"
+                className="w-full sm:w-28 px-3 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 cursor-pointer"
+                style={{ cursor: "pointer" }}
               >
                 {phoneCodes.map(({ code, label }) => (
                   <option key={label} value={code}>
@@ -324,10 +341,11 @@ const DriversRegistrationForm = () => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 placeholder="Phone Number"
-                className={`w-full px-4 py-3 rounded-lg border ${
-                  errors.phoneNumber ? "border-red-500" : "border-gray-300"
-                } bg-white text-gray-900`}
+                title="Enter your 9-digit phone number excluding country code"
+                className={`w-full px-4 py-3 rounded-lg border ${errors.phoneNumber ? "border-red-500" : "border-gray-300"
+                  } bg-white text-gray-900`}
                 pattern="^[0-9]{9}$"
+                style={{ cursor: "text" }}
               />
             </div>
             {errors.phoneNumber && (
@@ -337,15 +355,22 @@ const DriversRegistrationForm = () => {
 
           {/* Criminal Record */}
           <div className="col-span-full space-y-3">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
                 name="hasRecord"
                 checked={formData.criminalRecord.hasRecord}
                 onChange={handleChange}
-                className="w-5 h-5"
+                className="w-5 h-5 cursor-pointer"
+                id="criminalRecordCheckbox"
+                title="Tick if you have a criminal record"
               />
-              <label className="text-gray-700">I have a criminal record</label>
+              <label
+                htmlFor="criminalRecordCheckbox"
+                className="text-gray-700 cursor-pointer"
+              >
+                I have a criminal record
+              </label>
             </div>
 
             {formData.criminalRecord.hasRecord && (
@@ -356,14 +381,13 @@ const DriversRegistrationForm = () => {
                   value={formData.criminalRecord.reason}
                   onChange={handleChange}
                   placeholder="Reason for criminal record"
-                  className={`w-full px-4 py-3 rounded-lg border ${
-                    errors.criminalRecord ? "border-red-500" : "border-gray-300"
-                  } bg-white text-gray-900`}
+                  title="Please provide the reason for your criminal record"
+                  className={`w-full px-4 py-3 rounded-lg border ${errors.criminalRecord ? "border-red-500" : "border-gray-300"
+                    } bg-white text-gray-900`}
+                  style={{ cursor: "text" }}
                 />
                 {errors.criminalRecord && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.criminalRecord}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{errors.criminalRecord}</p>
                 )}
               </div>
             )}
@@ -374,7 +398,8 @@ const DriversRegistrationForm = () => {
         <div>
           <label
             htmlFor="certificate"
-            className="block text-sm font-medium text-gray-900 mb-2"
+            className="block text-sm font-medium text-gray-900 mb-2 cursor-pointer"
+            title="Upload your certificate as a PDF file"
           >
             Upload Certificate (PDF)
           </label>
@@ -389,23 +414,35 @@ const DriversRegistrationForm = () => {
                 certificate: e.target.files[0],
               })
             }
-            className={`w-full px-4 py-3 rounded-lg border ${
-              errors.certificate ? "border-red-500" : "border-gray-300"
-            } bg-white text-gray-900`}
+            className={`w-full px-4 py-3 rounded-lg border ${errors.certificate ? "border-red-500" : "border-gray-300"
+              } bg-white text-gray-900 cursor-pointer`}
+            title="Choose PDF file to upload"
           />
           {errors.certificate && (
             <p className="text-sm text-red-600 mt-1">{errors.certificate}</p>
           )}
         </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-center mt-6">
+        {/* Submit and Cancel Buttons */}
+        <div className="flex justify-center mt-6 gap-4">
+          {/* Register Button */}
           <button
             type="submit"
             disabled={loading || submitting}
-            className="bg-[#03045e] hover:bg-[#0077b6] text-white flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out"
+            title="Click to register as an ambulance driver"
+            className="bg-[#03045e] hover:bg-[#0077b6] text-white flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-400"
           >
             {submitting ? "Submitting..." : "Register"}
+          </button>
+          {/* Cancel Registration Button */}
+          <button
+            type="button"
+            onClick={() => router.push("/ambulance")}
+            className="bg-red-700 hover:bg-red-400 text-gray-100 flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transition-all duration-200 ease-in-out cursor-pointer"
+            title="Cancel registration and go back to ambulance page"
+            disabled={submitting}
+          >
+            Cancel Registration
           </button>
         </div>
       </form>

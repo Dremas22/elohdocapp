@@ -58,14 +58,14 @@ const NurseOnboarding = () => {
     <div className="min-h-screen bg-background/50 px-6 py-12 sm:py-20 flex items-center justify-center">
       <div className="w-full max-w-6xl bg-foreground rounded-3xl shadow-2xl p-8 sm:p-10 md:p-12 flex flex-col md:flex-row gap-10 md:gap-16">
         {/* Left Content */}
-        <div className="md:w-1/2 text-center md:text-left flex flex-col justify-center">
+        <div className="md:w-1/2 text-left md:text-left flex flex-col justify-center">
           <h1 className="text-4xl font-extrabold text-blue-800 mb-4 capitalize tracking-tight leading-tight">
             Welcome, Nurse
           </h1>
           <p className="text-gray-700 text-lg leading-relaxed mb-6">
-            Let&apos;s complete your onboarding to activate your profile and
-            begin practicing through our digital healthcare ecosystem.
+            Complete your onboarding to activate your profile and start delivering quality nursing care through our digital healthcare ecosystem.
           </p>
+
 
           <div className="space-y-4 text-base text-gray-600">
             <div className="flex items-start gap-2">
