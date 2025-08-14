@@ -232,7 +232,7 @@ const CustomerRegistrationForm = () => {
             type="button"
             onClick={() => router.push("/ambulance")}
             className="bg-red-700 hover:bg-red-400 text-gray-100 flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transition-all duration-200 ease-in-out cursor-pointer"
-            title="Cancel registration and go back to ambulance page"
+            title="Cancel registration and discard changes"
             disabled={submitting}
           >
             Cancel Registration
