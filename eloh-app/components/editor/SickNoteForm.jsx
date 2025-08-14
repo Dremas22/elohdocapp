@@ -15,12 +15,15 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
     successMessage,
   } = useSaveMedicalHistory();
 
-  const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().slice(0, 10)
+  );
   const [endDate, setEndDate] = useState("");
   const [reason, setReason] = useState("");
   const [signature, setSignature] = useState(null);
   const [showSignaturePad, setShowSignaturePad] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [openPreview, setOpenPreview] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
   const [previewData, setPreviewData] = useState(null);
@@ -57,23 +60,25 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
     if (success) setShowPreview(true);
   };
 
-  const handlePreview = () => {
-    const note = {
-      doctorName: doctorId?.displayName || "Dr. Name",
-      doctorEmail: doctorId?.email || "email@example.com",
-      phoneNumber: doctorId?.phoneNumber || "000-000-0000",
-      practiceNumber: doctorId?.practiceNumber || "PRAC123456",
-      patientName: patientData?.fullName || "__________",
-      createdAt: new Date(),
-      content: {
-        startDate,
-        endDate,
-        reason,
-      },
-    };
-
-    setPreviewData(note);
-    setOpenPreview(true);
+  const handlePreview = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/get-latest-note`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ patientId, noteType: "sickNotes" }),
+        }
+      );
+      const data = await response.json();
+      setPreviewData(data?.note);
+      setOpenPreview(true);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -90,11 +95,15 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
       )}
 
       <h2 className="text-xl font-semibold text-[#03045e]">Sick Note</h2>
-      <p><strong>Patient Name:</strong> {patientData?.fullName}</p>
+      <p>
+        <strong>Patient Name:</strong> {patientData?.fullName}
+      </p>
 
       <div className="bg-gray-100 p-4 rounded-md border border-gray-300 space-y-4">
         <div>
-          <label className="block mb-1 font-semibold" htmlFor="start-date">Start Date:</label>
+          <label className="block mb-1 font-semibold" htmlFor="start-date">
+            Start Date:
+          </label>
           <input
             id="start-date"
             type="date"
@@ -109,7 +118,9 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
         </div>
 
         <div>
-          <label className="block mb-1 font-semibold" htmlFor="end-date">End Date:</label>
+          <label className="block mb-1 font-semibold" htmlFor="end-date">
+            End Date:
+          </label>
           <input
             id="end-date"
             type="date"
@@ -125,7 +136,9 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
       </div>
 
       <div>
-        <label className="block mb-1 font-semibold" htmlFor="reason">Reason for Absence:</label>
+        <label className="block mb-1 font-semibold" htmlFor="reason">
+          Reason for Absence:
+        </label>
         <textarea
           id="reason"
           rows={3}
@@ -141,7 +154,8 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
       </div>
 
       <p>
-        <strong>Recommended Rest Period:</strong> {startDate || "---"} to {endDate || "---"}
+        <strong>Recommended Rest Period:</strong> {startDate || "---"} to{" "}
+        {endDate || "---"}
       </p>
 
       <div>
@@ -156,7 +170,7 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
             <button
               title="Remove current signature"
               onClick={() => setSignature(null)}
-              className="bg-red-600 text-white py-2 px-4 text-sm rounded shadow hover:bg-red-700 transition"
+              className="bg-red-600 text-white py-2 px-4 text-sm rounded shadow-[0_4px_#999] active:shadow-[0_2px_#666] hover:bg-red-700 transition"
             >
               Remove Signature
             </button>
@@ -175,8 +189,11 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
       </div>
 
       {error && <p className="text-sm text-red-600 font-semibold">{error}</p>}
-      {successMessage && <p className="text-sm text-green-700 font-semibold">{successMessage}</p>}
+      {successMessage && (
+        <p className="text-sm text-green-700 font-semibold">{successMessage}</p>
+      )}
 
+      {/* Buttons container for submit and preview */}
       <div className="flex flex-wrap justify-between items-center gap-4 pt-4">
         {!signature && !showSignaturePad && (
           <button
@@ -196,19 +213,18 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
         >
           {submitting ? "Submitting..." : "Submit"}
         </button>
-      </div>
 
-      {showPreview && (
-        <div className="pt-4">
+        {showPreview && (
           <button
             title="Preview your completed note"
             onClick={handlePreview}
+            disabled={isLoading}
             className="bg-[#03045e] text-white py-3 px-5 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer w-full sm:w-auto"
           >
             Preview
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

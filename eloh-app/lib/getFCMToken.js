@@ -1,6 +1,6 @@
-import { getMessaging, getToken } from "firebase/messaging";
+import { getToken } from "firebase/messaging";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/db/client";
+import { auth, messaging } from "@/db/client";
 
 // Utility to wait until Firebase Auth is ready
 const waitForAuth = () =>
@@ -38,12 +38,11 @@ export async function getFCMToken() {
       }
     }
 
-    const messaging = getMessaging();
-
     // Get token
     const fcmToken = await getToken(messaging, {
       vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
       serviceWorkerRegistration: readyRegistration,
+      forceRefresh: true,
     });
 
     if (!fcmToken) {

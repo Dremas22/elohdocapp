@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMessaging } from "firebase-admin/messaging";
 import { db } from "@/db/server";
+import { getFCMToken } from "@/lib/getFCMToken";
 
 export async function POST(req) {
   try {
@@ -45,22 +46,47 @@ export async function POST(req) {
 
     const patientName = patientData?.fullName || "A patient";
 
-    await getMessaging().send({
-      token: fcmToken,
-      notification: {
-        title: "New Consultation Request",
-        body: `${patientName} wants to start a video consultation.\nJoin here: ${process.env.NEXT_PUBLIC_URL}/room?staffId=${doctorId}&patientId=${patientId}`,
-      },
-      data: {
-        roomId: doctorId,
-        patientId,
-      },
-      webpush: {
-        fcmOptions: {
-          link: `${process.env.NEXT_PUBLIC_URL}/room?staffId=${doctorId}&patientId=${patientId}`,
+    try {
+      await getMessaging().send({
+        token: fcmToken,
+        notification: {
+          title: "New Consultation Request",
+          body: `${patientName} wants to start a video consultation.\nJoin here: ${process.env.NEXT_PUBLIC_URL}/room?staffId=${doctorId}&patientId=${patientId}`,
         },
-      },
-    });
+        data: {
+          roomId: doctorId,
+          patientId,
+        },
+        webpush: {
+          fcmOptions: {
+            link: `${process.env.NEXT_PUBLIC_URL}/room?staffId=${doctorId}&patientId=${patientId}`,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error sending notification:", error);
+
+      // Remove invalid tokens to prevent future errors
+      if (
+        error.code === "messaging/registration-token-not-registered" ||
+        error.code === "messaging/invalid-registration-token"
+      ) {
+        // Step 1: Clear the old token in Firestore
+        await driverDoc.ref.update({ fcmToken: null });
+
+        // Step 2: Attempt to get a fresh token
+        const newToken = await getFCMToken();
+
+        // Step 3: Only update Firestore if we actually got a valid token
+        if (newToken) {
+          await driverDoc.ref.update({ fcmToken: newToken });
+        } else {
+          console.warn("Unable to retrieve a new FCM token.");
+        }
+      } else {
+        throw error;
+      }
+    }
 
     return NextResponse.json(
       { message: "Notification sent", patient: patientData },

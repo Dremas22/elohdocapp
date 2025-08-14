@@ -1,7 +1,7 @@
 "use client";
 
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
-import { FaDownload, FaHeartbeat, FaTimes, } from "react-icons/fa";
+import { FaDownload, FaHeartbeat, FaTimes } from "react-icons/fa";
 import DownloadButton from "./DownloadButton";
 import { convertOKLCHtoRGB } from "@/lib/convertOKLCHtoRGB";
 import html2canvas from "html2canvas";
@@ -110,14 +110,21 @@ const NotePreview = ({
       const canvas = await html2canvas(previewRef.current);
       const imgData = canvas.toDataURL("image/png");
 
-      const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: "a4" });
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "px",
+        format: "a4",
+      });
       const padding = 20;
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const maxWidth = pageWidth - 2 * padding;
       const maxHeight = pageHeight - 2 * padding;
 
-      const ratio = Math.min(maxWidth / canvas.width, maxHeight / canvas.height);
+      const ratio = Math.min(
+        maxWidth / canvas.width,
+        maxHeight / canvas.height
+      );
       const imgWidth = canvas.width * ratio;
       const imgHeight = canvas.height * ratio;
       const x = (pageWidth - imgWidth) / 2;
@@ -193,17 +200,28 @@ const NotePreview = ({
             {noteType === "sickNotes" && (
               <div className="relative bg-white p-4 sm:p-6 rounded-xl border border-gray-300">
                 <div className="relative z-10 space-y-5">
-                  <h2 className="text-xl sm:text-2xl font-bold text-center text-[#023e8a]">Sick Note</h2>
-                  <p className="text-right text-sm">Date: <span>{formatDate(previewData.content?.startDate)}</span></p>
+                  <h2 className="text-xl sm:text-2xl font-bold text-center text-[#023e8a]">
+                    Sick Note
+                  </h2>
+                  <p className="text-right text-sm">
+                    Date:{" "}
+                    <span>{formatDate(previewData.content?.startDate)}</span>
+                  </p>
                   <p>To Whom It May Concern,</p>
                   <p>This letter serves as an official medical excuse for:</p>
                   <p className="text-center font-mono border-b border-gray-400 py-1">
                     {previewData?.patientName || "___________"}
                   </p>
-                  <p>due to a medical condition that required rest and/or treatment.</p>
+                  <p>
+                    due to a medical condition that required rest and/or
+                    treatment.
+                  </p>
                   {previewData.content?.reason && (
                     <p className="italic text-gray-700">
-                      <span className="font-semibold text-gray-900">Reason:</span> {previewData.content.reason}
+                      <span className="font-semibold text-gray-900">
+                        Reason:
+                      </span>{" "}
+                      {previewData.content.reason}
                     </p>
                   )}
                   <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-10 text-center">
@@ -220,9 +238,14 @@ const NotePreview = ({
                       <p className="text-xs mt-1 text-gray-500">End Date</p>
                     </div>
                   </div>
-                  <p>If further accommodations or verification are required, please contact my office.</p>
+                  <p>
+                    If further accommodations or verification are required,
+                    please contact my office.
+                  </p>
                   <p className="font-semibold mt-6">Sincerely,</p>
-                  <p className="border-b border-gray-500 inline-block min-w-[200px]">{docName}</p>
+                  <p className="border-b border-gray-500 inline-block min-w-[200px]">
+                    {docName}
+                  </p>
                 </div>
                 <ElodocWatermark position="right" />
               </div>
@@ -231,32 +254,49 @@ const NotePreview = ({
             {/* Prescription Note */}
             {noteType === "prescriptions" && (
               <div className="relative bg-white p-6 w-full sm:p-6 rounded-xl border border-gray-300">
-                <div className="absolute inset-0 flex justify-center items-center z-0 pointer-events-none select-none">
-                </div>
+                <div className="absolute inset-0 flex justify-center items-center z-0 pointer-events-none select-none"></div>
                 <div className="relative mr-2 z-10 space-y-5">
-                  <h2 className="text-xl sm:text-2xl font-bold text-center text-[#023e8a]">Prescription Note</h2>
-                  <p><span className="font-semibold">Date Issued:</span> {formatDate(previewData.content?.date)}</p>
+                  <h2 className="text-xl sm:text-2xl font-bold text-center text-[#023e8a]">
+                    Prescription Note
+                  </h2>
+                  <p>
+                    <span className="font-semibold">Date Issued:</span>{" "}
+                    {formatDate(previewData.content?.date)}
+                  </p>
                   <div>
-                    <p className="font-semibold mb-1">Prescribed Medication(s):</p>
+                    <p className="font-semibold mb-1">
+                      Prescribed Medication(s):
+                    </p>
                     {previewData.content?.medications &&
-                      Object.values(previewData.content.medications).length > 0 ? (
+                    Object.values(previewData.content.medications).length >
+                      0 ? (
                       <p className="text-gray-800">
-                        {Object.values(previewData.content.medications).join(", ")}
+                        {Object.values(previewData.content.medications).join(
+                          ", "
+                        )}
                       </p>
                     ) : (
-                      <p className="italic text-gray-500">No medications listed</p>
+                      <p className="italic text-gray-500">
+                        No medications listed
+                      </p>
                     )}
                   </div>
-                  <span className="text-[10rem] sm:text-[16rem] text-[#16292d] font-serif opacity-10 pt-10">℞</span>
+                  <span className="text-[10rem] sm:text-[16rem] text-[#16292d] font-serif opacity-10 pt-10">
+                    ℞
+                  </span>
                   <p>
                     <span className="font-semibold">Instructions:</span>{" "}
                     {previewData.content?.instructions || (
-                      <span className="italic text-gray-500">No instructions provided.</span>
+                      <span className="italic text-gray-500">
+                        No instructions provided.
+                      </span>
                     )}
                   </p>
                   <div className="text-right pt-6 border-t border-gray-200">
                     <div className="border-b border-gray-600 w-48 h-8 ml-auto"></div>
-                    <p className="text-xs italic text-gray-500 mt-1">Dr. {docName}</p>
+                    <p className="text-xs italic text-gray-500 mt-1">
+                      Dr. {docName}
+                    </p>
                   </div>
                 </div>
                 <ElodocWatermark position="left" />
@@ -267,7 +307,9 @@ const NotePreview = ({
             {noteType === "generalNotes" && (
               <div className="relative bg-white p-4 sm:p-6 rounded-xl border border-gray-300">
                 <div className="relative z-10 space-y-6">
-                  <h2 className="text-xl sm:text-2xl font-bold text-center text-[#023e8a]">Patient Medical Report</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-center text-[#023e8a]">
+                    Patient Medical Report
+                  </h2>
                   <div className="grid sm:grid-cols-2 gap-4 border border-gray-200 p-4 rounded-xl bg-white">
                     <div>
                       <p className="text-sm text-gray-500">Patient Name</p>
@@ -277,7 +319,9 @@ const NotePreview = ({
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Date Created</p>
-                      <p className="font-medium">{formatDate(previewData.createdAt)}</p>
+                      <p className="font-medium">
+                        {formatDate(previewData.createdAt)}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Doctor</p>
@@ -285,7 +329,9 @@ const NotePreview = ({
                     </div>
                   </div>
                   <div className="bg-white border border-gray-200 p-4 rounded-xl whitespace-pre-line text-sm sm:text-base">
-                    <h3 className="text-base sm:text-lg font-semibold text-[#023e8a] mb-2">Doctor's Notes:</h3>
+                    <h3 className="text-base sm:text-lg font-semibold text-[#023e8a] mb-2">
+                      Doctor's Notes:
+                    </h3>
                     <p>{previewData.content?.note || previewData.content}</p>
                   </div>
                   {signature && (
@@ -296,7 +342,9 @@ const NotePreview = ({
                         className="max-w-[200px] border rounded-md mb-2"
                       />
                       <div className="border-b border-gray-600 w-48 h-8 ml-auto"></div>
-                      <p className="text-xs italic text-gray-500 mt-1">Dr. {docName}</p>
+                      <p className="text-xs italic text-gray-500 mt-1">
+                        Dr. {docName}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -318,7 +366,6 @@ const NotePreview = ({
             >
               View Medical Record
             </button>
-
           )}
           <DownloadButton
             className="min-w-24 flex items-center justify-center gap-2 px-4 py-2"

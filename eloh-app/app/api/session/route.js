@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
-    const { token, fcmToken, role } = await req.json();
+    const { token, role, fcmToken } = await req.json();
 
     if (!token) {
       return NextResponse.json({ error: "Missing token" }, { status: 400 });
@@ -45,19 +45,28 @@ export async function POST(req) {
       await auth.setCustomUserClaims(uid, { role });
     }
 
-    // 📝 Only update FCM/status if user is in doctors/nurses collection
-    if (role === "doctor" || role === "nurse") {
+    // 📝 Only update FCM/status if user is in doctors/nurses/drivers collection
+    if (role === "doctor" || role === "nurse" || role === "driver") {
       const userRef = db?.collection(`${role}s`).doc(uid);
       const userSnap = await userRef.get();
+
       if (userSnap.exists) {
-        await userRef.set(
-          {
-            online: true,
-            lastLogin: new Date(),
-            updatedAt: new Date(),
-          },
-          { merge: true }
-        );
+        const updateData = {
+          online: true,
+          lastLogin: new Date(),
+          updatedAt: new Date(),
+        };
+
+        // If we received a valid FCM token, store it
+        if (
+          fcmToken &&
+          typeof fcmToken === "string" &&
+          fcmToken.trim() !== ""
+        ) {
+          updateData.fcmToken = fcmToken;
+        }
+
+        await userRef.set(updateData, { merge: true });
       }
     }
 

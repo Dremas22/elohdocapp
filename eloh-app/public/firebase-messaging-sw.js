@@ -18,17 +18,28 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage(function (payload) {
-  const notificationTitle = payload.notification.title;
-  const notificationBody = payload.notification.body;
+  // Safely read title/body
+  let notificationTitle = payload.notification?.title || "New Notification";
+  let notificationBody = payload.notification?.body || "You have a new message";
 
-  const link = payload?.fcmOptions?.link || payload?.data?.link || "/";
+  let link = payload?.fcmOptions?.link || payload?.data?.link || "/";
+
+  // Handle ambulance requests specifically
+  if (payload.data?.type === "ambulance_request") {
+    notificationTitle = "🚑 New Ambulance Request";
+    notificationBody = `Pickup: ${
+      payload.data.pickupAddress || "Unknown"
+    }\nFare: R${payload.data.fare || "0"}`;
+    link = link || "/dashboard/driver";
+  }
 
   const notificationOptions = {
     body: notificationBody,
     icon: "/images/elohdoc.png",
     requireInteraction: true,
     data: {
-      link: link,
+      link,
+      ...payload.data,
     },
   };
 
@@ -40,6 +51,7 @@ self.addEventListener("notificationclick", function (event) {
   event.notification.close(); // Close the notification
 
   const link = event.notification?.data?.link || "/";
+  const requestData = event.notification?.data;
 
   event.waitUntil(
     clients
@@ -48,6 +60,11 @@ self.addEventListener("notificationclick", function (event) {
         // If the app is already open, focus it
         for (const client of clientList) {
           if (client.url === link && "focus" in client) {
+            // Send the data back to the client so it can set ambulanceRequest
+            client.postMessage({
+              type: "NOTIFICATION_CLICK",
+              data: requestData,
+            });
             return client.focus();
           }
         }

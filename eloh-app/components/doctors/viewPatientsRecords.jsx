@@ -62,7 +62,7 @@ const ViewPatientsRecords = ({
   }
 
   return (
-    <div className="text-[#333] p-8 w-full max-w-6xl mx-auto">
+    <div className="text-[#333] p-4 pr-2 w-full max-w-6xl mx-auto">
       <h1 className="text-2xl text-gray-200 font-bold mb-6 text-center">
         Patient Medical Records
       </h1>
@@ -91,9 +91,9 @@ const ViewPatientsRecords = ({
       </div>
 
       {/* Table Section with Tooltip */}
-      <div className="relative group bg-white rounded-lg shadow-md border border-gray-200 lg:w-[60vw] md:w-[75vw] w-[85vw] px-2 sm:px-6 text-sm sm:text-base -ml-10 sm:ml-0">
+      <div className="relative group bg-white rounded-lg shadow-md border mr-2 border-gray-200 lg:w-[60vw] md:w-[75vw] w-[85vw] px-4 sm:px-6 text-sm sm:text-base -ml-8 sm:ml-0">
 
-        <div className="flex justify-end px-4 pt-3">
+        <div className="flex justify-end px-3 pt-3">
           <button
             title="close table"
             onClick={() => {

@@ -6,7 +6,7 @@ import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
 
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
 import NurseDashboardNavbar from "@/app/dashboard/nurse/nurseNav";
-import NurseSidebarMenu from "./nurseSidebar"; // New sidebar component
+import NurseSidebarMenu from "./nurseSidebar";
 import Link from "next/link";
 import SearchBar from "@/components/doctors/SearchBar";
 import { FiX } from "react-icons/fi";
@@ -109,18 +109,23 @@ const NurseCollectionViewer = () => {
   if (!userDoc) {
     return (
       <div className="min-h-screen bg-gray-950 pt-20">
-        <NurseDashboardNavbar />
+        <NurseDashboardNavbarDashboardNavbar />
         <div className="flex items-center justify-center h-full">
-          <div className="text-center text-gray-50">
+          <div className="text-center text-blue-600">
             <p className="text-lg font-medium">No user data found.</p>
             <p className="text-sm mt-1">
               Please make sure your account is registered correctly.
             </p>
-            <Link href="/sign-in?role=nurse">
-              <span className="inline-block mt-4 text-blue-600 hover:underline">
-                Go to Sign In
-              </span>
-            </Link>
+            <div className="flex justify-center mt-6">
+              <Link href="/sign-in?role=nurse" passHref>
+                <button
+                  type="button"
+                  className="bg-[#03045e] text-white py-3 px-6 text-xs md:text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex items-center justify-center gap-1 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
+                >
+                  Go to Sign In
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -130,9 +135,8 @@ const NurseCollectionViewer = () => {
   const { practiceNumber, isVerified } = userDoc;
 
   return (
-    <div className="min-h-screen flex flex-col pt-18 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col pt-12 relative overflow-hidden">
       <NurseDashboardNavbar />
-
       <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(100vh-5rem)]">
@@ -155,7 +159,7 @@ const NurseCollectionViewer = () => {
               {/* Earnings Modal */}
               {showEarnings && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-md z-50 flex items-center justify-center px-4">
-                  <div className="bg-white rounded-xl text-black p-6 w-full max-w-4xl shadow-lg relative border-t-8 border-[#0d6efd]">
+                  <div className="bg-white rounded-xl text-black p-8 w-full max-w-4xl shadow-lg relative border-t-8 border-[#0d6efd]">
                     {/* Close button */}
                     <button
                       onClick={() => setShowEarnings(false)}
@@ -238,7 +242,10 @@ const NurseCollectionViewer = () => {
               <h2 className="text-lg font-semibold mb-2">
                 Verification Declined
               </h2>
-              <p>Please contact support to verify your practice information.</p>
+              <p>
+                We could not verify your account. Please ensure your practice
+                number is registered or contact support for help.
+              </p>
             </div>
           )}
         </main>

@@ -11,7 +11,13 @@ export default async function Home() {
     const decoded = await auth?.verifySessionCookie(sessionCookie, true);
     const userId = decoded.uid;
 
-    const collections = ["doctors", "nurses", "patients"];
+    const collections = [
+      "doctors",
+      "nurses",
+      "patients",
+      "drivers",
+      "customers",
+    ];
 
     for (const col of collections) {
       const docSnap = await db.collection(col).doc(userId).get();
@@ -21,6 +27,9 @@ export default async function Home() {
         if (role === "doctor") redirect("/dashboard/doctor");
         if (role === "nurse") redirect("/dashboard/nurse");
         if (role === "patient") redirect("/dashboard/patient");
+        if (role === "driver") redirect("/dashboard/driver");
+        if (role === "customer") redirect("/dashboard/customer");
+        if (!collections.includes(role)) redirect("/");
       }
     }
   }

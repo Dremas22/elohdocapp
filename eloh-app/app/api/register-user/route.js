@@ -27,7 +27,7 @@ export async function POST(request) {
       );
     }
 
-    const validRoles = ["doctor", "nurse", "patient"];
+    const validRoles = ["doctor", "nurse", "patient", "driver", "customer"];
     if (!validRoles.includes(role)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
@@ -50,11 +50,12 @@ export async function POST(request) {
       updatedAt: now,
     };
 
-    if (role === "doctor" || role === "nurse") {
+    if (role === "doctor" || role === "nurse" || role === "driver") {
       userDoc.isVerified = false;
-      userDoc.available = true;
+      userDoc.available = false;
     } else if (role === "patient") {
       userDoc.isActive = true;
+      userDoc.fcmToken = null;
       userDoc.consultations = {
         doctor: 0,
         nurse: 0,
@@ -63,7 +64,7 @@ export async function POST(request) {
 
     await userDocRef.set(userDoc);
 
-    if (role === "doctor" || role === "nurse") {
+    if (role === "doctor" || role === "nurse" || role === "driver") {
       await auth?.setCustomUserClaims(userId, { role }); // use role from data
     }
 

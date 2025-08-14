@@ -11,7 +11,7 @@ const NursesList = ({ nurses, sendNotificationToDoctor }) => {
 
   return (
     <div className="w-full flex justify-center">
-      <div className="flex flex-wrap gap-6 justify-center items-center max-w-7xl px-4 py-6">
+      <div className="flex flex-wrap gap-4 justify-center items-center max-w-7xl px-4 py-5">
         {nurses.map((nurse) => (
           <div
             key={nurse.userId}
