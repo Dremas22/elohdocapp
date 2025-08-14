@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMessaging } from "firebase-admin/messaging";
 import { db } from "@/db/server";
+import { getFCMToken } from "@/lib/getFCMToken";
 
 export async function POST(req) {
   try {
@@ -70,9 +71,19 @@ export async function POST(req) {
         error.code === "messaging/registration-token-not-registered" ||
         error.code === "messaging/invalid-registration-token"
       ) {
-        await userDoc.ref.update({ fcmToken: null });
+        // Step 1: Clear the old token in Firestore
+        await driverDoc.ref.update({ fcmToken: null });
+
+        // Step 2: Attempt to get a fresh token
+        const newToken = await getFCMToken();
+
+        // Step 3: Only update Firestore if we actually got a valid token
+        if (newToken) {
+          await driverDoc.ref.update({ fcmToken: newToken });
+        } else {
+          console.warn("Unable to retrieve a new FCM token.");
+        }
       } else {
-        // Re-throw unexpected errors to be handled by outer catch
         throw error;
       }
     }
