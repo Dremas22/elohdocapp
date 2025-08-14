@@ -55,6 +55,7 @@ export async function POST(request) {
       userDoc.available = false;
     } else if (role === "patient") {
       userDoc.isActive = true;
+      userDoc.fcmToken = null;
       userDoc.consultations = {
         doctor: 0,
         nurse: 0,
