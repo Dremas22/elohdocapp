@@ -53,12 +53,6 @@ const StaffScroller = ({
     });
   }, [doctors, nurses, view, selectedCategory]);
 
-  useEffect(() => {
-    console.log("View:", view);
-    console.log("Selected Category:", selectedCategory);
-    console.log("Filtered Staff:", filteredStaff);
-  }, [filteredStaff, view, selectedCategory]);
-
   const scroll = (dir) => {
     if (scrollRef.current) {
       scrollRef.current.scrollBy({
