@@ -31,18 +31,21 @@ const AmbulanceLandingPage = () => {
       {/* Buttons (Your style) */}
       <div className="flex flex-col sm:flex-row gap-5 mt-12 animate-fadeInUp delay-200">
         <button
+          title="Click to sign in as an ambulance driver"
           onClick={() => handleRoleClick("driver")}
-          className="bg-[#03045e] text-white font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
+          className="bg-[#03045e] text-white font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
         >
           Ambulance Driver
         </button>
         <button
+          title="Click to sign in as a customer"
           onClick={() => handleRoleClick("customer")}
-          className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
+          className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
         >
           Customer
         </button>
       </div>
+
 
       {/* Footer note */}
       <footer className="absolute bottom-6 text-[#023e8a] text-sm text-center opacity-80 animate-fadeInUp delay-300">
