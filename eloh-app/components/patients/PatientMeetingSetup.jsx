@@ -143,7 +143,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
 
   if (loading || !currentUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white bg-gray-900 px-4">
+      <div className="min-h-screen flex items-center justify-center text-white bg-gray-950 px-4">
         Loading user info...
       </div>
     );

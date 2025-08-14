@@ -189,7 +189,7 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
           <button
             title="Open signature pad to sign this prescription"
             onClick={() => setShowSignaturePad(true)}
-            className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow active:translate-y-1 hover:bg-[#023e8a] transition cursor-pointer"
+            className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition cursor-pointer"
             style={{ minWidth: "120px" }}
           >
             Sign Here
@@ -210,7 +210,7 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
           <button
             title="Remove signature and sign again"
             onClick={() => setSignature(null)}
-            className="bg-red-600 text-white py-2 px-4 text-sm rounded-lg hover:bg-red-700 transition w-full sm:w-auto cursor-pointer"
+            className="bg-red-600 text-white py-2 px-4 text-sm rounded-lg shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-red-700 transition w-full sm:w-auto cursor-pointer"
           >
             Remove Signature
           </button>
@@ -223,27 +223,30 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
       {error && <p className="text-red-600 text-sm font-semibold mt-2">{error}</p>}
       {successMessage && <p className="text-green-700 text-sm font-semibold mt-2">{successMessage}</p>}
 
-      <button
-        title="Submit and save prescription"
-        onClick={handleSubmit}
-        disabled={submitting}
-        className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow active:translate-y-1 hover:bg-[#023e8a] transition cursor-pointer"
-        style={{ minWidth: "120px" }}
-      >
-        {submitting ? "Submitting..." : "Submit"}
-      </button>
+      {/* Buttons container */}
+      <div className="flex flex-wrap justify-between items-center gap-4 pt-4">
+        <button
+          title="Submit and save prescription"
+          onClick={handleSubmit}
+          disabled={submitting}
+          className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition cursor-pointer"
+          style={{ minWidth: "120px" }}
+        >
+          {submitting ? "Submitting..." : "Submit"}
+        </button>
 
-      {showPreview && (
-        <div className="flex justify-center pt-4">
+        {showPreview && (
           <button
             title="View submitted prescription preview"
             onClick={handlePreview}
-            className="w-full sm:w-auto bg-[#03045e] text-white py-3 px-2 text-sm sm:text-lg font-semibold rounded-xl shadow active:translate-y-1 hover:bg-[#023e8a] transition cursor-pointer"
+            disabled={isLoading}
+            className="bg-[#03045e] text-white py-3 px-4 text-sm sm:text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition cursor-pointer ml-auto"
+            style={{ minWidth: "120px" }}
           >
             {isLoading ? "Loading Preview..." : "Preview"}
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

@@ -12,6 +12,7 @@ const PatientDashboardNavbar = () => {
   const router = useRouter();
   const [userDoc, setUserDoc] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [signingOut, setSigningOut] = useState(false); // <-- new state
 
   useEffect(() => {
     const fetchUserDoc = async () => {
@@ -38,6 +39,7 @@ const PatientDashboardNavbar = () => {
   }, []);
 
   const handleSignOut = async () => {
+    setSigningOut(true); // start loading
     try {
       await signOut(auth);
       await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
@@ -46,6 +48,7 @@ const PatientDashboardNavbar = () => {
       router.push("/sign-in?role=patient");
     } catch (error) {
       console.error("Error signing out:", error);
+      setSigningOut(false); // stop loading on error
     }
   };
 
@@ -89,13 +92,11 @@ const PatientDashboardNavbar = () => {
         onClick={handleSignOut}
         aria-label="Sign Out"
         title="Sign Out"
-        disabled={loading}
+        disabled={loading || signingOut} // disable while fetching or signing out
         className="bg-[#03045e] text-white py-3 px-3 text-xs md:text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex flex-col items-center justify-center gap-1 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
       >
-        {loading ? (
-          <>
-            <FaSpinner className="w-4 h-4 animate-spin" />
-          </>
+        {(loading || signingOut) ? (
+          <FaSpinner className="w-4 h-4 animate-spin" />
         ) : (
           <span className="text-[10px] sm:text-xs md:text-sm">Sign Out</span>
         )}

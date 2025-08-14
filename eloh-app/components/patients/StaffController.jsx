@@ -127,25 +127,23 @@ const StaffScroller = ({
         </h2>
       )}
 
-      {/* Scroll arrows */}
-      {filteredStaff.length >= 4 && (
-        <>
-          <button
-            onClick={() => scroll("left")}
-            title="Scroll left"
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
-          >
-            <FaArrowLeft />
-          </button>
-          <button
-            onClick={() => scroll("right")}
-            title="Scroll right"
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
-          >
-            <FaArrowRight />
-          </button>
-        </>
-      )}
+      {/* Scroll arrows - always visible */}
+      <>
+        <button
+          onClick={() => scroll("left")}
+          title="Scroll left"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
+        >
+          <FaArrowLeft />
+        </button>
+        <button
+          onClick={() => scroll("right")}
+          title="Scroll right"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[#292a46] hover:bg-[#37385e] text-white p-3.5 rounded-full shadow-lg cursor-pointer"
+        >
+          <FaArrowRight />
+        </button>
+      </>
 
       {/* Scrollable staff cards or fallback message */}
       <div

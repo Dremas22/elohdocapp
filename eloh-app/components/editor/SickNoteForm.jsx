@@ -170,7 +170,7 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
             <button
               title="Remove current signature"
               onClick={() => setSignature(null)}
-              className="bg-red-600 text-white py-2 px-4 text-sm rounded shadow hover:bg-red-700 transition"
+              className="bg-red-600 text-white py-2 px-4 text-sm rounded shadow-[0_4px_#999] active:shadow-[0_2px_#666] hover:bg-red-700 transition"
             >
               Remove Signature
             </button>
@@ -193,6 +193,7 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
         <p className="text-sm text-green-700 font-semibold">{successMessage}</p>
       )}
 
+      {/* Buttons container for submit and preview */}
       <div className="flex flex-wrap justify-between items-center gap-4 pt-4">
         {!signature && !showSignaturePad && (
           <button
@@ -212,10 +213,8 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
         >
           {submitting ? "Submitting..." : "Submit"}
         </button>
-      </div>
 
-      {showPreview && (
-        <div className="pt-4">
+        {showPreview && (
           <button
             title="Preview your completed note"
             onClick={handlePreview}
@@ -224,8 +223,8 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
           >
             Preview
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
