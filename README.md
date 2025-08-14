@@ -77,49 +77,236 @@ Eloh Doc uses [LiveKit](https://livekit.io/) for secure, high-quality video/audi
 
 ## 📁 File Structure
 
-```bash
-eloh-doc-app/
-├── app/                         # Next.js app directory
-│   └── dashboard/               # Role-specific dashboards
-│       ├── doctor/              # Doctor views & components
-│       ├── nurse/               # Nurse views & components
-│       └── patient/             # Patient views & components
-├── components/                  # Shared UI and functional components
-│   ├── Chat.jsx
-│   ├── SaveStripePayment.jsx
-│   ├── patients/
-│   └── doctors/
-├── hooks/                       # Custom React hooks
-│   └── useCurrentUser.js
-│   └── useSaveMedicalHistory.js
-├── pages/                       # API routes & page overrides
-│   ├── api/
-│   │   ├── stripe/              # Stripe payment handlers
-│   │   └── patients/            # Patient API endpoints
-│   └── index.jsx
-├── public/                      # Static files
-├── utils/                       # Utility functions (e.g., token generation, formatting)
-├── firebase/                    # Firebase client & admin setup
-│   ├── client.ts                # Firebase app initialization
-│   └── server.ts                 # Firebase Admin SDK init
-├── .env.local                   # Environment variables
-├── README.md                    # Project documentation
-└── package.json
+# File Tree: eloh-app
+
+```
+├── 📁 .next/ 🚫 (auto-hidden)
+├── 📁 app/
+│   ├── 📁 about/
+│   │   └── 📄 page.jsx
+│   ├── 📁 ambulance/
+│   │   ├── 📁 customers/
+│   │   │   └── 📄 page.jsx
+│   │   ├── 📁 drivers/
+│   │   │   └── 📄 page.jsx
+│   │   └── 📄 page.jsx
+│   ├── 📁 api/
+│   │   ├── 📁 ambulance/
+│   │   │   ├── 📁 customers/
+│   │   │   │   └── 📁 [customerId]/
+│   │   │   │       └── 📄 route.js
+│   │   │   └── 📁 drivers/
+│   │   │       └── 📁 [driverId]/
+│   │   │           └── 📄 route.js
+│   │   ├── 📁 check-registration/
+│   │   │   └── 📄 route.js
+│   │   ├── 📁 diagnose/
+│   │   │   └── 📄 route.js
+│   │   ├── 📁 doctor/
+│   │   │   └── 📁 toggle-availability/
+│   │   │       └── 📄 route.js
+│   │   ├── 📁 end-consultation/
+│   │   │   └── 📄 route.js
+│   │   ├── 📁 get-latest-note/
+│   │   │   └── 📄 route.js
+│   │   ├── 📁 notify-doctor/
+│   │   │   └── 📄 route.js
+│   │   ├── 📁 patients/
+│   │   │   ├── 📁 [patientId]/
+│   │   │   │   └── 📄 route.js
+│   │   │   ├── 📁 get-all-notes/
+│   │   │   │   └── 📄 route.js
+│   │   │   ├── 📁 get-medical-records/
+│   │   │   │   └── 📄 route.js
+│   │   │   └── 📁 update-history/
+│   │   │       └── 📄 route.js
+│   │   ├── 📁 register-user/
+│   │   │   └── 📄 route.js
+│   │   ├── 📁 save-ai-diagnosis/
+│   │   │   └── 📄 route.js
+│   │   ├── 📁 send-ambulance-notification/
+│   │   │   └── 📄 route.js
+│   │   ├── 📁 session/
+│   │   │   └── 📄 route.js
+│   │   ├── 📁 stripe-checkout/
+│   │   │   └── 📄 route.js
+│   │   ├── 📁 stripe-subscription/
+│   │   │   └── 📄 route.js
+│   │   ├── 📁 token/
+│   │   │   └── 📄 route.js
+│   │   ├── 📁 users/
+│   │   │   └── 📁 update/
+│   │   │       └── 📄 route.js
+│   │   └── 📁 verify/
+│   │       └── 📄 route.js
+│   ├── 📁 contact/
+│   │   └── 📄 page.jsx
+│   ├── 📁 dashboard/
+│   │   ├── 📁 customer/
+│   │   │   └── 📄 page.jsx
+│   │   ├── 📁 doctor/
+│   │   │   ├── 📄 DoctorsCollectionViewer.jsx
+│   │   │   ├── 📄 FilteredPatientsTable.jsx
+│   │   │   ├── 📄 doctorEarnings.jsx
+│   │   │   ├── 📄 doctorNav.jsx
+│   │   │   ├── 📄 doctorSidebar.jsx
+│   │   │   ├── 📄 doctorToggleBtn.jsx
+│   │   │   └── 📄 page.jsx
+│   │   ├── 📁 driver/
+│   │   │   └── 📄 page.jsx
+│   │   ├── 📁 nurse/
+│   │   │   ├── 📄 NurseCollectionViewer.jsx
+│   │   │   ├── 📄 nurseNav.jsx
+│   │   │   ├── 📄 nurseSidebar.jsx
+│   │   │   └── 📄 page.jsx
+│   │   └── 📁 patient/
+│   │       ├── 📄 page.jsx
+│   │       ├── 📄 patientNav.jsx
+│   │       └── 📄 patientSidebar.jsx
+│   ├── 📁 onboarding/
+│   │   ├── 📁 customer/
+│   │   │   └── 📄 page.jsx
+│   │   ├── 📁 doctor/
+│   │   │   └── 📄 page.jsx
+│   │   ├── 📁 driver/
+│   │   │   └── 📄 page.jsx
+│   │   ├── 📁 nurse/
+│   │   │   └── 📄 page.jsx
+│   │   └── 📁 patient/
+│   │       └── 📄 page.jsx
+│   ├── 📁 payment/
+│   │   └── 📄 page.jsx
+│   ├── 📁 room/
+│   │   └── 📄 page.jsx
+│   ├── 📁 sign-in/
+│   │   └── 📄 page.jsx
+│   ├── 🖼️ favicon.ico
+│   ├── 🎨 globals.css
+│   ├── 📄 layout.jsx
+│   └── 📄 page.jsx
+├── 📁 components/
+│   ├── 📁 ambulance/
+│   │   ├── 📁 customers/
+│   │   │   └── 📄 CustomerRegistrationForm.jsx
+│   │   ├── 📁 drivers/
+│   │   │   └── 📄 DriversRegistrationForm.jsx
+│   │   ├── 📄 AmbulanceLandingPage.jsx
+│   │   └── 📄 PayAmbulance.jsx
+│   ├── 📁 doctors/
+│   │   ├── 📄 DoctorsRegistrationForm.jsx
+│   │   ├── 📄 SearchBar.jsx
+│   │   └── 📄 viewPatientsRecords.jsx
+│   ├── 📁 editor/
+│   │   ├── 📄 DownloadButton.jsx
+│   │   ├── 📄 MeetingRoomNavbar.jsx
+│   │   ├── 📄 NotePreview.jsx
+│   │   ├── 📄 PrescriptionForm.jsx
+│   │   ├── 📄 SickNoteForm.jsx
+│   │   ├── 📄 SignaturePad.jsx
+│   │   └── 📄 TextEditor.jsx
+│   ├── 📁 maps/
+│   │   ├── 📄 CustomerMap.jsx
+│   │   └── 📄 DriverMap.jsx
+│   ├── 📁 nurses/
+│   │   ├── 📄 NurseAvailbilityBtn.jsx
+│   │   └── 📄 NursesRegistrationForm.jsx
+│   ├── 📁 patients/
+│   │   ├── 📁 cards/
+│   │   │   ├── 📄 DoctorsList.jsx
+│   │   │   └── 📄 NursesList.jsx
+│   │   ├── 📁 forms/
+│   │   │   ├── 📄 Step1BasicInfo.jsx
+│   │   │   ├── 📄 Step2ContactInfo.jsx
+│   │   │   ├── 📄 Step3SocialHistory.jsx
+│   │   │   ├── 📄 Step4Allergies.jsx
+│   │   │   └── 📄 Step5MedicalHistory.jsx
+│   │   ├── 📁 payments/
+│   │   │   ├── 📄 payOptions.jsx
+│   │   │   ├── 📄 payToDoctor.jsx
+│   │   │   └── 📄 payToNurse.jsx
+│   │   ├── 📄 FullMedicalRecords.jsx
+│   │   ├── 📄 NoteList.jsx
+│   │   ├── 📄 PatientDisplay.jsx
+│   │   ├── 📄 PatientMeetingSetup.jsx
+│   │   ├── 📄 PatientsRegistrationForm.jsx
+│   │   ├── 📄 ProgressBar.jsx
+│   │   ├── 📄 SocialHistorySection.jsx
+│   │   ├── 📄 StaffController.jsx
+│   │   └── 📄 ToggleMedicalSection.jsx
+│   ├── 📁 video-conferencing/
+│   │   ├── 📄 MeetingRoom.jsx
+│   │   ├── 📄 PatientCloseMeetingButton.jsx
+│   │   └── 📄 StaffCloseMeetingButton.jsx
+│   ├── 📄 AmbulanceButton.jsx
+│   ├── 📄 Chat.jsx
+│   ├── 📄 LandingPage.jsx
+│   ├── 📄 LanguageSelector.jsx
+│   ├── 📄 Loading.jsx
+│   ├── 📄 NotificationModal.jsx
+│   ├── 📄 ProfileModal.jsx
+│   ├── 📄 SaveStripePayment.js
+│   ├── 📄 SignInWithGoogleBtn.jsx
+│   ├── 📄 calendar.jsx
+│   ├── 📄 maiNavbar.jsx
+│   ├── 📄 selection.jsx
+│   ├── 📄 signInOrSignUpForm.jsx
+│   ├── 📄 video.jsx
+│   └── 📄 viewMedicalRecords.jsx
+├── 📁 constants/
+│   └── 📄 index.js
+├── 📁 db/
+│   ├── 📄 client.js
+│   └── 📄 server.js
+├── 📁 helpers/
+│   ├── 📄 index.js
+│   └── 📄 toastHelper.js
+├── 📁 hooks/
+│   ├── 📄 useCurrentUser.js
+│   └── 📄 useSaveMedicalHistory.js
+├── 📁 lib/
+│   ├── 📁 ambulance-actions/
+│   │   ├── 📄 createAmbulanceMarker.js
+│   │   └── 📄 createCustomerMarker.js
+│   ├── 📄 convertFirebaseDate.js
+│   ├── 📄 convertOKLCHtoRGB.js
+│   ├── 📄 getFCMToken.js
+│   ├── 📄 postMeetingUpdates.js
+│   ├── 📄 queries.js
+│   ├── 📄 session-signout.js
+│   └── 📄 truncate.js
+├── 📁 node_modules/ 🚫 (auto-hidden)
+├── 📁 public/
+│   ├── 📁 images/
+│   │   ├── 🖼️ deafult_avatar.jpg
+│   │   ├── 🖼️ elohdoc.png
+│   │   ├── 🖼️ star_of_life.png
+│   │   └── 🖼️ wasalaLogo.png
+│   ├── 📁 videos/
+│   │   └── 📄 elohdocvid.mp4
+│   └── 📄 firebase-messaging-sw.js
+├── 📁 utils/
+│   └── 📄 validateForm.js
+├── 🔒 .env 🚫 (auto-hidden)
+├── 🚫 .gitignore
+├── 📖 README.md
+├── 📄 jsconfig.json
+├── 📄 middleware.js
+├── 📄 next.config.mjs
+├── 📄 package-lock.json
+├── 📄 package.json
+└── 📄 postcss.config.mjs
 ```
 
+---
+
+### ================================
+### 🏥 Eloh Doc App Environment Variables
+### ================================
+
+### 🔗 Frontend Configuration
+```env
+NEXT_PUBLIC_URL=http://localhost:3000                     # Base URL of the frontend
+NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key                # Firebase Web API key
+NEXT_PUBLIC_STRIPE_PUBLIC_KEY=your-stripe-publishable-key # Stripe publishable key
 
 
-NEXT_PUBLIC_URL=http://localhost:3000
-NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
-NEXT_PUBLIC_STRIPE_PUBLIC_KEY=your-stripe-publishable-key
-STRIPE_SECRET_KEY=your-stripe-secret-key
-
-# LiveKit Config
-NEXT_PUBLIC_LIVEKIT_URL=https://your-livekit-url
-LIVEKIT_API_KEY=your-livekit-api-key
-LIVEKIT_API_SECRET=your-livekit-secret
-
-# Firebase Admin
-FIREBASE_PROJECT_ID=your-project-id
-FIREBASE_CLIENT_EMAIL=your-service-account-email
-FIREBASE_PRIVATE_KEY=your-private-key
