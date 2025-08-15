@@ -28,45 +28,6 @@ const DriverMap = () => {
 
   const [showEarnings, setShowEarnings] = useState(false);
 
-  /**
-     * const [ambulanceRequest, setAmbulanceRequest] = useState({
-    type: "ambulance_request",
-    pickupAddress: "123 Main Street, Cape Town",
-    fare: 250,
-    distance: "12",
-    duration: "20",
-    pickupLat: -33.9258,
-    pickupLng: 18.4232,
-    tripId: "dummy-trip-001",
-  });
-  
-     */
-
-  // FCM foreground listener
-
-  // useEffect(() => {
-  //   const unsubscribe = onMessage(messaging, (payload) => {
-  //     if (
-  //       payload?.data?.type === "ambulance_request" ||
-  //       payload?.type === "NOTIFICATION_CLICK"
-  //     ) {
-  //       const requestData = {
-  //         customerName: payload.data.customerName || "",
-  //         pickupAddress: payload.data.pickupAddress || "Unknown",
-  //         fare: parseFloat(payload.data.fare || "0"),
-  //         distance: payload.data.distance || "0",
-  //         duration: payload.data.duration || "0",
-  //         pickupLat: parseFloat(payload.data.pickupLat || "0"),
-  //         pickupLng: parseFloat(payload.data.pickupLng || "0"),
-  //         type: payload.data.type,
-  //       };
-  //       setAmbulanceRequest(requestData);
-  //     }
-  //   });
-
-  //   return () => unsubscribe();
-  // }, []);
-
   useEffect(() => {
     const unsubscribe = onMessage(messaging, (payload) => {
       if (payload?.data?.type === "ambulance_request") {

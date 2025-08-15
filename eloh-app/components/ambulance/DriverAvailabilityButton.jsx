@@ -9,6 +9,7 @@ import { useState } from "react";
  * Shows a loading spinner while toggling.
  * Includes a tooltip for clarity.
  */
+
 const DriverAvailabilityButton = ({ isAvailable, fetching, onChange }) => {
     return (
         <div className="flex flex-col items-center gap-1 mb-3 lg:mt-5 sm:mb-2 sm:-mt-2 md:-mt-2.5 relative">
