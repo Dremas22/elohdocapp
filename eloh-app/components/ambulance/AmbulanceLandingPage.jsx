@@ -48,7 +48,7 @@ const AmbulanceLandingPage = () => {
 
 
       {/* Footer note */}
-      <footer className="absolute bottom-6 text-[#023e8a] text-sm text-center opacity-80 animate-fadeInUp delay-300">
+      <footer className="absolute bottom-6 text-[#023e8a] text-sm text-center opacity-80 animate-fadeInUp delay-300 mb-5">
         © {new Date().getFullYear()} ElohDoc Ambulance Services. All rights reserved.
       </footer>
 

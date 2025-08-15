@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
  * @param {Object|null} payload - Notification payload received via FCM.
  * @param {boolean} compact - Flag to determine layout: true = compact/mobile, false = full/desktop.
  */
+
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
     ? "grid grid-cols-3 gap-6 justify-around"
@@ -313,8 +314,6 @@ const NurseSidebarMenu = ({
             : "translate-y-full opacity-0 pointer-events-none"
           }`}
       >
-
-
         <ActionButtons
           buttons={actionButtons}
           notificationCount={notificationCount}
@@ -322,7 +321,7 @@ const NurseSidebarMenu = ({
           compact={true}
         />
         <div className="flex items-center gap-3">
-          <ToggleButton
+          <NurseToggleButton
             isAvailable={isAvailable}
             onChange={handleToggle}
             fetching={fetching}
