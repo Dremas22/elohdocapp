@@ -14,7 +14,7 @@ import { messaging } from "@/db/client";
 import Calendar from "@/components/calendar";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
-import ToggleButton from "@/components/nurses/NurseAvailbilityBtn";
+import NurseToggleButton from "@/components/nurses/NurseAvailbilityBtn";
 import { useRouter } from "next/navigation";
 
 /**
@@ -268,7 +268,7 @@ const NurseSidebarMenu = ({
 
             {/* Availability Toggle */}
             <div className="mt-6 flex flex-col items-center">
-              <ToggleButton
+              <NurseToggleButton
                 isAvailable={isAvailable}
                 onChange={handleToggle}
                 fetching={fetching}

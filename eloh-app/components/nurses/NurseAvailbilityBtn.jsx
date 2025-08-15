@@ -9,7 +9,7 @@ import { useState } from "react";
  * Displays "Available" or "Unavailable" above the switch, and shows a loading spinner on toggle.
  * Includes a tooltip on hover to explain the toggle.
  */
-const ToggleButton = ({ isAvailable, fetching, onChange }) => {
+const NurseToggleButton = ({ isAvailable, fetching, onChange }) => {
   return (
     <div className="flex flex-col items-center gap-1 relative">
       {/* Status Label */}
@@ -48,4 +48,4 @@ const ToggleButton = ({ isAvailable, fetching, onChange }) => {
   );
 };
 
-export default ToggleButton;
+export default NurseToggleButton;

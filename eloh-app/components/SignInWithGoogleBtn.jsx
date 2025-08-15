@@ -30,8 +30,8 @@ const GoogleSignInButton = () => {
     setIsLoading(true);
     try {
       const result = await signInWithPopup(auth, googleAuth);
-      const user = result.user;
-      const token = await user.getIdToken(true);
+      const user = result?.user;
+      const token = await user?.getIdToken(true);
 
       // 🟢 Now safely get FCM token
       const fcmToken = await getFCMToken();
@@ -84,16 +84,16 @@ const GoogleSignInButton = () => {
       />
 
       {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center justify-start pt-15 px-4 text-center h-full">
+      <div className="relative z-10 flex flex-col items-center justify-start pt-8 px-4 text-center h-full">
         <h2
-          className="text-3xl md:text-4xl font-bold text-[#03045e] mb-6"
+          className="text-3xl md:text-4xl font-bold text-[#03045e] mb-1 lg:mb-6"
           title={`Sign in as a ${capitalizedRole}`}
         >
           {capitalizedRole} Sign-In
         </h2>
 
         <p
-          className="text-gray-700 text-lg mb-8 max-w-md"
+          className="text-gray-700 text-lg mb-6 lg:mb-10 max-w-md"
           title="Use your ElohDoc credentials to log in"
         >
           Please sign in to your ElohDoc account to continue.
@@ -103,7 +103,7 @@ const GoogleSignInButton = () => {
           onClick={handleSignIn}
           disabled={isLoading}
           title="Sign in using your Google account"
-          className="bg-[#03045e] hover:bg-[#0077b6] text-white mb-5 flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer"
+          className="bg-[#03045e] hover:bg-[#0077b6] text-white mb-5 lg:mb-8 flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer"
         >
           <FcGoogle size={22} />
           {isLoading ? "Signing in..." : "Sign In with Google"}
