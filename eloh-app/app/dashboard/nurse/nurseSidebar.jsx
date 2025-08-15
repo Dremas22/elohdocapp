@@ -14,7 +14,7 @@ import { messaging } from "@/db/client";
 import Calendar from "@/components/calendar";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
-import ToggleButton from "@/components/nurses/NurseAvailbilityBtn";
+import NurseToggleButton from "@/components/nurses/NurseAvailbilityBtn";
 import { useRouter } from "next/navigation";
 
 /**
@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
  * @param {Object|null} payload - Notification payload received via FCM.
  * @param {boolean} compact - Flag to determine layout: true = compact/mobile, false = full/desktop.
  */
+
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
     ? "grid grid-cols-3 gap-6 justify-around"
@@ -268,7 +269,7 @@ const NurseSidebarMenu = ({
 
             {/* Availability Toggle */}
             <div className="mt-6 flex flex-col items-center">
-              <ToggleButton
+              <NurseToggleButton
                 isAvailable={isAvailable}
                 onChange={handleToggle}
                 fetching={fetching}
@@ -313,8 +314,6 @@ const NurseSidebarMenu = ({
             : "translate-y-full opacity-0 pointer-events-none"
           }`}
       >
-
-
         <ActionButtons
           buttons={actionButtons}
           notificationCount={notificationCount}
@@ -322,7 +321,7 @@ const NurseSidebarMenu = ({
           compact={true}
         />
         <div className="flex items-center gap-3">
-          <ToggleButton
+          <NurseToggleButton
             isAvailable={isAvailable}
             onChange={handleToggle}
             fetching={fetching}
