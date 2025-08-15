@@ -6,7 +6,17 @@ export async function POST(req) {
   try {
     const { token, role, fcmToken } = await req.json();
 
+    const cookieStore = await cookies();
+
     if (!token) {
+      // Clear any old session
+      cookieStore.set("session", "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 0,
+      });
       return NextResponse.json({ error: "Missing token" }, { status: 400 });
     }
 
@@ -29,7 +39,6 @@ export async function POST(req) {
 
     const sessionCookie = await auth?.createSessionCookie(token, { expiresIn });
 
-    const cookieStore = await cookies();
     cookieStore.set("session", sessionCookie, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
