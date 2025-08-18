@@ -12,6 +12,7 @@ import { collection, getDocs, orderBy, query, limit } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import PayAmbulance from "../ambulance/PayAmbulance";
 import { auth } from "@/db/client";
+import CustomerSidebarMenu from "@/app/dashboard/customer/CustomerSidebar";
 
 export default function CustomerMap() {
   const mapRef = useRef(null);
@@ -412,7 +413,14 @@ export default function CustomerMap() {
   };
 
   return (
-    <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 lg:pt-80 pt-100 p-4">
+    <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 lg:pt-80 pt-115 lg:pl-66 p-4">
+
+      {/* Sidebar */}
+      <CustomerSidebarMenu
+        userDoc={auth.currentUser}
+
+      />
+
       <div className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-4 sm:p-6 mb-6">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
           🚑 Request Ambulance

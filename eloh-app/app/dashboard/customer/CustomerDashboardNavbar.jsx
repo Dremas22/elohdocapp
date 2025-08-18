@@ -25,11 +25,10 @@ const CustomerDashboardNavbar = () => {
                 const docSnap = await getDoc(doc(db, "customers", user.uid));
                 if (docSnap.exists()) {
                     setUserDoc(docSnap.data());
-                } else {
-                    console.warn("Customer document not found.");
+                    // else silently do nothing
                 }
-            } catch (error) {
-                console.error("Error fetching customer document:", error);
+            } catch {
+                // silently fail if fetching fails
             }
             setLoading(false);
         };

@@ -196,7 +196,7 @@ const CustomerSidebarMenu = ({
             </div>
 
             {/* Mobile Sidebar Toggle Button */}
-            <div className="lg:hidden fixed bottom-1 -right-2 z-50 group cursor-pointer flex items-center space-x-2 bg-blue-300/20 text-white rounded-full px-2 py-2 shadow-sm select-none scale-80 backdrop-blur-sm">
+            <div className="lg:hidden fixed bottom-1 -right-2 z-50 group cursor-pointer flex items-center space-x-2 bg-[#03045e] text-white rounded-full px-2 py-2 shadow-sm select-none scale-80 backdrop-blur-sm">
                 <button
                     onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
                     title={mobileSidebarOpen ? "Hide menu options" : "Show menu options"}
@@ -213,7 +213,7 @@ const CustomerSidebarMenu = ({
                     ) : (
                         <>
                             <FiChevronUp className="h-6 w-6" />
-                            <span className="text-sm font-semibold">Show menu</span>
+                            <span className="text-sm font-semibold ">Show menu</span>
                         </>
                     )}
                 </button>
