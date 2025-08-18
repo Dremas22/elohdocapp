@@ -2,6 +2,7 @@
 
 import CustomerMap from "@/components/maps/CustomerMap";
 import Script from "next/script";
+import CustomerDashboardNavbar from "./CustomerDashboardNavbar";
 
 const CustomerDashboard = () => {
   return (
@@ -12,6 +13,7 @@ const CustomerDashboard = () => {
           strategy="beforeInteractive" // or "afterInteractive"
           onError={() => console.error("Google Maps script failed to load")}
         />
+        < CustomerDashboardNavbar />
         <CustomerMap />
       </>
     </div>

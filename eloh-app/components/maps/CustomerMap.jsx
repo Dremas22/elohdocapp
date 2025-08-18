@@ -12,6 +12,7 @@ import { collection, getDocs, orderBy, query, limit } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import PayAmbulance from "../ambulance/PayAmbulance";
 import { auth } from "@/db/client";
+import CustomerSidebarMenu from "@/app/dashboard/customer/CustomerSidebar";
 
 export default function CustomerMap() {
   const mapRef = useRef(null);
@@ -412,61 +413,65 @@ export default function CustomerMap() {
   };
 
   return (
-    <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 p-4">
-      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-6 mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+    <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 lg:pt-80 pt-115 lg:pl-66 p-4">
+
+      {/* Sidebar */}
+      <CustomerSidebarMenu
+        userDoc={auth.currentUser}
+
+      />
+
+      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-4 sm:p-6 mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">
           🚑 Request Ambulance
         </h2>
 
         {/* Pickup */}
-        <label className="block text-xl font-medium text-black mb-2">
+        <label className="block text-lg sm:text-xl font-medium text-black mb-2">
           Pickup location
         </label>
-        <div className="flex gap-2 mb-4">
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
           <input
             ref={pickupInputRef}
             type="text"
             placeholder="Enter pickup address or use current location"
-            className="flex-1 p-3 border border-gray-300 text-black rounded-lg focus:outline-none 
-            focus:ring-2 focus:ring-blue-500"
+            className="flex-1 p-3 border border-gray-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
           />
           <button
             onClick={useMyLocation}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg w-full sm:w-auto"
           >
             📍 Use my location
           </button>
         </div>
 
         {/* Destination */}
-        <label className="block text-xl font-medium text-black mb-2">
+        <label className="block text-lg sm:text-xl font-medium text-black mb-2">
           Destination
         </label>
         <input
           ref={destInputRef}
           type="text"
           placeholder="Type destination (clinic, hospital, address or any place)..."
-          className="mb-4 p-3 border border-gray-300 text-black rounded-lg w-full 
-          focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="mb-4 p-3 border border-gray-300 text-black rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
         {/* Action buttons */}
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={handleCreateRoute}
             disabled={locationLoading}
-            className={`flex-1 ${
-              locationLoading
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            } text-white font-semibold py-2 px-4 rounded-lg`}
+            className={`flex-1 ${locationLoading
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+              } text-white font-semibold py-2 px-4 rounded-lg w-full`}
           >
             {locationLoading ? "Loading..." : "Create Route"}
           </button>
 
           <button
             onClick={handleCancelRoute}
-            className="flex-1 bg-[#fb5607] hover:bg-[#f48c06] text-white font-semibold py-2 px-4 rounded-lg"
+            className="flex-1 bg-[#fb5607] hover:bg-[#f48c06] text-white font-semibold py-2 px-4 rounded-lg w-full"
           >
             Cancel Route
           </button>
@@ -478,7 +483,7 @@ export default function CustomerMap() {
                 map
               )
             }
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg"
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg w-full"
           >
             Track Ambulances (30km)
           </button>
@@ -509,16 +514,16 @@ export default function CustomerMap() {
           <button
             onClick={() => setShowPay(true)}
             disabled={!routeReady}
-            className={`w-full ${
-              routeReady
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-gray-300 cursor-not-allowed"
-            } text-white py-2 px-4 rounded-lg font-semibold`}
+            className={`w-full ${routeReady
+              ? "bg-red-600 hover:bg-red-700"
+              : "bg-gray-300 cursor-not-allowed"
+              } text-white py-2 px-4 rounded-lg font-semibold`}
           >
             Request Ambulance
           </button>
         </div>
       </div>
+
 
       {/* Map */}
       <div

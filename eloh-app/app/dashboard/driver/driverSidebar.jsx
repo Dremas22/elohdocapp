@@ -134,7 +134,7 @@ const DriverSidebarMenu = ({ userDoc, setShowEarnings, compact = false }) => {
             </div>
 
             {/* Mobile Toggle Button */}
-            <div className="lg:hidden fixed bottom-1 -right-1 z-50 flex items-center space-x-2 text-white rounded-full px-2 py-2 backdrop-blur-sm bg-blue-800/40">
+            <div className="lg:hidden fixed bottom-1 -right-1 z-50 flex items-center space-x-2 text-white rounded-full px-2 py-2 backdrop-blur-sm bg-[#03045e]">
                 <button
                     onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
                     title={mobileSidebarOpen ? "Hide menu" : "Show menu"}
@@ -148,7 +148,7 @@ const DriverSidebarMenu = ({ userDoc, setShowEarnings, compact = false }) => {
                     ) : (
                         <>
                             <FiChevronUp className="h-6 w-6" />
-                            <span className="text-sm font-semibold">Show menu</span>
+                            <span className="text-sm font-semibold ">Show menu</span>
                         </>
                     )}
                 </button>
