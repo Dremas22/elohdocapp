@@ -7,6 +7,7 @@ import MeetingRoomNavbar from "./MeetingRoomNavbar";
 import PrescriptionForm from "./PrescriptionForm";
 import SickNoteForm from "./SickNoteForm";
 import useSaveMedicalHistory from "@/hooks/useSaveMedicalHistory";
+import MessageBanner from "../MessageBanner";
 
 /**
  * RichTextEditor component provides an interface for doctors to add medical notes,
@@ -21,7 +22,8 @@ const RichTextEditor = ({ roomID }) => {
   const { loading, currentUser } = useCurrentUser();
 
   // Hook for saving notes with status/error feedback
-  const { handleSaveNote, error, submitting, successMessage } = useSaveMedicalHistory();
+  const { handleSaveNote, error, submitting, successMessage } =
+    useSaveMedicalHistory();
 
   // State for the current textual note input
   const [currentNote, setCurrentNote] = useState("");
@@ -49,7 +51,9 @@ const RichTextEditor = ({ roomID }) => {
       if (!patientId) return;
 
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/patients/${patientId}`);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/patients/${patientId}`
+        );
         if (!res.ok) throw new Error("Failed to fetch patient data");
         const data = await res.json();
         setPatientData(data);
@@ -68,12 +72,6 @@ const RichTextEditor = ({ roomID }) => {
     <>
       {isDoctor && patientData ? (
         <div className="w-full p-4 bg-white text-black border-l border-gray-700 flex flex-col justify-between">
-          {/* Display error message if any */}
-          {error && <p className="text-red-500">{error}</p>}
-
-          {/* Display success message */}
-          {successMessage && <p className="text-green-500">{successMessage}</p>}
-
           {/* Navigation bar for switching between modes */}
           <MeetingRoomNavbar mode={mode} setMode={setMode} doctorId={roomID} />
 
@@ -132,6 +130,13 @@ const RichTextEditor = ({ roomID }) => {
           </div>
         </div>
       ) : null}
+      {/* Display error message if any */}
+      {error && <MessageBanner type="error" message={error} />}
+
+      {/* Display success message */}
+      {successMessage && (
+        <MessageBanner type="success" message={successMessage} />
+      )}
     </>
   );
 };

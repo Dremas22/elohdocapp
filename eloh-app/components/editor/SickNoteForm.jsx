@@ -4,6 +4,7 @@ import { useState } from "react";
 import SignaturePad from "./SignaturePad";
 import useSaveMedicalHistory from "@/hooks/useSaveMedicalHistory";
 import NotePreview from "./NotePreview";
+import MessageBanner from "../MessageBanner";
 
 const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
   const {
@@ -188,9 +189,9 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
         )}
       </div>
 
-      {error && <p className="text-sm text-red-600 font-semibold">{error}</p>}
+      {error && <MessageBanner type="error" message={error} />}
       {successMessage && (
-        <p className="text-sm text-green-700 font-semibold">{successMessage}</p>
+        <MessageBanner type="success" message={successMessage} />
       )}
 
       {/* Buttons container for submit and preview */}
