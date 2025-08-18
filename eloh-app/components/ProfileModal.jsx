@@ -16,6 +16,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { toastSuccess } from "@/helpers/toastHelper";
 
 const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
   const isPatient = userDoc?.role === "patient";
@@ -93,7 +94,11 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
   const handleDbSave = async () => {
     const errors = {};
 
-    if (userDoc?.role === "doctor" || userDoc?.role === "nurse") {
+    if (
+      userDoc?.role === "doctor" ||
+      userDoc?.role === "nurse" ||
+      userDoc?.role === "driver"
+    ) {
       if (!bankingDetails.accountName.trim()) {
         errors.accountName = "Account holder name is required.";
       }
@@ -136,7 +141,9 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
     const updatedData = {
       phoneNumber: `${phoneCode}${localNumber}`,
       ...(isPatient && { location }),
-      ...((userDoc?.role === "doctor" || userDoc?.role === "nurse") && {
+      ...((userDoc?.role === "doctor" ||
+        userDoc?.role === "nurse" ||
+        userDoc?.role === "driver") && {
         banking: {
           ...bankingDetails,
         },
@@ -162,7 +169,13 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
       const uid = user.uid;
 
       // Step 1: Try deleting from doctors, nurses, patients collections
-      const collections = ["doctors", "nurses", "patients"];
+      const collections = [
+        "doctors",
+        "nurses",
+        "patients",
+        "drivers",
+        "customers",
+      ];
 
       let found = false;
       for (const col of collections) {
@@ -324,7 +337,7 @@ const ProfileModal = ({ userDoc, onClose, onSave, loading }) => {
 
         <div className="m-4">
           {/* Banking Details Form - visible for both doctors and nurses */}
-          {["doctor", "nurse"].includes(userDoc?.role) && (
+          {["doctor", "nurse", "driver"].includes(userDoc?.role) && (
             <div>
               {/* Image Upload - visible for doctors only */}
               {userDoc?.role === "doctor" && (
