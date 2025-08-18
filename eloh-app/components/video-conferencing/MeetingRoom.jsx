@@ -31,7 +31,6 @@ const MeetingRoom = () => {
   const isPatient = !isDoctor;
   const room = doctorId;
 
-  const [token, setToken] = useState("");
   const [hasJoined, setHasJoined] = useState(false);
   const [meetingClosing, setMeetingClosing] = useState(false);
   const [patientName, setPatientName] = useState("");
@@ -106,7 +105,6 @@ const MeetingRoom = () => {
       const data = await resp.json();
 
       if (data.token) {
-        setToken(data.token);
         await roomInstance.connect(
           process.env.NEXT_PUBLIC_LIVEKIT_URL,
           data.token
@@ -185,8 +183,9 @@ const MeetingRoom = () => {
 
   return (
     <div
-      className={`flex ${isMobile && isDoctor ? "flex-col" : "flex-row"
-        } h-screen w-full bg-[#f1f8ff] font-sans relative overflow-hidden`}
+      className={`flex ${
+        isMobile && isDoctor ? "flex-col" : "flex-row"
+      } h-screen w-full bg-[#f1f8ff] font-sans relative overflow-hidden`}
     >
       {!hasJoined ? (
         <div className="m-auto text-lg font-semibold text-[#0077b6]">
@@ -197,8 +196,9 @@ const MeetingRoom = () => {
           <RoomContext.Provider value={roomInstance}>
             <div
               data-lk-theme="default"
-              className={`${isDoctor ? (isMobile ? "w-full h-1/2" : "flex-[0.6]") : "flex-1"
-                } bg-[#788588] border-r border-[#788588] overflow-hidden relative flex flex-col`}
+              className={`${
+                isDoctor ? (isMobile ? "w-full h-1/2" : "flex-[0.6]") : "flex-1"
+              } bg-[#788588] border-r border-[#788588] overflow-hidden relative flex flex-col`}
             >
               <header className="bg-gray-300 text-white py-2 px-4 font-semibold text-lg shadow flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -235,7 +235,6 @@ const MeetingRoom = () => {
               </div>
 
               <RoomAudioRenderer />
-
             </div>
           </RoomContext.Provider>
 
@@ -245,10 +244,11 @@ const MeetingRoom = () => {
             </div>
           ) : isDoctor ? (
             <div
-              className={`${isMobile
-                ? "w-full h-1/2 border-t"
-                : "flex-[0.4] min-w-[400px] border-l"
-                } bg-white border-[#90e0ef] shadow-inner overflow-y-auto p-4`}
+              className={`${
+                isMobile
+                  ? "w-full h-1/2 border-t"
+                  : "flex-[0.4] min-w-[400px] border-l"
+              } bg-white border-[#90e0ef] shadow-inner overflow-y-auto p-4`}
             >
               <h2 className="text-xl font-semibold text-[#0077b6] mb-4">
                 Doctor’s Notes
