@@ -3,8 +3,37 @@
 import CustomerMap from "@/components/maps/CustomerMap";
 import Script from "next/script";
 import CustomerDashboardNavbar from "./CustomerDashboardNavbar";
+import { useEffect, useState } from "react";
+import { auth, db } from "@/db/client";
+import { doc, getDoc } from "firebase/firestore";
+import { toastError } from "@/helpers/toastHelper";
 
 const CustomerDashboard = () => {
+  const [userDoc, setUserDoc] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserDoc = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const docSnap = await getDoc(doc(db, "customers", user.uid));
+        if (docSnap.exists()) {
+          setUserDoc(docSnap.data());
+        }
+      } catch {
+        toastError(`Error fetching customer data: `);
+      }
+      setLoading(false);
+    };
+
+    const unsubscribe = auth.onAuthStateChanged(fetchUserDoc);
+    return () => unsubscribe();
+  }, []);
+
   return (
     <div className="flex items-center justify-center w-full h-screen text-black">
       <>
@@ -13,8 +42,8 @@ const CustomerDashboard = () => {
           strategy="beforeInteractive" // or "afterInteractive"
           onError={() => console.error("Google Maps script failed to load")}
         />
-        < CustomerDashboardNavbar />
-        <CustomerMap />
+        <CustomerDashboardNavbar userDoc={userDoc} loading={loading} />
+        <CustomerMap userDoc={userDoc} />
       </>
     </div>
   );

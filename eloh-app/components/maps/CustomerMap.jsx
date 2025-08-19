@@ -16,7 +16,7 @@ import { FiMapPin } from "react-icons/fi";
 import PayAmbulance from "../ambulance/PayAmbulance";
 import CustomerSidebarMenu from "@/app/dashboard/customer/CustomerSidebar";
 
-export default function CustomerMap() {
+export default function CustomerMap({ userDoc }) {
   const mapRef = useRef(null);
   const pickupInputRef = useRef(null);
   const destInputRef = useRef(null);
@@ -434,7 +434,7 @@ export default function CustomerMap() {
   return (
     <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 lg:pt-140 pt-170 lg:pl-66 p-4">
       {/* Sidebar */}
-      <CustomerSidebarMenu userDoc={auth.currentUser} />
+      <CustomerSidebarMenu userDoc={userDoc} />
 
       <div className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-4 sm:p-6 mb-6">
         <h2 className=" text-xl sm:text-2xl font-bold text-gray-800 mb-4">
