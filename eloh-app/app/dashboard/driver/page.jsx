@@ -38,7 +38,7 @@ const DriversDashboard = async () => {
     }
 
     return (
-      <div className="bg-gray-950 sm:p-0 sm:pr-20 p-5">
+      <div className="bg-gray-100 sm:p-0 sm:pr-20 p-5">
         <DriverCollectionViewer
           userDoc={driverData}
           customers={customers}

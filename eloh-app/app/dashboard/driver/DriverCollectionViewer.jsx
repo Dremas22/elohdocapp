@@ -98,7 +98,7 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
                   {/* Earnings Modal */}
                   {showEarnings && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-md px-4">
-                      <div className="bg-white text-black rounded-xl p-6 w-full max-w-4xl shadow-lg relative border-t-8 border-[#0d6efd] overflow-auto">
+                      <div className="bg-gray-100 text-black rounded-xl p-6 w-full max-w-4xl shadow-lg relative border-t-8 border-[#0d6efd] overflow-auto">
                         <button
                           onClick={() => setShowEarnings(false)}
                           className="absolute top-3 right-4 text-gray-600 hover:text-red-600 text-xl"
