@@ -416,12 +416,8 @@ export default function CustomerMap() {
 
   return (
     <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 lg:pt-140 pt-170 lg:pl-66 p-4">
-
       {/* Sidebar */}
-      <CustomerSidebarMenu
-        userDoc={auth.currentUser}
-
-      />
+      <CustomerSidebarMenu userDoc={auth.currentUser} />
 
       <div className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-4 sm:p-6 mb-6">
         <h2 className=" text-xl sm:text-2xl font-bold text-gray-800 mb-4">
@@ -454,8 +450,6 @@ export default function CustomerMap() {
             <FaLocationDot className="h-4 w-5" />
             <span>Use Current Location</span>
           </button>
-
-
         </div>
 
         {/* Destination */}
@@ -479,11 +473,11 @@ export default function CustomerMap() {
             title="Create route"
             onClick={handleCreateRoute}
             disabled={locationLoading}
-            className={`flex-1 ${locationLoading
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-[#03045e] hover:bg-[#023e8a]"
-              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer`}
-
+            className={`flex-1 ${
+              locationLoading
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-[#03045e] hover:bg-[#023e8a]"
+            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer`}
           >
             {locationLoading ? "Loading..." : "Create Route"}
           </button>
@@ -498,15 +492,16 @@ export default function CustomerMap() {
 
           <button
             title="Track nearby ambulances"
-            onClick={() =>
-              trackAmbulances(
+            onClick={async () =>
+              await trackAmbulances(
                 destinationPlace || pickupPlace || currentLocation,
-                map
+                map,
+                45
               )
             }
             className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
-            Track Ambulances (30km)
+            Track Ambulances (45km)
           </button>
         </div>
 
@@ -536,16 +531,16 @@ export default function CustomerMap() {
             title="Request ambulance now"
             onClick={() => setShowPay(true)}
             disabled={!routeReady}
-            className={`w-full ${routeReady
-              ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
-              : "bg-gray-300 cursor-not-allowed"
-              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
+            className={`w-full ${
+              routeReady
+                ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
+                : "bg-gray-300 cursor-not-allowed"
+            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
           >
             Request Ambulance
           </button>
         </div>
       </div>
-
 
       {/* Map */}
       <div
@@ -554,19 +549,17 @@ export default function CustomerMap() {
       />
 
       {/* Payment panel */}
-      {
-        showPay && (
-          <div className="w-full max-w-lg bg-white p-4 rounded-lg shadow mt-6">
-            <PayAmbulance
-              fare={fareDetails?.fare}
-              distance={fareDetails?.distance}
-              duration={fareDetails?.duration}
-              pickupLocation={fareDetails?.origin}
-              hospital={fareDetails?.destination}
-            />
-          </div>
-        )
-      }
-    </div >
+      {showPay && (
+        <div className="w-full max-w-lg bg-white p-4 rounded-lg shadow mt-6">
+          <PayAmbulance
+            fare={fareDetails?.fare}
+            distance={fareDetails?.distance}
+            duration={fareDetails?.duration}
+            pickupLocation={fareDetails?.origin}
+            hospital={fareDetails?.destination}
+          />
+        </div>
+      )}
+    </div>
   );
 }
