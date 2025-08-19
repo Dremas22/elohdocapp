@@ -300,48 +300,51 @@ Eloh Doc uses [LiveKit](https://livekit.io/) for secure, high-quality video/audi
 ---
 
 ### ================================
-### 🏥 Eloh Doc App Environment Variables
+### 🏥 Eloh Doc App Environment Variables (Example Values)
 ### ================================
+
+### ⚠️ NOTE: The values below are **examples only**.
+### Real values are stored safely in your .env file and should never be shared publicly.
 
 ### 🔗 Frontend Configuration
 
 ```
 NEXT_PUBLIC_URL=http://localhost:3000
-NEXT_PUBLIC_FIREBASE_API_KEY=bvjhb
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=nfvjv hb
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=nhfhgvb
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=jhtgjmb
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=nfgjhmnb
-NEXT_PUBLIC_FIREBASE_APP_ID=hthkn
-NEXT_PUBLIC_FIREBASE_MEASURE_ID=ghctg jb
-NEXT_PUBLIC_FIREBASE_VAPID_KEY=gjhgb mbfZPdnuNf724Ng1PF8ET6SNQJFJ9x8diuPfdzgT4FeSRKg_K4wtbHvDBGSRpJWSXE
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=vgjgb
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=dhgfgasjc
-NEXT_PUBLIC_EMAIL_JS_SERVICE_ID=sdhvhgb
-NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID=sdhgvb
-NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY=hsdgvbk
-NEXT_PUBLIC_LIVEKIT_URL=hdggfcaj
+NEXT_PUBLIC_FIREBASE_API_KEY=example-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=example-auth-domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=example-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=example-storage-bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=example-sender-id
+NEXT_PUBLIC_FIREBASE_APP_ID=example-app-id
+NEXT_PUBLIC_FIREBASE_MEASURE_ID=example-measure-id
+NEXT_PUBLIC_FIREBASE_VAPID_KEY=example-vapid-key
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=example-google-maps-key
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=example-stripe-pub-key
+NEXT_PUBLIC_EMAIL_JS_SERVICE_ID=example-emailjs-service-id
+NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID=example-emailjs-template-id
+NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY=example-emailjs-public-key
+NEXT_PUBLIC_LIVEKIT_URL=example-livekit-url
 
 ### 🔐 Backend / Server Configuration
-FIREBASE_PROJECT_ID=hrrfvjg
-FIREBASE_CLIENT_EMAIL=ku,hm
-FIREBASE_PRIVATE_KEY="nhgfvmjhvumnvumhv n
-FIREBASE_PRIVATE_KEY_ID=nbfvmhhbn
-FIREBASE_CLIENT_ID= nfv nb
-FIREBASE_AUTH_URI=gfhn
-FIREBASE_TOKEN_URI=hfhgvh hmh
-FIREBASE_AUTH_PROVIDER_CERT_URL=ytgcwrs
-FIREBASE_CLIENT_CERT_URL=ffgdva hcnb
-FIREBASE_UNIVERSE_DOMAIN=hgdg
+FIREBASE_PROJECT_ID=example-firebase-project-id
+FIREBASE_CLIENT_EMAIL=example-firebase-client-email
+FIREBASE_PRIVATE_KEY="example-firebase-private-key"
+FIREBASE_PRIVATE_KEY_ID=example-firebase-private-key-id
+FIREBASE_CLIENT_ID=example-firebase-client-id
+FIREBASE_AUTH_URI=example-firebase-auth-uri
+FIREBASE_TOKEN_URI=example-firebase-token-uri
+FIREBASE_AUTH_PROVIDER_CERT_URL=example-firebase-cert-url
+FIREBASE_CLIENT_CERT_URL=example-firebase-client-cert-url
+FIREBASE_UNIVERSE_DOMAIN=example-firebase-universe-domain
 FIREBASE_TYPE=service_account
 
-LIVEKIT_API_KEY=sdfgk
-LIVEKIT_API_SECRET=dsbngvikqjb
-LIVEKIT_URL=bsgvukjb
+LIVEKIT_API_KEY=example-livekit-api-key
+LIVEKIT_API_SECRET=example-livekit-secret
+LIVEKIT_URL=example-livekit-url
 
-STRIPE_SECRET_KEY=djfgjz
+STRIPE_SECRET_KEY=example-stripe-secret-key
 
-OPENROUTER_API_KEY=sk-or-v1-cgvsdujn d
+OPENROUTER_API_KEY=example-openrouter-api-key
 ```
 
 
