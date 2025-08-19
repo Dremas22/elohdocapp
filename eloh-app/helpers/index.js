@@ -1,12 +1,9 @@
 import { auth, db } from "@/db/client";
 import { createAmbulanceMarker } from "@/lib/ambulance-actions/createAmbulanceMarker";
 import {
-  addDoc,
   collection,
   doc,
   getDocs,
-  limit,
-  orderBy,
   query,
   updateDoc,
   where,
@@ -27,24 +24,17 @@ const calculateDistance = (loc1, loc2) => {
   return R * c;
 };
 
-export const trackAmbulances = async (pickupLocation, map) => {
+export const trackAmbulances = async (pickupLocation, map, radiusKm = 45) => {
   try {
-    const usersSnapshot = await getDocs(collection(db, "drivers"));
+    const ambulancesInRange = [];
+    const driversSnapshot = await getDocs(
+      query(collection(db, "drivers"), where("available", "==", true))
+    );
 
-    for (const userDoc of usersSnapshot.docs) {
-      const userId = userDoc.id;
-      const routesRef = collection(doc(db, "drivers", userId), "routes");
-      const routeQuery = query(
-        routesRef,
-        orderBy("createdAt", "desc"),
-        limit(1)
-      );
-      const routeSnapshot = await getDocs(routeQuery);
-
-      if (routeSnapshot.empty) continue;
-
-      const latestRoute = routeSnapshot.docs[0].data();
-      const driverLocation = latestRoute.origin;
+    for (let i = 0; i < driversSnapshot.docs.length; i++) {
+      const driverDoc = driversSnapshot.docs[i];
+      const driverData = driverDoc.data();
+      const driverLocation = driverData.location;
 
       if (
         !driverLocation ||
@@ -55,14 +45,37 @@ export const trackAmbulances = async (pickupLocation, map) => {
       }
 
       const distance = calculateDistance(pickupLocation, driverLocation);
-      if (distance <= 30) {
-        createAmbulanceMarker(driverLocation, map, "🚑", "Ambulance");
 
-        toastSuccess(`🚑 Ambulance found within ${distance.toFixed(2)} km`);
+      if (distance <= radiusKm) {
+        ambulancesInRange.push({
+          driverId: driverDoc.id,
+          location: driverLocation,
+          distance,
+          name: driverData.fullName,
+        });
+
+        // Slightly jitter overlapping markers so all are visible
+        const jitter = 0.00005 * i; // ~5 meters per driver
+        const jitteredLocation = {
+          lat: driverLocation.lat + jitter,
+          lng: driverLocation.lng + jitter,
+        };
+
+        if (map)
+          createAmbulanceMarker(
+            jitteredLocation,
+            map,
+            "🚑",
+            driverData?.fullName
+          );
       }
     }
+
+    console.log(ambulancesInRange, "AVAILABLE_AMBULANCES_IN_RANGE");
+    return ambulancesInRange;
   } catch (error) {
-    console.error("Error tracking ambulances:", error.message);
+    console.error("Error tracking available ambulances:", error.message);
+    return [];
   }
 };
 
@@ -143,25 +156,31 @@ export const getAddressFromLatLng = async (lat, lng) => {
   return null;
 };
 
-export async function findNearestAvailableDriver(pickupLocation) {
+/**
+ * Finds the nearest available driver to a pickup location, excluding any drivers in `excludeDriverIds`.
+ */
+export async function findNearestAvailableDriver(
+  pickupLocation,
+  excludeDriverIds = []
+) {
   if (!pickupLocation?.lat || !pickupLocation?.lng) {
     console.warn("Pickup location is missing latitude or longitude");
     return null;
   }
 
-  // Query all available ambulance drivers
   const driversRef = collection(db, "drivers");
-  const q = query(driversRef, where("available", "==", true)); // ensure field is boolean true
+  const q = query(driversRef, where("available", "==", true));
   const querySnapshot = await getDocs(q);
 
   let nearestDriver = null;
   let minDistance = Infinity;
 
   querySnapshot.forEach((docSnap) => {
+    if (excludeDriverIds.includes(docSnap.id)) return; // skip excluded drivers
+
     const driverData = docSnap.data();
     let driverLat, driverLng;
 
-    // Handle both { lat, lng } objects and GeoPoint
     if (driverData.location?.lat != null && driverData.location?.lng != null) {
       driverLat = driverData.location.lat;
       driverLng = driverData.location.lng;
@@ -180,7 +199,7 @@ export async function findNearestAvailableDriver(pickupLocation) {
       lat: driverLat,
       lng: driverLng,
     });
-    toastSuccess(`Driver ${docSnap.id} is ${dist.toFixed(2)} km away.`);
+    // Optional: toastSuccess(`Driver ${docSnap.id} is ${dist.toFixed(2)} km away.`);
 
     if (dist < minDistance) {
       minDistance = dist;
@@ -189,7 +208,7 @@ export async function findNearestAvailableDriver(pickupLocation) {
   });
 
   if (!nearestDriver) {
-    toastInfo("No drivers matched the location criteria.");
+    toastInfo("No available drivers found nearby.");
   }
 
   return nearestDriver;

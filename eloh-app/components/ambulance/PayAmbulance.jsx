@@ -71,9 +71,10 @@ export default function PayAmbulance({
         onClick={handleProceed}
         disabled={loading}
         className={`flex justify-center items-center gap-2 px-6 py-3 rounded-2xl font-semibold text-white transition-all duration-300 transform
-          ${loading
-            ? "bg-gray-400 cursor-not-allowed shadow-none"
-            : "bg-green-600 hover:bg-green-700 hover:scale-105 active:scale-95 cursor-pointer shadow-[0_4px_#999] active:shadow-[0_2px_#666]"
+          ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed shadow-none"
+              : "bg-green-600 hover:bg-green-700 hover:scale-105 active:scale-95 cursor-pointer shadow-[0_4px_#999] active:shadow-[0_2px_#666]"
           }`}
       >
         {/* spinner while loading */}

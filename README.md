@@ -300,13 +300,51 @@ Eloh Doc uses [LiveKit](https://livekit.io/) for secure, high-quality video/audi
 ---
 
 ### ================================
-### 🏥 Eloh Doc App Environment Variables
+### 🏥 Eloh Doc App Environment Variables (Example Values)
 ### ================================
 
+### ⚠️ NOTE: The values below are **examples only**.
+### Real values are stored safely in your .env file and should never be shared publicly.
+
 ### 🔗 Frontend Configuration
-```env
-NEXT_PUBLIC_URL=http://localhost:3000                     # Base URL of the frontend
-NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key                # Firebase Web API key
-NEXT_PUBLIC_STRIPE_PUBLIC_KEY=your-stripe-publishable-key # Stripe publishable key
+
+```
+NEXT_PUBLIC_URL=http://localhost:3000
+NEXT_PUBLIC_FIREBASE_API_KEY=example-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=example-auth-domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=example-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=example-storage-bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=example-sender-id
+NEXT_PUBLIC_FIREBASE_APP_ID=example-app-id
+NEXT_PUBLIC_FIREBASE_MEASURE_ID=example-measure-id
+NEXT_PUBLIC_FIREBASE_VAPID_KEY=example-vapid-key
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=example-google-maps-key
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=example-stripe-pub-key
+NEXT_PUBLIC_EMAIL_JS_SERVICE_ID=example-emailjs-service-id
+NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID=example-emailjs-template-id
+NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY=example-emailjs-public-key
+NEXT_PUBLIC_LIVEKIT_URL=example-livekit-url
+
+### 🔐 Backend / Server Configuration
+FIREBASE_PROJECT_ID=example-firebase-project-id
+FIREBASE_CLIENT_EMAIL=example-firebase-client-email
+FIREBASE_PRIVATE_KEY="example-firebase-private-key"
+FIREBASE_PRIVATE_KEY_ID=example-firebase-private-key-id
+FIREBASE_CLIENT_ID=example-firebase-client-id
+FIREBASE_AUTH_URI=example-firebase-auth-uri
+FIREBASE_TOKEN_URI=example-firebase-token-uri
+FIREBASE_AUTH_PROVIDER_CERT_URL=example-firebase-cert-url
+FIREBASE_CLIENT_CERT_URL=example-firebase-client-cert-url
+FIREBASE_UNIVERSE_DOMAIN=example-firebase-universe-domain
+FIREBASE_TYPE=service_account
+
+LIVEKIT_API_KEY=example-livekit-api-key
+LIVEKIT_API_SECRET=example-livekit-secret
+LIVEKIT_URL=example-livekit-url
+
+STRIPE_SECRET_KEY=example-stripe-secret-key
+
+OPENROUTER_API_KEY=example-openrouter-api-key
+```
 
 

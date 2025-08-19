@@ -1,3 +1,4 @@
+import { SEVEN_DAYS_MS } from "@/constants";
 import { auth, db } from "@/db/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -26,7 +27,7 @@ export async function POST(req) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const expirationTimeMs = decodedToken.exp * 1000;
+    const expirationTimeMs = Date.now() + SEVEN_DAYS_MS;
     const nowMs = Date.now();
     const expiresIn = expirationTimeMs - nowMs;
 

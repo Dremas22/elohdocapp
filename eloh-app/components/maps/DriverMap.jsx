@@ -12,8 +12,12 @@ import {
 } from "firebase/firestore";
 import { auth, db, messaging } from "@/db/client";
 import { createAmbulanceMarker } from "@/lib/ambulance-actions/createAmbulanceMarker";
-import { toastSuccess, toastError, toastInfo } from "@/helpers/toastHelper";
-import { deleteDriverRoute, saveDriverRoute } from "@/helpers";
+import { toastError, toastInfo } from "@/helpers/toastHelper";
+import {
+  deleteDriverRoute,
+  findNearestAvailableDriver,
+  saveDriverRoute,
+} from "@/helpers";
 import { onMessage } from "firebase/messaging";
 import AmbulanceDriverDashboardNavbar from "@/app/dashboard/driver/driverNav";
 import DriverSidebarMenu from "@/app/dashboard/driver/driverSidebar";
@@ -25,6 +29,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [directionsRenderer, setDirectionsRenderer] = useState(null);
   const [ambulanceRequest, setAmbulanceRequest] = useState(null);
+  const [excludedDrivers, setExcludedDrivers] = useState([]);
 
   useEffect(() => {
     const unsubscribe = onMessage(messaging, (payload) => {
@@ -160,6 +165,52 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     }
   };
 
+  const handleDecline = async () => {
+    if (!ambulanceRequest) return;
+
+    // Add current driver to excluded list
+    const currentDriverId = auth.currentUser?.uid;
+    const updatedExclusions = [...excludedDrivers, currentDriverId];
+    setExcludedDrivers(updatedExclusions);
+
+    const pickupLocation = {
+      lat: parseFloat(ambulanceRequest.pickupLat),
+      lng: parseFloat(ambulanceRequest.pickupLng),
+    };
+
+    // Find next nearest driver
+    const nextDriver = await findNearestAvailableDriver(
+      pickupLocation,
+      updatedExclusions
+    );
+
+    if (nextDriver) {
+      // Send notification to driver
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/send-ambulance-notification`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            driverId: nextDriver?.userId || nextDriver?.id,
+            tripDetails: ambulanceRequest,
+            customerId: auth?.currentUser?.uid,
+          }),
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!response.ok) {
+        toastError(`Error: ${response.text()}`);
+      }
+      toastInfo(`Request reassigned to driver ${nextDriver.id}`);
+    } else {
+      toastInfo("No other available drivers nearby.");
+    }
+
+    // Optionally clear current request from this driver's view
+    setAmbulanceRequest(null);
+  };
+
   return (
     <div className="flex w-full min-h-screen bg-gray-100 relative">
       {/* Sidebar */}
@@ -228,7 +279,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
                     ✅ Accept
                   </button>
                   <button
-                    onClick={() => setAmbulanceRequest(null)}
+                    onClick={() => handleDecline()}
                     className="flex-1 bg-red-600 text-white py-2 px-4 rounded-xl shadow hover:bg-red-700 hover:shadow-lg transition"
                   >
                     ❌ Decline
@@ -237,7 +288,6 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
               </div>
             </div>
           )}
-
         </div>
       </div>
     </div>
