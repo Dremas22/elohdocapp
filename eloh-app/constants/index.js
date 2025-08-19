@@ -1,3 +1,9 @@
+/**
+ * Categories of doctors.
+ *
+ * `id` → internal key for storage/logic
+ * `title` → display-friendly label
+ */
 export const doctorCategories = [
   { id: "gp", title: "General Practitioner" },
   { id: "cardio", title: "Cardiologist" },
@@ -9,6 +15,11 @@ export const doctorCategories = [
   { id: "surgeon", title: "Surgeon" },
 ];
 
+/**
+ * Categories of nurses.
+ *
+ * Structured similarly to doctor categories for consistency.
+ */
 export const nurseCategories = [
   { id: "rn", title: "Registered Nurse" },
   { id: "en", title: "Enrolled Nurse" },
@@ -20,6 +31,12 @@ export const nurseCategories = [
   { id: "midwife", title: "Midwife" },
 ];
 
+/**
+ * International dialing codes for African countries only.
+ *
+ * Stored as `{ code, label }` so they can be shown in dropdowns
+ * without needing additional formatting logic.
+ */
 export const phoneCodes = [
   { code: "+27", label: "South Africa (+27)" },
   { code: "+213", label: "Algeria (+213)" },
@@ -76,6 +93,14 @@ export const phoneCodes = [
   { code: "+263", label: "Zimbabwe (+263)" },
 ];
 
+/**
+ * Full list of African countries.
+ *
+ * Each entry has a **custom unique ID**, not just ISO codes.
+ * Example: "ZA_skd93kfj" instead of "ZA".
+ * This ensures uniqueness in Firestore or databases where
+ * string IDs must not collide across collections.
+ */
 export const africanCountries = [
   { id: "ZA_skd93kfj", title: "South Africa" },
   { id: "DZ_8sd7f2k3", title: "Algeria" },
@@ -133,6 +158,12 @@ export const africanCountries = [
   { id: "ZW_jd83kdls", title: "Zimbabwe" },
 ];
 
+/**
+ * The 11 official languages of South Africa.
+ *
+ * `id` values follow ISO 639-1 codes,
+ * making them compatible with i18n/locale libraries.
+ */
 export const southAfricanLanguages = [
   { id: "af", value: "Afrikaans" },
   { id: "en", value: "English" },
@@ -147,12 +178,28 @@ export const southAfricanLanguages = [
   { id: "ts", value: "Xitsonga" },
 ];
 
+/**
+ * Maps human-readable note types to Firestore field keys.
+ *
+ * Example:
+ *  - "sick-note" → "sickNotes"
+ *  - "prescription" → "prescriptions"
+ *  - "note" → "generalNotes"
+ *
+ * This keeps DB schema consistent while still allowing
+ * user-friendly naming in the UI.
+ */
 export const noteTypeMap = {
   note: "generalNotes",
   "sick-note": "sickNotes",
   prescription: "prescriptions",
 };
 
+/**
+ * Major South African banks.
+ *
+ * Used when capturing staff payout details.
+ */
 export const banks = [
   { id: "absa", title: "Absa Bank" },
   { id: "capitec", title: "Capitec Bank" },
@@ -164,6 +211,11 @@ export const banks = [
   { id: "african", title: "African Bank" },
 ];
 
+/**
+ * Categories of emergency drivers/paramedics.
+ *
+ * Supports role-specific logic for transport/response staff.
+ */
 export const driverCategories = [
   { id: "emtb", title: "Emergency Medical Technician - Basic" },
   { id: "emti", title: "Emergency Medical Technician - Intermediate" },
@@ -175,6 +227,18 @@ export const driverCategories = [
   { id: "rescue", title: "Rescue Paramedic" },
 ];
 
+/** Total amount charged to the patient per consultation (ZAR). */
 export const CONSULTATION_FEE = 500;
+
+/** Fixed amount retained by the platform per consultation. */
 export const PLATFORM_FEE = 50;
+
+/** Net amount paid out to staff per consultation. */
 export const STAFF_EARNING_PER_CONSULTATION = CONSULTATION_FEE - PLATFORM_FEE;
+
+/**
+ * Represents 7 days in milliseconds.
+ *
+ * Useful for session expiry, scheduling, and caching.
+ */
+export const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
