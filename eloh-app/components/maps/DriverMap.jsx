@@ -225,8 +225,8 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
         <AmbulanceDriverDashboardNavbar />
 
         {/* Push content below fixed navbar */}
-        <div className="w-full flex flex-col items-center mt-24 p-4">
-          <div className="w-[60%] bg-white rounded-2xl shadow-md lg:ml-60 p-6 mb-4">
+        <div className="w-full flex flex-col items-center mt-5 p-4">
+          <div className="lg:w-[60%] w-[90%] bg-white rounded-2xl shadow-md lg:ml-60 p-6 mb-4">
             <div className="flex space-x-4">
               <button
                 onClick={handleCancelRoute}
@@ -239,7 +239,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
           <div
             ref={mapRef}
-            className=" lg:ml-60 w-[80%] h-[400px] rounded-lg overflow-hidden"
+            className=" lg:ml-80 lg:w-[80%] w-[110%] lg:h-[550px] h-[500px] rounded-lg overflow-hidden"
           />
 
           {ambulanceRequest && (
