@@ -18,15 +18,13 @@ import { onMessage } from "firebase/messaging";
 import AmbulanceDriverDashboardNavbar from "@/app/dashboard/driver/driverNav";
 import DriverSidebarMenu from "@/app/dashboard/driver/driverSidebar";
 
-const DriverMap = () => {
+const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const mapRef = useRef(null);
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [directionsRenderer, setDirectionsRenderer] = useState(null);
   const [ambulanceRequest, setAmbulanceRequest] = useState(null);
-
-  const [showEarnings, setShowEarnings] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onMessage(messaging, (payload) => {
@@ -105,7 +103,8 @@ const DriverMap = () => {
   }, [map, marker]);
 
   const handleAcceptRequest = async (request) => {
-    if (!map || !currentLocation) return toastError("Map or location not ready");
+    if (!map || !currentLocation)
+      return toastError("Map or location not ready");
 
     if (directionsRenderer) directionsRenderer.setMap(null);
     const newRenderer = new window.google.maps.DirectionsRenderer();
@@ -125,7 +124,11 @@ const DriverMap = () => {
 
     const directionsService = new window.google.maps.DirectionsService();
     directionsService.route(
-      { origin, destination, travelMode: window.google.maps.TravelMode.DRIVING },
+      {
+        origin,
+        destination,
+        travelMode: window.google.maps.TravelMode.DRIVING,
+      },
       (result, status) => {
         if (status === "OK") newRenderer.setDirections(result);
         else toastError("Failed to create route");
@@ -161,8 +164,9 @@ const DriverMap = () => {
     <div className="flex w-full min-h-screen bg-gray-100 relative">
       {/* Sidebar */}
       <DriverSidebarMenu
-        userDoc={auth.currentUser}
+        userDoc={userDoc}
         setShowEarnings={setShowEarnings}
+        isVerified={isVerified}
       />
 
       <div className="flex-1 flex flex-col items-center">
