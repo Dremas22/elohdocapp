@@ -62,7 +62,7 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
   const { isVerified } = userDocState;
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-gray-950">
+    <div className="flex flex-col w-full min-h-screen bg-gray-100">
       <Script
         src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
         strategy="afterInteractive"
@@ -121,11 +121,11 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
               )}
             </>
           ) : isVerified === false ? (
-            <div className="text-gray-600 mt-10 text-center">
-              <h2 className="text-lg font-semibold mb-2">
+            <div className="text-gray-400 text-center pt-30 lg:pl-55">
+              <h2 className="lg:text-3xl text-2xl font-semibold mb-2">
                 Verification Pending
               </h2>
-              <p>
+              <p className="lg:text-2xl text-xl">
                 Once your account is verified, you'll access patient information
                 here.
               </p>
@@ -136,8 +136,7 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
                 Verification Declined
               </h2>
               <p>
-                We could not verify your account. Please ensure your practice
-                number is registered or contact support for help.
+                We could not verify your account. Please ensure your certificate is valid or contact support for help.
               </p>
             </div>
           )}
