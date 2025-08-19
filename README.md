@@ -304,9 +304,44 @@ Eloh Doc uses [LiveKit](https://livekit.io/) for secure, high-quality video/audi
 ### ================================
 
 ### 🔗 Frontend Configuration
-```env
-NEXT_PUBLIC_URL=http://localhost:3000                     # Base URL of the frontend
-NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key                # Firebase Web API key
-NEXT_PUBLIC_STRIPE_PUBLIC_KEY=your-stripe-publishable-key # Stripe publishable key
+
+```
+NEXT_PUBLIC_URL=http://localhost:3000
+NEXT_PUBLIC_FIREBASE_API_KEY=bvjhb
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=nfvjv hb
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=nhfhgvb
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=jhtgjmb
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=nfgjhmnb
+NEXT_PUBLIC_FIREBASE_APP_ID=hthkn
+NEXT_PUBLIC_FIREBASE_MEASURE_ID=ghctg jb
+NEXT_PUBLIC_FIREBASE_VAPID_KEY=gjhgb mbfZPdnuNf724Ng1PF8ET6SNQJFJ9x8diuPfdzgT4FeSRKg_K4wtbHvDBGSRpJWSXE
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=vgjgb
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=dhgfgasjc
+NEXT_PUBLIC_EMAIL_JS_SERVICE_ID=sdhvhgb
+NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID=sdhgvb
+NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY=hsdgvbk
+NEXT_PUBLIC_LIVEKIT_URL=hdggfcaj
+
+### 🔐 Backend / Server Configuration
+FIREBASE_PROJECT_ID=hrrfvjg
+FIREBASE_CLIENT_EMAIL=ku,hm
+FIREBASE_PRIVATE_KEY="nhgfvmjhvumnvumhv n
+FIREBASE_PRIVATE_KEY_ID=nbfvmhhbn
+FIREBASE_CLIENT_ID= nfv nb
+FIREBASE_AUTH_URI=gfhn
+FIREBASE_TOKEN_URI=hfhgvh hmh
+FIREBASE_AUTH_PROVIDER_CERT_URL=ytgcwrs
+FIREBASE_CLIENT_CERT_URL=ffgdva hcnb
+FIREBASE_UNIVERSE_DOMAIN=hgdg
+FIREBASE_TYPE=service_account
+
+LIVEKIT_API_KEY=sdfgk
+LIVEKIT_API_SECRET=dsbngvikqjb
+LIVEKIT_URL=bsgvukjb
+
+STRIPE_SECRET_KEY=djfgjz
+
+OPENROUTER_API_KEY=sk-or-v1-cgvsdujn d
+```
 
 
