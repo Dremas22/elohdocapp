@@ -188,39 +188,52 @@ const DriverMap = () => {
           />
 
           {ambulanceRequest && (
-            <div className="fixed bottom-10 right-10 bg-white rounded-lg shadow-lg p-6 w-[400px] z-50">
-              <h3 className="text-lg font-bold mb-2">New Ambulance Request</h3>
-              <p>
-                <strong>Customer Name:</strong> {ambulanceRequest.customerName}
-              </p>
-              <p>
-                <strong>Pickup Location:</strong> {ambulanceRequest.pickupAddress}
-              </p>
-              <p>
-                <strong>Fare:</strong> R{ambulanceRequest.fare}
-              </p>
-              <p>
-                <strong>Distance:</strong> {ambulanceRequest.distance} km
-              </p>
-              <p>
-                <strong>Duration:</strong> {ambulanceRequest.duration} min
-              </p>
-              <div className="flex justify-end mt-4 space-x-4">
-                <button
-                  onClick={() => handleAcceptRequest(ambulanceRequest)}
-                  className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
-                >
-                  Accept
-                </button>
-                <button
-                  onClick={() => setAmbulanceRequest(null)}
-                  className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
-                >
-                  Decline
-                </button>
+            <div className="fixed bottom-10 right-10 w-[400px] z-50 animate-slide-up">
+              <div className="bg-white rounded-2xl shadow-2xl border-l-4 border-red-600 p-6 relative overflow-hidden">
+                {/* Header */}
+                <h3 className="text-xl font-bold mb-3 flex items-center text-black">
+                  New Ambulance Request
+                </h3>
+                {/* Info */}
+                <div className="space-y-2 text-gray-700">
+                  <p>
+                    <strong>Customer:</strong> {ambulanceRequest.customerName}
+                  </p>
+                  <p>
+                    <strong>Pickup:</strong> {ambulanceRequest.pickupAddress}
+                  </p>
+                  <p>
+                    <strong>Fare:</strong>{" "}
+                    <span className="text-green-600 font-semibold">
+                      R{ambulanceRequest.fare}
+                    </span>
+                  </p>
+                  <p>
+                    <strong>Distance:</strong> {ambulanceRequest.distance} km
+                  </p>
+                  <p>
+                    <strong>Duration:</strong> {ambulanceRequest.duration} min
+                  </p>
+                </div>
+                {/* Buttons */}
+                <div className="flex justify-between mt-6 space-x-4">
+                  <button
+                    onClick={() => handleAcceptRequest(ambulanceRequest)}
+                    className="flex-1 bg-green-600 text-white py-2 px-4 rounded-xl shadow hover:bg-green-700 hover:shadow-lg transition"
+                  >
+                    ✅ Accept
+                  </button>
+                  <button
+                    onClick={() => setAmbulanceRequest(null)}
+                    className="flex-1 bg-red-600 text-white py-2 px-4 rounded-xl shadow hover:bg-red-700 hover:shadow-lg transition"
+                  >
+                    ❌ Decline
+                  </button>
+                </div>
               </div>
             </div>
           )}
+
         </div>
       </div>
     </div>
