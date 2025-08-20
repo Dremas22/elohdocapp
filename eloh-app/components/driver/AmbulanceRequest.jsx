@@ -4,14 +4,16 @@ const AmbulanceRequest = ({
   handleAcceptRequest,
 }) => {
   return (
-    <div className="fixed bottom-10 right-10 w-[400px] z-50 animate-slide-up">
-      <div className="bg-white rounded-2xl shadow-2xl border-l-4 border-red-600 p-6 relative overflow-hidden">
+    <div className="fixed bottom-5 right-5 z-50 animate-slide-up 
+                    w-[90%] max-w-md mx-auto sm:bottom-10 sm:right-10">
+      <div className="bg-white rounded-2xl shadow-2xl border-l-4 border-gray-300 p-4 sm:p-6 relative overflow-hidden">
         {/* Header */}
-        <h3 className="text-xl font-bold mb-3 flex items-center text-black">
+        <h3 className="text-lg sm:text-xl font-bold mb-3 flex items-center text-black">
           New Ambulance Request
         </h3>
+
         {/* Info */}
-        <div className="space-y-2 text-gray-700">
+        <div className="space-y-1 sm:space-y-2 text-gray-700 text-sm sm:text-base">
           <p>
             <strong>Customer:</strong> {ambulanceRequest.customerName}
           </p>
@@ -31,17 +33,18 @@ const AmbulanceRequest = ({
             <strong>Duration:</strong> {ambulanceRequest.duration} min
           </p>
         </div>
+
         {/* Buttons */}
-        <div className="flex justify-between mt-6 space-x-4">
+        <div className="flex flex-col sm:flex-row justify-between mt-4 sm:mt-6 gap-3">
           <button
             onClick={() => handleAcceptRequest(ambulanceRequest)}
-            className="flex-1 bg-green-600 text-white py-2 px-4 rounded-xl shadow hover:bg-green-700 hover:shadow-lg transition"
+            className="w-full sm:flex-1 bg-green-600 text-white py-2 px-4 rounded-xl shadow hover:bg-green-700 hover:shadow-lg transition cursor-pointer"
           >
             ✅ Accept
           </button>
           <button
             onClick={() => handleDecline()}
-            className="flex-1 bg-red-600 text-white py-2 px-4 rounded-xl shadow hover:bg-red-700 hover:shadow-lg transition"
+            className="w-full sm:flex-1 bg-red-600 text-white py-2 px-4 rounded-xl shadow hover:bg-red-700 hover:shadow-lg transition cursor-pointer"
           >
             ❌ Decline
           </button>

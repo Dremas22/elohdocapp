@@ -82,6 +82,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
         });
         setMap(gMap);
 
+        // ✅ ONLY create the custom ambulance marker, no default ping
         const m = createAmbulanceMarker(location, gMap, "🚑", "Ambulance");
         setMarker(m);
       }
@@ -226,7 +227,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   };
 
   return (
-    <div className="flex w-full min-h-screen bg-gray-100 relative">
+    <div className="flex w-full h-full bg-gray-100 relative">
       {/* Sidebar */}
       <DriverSidebarMenu
         userDoc={userDoc}
@@ -253,7 +254,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
           <div
             ref={mapRef}
-            className=" lg:ml-80 lg:w-[80%] w-[110%] lg:h-[550px] h-[500px] rounded-lg overflow-hidden"
+            className=" lg:ml-80 lg:w-[80%] w-[110%] lg:h-[550px] h-[510px] rounded-lg overflow-hidden"
           />
 
           {ambulanceRequest && (
