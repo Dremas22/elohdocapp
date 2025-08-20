@@ -95,7 +95,7 @@ export default function CustomerMap({ userDoc }) {
 
           setMap(gMap);
           // initial customer marker
-          createCustomerMarker(loc, gMap, "🧍", "Customer");
+          createCustomerMarker(loc, gMap, "🧍", "Customer (You)");
 
           // Setup pickup autocomplete
           const pickupAutocomplete = new window.google.maps.places.Autocomplete(
