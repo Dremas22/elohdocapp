@@ -55,3 +55,9 @@ body::-webkit-scrollbar,
 .animate-slide-up {
   animation: slide-up 0.4s ease-out forwards;
 }
+
+@layer base {
+  .chat {
+    @apply bg-[url('/images/elohdoc.png')] bg-no-repeat bg-cover bg-center flex items-center justify-center h-screen;
+  }
+}
