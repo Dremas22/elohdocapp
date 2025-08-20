@@ -8,7 +8,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { toastInfo, toastSuccess } from "./toastHelper";
+import { toastInfo } from "./toastHelper";
 
 const calculateDistance = (loc1, loc2) => {
   const R = 6371;
@@ -71,7 +71,6 @@ export const trackAmbulances = async (pickupLocation, map, radiusKm = 45) => {
       }
     }
 
-    console.log(ambulancesInRange, "AVAILABLE_AMBULANCES_IN_RANGE");
     return ambulancesInRange;
   } catch (error) {
     console.error("Error tracking available ambulances:", error.message);

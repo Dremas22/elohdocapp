@@ -22,7 +22,6 @@ export default function CustomerMap({ userDoc }) {
   const destInputRef = useRef(null);
   const paySectionRef = useRef(null);
 
-
   const [map, setMap] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [pickupPlace, setPickupPlace] = useState(null);
@@ -37,18 +36,21 @@ export default function CustomerMap({ userDoc }) {
 
   useEffect(() => {
     if (showPay && paySectionRef.current) {
-      paySectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      paySectionRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   }, [showPay]);
-
-
 
   useEffect(() => {
     if (showPay && paySectionRef.current) {
-      paySectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      paySectionRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   }, [showPay]);
-
 
   const RATE_PER_KM = 10; // change to your rate
 
@@ -490,10 +492,11 @@ export default function CustomerMap({ userDoc }) {
             title="Create route"
             onClick={handleCreateRoute}
             disabled={locationLoading}
-            className={`flex-1 ${locationLoading
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-[#03045e] hover:bg-[#023e8a]"
-              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer`}
+            className={`flex-1 ${
+              locationLoading
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-[#03045e] hover:bg-[#023e8a]"
+            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer`}
           >
             {locationLoading ? "Creating route..." : "Create Route"}
           </button>
@@ -512,12 +515,12 @@ export default function CustomerMap({ userDoc }) {
               await trackAmbulances(
                 destinationPlace || pickupPlace || currentLocation,
                 map,
-                45
+                450
               )
             }
             className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
-            Track Ambulances (45km)
+            Track Ambulances (450km)
           </button>
         </div>
 
@@ -547,10 +550,11 @@ export default function CustomerMap({ userDoc }) {
             title="Request ambulance now"
             onClick={() => setShowPay(true)}
             disabled={!routeReady}
-            className={`w-full ${routeReady
-              ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
-              : "bg-gray-300 cursor-not-allowed"
-              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
+            className={`w-full ${
+              routeReady
+                ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
+                : "bg-gray-300 cursor-not-allowed"
+            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
           >
             Request Ambulance
           </button>
@@ -562,7 +566,6 @@ export default function CustomerMap({ userDoc }) {
         ref={mapRef}
         className="w-full max-w-6xl h-[480px] rounded-lg shadow-lg overflow-hidden"
       />
-
 
       {/* Payment panel */}
       {showPay && (
@@ -579,7 +582,6 @@ export default function CustomerMap({ userDoc }) {
           />
         </div>
       )}
-
     </div>
   );
 }
