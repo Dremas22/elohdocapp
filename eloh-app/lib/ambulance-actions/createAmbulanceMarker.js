@@ -21,10 +21,14 @@ export const createAmbulanceMarker = (
     position: jitteredLocation,
     map,
     title,
-    label: {
-      text: label,
-      fontSize: "20px",
-      fontWeight: "bold",
+    icon: {
+      url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+          <text y="32" font-size="30">🚑</text>
+        </svg>
+      `)}`,
+      scaledSize: new window.google.maps.Size(40, 40),
+      anchor: new window.google.maps.Point(20, 40),
     },
   });
 };
