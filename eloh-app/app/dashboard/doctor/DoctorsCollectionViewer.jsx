@@ -6,11 +6,12 @@ import SearchBar from "@/components/doctors/SearchBar";
 import { useState, useRef, useEffect } from "react";
 import FilteredPatientsTable from "./FilteredPatientsTable";
 import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
-import { FiX } from "react-icons/fi";
+import { FiMessageCircle, FiX } from "react-icons/fi";
 import Link from "next/link";
 import Earnings from "./doctorEarnings";
 import { db } from "@/db/client";
 import { doc, onSnapshot } from "firebase/firestore";
+import ElohDocChatApp from "@/components/chat-app/ElohDocChatApp";
 
 const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
   // State to manage search/filter and modals
@@ -21,6 +22,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
   const [openViewPatientRecords, setOpenViewPatientRecords] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [userDocState, setUserDoc] = useState(userDoc || {});
+  const [openChat, setOpenChat] = useState(false);
 
   // Ref for scrolling to patient record viewer
   const patientRecordsRef = useRef(null);
@@ -194,6 +196,34 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
                   compact
                 />
               </div>
+              {/* Chat Toggle Button */}
+              {/* Chat Toggle Button */}
+              <button
+                onClick={() => setOpenChat(!openChat)}
+                title="Open Chat"
+                className="fixed bottom-6 right-6 bg-[#0d6efd] hover:bg-[#0b5ed7] text-white p-4 rounded-full shadow-lg z-50"
+                aria-label="Toggle Chat"
+              >
+                <div className="relative">
+                  <FiMessageCircle size={28} />
+                  {/* Unseen messages badge */}
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full shadow">
+                    3
+                  </span>
+                </div>
+              </button>
+
+              {/* Chat Modal */}
+              {openChat && (
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-[10px] z-50 flex items-center justify-center chat">
+                  <div className="relative w-[80vw] h-[90vh]">
+                    {/* Chat App */}
+                    <div className="w-full h-full rounded-xl overflow-hidden relative z-[50]">
+                      <ElohDocChatApp setOpenChat={setOpenChat} />
+                    </div>
+                  </div>
+                </div>
+              )}
             </>
           ) : isVerified === false ? (
             // If account is pending verification

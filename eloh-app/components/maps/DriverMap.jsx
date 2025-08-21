@@ -12,55 +12,47 @@ import {
 } from "firebase/firestore";
 import { auth, db, messaging } from "@/db/client";
 import { createAmbulanceMarker } from "@/lib/ambulance-actions/createAmbulanceMarker";
-import { toastSuccess, toastError, toastInfo } from "@/helpers/toastHelper";
-import { deleteDriverRoute, saveDriverRoute } from "@/helpers";
+import { toastError, toastInfo } from "@/helpers/toastHelper";
+import {
+  deleteDriverRoute,
+  findNearestAvailableDriver,
+  saveDriverRoute,
+} from "@/helpers";
 import { onMessage } from "firebase/messaging";
+import AmbulanceDriverDashboardNavbar from "@/app/dashboard/driver/driverNav";
+import DriverSidebarMenu from "@/app/dashboard/driver/driverSidebar";
+import ActiveRequest from "../driver/ActiveRequest";
+import AmbulanceRequest from "../driver/AmbulanceRequest";
 
-const DriverMap = () => {
+const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const mapRef = useRef(null);
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [directionsRenderer, setDirectionsRenderer] = useState(null);
   const [ambulanceRequest, setAmbulanceRequest] = useState(null);
+  const [excludedDrivers, setExcludedDrivers] = useState([]);
+  const [activeRequest, setActiveRequest] = useState(null);
 
-  /**
-   * const [ambulanceRequest, setAmbulanceRequest] = useState({
-  type: "ambulance_request",
-  pickupAddress: "123 Main Street, Cape Town",
-  fare: 250,
-  distance: "12",
-  duration: "20",
-  pickupLat: -33.9258,
-  pickupLng: 18.4232,
-  tripId: "dummy-trip-001",
-});
+  useEffect(() => {
+    const unsubscribe = onMessage(messaging, (payload) => {
+      if (payload?.data?.type === "ambulance_request") {
+        const requestData = {
+          customerName: payload.data.customerName || "",
+          pickupAddress: payload.data.pickupAddress || "Unknown",
+          fare: parseFloat(payload.data.fare || "0"),
+          distance: payload.data.distance || "0",
+          duration: payload.data.duration || "0",
+          pickupLat: parseFloat(payload.data.pickupLat || "0"),
+          pickupLng: parseFloat(payload.data.pickupLng || "0"),
+          type: payload.data.type,
+        };
+        setAmbulanceRequest(requestData);
+      }
+    });
 
-   */
-
-  // FCM foreground listener
-  // useEffect(() => {
-  //   const unsubscribe = onMessage(messaging, (payload) => {
-  //     if (
-  //       payload?.data?.type === "ambulance_request" ||
-  //       payload?.type === "NOTIFICATION_CLICK"
-  //     ) {
-  //       const requestData = {
-  //         customerName: payload.data.customerName || "",
-  //         pickupAddress: payload.data.pickupAddress || "Unknown",
-  //         fare: parseFloat(payload.data.fare || "0"),
-  //         distance: payload.data.distance || "0",
-  //         duration: payload.data.duration || "0",
-  //         pickupLat: parseFloat(payload.data.pickupLat || "0"),
-  //         pickupLng: parseFloat(payload.data.pickupLng || "0"),
-  //         type: payload.data.type,
-  //       };
-  //       setAmbulanceRequest(requestData);
-  //     }
-  //   });
-
-  //   return () => unsubscribe();
-  // }, []);
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -74,11 +66,6 @@ const DriverMap = () => {
 
   // Initialize map + continuous driver location update
   useEffect(() => {
-    if (!window.google || !window.google.maps) {
-      console.error("Google Maps not loaded yet");
-      return;
-    }
-
     if (!navigator.geolocation) {
       toastError("Geolocation not supported.", 5000);
       return;
@@ -88,7 +75,6 @@ const DriverMap = () => {
       const location = { lat: coords.latitude, lng: coords.longitude };
       setCurrentLocation(location);
 
-      // Initialize map if not yet initialized
       if (!map && mapRef.current) {
         const gMap = new window.google.maps.Map(mapRef.current, {
           center: location,
@@ -96,18 +82,16 @@ const DriverMap = () => {
         });
         setMap(gMap);
 
-        // Create initial marker
+        // ✅ ONLY create the custom ambulance marker, no default ping
         const m = createAmbulanceMarker(location, gMap, "🚑", "Ambulance");
         setMarker(m);
       }
 
-      // Update marker
       if (marker) {
         marker.setPosition(location);
         map?.panTo(location);
       }
 
-      // Update Firestore
       try {
         const user = auth.currentUser;
         if (!user) return;
@@ -118,7 +102,6 @@ const DriverMap = () => {
       }
     };
 
-    // Watch position continuously
     const watchId = navigator.geolocation.watchPosition(
       ({ coords }) => updateDriverLocation(coords),
       (error) => toastError(`Geolocation error: ${error}`, 5000),
@@ -161,12 +144,14 @@ const DriverMap = () => {
       }
     );
 
-    setAmbulanceRequest(null);
+    setActiveRequest(request); // ✅ Keep request visible after acceptance
+    setAmbulanceRequest(null); // remove the popup
   };
 
   const handleCancelRoute = async () => {
     if (directionsRenderer) directionsRenderer.setMap(null);
     setDirectionsRenderer(null);
+    setActiveRequest(null);
 
     try {
       const user = auth.currentUser;
@@ -186,61 +171,108 @@ const DriverMap = () => {
     }
   };
 
-  return (
-    <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 p-4">
-      <div className="w-[60%] bg-white rounded-2xl shadow-md p-6 mb-4 mt-20">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Driver Dashboard
-        </h2>
-        <div className="flex space-x-4">
-          <button
-            onClick={handleCancelRoute}
-            className="flex-1 bg-[#fb5607] hover:bg-[#f48c06] text-white font-semibold py-2 px-4 rounded-lg"
-          >
-            Cancel Route
-          </button>
-        </div>
-      </div>
+  const handleDecline = async () => {
+    if (!ambulanceRequest) return;
 
-      <div
-        ref={mapRef}
-        className="w-[90%] h-[400px] rounded-lg overflow-hidden"
+    // Add current driver to excluded list
+    const currentDriverId = auth.currentUser?.uid;
+    const updatedExclusions = [...excludedDrivers, currentDriverId];
+    setExcludedDrivers(updatedExclusions);
+    const pickupLocation = {
+      lat: parseFloat(ambulanceRequest?.pickupLat),
+      lng: parseFloat(ambulanceRequest?.pickupLng),
+    };
+
+    const reqData = {
+      customerName: ambulanceRequest?.customerName,
+      pickupAddress: ambulanceRequest?.pickupAddress,
+      fare: parseFloat(ambulanceRequest?.fare),
+      distance: ambulanceRequest?.distance,
+      duration: ambulanceRequest?.duration,
+      pickupLocation,
+      type: ambulanceRequest?.type,
+    };
+
+    // Find next nearest driver
+    const nextDriver = await findNearestAvailableDriver(
+      pickupLocation,
+      updatedExclusions
+    );
+
+    if (nextDriver) {
+      // Send notification to driver
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/send-ambulance-notification`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            driverId: nextDriver?.userId || nextDriver?.id,
+            tripDetails: reqData,
+            customerId: auth?.currentUser?.uid,
+          }),
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!response.ok) {
+        toastError(`Error: ${response.text()}`);
+      }
+      toastInfo(`Request reassigned to driver ${nextDriver.id}`);
+    } else {
+      toastInfo("No other available drivers nearby.");
+    }
+
+    // Optionally clear current request from this driver's view
+    setAmbulanceRequest(null);
+  };
+
+  return (
+    <div className="flex w-full h-full bg-gray-100 relative">
+      {/* Sidebar */}
+      <DriverSidebarMenu
+        userDoc={userDoc}
+        setShowEarnings={setShowEarnings}
+        isVerified={isVerified}
       />
 
-      {ambulanceRequest && (
-        <div className="fixed bottom-10 right-10 bg-white rounded-lg shadow-lg p-6 w-[400px] z-50">
-          <h3 className="text-lg font-bold mb-2">New Ambulance Request</h3>
-          <p>
-            <strong>Customer Name:</strong> {ambulanceRequest.customerName}
-          </p>
-          <p>
-            <strong>Pickup Location:</strong> {ambulanceRequest.pickupAddress}
-          </p>
-          <p>
-            <strong>Fare:</strong> R{ambulanceRequest.fare}
-          </p>
-          <p>
-            <strong>Distance:</strong> {ambulanceRequest.distance} km
-          </p>
-          <p>
-            <strong>Duration:</strong> {ambulanceRequest.duration} min
-          </p>
-          <div className="flex justify-end mt-4 space-x-4">
-            <button
-              onClick={() => handleAcceptRequest(ambulanceRequest)}
-              className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
-            >
-              Accept
-            </button>
-            <button
-              onClick={() => setAmbulanceRequest(null)}
-              className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
-            >
-              Decline
-            </button>
+      <div className="flex-1 flex flex-col items-center">
+        {/* Navbar */}
+        <AmbulanceDriverDashboardNavbar />
+
+        {/* Push content below fixed navbar */}
+        <div className="w-full flex flex-col items-center mt-5 p-4">
+          <div className="lg:w-[60%] w-[90%] bg-white rounded-2xl shadow-md lg:ml-60 p-6 mb-4">
+            <div className="flex space-x-4">
+              <button
+                onClick={handleCancelRoute}
+                className="bg-[#03045e] text-white font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex-1/2 cursor-pointer"
+              >
+                Cancel Route
+              </button>
+            </div>
           </div>
+
+          <div
+            ref={mapRef}
+            className=" lg:ml-80 lg:w-[80%] w-[110%] lg:h-[550px] h-[510px] rounded-lg overflow-hidden"
+          />
+
+          {ambulanceRequest && (
+            <AmbulanceRequest
+              ambulanceRequest={ambulanceRequest}
+              handleDecline={handleDecline}
+              handleAcceptRequest={handleAcceptRequest}
+            />
+          )}
+
+          {activeRequest && (
+            <ActiveRequest
+              activeRequest={activeRequest}
+              handleCancelRoute={handleCancelRoute}
+            />
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

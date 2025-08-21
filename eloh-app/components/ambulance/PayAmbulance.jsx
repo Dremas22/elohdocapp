@@ -1,7 +1,7 @@
 "use client";
 
 import { auth } from "@/db/client";
-import { findNearestAvailableDriver, notifyDriver } from "@/helpers";
+import { findNearestAvailableDriver } from "@/helpers";
 import { toastError, toastSuccess } from "@/helpers/toastHelper";
 import { useState } from "react";
 
@@ -35,10 +35,10 @@ export default function PayAmbulance({
         duration,
         hospital,
         pickupLocation,
-        type: "ambulance_request", // or other status tracking
+        type: "ambulance_request",
       };
 
-      // Send notification to driver (write to Firestore)
+      // Send notification to driver
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/send-ambulance-notification`,
         {
@@ -66,17 +66,42 @@ export default function PayAmbulance({
   };
 
   return (
-    <div className="w-[70%] bg-white rounded-xl shadow-md p-6 mt-6">
+    <div className="flex justify-center mt-6 w-full">
       <button
         onClick={handleProceed}
         disabled={loading}
-        className={`mt-4 text-white py-2 px-4 rounded cursor-pointer ${
-          loading ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
-        }`}
+        className={`flex justify-center items-center gap-2 px-6 py-3 rounded-2xl font-semibold text-white transition-all duration-300 transform
+          ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed shadow-none"
+              : "bg-green-600 hover:bg-green-700 hover:scale-105 active:scale-95 cursor-pointer shadow-[0_4px_#999] active:shadow-[0_2px_#666]"
+          }`}
       >
-        {loading
-          ? "Processing..."
-          : "Proceed to pay and search for available ambulances"}
+        {/* spinner while loading */}
+        {loading && (
+          <svg
+            className="animate-spin h-5 w-5 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v8z"
+            ></path>
+          </svg>
+        )}
+
+        {loading ? "Processing..." : "Pay & Request Ambulance"}
       </button>
     </div>
   );

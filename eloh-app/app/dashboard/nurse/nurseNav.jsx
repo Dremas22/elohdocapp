@@ -21,7 +21,7 @@ const NurseDashboardNavbar = () => {
         return;
       }
       try {
-        const docSnap = await getDoc(doc(db, "nurses", user.uid)); // For nurses
+        const docSnap = await getDoc(doc(db, "nurses", user.uid));
         if (docSnap.exists()) {
           setUserDoc(docSnap.data());
         } else {

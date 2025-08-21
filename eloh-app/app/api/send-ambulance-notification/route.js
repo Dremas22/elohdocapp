@@ -28,6 +28,7 @@ export async function POST(req) {
     }
 
     let customerName = "A customer";
+
     if (customerId) {
       const customerDoc = await db
         .collection("customers")
@@ -53,7 +54,7 @@ export async function POST(req) {
           duration: String(tripDetails.duration || "0"),
           pickupLat: String(tripDetails.pickupLocation.lat || ""),
           pickupLng: String(tripDetails.pickupLocation.lng || ""),
-          tripId: tripDetails.tripId || "",
+          tripId: tripDetails.tripId || customerId || "",
           link: `${process.env.NEXT_PUBLIC_URL}/dashboard/driver`,
         },
         webpush: {

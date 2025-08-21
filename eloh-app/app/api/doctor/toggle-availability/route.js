@@ -18,7 +18,11 @@ async function verifyUserAndGetDoc(token) {
     const nurseDoc = await nurseRef.get();
     if (nurseDoc.exists) return { uid, role: "nurse", doc: nurseDoc };
 
-    throw new Error("User not found in doctor or nurse collection");
+    const driverRef = db.collection("drivers").doc(uid);
+    const driverDoc = await driverRef.get();
+    if (driverDoc.exists) return { uid, role: "driver", doc: driverDoc };
+
+    throw new Error("User not found in doctor, nurse or driver collection");
   } catch (err) {
     console.error("Token verification failed:", err.message);
     throw new Error("Unauthorized");

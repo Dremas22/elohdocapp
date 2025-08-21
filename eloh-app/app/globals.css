@@ -39,3 +39,25 @@ body::-webkit-scrollbar,
   display: none;
   /* Chrome, Safari, and Edge */
 }
+
+/* 🔥 Slide-up animation */
+@keyframes slide-up {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
+
+@layer base {
+  .chat {
+    @apply bg-[url('/images/elohdoc.png')] bg-no-repeat bg-cover bg-center flex items-center justify-center h-screen;
+  }
+}

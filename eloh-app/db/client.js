@@ -5,6 +5,7 @@ import {
 } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 import {
   getMessaging,
   isSupported as messagingSupported,
@@ -28,6 +29,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleAuth = new GoogleAuthProvider();
+const storage = getStorage(app);
 
 // Optional: Analytics
 let analytics;
@@ -49,4 +51,4 @@ if (typeof window !== "undefined") {
   });
 }
 
-export { app, db, auth, googleAuth, analytics, messaging };
+export { app, db, auth, storage, googleAuth, analytics, messaging };

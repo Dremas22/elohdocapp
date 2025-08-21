@@ -10,13 +10,17 @@ import { toastError, toastInfo } from "@/helpers/toastHelper";
 import { createCustomerMarker } from "@/lib/ambulance-actions/createCustomerMarker";
 import { collection, getDocs, orderBy, query, limit } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
-import PayAmbulance from "../ambulance/PayAmbulance";
 import { auth } from "@/db/client";
+import { FaLocationDot } from "react-icons/fa6";
+import { FiMapPin } from "react-icons/fi";
+import PayAmbulance from "../ambulance/PayAmbulance";
+import CustomerSidebarMenu from "@/app/dashboard/customer/CustomerSidebar";
 
-export default function CustomerMap() {
+export default function CustomerMap({ userDoc }) {
   const mapRef = useRef(null);
   const pickupInputRef = useRef(null);
   const destInputRef = useRef(null);
+  const paySectionRef = useRef(null);
 
   const [map, setMap] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -29,6 +33,24 @@ export default function CustomerMap() {
   const [destMarker, setDestMarker] = useState(null);
   const [locationLoading, setLocationLoading] = useState(true);
   const [showPay, setShowPay] = useState(false);
+
+  useEffect(() => {
+    if (showPay && paySectionRef.current) {
+      paySectionRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [showPay]);
+
+  useEffect(() => {
+    if (showPay && paySectionRef.current) {
+      paySectionRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [showPay]);
 
   const RATE_PER_KM = 10; // change to your rate
 
@@ -73,7 +95,7 @@ export default function CustomerMap() {
 
           setMap(gMap);
           // initial customer marker
-          createCustomerMarker(loc, gMap, "🧍", "Customer");
+          createCustomerMarker(loc, gMap, "🧍", "Customer (You)");
 
           // Setup pickup autocomplete
           const pickupAutocomplete = new window.google.maps.places.Autocomplete(
@@ -412,75 +434,93 @@ export default function CustomerMap() {
   };
 
   return (
-    <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 p-4">
-      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-6 mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+    <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 lg:pt-140 pt-170 lg:pl-66 p-4">
+      {/* Sidebar */}
+      <CustomerSidebarMenu userDoc={userDoc} />
+
+      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-4 sm:p-6 mb-6">
+        <h2 className=" text-xl sm:text-2xl font-bold text-gray-800 mb-4">
           🚑 Request Ambulance
         </h2>
 
         {/* Pickup */}
-        <label className="block text-xl font-medium text-black mb-2">
+        <label className="block text-lg sm:text-xl font-medium text-black mb-2">
           Pickup location
         </label>
-        <div className="flex gap-2 mb-4">
-          <input
-            ref={pickupInputRef}
-            type="text"
-            placeholder="Enter pickup address or use current location"
-            className="flex-1 p-3 border border-gray-300 text-black rounded-lg focus:outline-none 
-            focus:ring-2 focus:ring-blue-500"
-          />
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+          <div className="relative w-full">
+            <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <input
+              title="Where should we pick you up?"
+              ref={pickupInputRef}
+              type="text"
+              placeholder="Enter pickup address or use current location"
+              className="flex-1 p-3 pl-10 border border-gray-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+            />
+          </div>
+
           <button
+            title="Set pickup location to your current location"
             onClick={useMyLocation}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg"
+            className="bg-[#03045e] text-white font-semibold py-2 px-8 rounded-xl shadow-[0_4px_#999] 
+             active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] 
+             transition-all duration-200 ease-in-out cursor-pointer flex items-center gap-2 -mt-2"
           >
-            📍 Use my location
+            <FaLocationDot className="h-4 w-5" />
+            <span>Use Current Location</span>
           </button>
         </div>
 
         {/* Destination */}
-        <label className="block text-xl font-medium text-black mb-2">
+        <label className="block text-lg sm:text-xl font-medium text-black mb-2">
           Destination
         </label>
-        <input
-          ref={destInputRef}
-          type="text"
-          placeholder="Type destination (clinic, hospital, address or any place)..."
-          className="mb-4 p-3 border border-gray-300 text-black rounded-lg w-full 
-          focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        <div className="relative mb-4">
+          <FiMapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <input
+            title="Where are you headed?"
+            ref={destInputRef}
+            type="text"
+            placeholder="Type destination (clinic, hospital, address or any place)..."
+            className="pl-10 p-3 border border-gray-300 text-black rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
         {/* Action buttons */}
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
+            title="Create route"
             onClick={handleCreateRoute}
             disabled={locationLoading}
             className={`flex-1 ${
               locationLoading
                 ? "bg-gray-300 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            } text-white font-semibold py-2 px-4 rounded-lg`}
+                : "bg-[#03045e] hover:bg-[#023e8a]"
+            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer`}
           >
-            {locationLoading ? "Loading..." : "Create Route"}
+            {locationLoading ? "Creating route..." : "Create Route"}
           </button>
 
           <button
+            title="Discard changes"
             onClick={handleCancelRoute}
-            className="flex-1 bg-[#fb5607] hover:bg-[#f48c06] text-white font-semibold py-2 px-4 rounded-lg"
+            className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
             Cancel Route
           </button>
 
           <button
-            onClick={() =>
-              trackAmbulances(
+            title="Track nearby ambulances"
+            onClick={async () =>
+              await trackAmbulances(
                 destinationPlace || pickupPlace || currentLocation,
-                map
+                map,
+                450
               )
             }
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg"
+            className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
-            Track Ambulances (30km)
+            Track Ambulances (450km)
           </button>
         </div>
 
@@ -507,13 +547,14 @@ export default function CustomerMap() {
         {/* Request Ambulance */}
         <div className="mt-4">
           <button
+            title="Request ambulance now"
             onClick={() => setShowPay(true)}
             disabled={!routeReady}
             className={`w-full ${
               routeReady
-                ? "bg-red-600 hover:bg-red-700"
+                ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
                 : "bg-gray-300 cursor-not-allowed"
-            } text-white py-2 px-4 rounded-lg font-semibold`}
+            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
           >
             Request Ambulance
           </button>
@@ -528,7 +569,10 @@ export default function CustomerMap() {
 
       {/* Payment panel */}
       {showPay && (
-        <div className="w-full max-w-lg bg-white p-4 rounded-lg shadow mt-6">
+        <div
+          ref={paySectionRef}
+          className="w-full max-w-lg bg-white p-4 rounded-lg shadow mt-6"
+        >
           <PayAmbulance
             fare={fareDetails?.fare}
             distance={fareDetails?.distance}
