@@ -106,13 +106,18 @@ const Detail = () => {
 
       {/* Buttons at the bottom */}
       <div className="flex flex-col gap-3 p-5 border-t border-gray-700">
-        {isCurrentUserBlocked
-          ? "You are Blocked!"
-          : isReceiverBlocked
-          ? "User Blocked"
-          : loading
-          ? "Processing..."
-          : "Block User"}
+        <button
+          onClick={handleBlock}
+          className="w-full p-3 bg-red-500 hover:bg-red-600 rounded-md text-white font-medium transition-colors"
+        >
+          {isCurrentUserBlocked
+            ? "You are Blocked!"
+            : isReceiverBlocked
+            ? "User Blocked"
+            : loading
+            ? "Processing..."
+            : "Block User"}
+        </button>
 
         <button
           onClick={handleAuthAction}
