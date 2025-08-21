@@ -12,6 +12,7 @@ import Earnings from "./doctorEarnings";
 import { db } from "@/db/client";
 import { doc, onSnapshot } from "firebase/firestore";
 import ElohDocChatApp from "@/components/chat-app/ElohDocChatApp";
+import { useUserStore } from "@/hooks/useUserStore";
 
 const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
   // State to manage search/filter and modals
@@ -26,6 +27,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
 
   // Ref for scrolling to patient record viewer
   const patientRecordsRef = useRef(null);
+  const { fetchUserInfo } = useUserStore();
 
   // Scroll into view when record viewer opens
   useEffect(() => {
@@ -44,6 +46,8 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
           ...prev,
           ...updatedData,
         }));
+
+        fetchUserInfo(updatedData);
       }
     });
 
@@ -196,7 +200,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
                   compact
                 />
               </div>
-              {/* Chat Toggle Button */}
+
               {/* Chat Toggle Button */}
               <button
                 onClick={() => setOpenChat(!openChat)}
@@ -215,11 +219,11 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
 
               {/* Chat Modal */}
               {openChat && (
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-[10px] z-50 flex items-center justify-center chat">
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-[10px] z-[60] flex items-center justify-center chat">
                   <div className="relative w-[80vw] h-[90vh]">
                     {/* Chat App */}
-                    <div className="w-full h-full rounded-xl overflow-hidden relative z-[50]">
-                      <ElohDocChatApp setOpenChat={setOpenChat} />
+                    <div className="w-full h-full rounded-xl overflow-hidden relative z-[60]">
+                      <ElohDocChatApp setOpenChat={setOpenChat} role="doctor" />
                     </div>
                   </div>
                 </div>
