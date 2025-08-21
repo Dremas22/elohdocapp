@@ -64,20 +64,20 @@ const AddUser = ({ onClick, role }) => {
         messages: [],
       });
 
-      await updateDoc(doc(userChatsRef, user.userId), {
+      await updateDoc(doc(userChatsRef, user?.userId), {
         chats: arrayUnion({
           chatId: newChatRef.id,
           lastMessage: "",
-          receiverId: currentUser.userId,
+          receiverId: currentUser?.userId,
           updatedAt: Date.now(),
         }),
       });
 
-      await updateDoc(doc(userChatsRef, currentUser.userId), {
+      await updateDoc(doc(userChatsRef, currentUser?.userId), {
         chats: arrayUnion({
           chatId: newChatRef.id,
           lastMessage: "",
-          receiverId: user.userId,
+          receiverId: user?.userId,
           updatedAt: Date.now(),
         }),
       });
@@ -117,15 +117,15 @@ const AddUser = ({ onClick, role }) => {
         {user && (
           <div className="flex items-center justify-between bg-gray-700 p-4 rounded-lg">
             <div className="flex items-center gap-4">
-              {user.photoUrl ? (
+              {user?.photoUrl ? (
                 <img
-                  src={user.photoUrl}
-                  alt={user.fullName}
+                  src={user?.photoUrl}
+                  alt={user?.fullName}
                   className="w-12 h-12 rounded-full object-cover"
                 />
               ) : (
                 <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center text-white font-medium">
-                  {user.fullName?.charAt(0).toUpperCase() || "U"}
+                  {user?.fullName?.charAt(0).toUpperCase() || "U"}
                 </div>
               )}
               <span className="text-white font-medium">

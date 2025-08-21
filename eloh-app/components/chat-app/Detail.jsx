@@ -5,7 +5,13 @@ import { useChatStore } from "@/hooks/useChatStore";
 import { useUserStore } from "@/hooks/useUserStore";
 import { getDisplayName } from "@/lib/getDisplayName";
 import { signOut } from "firebase/auth";
-import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -28,12 +34,14 @@ const Detail = () => {
   const handleBlock = async () => {
     if (!user || !currentUser) return;
 
+    setLoading(true);
+
     try {
       let userDocRef = null;
 
       // Find the correct collection for the currentUser
       for (const col of COLLECTIONS) {
-        const ref = doc(db, col, currentUser.userId);
+        const ref = doc(db, col, currentUser?.userId);
         const snap = await getDoc(ref);
         if (snap.exists()) {
           userDocRef = ref;
@@ -49,13 +57,15 @@ const Detail = () => {
       // Update block status
       await updateDoc(userDocRef, {
         blocked: isReceiverBlocked
-          ? arrayRemove(user.id) // unblock
-          : arrayUnion(user.id), // block
+          ? arrayRemove(user?.userId) // unblock
+          : arrayUnion(user?.userId), // block
       });
 
       changeBlock();
     } catch (err) {
       console.error("Error updating block status:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,16 +106,13 @@ const Detail = () => {
 
       {/* Buttons at the bottom */}
       <div className="flex flex-col gap-3 p-5 border-t border-gray-700">
-        <button
-          onClick={handleBlock}
-          className="w-full p-3 bg-red-500 hover:bg-red-600 rounded-md text-white font-medium transition-colors"
-        >
-          {isCurrentUserBlocked
-            ? "You are Blocked!"
-            : isReceiverBlocked
-            ? "User blocked"
-            : "Block User"}
-        </button>
+        {isCurrentUserBlocked
+          ? "You are Blocked!"
+          : isReceiverBlocked
+          ? "User Blocked"
+          : loading
+          ? "Processing..."
+          : "Block User"}
 
         <button
           onClick={handleAuthAction}

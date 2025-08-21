@@ -114,7 +114,7 @@ const ChatList = ({ role }) => {
           {/* Avatar */}
           {chat.user?.photoUrl &&
           !chat.user?.blocked.includes(
-            currentUser?.userId || "deafult_avatar.jpg"
+            chat?.user?.userId || "deafult_avatar.jpg"
           ) ? (
             <img
               src={chat?.user?.photoUrl || "/images/deafult_avatar.jpg"}
