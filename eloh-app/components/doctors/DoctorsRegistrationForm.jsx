@@ -168,13 +168,11 @@ const DoctorsRegistrationForm = () => {
               value={currentUser?.displayName || formData.fullName || ""}
               disabled={!!currentUser?.displayName}
               placeholder="Full Name"
-              className={`w-full px-4 py-3 rounded-lg border ${
-                errors.fullName ? "border-red-500" : "border-gray-300"
-              } ${
-                currentUser?.displayName
+              className={`w-full px-4 py-3 rounded-lg border ${errors.fullName ? "border-red-500" : "border-gray-300"
+                } ${currentUser?.displayName
                   ? "bg-gray-100 text-gray-600"
                   : "bg-white text-gray-900"
-              } focus:outline-none`}
+                } focus:outline-none`}
             />
             {errors.fullName && (
               <p className="text-sm text-red-600 mt-1">{errors.fullName}</p>
@@ -201,9 +199,8 @@ const DoctorsRegistrationForm = () => {
               value={formData.practiceNumber}
               onChange={handleChange}
               placeholder="Practice Number"
-              className={`w-full px-4 py-3 rounded-xl border ${
-                errors.practiceNumber ? "border-red-500" : "border-gray-300"
-              } bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
+              className={`w-full px-4 py-3 rounded-xl border ${errors.practiceNumber ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
             />
             {errors.practiceNumber && (
               <p className="text-sm text-red-600 mt-1">
@@ -218,9 +215,8 @@ const DoctorsRegistrationForm = () => {
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-xl border ${
-                errors.category ? "border-red-500" : "border-gray-300"
-              } bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
+              className={`w-full px-4 py-3 rounded-xl border ${errors.category ? "border-red-500" : "border-gray-300"
+                } bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
             >
               <option value="" disabled>
                 Select Category
@@ -258,9 +254,8 @@ const DoctorsRegistrationForm = () => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 placeholder="Phone Number"
-                className={`w-full px-4 py-3 rounded-xl border ${
-                  errors.phoneNumber ? "border-red-500" : "border-gray-300"
-                } bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
+                className={`w-full px-4 py-3 rounded-xl border ${errors.phoneNumber ? "border-red-500" : "border-gray-300"
+                  } bg-white text-gray-900 focus:ring-2 focus:ring-[#90e0ef]`}
               />
             </div>
             {errors.phoneNumber && (
@@ -269,16 +264,27 @@ const DoctorsRegistrationForm = () => {
           </div>
         </div>
 
-        {/* Submit Button */}
         <div className="flex justify-center pt-4">
-          <button
-            type="submit"
-            disabled={loading || submitting}
-            className="bg-[#03045e] cursor-ptext-white py-3 px-5 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-          >
-            {submitting ? "Submitting..." : "Register"}
-          </button>
+          <div className="relative group inline-flex items-center">
+            <button
+              type="submit"
+              disabled={loading || submitting}
+              className="bg-[#03045e] text-white py-3 px-5 text-lg font-semibold rounded-xl 
+                 shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 
+                 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            >
+              {submitting ? "Submitting..." : "Register"}
+            </button>
+
+            {/* Tooltip to the right */}
+            <span className="absolute left-full top-1/2 -translate-y-1/2 ml-3 
+                     hidden group-hover:inline-block bg-gray-800 text-white text-sm 
+                     rounded-md px-2 py-1 shadow-lg whitespace-nowrap">
+              Click to register your account
+            </span>
+          </div>
         </div>
+
       </form>
     </div>
   );
