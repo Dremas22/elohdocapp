@@ -140,8 +140,7 @@ const ChatApp = () => {
               {getDisplayName(user)}
             </span>
             <p className="text-xs text-gray-400 italic tracking-wide">
-              {currentUser?.role?.charAt(0).toUpperCase() +
-                currentUser?.role?.slice(1)}
+              {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)}
             </p>
           </div>
         </div>
