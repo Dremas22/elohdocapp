@@ -13,6 +13,9 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
 import { MdInfo } from "react-icons/md";
+import { FiMessageCircle } from "react-icons/fi";
+import ElohDocChatApp from "@/components/chat-app/ElohDocChatApp";
+import { useUserStore } from "@/hooks/useUserStore";
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -21,7 +24,9 @@ const PatientDashboard = () => {
   const [userLoading, setUserLoading] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [mode, setMode] = useState("general-notes");
+  const [openChat, setOpenChat] = useState(false);
   const toastShown = useRef(false);
+  const { fetchUserInfo } = useUserStore();
 
   useEffect(() => {
     if (!loading && currentUser?.uid) {
@@ -40,8 +45,8 @@ const PatientDashboard = () => {
             type === "doctor"
               ? (consultations.doctor || 0) >= 1
               : type === "nurse"
-                ? (consultations.nurse || 0) >= 1
-                : (consultations.doctor || 0) >= 1 ||
+              ? (consultations.nurse || 0) >= 1
+              : (consultations.doctor || 0) >= 1 ||
                 (consultations.nurse || 0) >= 1;
 
           if (hasConsultations && type !== "none") {
@@ -103,6 +108,7 @@ const PatientDashboard = () => {
           }
 
           setUserDoc({ id: snapshot.id, ...data });
+          fetchUserInfo({ id: snapshot.id, ...data });
         }
 
         setUserLoading(false);
@@ -192,6 +198,34 @@ const PatientDashboard = () => {
           </div>
         </main>
       </div>
+
+      {/* Chat Toggle Button */}
+      <button
+        onClick={() => setOpenChat(!openChat)}
+        title="Open Chat"
+        className="fixed bottom-6 right-6 bg-[#0d6efd] hover:bg-[#0b5ed7] text-white p-4 rounded-full shadow-lg z-50"
+        aria-label="Toggle Chat"
+      >
+        <div className="relative">
+          <FiMessageCircle size={28} />
+          {/* Unseen messages badge */}
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full shadow">
+            3
+          </span>
+        </div>
+      </button>
+
+      {/* Chat Modal */}
+      {openChat && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-[10px] z-50 flex items-center justify-center chat">
+          <div className="relative w-[80vw] h-[90vh]">
+            {/* Chat App */}
+            <div className="w-full h-full rounded-xl overflow-hidden relative z-[50]">
+              <ElohDocChatApp setOpenChat={setOpenChat} role="patient" />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating Chat Modal */}
       {showChat && (
