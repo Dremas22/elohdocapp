@@ -335,7 +335,7 @@ Root path: `c:\Users\nelso\Documents\elohdocapp\eloh-app`
 
 ### 🔗 Frontend Configuration
 
-```
+
 NEXT_PUBLIC_URL=http://localhost:3000
 NEXT_PUBLIC_FIREBASE_API_KEY=example-api-key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=example-auth-domain
