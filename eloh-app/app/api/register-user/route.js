@@ -46,6 +46,7 @@ export async function POST(request) {
     const now = new Date();
     let userDoc = {
       ...data,
+      blocked: [],
       createdAt: now,
       updatedAt: now,
     };
@@ -64,12 +65,19 @@ export async function POST(request) {
 
     await userDocRef.set(userDoc);
 
+    // Add default sub-collections if they don’t exist
+    const userChatsRef = db?.collection("userchats").doc(userId);
+    const userChatsSnap = await userChatsRef.get();
+    if (!userChatsSnap.exists) {
+      await userChatsRef.set({ chats: [] });
+    }
+
     if (role === "doctor" || role === "nurse" || role === "driver") {
-      await auth?.setCustomUserClaims(userId, { role }); // use role from data
+      await auth?.setCustomUserClaims(userId, { role });
     }
 
     return NextResponse.json(
-      { message: "User successfully created" },
+      { message: "User registration complete" },
       { status: 201 }
     );
   } catch (error) {
