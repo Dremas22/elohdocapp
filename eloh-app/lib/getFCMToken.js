@@ -1,6 +1,6 @@
 import { getToken } from "firebase/messaging";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth, messaging } from "@/db/client";
+import { auth, messagingPromise } from "@/db/client";
 import { toastError, toastInfo } from "@/helpers/toastHelper";
 
 // Utility to wait until Firebase Auth is ready
@@ -76,6 +76,13 @@ export async function getFCMToken() {
         toastError("Notification permission denied", 5000);
         return null;
       }
+    }
+
+    const messaging = await messagingPromise;
+
+    if (!messaging) {
+      console.warn("Messaging not supported in this environment.");
+      return null;
     }
 
     // Get token

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { FiChevronUp, FiChevronDown, FiPhone } from "react-icons/fi";
 import { FaPills, FaFirstAid } from "react-icons/fa";
-import { messaging } from "@/db/client";
+import { messagingPromise } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
@@ -79,13 +79,24 @@ const CustomerSidebarMenu = ({
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onMessage(messaging, (payload) => {
-      setNotificationPayload(payload);
-      setHasNotification(true);
-      setNotificationCount((prev) => prev + 1);
-    });
+    let unsubscribe = () => {};
 
-    return () => unsubscribe();
+    const setupMessaging = async () => {
+      const messaging = await messagingPromise;
+      if (!messaging) return;
+
+      unsubscribe = onMessage(messaging, (payload) => {
+        setNotificationPayload(payload);
+        setHasNotification(true);
+        setNotificationCount((prev) => prev + 1);
+      });
+    };
+
+    setupMessaging();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const handleProfileSave = async (updatedData) => {
