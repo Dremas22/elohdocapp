@@ -241,7 +241,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
         {/* Push content below fixed navbar */}
         <div className="w-full flex flex-col items-center mt-5 p-4">
-          <div className="lg:w-[60%] w-[90%] bg-white rounded-2xl shadow-md lg:ml-60 p-6 mb-4">
+          <div className="lg:w-[15%] w-[65%] bg-white rounded-2xl shadow-md lg:ml-60 p-6 mb-4">
             <div className="flex space-x-4">
               <button
                 onClick={handleCancelRoute}
