@@ -22,6 +22,7 @@ export default function CustomerMap({ userDoc }) {
   const destInputRef = useRef(null);
   const paySectionRef = useRef(null);
 
+  const [calculatingTrip, setCalculatingTrip] = useState(false);
   const [map, setMap] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [pickupPlace, setPickupPlace] = useState(null);
@@ -206,8 +207,8 @@ export default function CustomerMap({ userDoc }) {
     const fallback = { lat: -33.9249, lng: 18.4241 }; // Cape Town fallback
 
     const init = async () => {
-      setLocationLoading(true);
 
+      setLocationLoading(true);
       try {
         // 1. Init map immediately
         const mapInstance = new google.maps.Map(mapRef.current, {
@@ -242,6 +243,7 @@ export default function CustomerMap({ userDoc }) {
         console.error("Error during initialization:", error);
       } finally {
         setLocationLoading(false);
+
       }
     };
 
@@ -253,6 +255,7 @@ export default function CustomerMap({ userDoc }) {
       return toastError("Pickup location missing");
     if (!destinationPlace) return toastError("Destination missing");
 
+    setCalculatingTrip(true);
     createRoute(pickupPlace || currentLocation, destinationPlace, map);
   };
 
@@ -261,6 +264,7 @@ export default function CustomerMap({ userDoc }) {
     setLocationLoading(true);
     if (!gMap) {
       console.error("Map not ready");
+      setCalculatingTrip(false);
       return;
     }
     if (!origin || !destination) {
@@ -354,12 +358,15 @@ export default function CustomerMap({ userDoc }) {
             console.error("Directions service failed:", status);
             alert("Unable to create route: " + status);
           }
+          setCalculatingTrip(false);
+          setLocationLoading(false);
         }
       );
     } catch (err) {
       console.error("createRoute error:", err.message);
-    } finally {
+
       setLocationLoading(false);
+      setCalculatingTrip(false);
     }
   }
 
@@ -492,13 +499,13 @@ export default function CustomerMap({ userDoc }) {
             title="Create route"
             onClick={handleCreateRoute}
             disabled={locationLoading}
-            className={`flex-1 ${
-              locationLoading
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-[#03045e] hover:bg-[#023e8a]"
-            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer`}
+            className={`flex-1 ${locationLoading
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-[#03045e] hover:bg-[#023e8a]"
+              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer`}
           >
-            {locationLoading ? "Creating route..." : "Create Route"}
+
+            Create Route
           </button>
 
           <button
@@ -525,6 +532,35 @@ export default function CustomerMap({ userDoc }) {
         </div>
 
         {/* Trip summary (distance/fare) */}
+        {calculatingTrip && (
+
+          <div className="mt-4 flex items-center justify-center gap-2 p-2 bg-blue-400 text-blue-800 rounded-md border border-blue-300 text-sm font-medium animate-pulse">
+            {/* Spinner */}
+            <svg
+              className="w-4 h-4 text-blue-800 animate-spin"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              ></path>
+            </svg>
+            <span>Calculating trip...</span>
+          </div>
+
+
+        )}
         {fareDetails && (
           <div className="mt-4 bg-gray-50 text-black p-4 rounded border">
             <h3 className="font-semibold mb-2">Trip summary</h3>
@@ -550,11 +586,10 @@ export default function CustomerMap({ userDoc }) {
             title="Request ambulance now"
             onClick={() => setShowPay(true)}
             disabled={!routeReady}
-            className={`w-full ${
-              routeReady
-                ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
-                : "bg-gray-300 cursor-not-allowed"
-            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
+            className={`w-full ${routeReady
+              ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
+              : "bg-gray-300 cursor-not-allowed"
+              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
           >
             Request Ambulance
           </button>

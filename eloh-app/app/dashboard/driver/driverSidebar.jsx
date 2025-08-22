@@ -188,11 +188,18 @@ const DriverSidebarMenu = ({
           }`}
       >
         {isVerified ? (
-          <ActionButtons
-            buttons={actionButtons}
-            notificationCount={0}
-            compact={compact}
-          />
+          <>
+            <ActionButtons
+              buttons={actionButtons}
+              notificationCount={0}
+              compact={compact}
+            />
+            <DriverAvailabilityButton
+              isAvailable={isAvailable}
+              onChange={handleToggle}
+              fetching={fetching}
+            />
+          </>
         ) : (
           <div className="text-center text-white mt-10 px-2">
             <p className="text-sm font-medium">
@@ -202,13 +209,8 @@ const DriverSidebarMenu = ({
             </p>
           </div>
         )}
-
-        <DriverAvailabilityButton
-          isAvailable={isAvailable}
-          onChange={handleToggle}
-          fetching={fetching}
-        />
       </div>
+
 
       {/* Mobile Toggle Button */}
       <div className="lg:hidden fixed bottom-1 right-1 z-50 flex items-center space-x-2 text-white rounded-full px-2 py-2 backdrop-blur-sm bg-[#03045e]">
@@ -239,11 +241,18 @@ const DriverSidebarMenu = ({
           }`}
       >
         {isVerified === true ? (
-          <ActionButtons
-            buttons={actionButtons}
-            notificationCount={0}
-            compact={true}
-          />
+          <>
+            <ActionButtons
+              buttons={actionButtons}
+              notificationCount={0}
+              compact={true}
+            />
+            <DriverAvailabilityButton
+              isAvailable={isAvailable}
+              onChange={handleToggle}
+              fetching={fetching}
+            />
+          </>
         ) : isVerified === false ? (
           <div className="text-center text-white mt-4 px-2">
             <p className="text-sm font-medium">
@@ -256,11 +265,6 @@ const DriverSidebarMenu = ({
           </div>
         )}
 
-        <DriverAvailabilityButton
-          isAvailable={isAvailable}
-          onChange={handleToggle}
-          fetching={fetching}
-        />
       </div>
 
       {/* Slide-in Calendar */}
