@@ -10,7 +10,7 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
-import { auth, db, messaging } from "@/db/client";
+import { auth, db, messagingPromise } from "@/db/client";
 import { createAmbulanceMarker } from "@/lib/ambulance-actions/createAmbulanceMarker";
 import { toastError, toastInfo } from "@/helpers/toastHelper";
 import {
@@ -35,23 +35,34 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const [activeRequest, setActiveRequest] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onMessage(messaging, (payload) => {
-      if (payload?.data?.type === "ambulance_request") {
-        const requestData = {
-          customerName: payload.data.customerName || "",
-          pickupAddress: payload.data.pickupAddress || "Unknown",
-          fare: parseFloat(payload.data.fare || "0"),
-          distance: payload.data.distance || "0",
-          duration: payload.data.duration || "0",
-          pickupLat: parseFloat(payload.data.pickupLat || "0"),
-          pickupLng: parseFloat(payload.data.pickupLng || "0"),
-          type: payload.data.type,
-        };
-        setAmbulanceRequest(requestData);
-      }
-    });
+    let unsubscribe = () => {};
 
-    return () => unsubscribe();
+    const setupMessaging = async () => {
+      const messaging = await messagingPromise;
+
+      if (!messaging) return;
+
+      unsubscribe = onMessage(messaging, (payload) => {
+        if (payload?.data?.type === "ambulance_request") {
+          const requestData = {
+            customerName: payload.data.customerName || "",
+            pickupAddress: payload.data.pickupAddress || "Unknown",
+            fare: parseFloat(payload.data.fare || "0"),
+            distance: payload.data.distance || "0",
+            duration: payload.data.duration || "0",
+            pickupLat: parseFloat(payload.data.pickupLat || "0"),
+            pickupLng: parseFloat(payload.data.pickupLng || "0"),
+            type: payload.data.type,
+          };
+          setAmbulanceRequest(requestData);
+        }
+      });
+    };
+
+    setupMessaging();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   useEffect(() => {

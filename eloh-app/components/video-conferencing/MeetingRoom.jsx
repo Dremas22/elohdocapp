@@ -55,7 +55,8 @@ const MeetingRoom = () => {
       if (ended && !hasAlreadyHandledEnd.current) {
         hasAlreadyHandledEnd.current = true;
         if (isDoctor) {
-          router.push(`/dashboard/${docSnap.data()?.role || "doctor"}`);
+          console.log(userRole, "USER_ROLE_FROM_SNAPSHOT");
+          router.push(router.push(`/dashboard/${userRole}`));
         } else {
           router.back();
         }
@@ -161,7 +162,7 @@ const MeetingRoom = () => {
       );
 
       if (isDoctor) {
-        router.push(`/dashboard/${userRole}`);
+        router.push(`/dashboard/${staffRole || userRole}`);
       } else {
         router.back();
       }
