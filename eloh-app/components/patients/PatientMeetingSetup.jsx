@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import ViewMedicalRecords from "../viewMedicalRecords";
 import StaffScroller from "./StaffController";
 import Link from "next/link";
+import { sendNotificationToDoctor } from "@/lib/sendNotificationToStaff";
 
 /**
  * PatientMeetingSetup component
@@ -54,8 +55,8 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
     if (!currentUser?.uid) return;
 
     const patientRef = doc(db, "patients", currentUser.uid);
-    let unsubDoctors = () => { };
-    let unsubNurses = () => { };
+    let unsubDoctors = () => {};
+    let unsubNurses = () => {};
 
     const unsubPatient = onSnapshot(
       patientRef,
@@ -116,30 +117,6 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
 
   const fullName = currentUser?.displayName || `Unknown-user_${Date.now()}`;
   const { doctor, nurse } = userDoc?.consultations ?? { doctor: 0, nurse: 0 };
-
-  /**
-   * Sends a notification request to the specified doctor about a patient's consultation.
-   * @param {string} doctorId - The ID of the doctor to notify
-   * @param {string} patientId - The ID of the patient requesting consultation
-   */
-  const sendNotificationToDoctor = async (doctorId, patientId) => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/notify-doctor`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ doctorId, patientId }),
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-    } catch (error) {
-      console.error("Notification error:", error);
-      alert("Failed to send notification.");
-    }
-  };
 
   if (loading || !currentUser) {
     return (
@@ -214,7 +191,9 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             Loading doctors & nurses...
           </p>
         ) : error ? (
-          <p className="text-red-600 text-center mt-20 font-semibold">{error}</p>
+          <p className="text-red-600 text-center mt-20 font-semibold">
+            {error}
+          </p>
         ) : doctor === 0 && nurse === 0 ? (
           <div className="text-center mt-10 text-gray-600 text-sm sm:text-base">
             <p className="italic mb-2">

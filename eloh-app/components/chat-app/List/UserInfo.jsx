@@ -10,7 +10,7 @@ const UserInfo = () => {
       {/* User Info */}
       <div className="flex items-center gap-5">
         <img
-          src={currentUser?.photoUrl || "/images/deafult_avatar.jpg"}
+          src={currentUser?.photoUrl || "/images/default_avatar.jpg"}
           alt="User Avatar"
           className="w-12 h-12 rounded-full object-cover"
         />
