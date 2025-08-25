@@ -6,53 +6,111 @@ import {
   doc,
   getDoc,
   onSnapshot,
+  serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
 import { useUserStore } from "@/hooks/useUserStore";
 import { useChatStore } from "@/hooks/useChatStore";
 import { db } from "@/db/client";
-import {
-  IoCall,
-  IoVideocam,
-  IoInformationCircle,
-  IoSend,
-  IoImage,
-  IoMic,
-} from "react-icons/io5";
-import { HiOutlineEmojiHappy, HiOutlineCamera } from "react-icons/hi";
+import { IoCall, IoVideocam, IoSend, IoImage, IoMic } from "react-icons/io5";
+import { HiOutlineEmojiHappy } from "react-icons/hi";
 import { FiArrowLeft } from "react-icons/fi"; // Back button for mobile
 import ChatMessage from "./ChatMessage";
 import { getDisplayName } from "@/lib/getDisplayName";
+import { sendNotificationToDoctor } from "@/lib/sendNotificationToStaff";
+import { toastError } from "@/helpers/toastHelper";
+import { useRouter } from "next/navigation";
+import upload from "@/lib/uploadFile";
 
 const ChatApp = () => {
   const [chat, setChat] = useState({ messages: [] });
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [img, setImg] = useState({ file: null, url: "" });
+  const [incomingCall, setIncomingCall] = useState(null);
+  const [calling, setCalling] = useState(false);
+  const [ringtone, setRingtone] = useState(null);
 
   const { currentUser } = useUserStore();
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, setChatId } =
     useChatStore();
 
   const endRef = useRef(null);
+  const router = useRouter();
 
+  // Scroll to bottom when messages update
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chat.messages]);
 
+  // Listen to chat messages
   useEffect(() => {
     if (!chatId) return;
     const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
-      setChat(res.data());
+      if (res.exists()) setChat(res.data());
     });
     return () => unSub();
   }, [chatId]);
 
+  useEffect(() => {
+    if (!currentUser || !user) return;
+
+    // Determine staff vs patient for callId
+    let staffId;
+    let patientId;
+
+    if (["doctor", "nurse"].includes(currentUser.role)) {
+      staffId = currentUser.userId;
+      patientId = user.userId;
+    } else if (["doctor", "nurse"].includes(user.role)) {
+      staffId = user.userId;
+      patientId = currentUser.userId;
+    } else {
+      console.warn("Video calls must involve a doctor/nurse and a patient");
+      return;
+    }
+
+    const callId = `${staffId}_${patientId}`;
+
+    const callDocRef = doc(db, "calls", callId);
+
+    const unsubscribe = onSnapshot(callDocRef, (snap) => {
+      if (!snap.exists()) return setIncomingCall(null);
+
+      const data = snap.data();
+      console.log(data, "DATA_XXX");
+
+      if (
+        data?.status === "ringing" &&
+        data?.caller?.id !== currentUser?.userId
+      ) {
+        setIncomingCall(data);
+        if (!ringtone) {
+          const audio = new Audio("/ringtones/ringtone.mp3");
+          audio.loop = true;
+          audio.play().catch(() => console.error("Autoplay blocked"));
+          setRingtone(audio);
+        }
+      } else if (data?.status === "accepted" || data?.status === "declined") {
+        if (ringtone) {
+          ringtone.pause();
+          ringtone.currentTime = 0;
+          setRingtone(null);
+        }
+        setIncomingCall(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [currentUser?.userId, user?.userId]);
+
+  // Emoji selection
   const handleEmoji = (emojiData) => {
     setText((prev) => prev + emojiData.emoji);
     setOpen(false);
   };
 
+  // Handle image selection
   const handleImg = (e) => {
     if (e.target.files && e.target.files[0]) {
       setImg({
@@ -62,14 +120,16 @@ const ChatApp = () => {
     }
   };
 
+  // Send message
   const handleSend = async () => {
     if (!text.trim() && !img.file) return;
 
     let imgUrl = null;
     try {
       if (img.file) {
+        // TODO: implement your upload function
         //imgUrl = await upload(img.file);
-        console.log(img);
+        console.log("Image ready to upload:", img.file);
       }
 
       if (chatId) {
@@ -78,46 +138,122 @@ const ChatApp = () => {
             senderId: currentUser?.userId,
             text,
             createdAt: new Date(),
-            photoURL: currentUser?.photoUrl || "/images/deafult_avatar.jpg",
+            photoURL: currentUser?.photoUrl || "/images/default_avatar.jpg",
             ...(imgUrl && { img: imgUrl }),
           }),
         });
       }
 
+      // Update lastMessage and isSeen in userchats
       const userIDs = [currentUser?.userId, user?.userId];
       for (const id of userIDs) {
         if (!id) continue;
-
         const userChatsRef = doc(db, "userchats", id);
         const userChatsSnap = await getDoc(userChatsRef);
-
         if (userChatsSnap.exists()) {
           const data = userChatsSnap.data();
           const chatIndex = data.chats.findIndex((c) => c.chatId === chatId);
-
           if (chatIndex >= 0) {
             data.chats[chatIndex].lastMessage = text || "Image";
             data.chats[chatIndex].isSeen = id === currentUser?.userId;
             data.chats[chatIndex].updatedAt = Date.now();
-
             await updateDoc(userChatsRef, { chats: data.chats });
           }
         }
       }
     } catch (err) {
       console.error(err);
+      toastError("Failed to send message.");
     } finally {
       setText("");
       setImg({ file: null, url: "" });
     }
   };
 
+  // Make a video call
+  const handleMakeCall = async () => {
+    if (!currentUser || !user) return;
+
+    let staffId = null;
+    let patientId = null;
+    const caller = currentUser;
+
+    if (["doctor", "nurse"].includes(currentUser.role)) {
+      staffId = currentUser.userId;
+      patientId = user.userId;
+    } else if (["doctor", "nurse"].includes(user.role)) {
+      staffId = user.userId;
+      patientId = currentUser.userId;
+    } else {
+      toastError(
+        "Video calls can only be initiated between a doctor/nurse and a patient."
+      );
+      return;
+    }
+
+    try {
+      // Send push notification
+      const audio = await sendNotificationToDoctor(staffId, patientId, {
+        type: "incoming-call",
+        caller: {
+          id: caller.userId,
+          name: caller.fullName,
+          photoUrl: caller.photoUrl || "/images/default_avatar.jpg",
+        },
+      });
+
+      // Play ringtone if audio returned
+      if (audio) {
+        setRingtone(audio);
+      }
+
+      router.push(`/room?staffId=${staffId}&patientId=${patientId}`);
+      setCalling(true);
+    } catch (err) {
+      console.error("Error starting call:", err);
+      toastError("Failed to start the call. Please try again.");
+    }
+  };
+
+  const handleAcceptCall = async () => {
+    if (!incomingCall) return;
+    const callId = `${incomingCall?.doctorId}_${incomingCall?.patientId}`;
+    await updateDoc(doc(db, "calls", callId), {
+      status: "accepted",
+      updatedAt: serverTimestamp(),
+    });
+    if (ringtone) {
+      ringtone.pause();
+      ringtone.currentTime = 0;
+      setRingtone(null);
+    }
+    router.push(
+      `/room?staffId=${incomingCall?.doctorId}&patientId=${incomingCall?.patientId}`
+    );
+
+    console.log(incomingCall, "INCOMING_CALL");
+  };
+
+  const handleDeclineCall = async () => {
+    if (!incomingCall) return;
+    const callId = `${incomingCall?.doctorId}_${incomingCall?.patientId}`;
+    await updateDoc(doc(db, "calls", callId), {
+      status: "declined",
+      updatedAt: serverTimestamp(),
+    });
+    if (ringtone) {
+      ringtone.pause();
+      ringtone.currentTime = 0;
+      setRingtone(null);
+    }
+    setIncomingCall(null);
+  };
+
   return (
-    <div className="flex-2 flex flex-col border-x border-gray-700 h-full ">
-      {/* Top (Sticky for mobile) */}
+    <div className="flex-2 flex flex-col border-x border-gray-700 h-full">
+      {/* Top */}
       <div className="flex justify-between items-center p-3 md:p-5 border-b border-gray-700 sticky top-0 bg-gray-900 z-10">
         <div className="flex items-center gap-3 md:gap-4">
-          {/* Back button for mobile */}
           <button
             onClick={() => setChatId(null)}
             className="md:hidden p-2 rounded-full bg-gray-800 hover:bg-gray-700"
@@ -125,7 +261,7 @@ const ChatApp = () => {
             <FiArrowLeft className="text-white w-5 h-5" />
           </button>
           <img
-            src={user?.photoUrl || "/images/deafult_avatar.jpg"}
+            src={user?.photoUrl || "/images/default_avatar.jpg"}
             alt="avatar"
             className="w-10 h-10 md:w-14 md:h-14 rounded-full object-cover"
           />
@@ -139,13 +275,17 @@ const ChatApp = () => {
           </div>
         </div>
         <div className="flex gap-3 md:gap-4 text-gray-400 text-lg md:text-xl">
-          <IoCall className="cursor-pointer hover:text-white" />
-          <IoVideocam className="cursor-pointer hover:text-white" />
-
+          <a href={`tel:${user?.phoneNumber}`}>
+            <IoCall className="cursor-pointer hover:text-white" />
+          </a>
+          <IoVideocam
+            className="cursor-pointer hover:text-white"
+            onClick={handleMakeCall}
+          />
         </div>
       </div>
 
-      {/* Center Messages */}
+      {/* Messages */}
       <div className="flex-1 flex flex-col p-3 md:p-5 gap-3 md:gap-5 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-900">
         {chat.messages.map((message, idx) => (
           <ChatMessage key={idx} message={message} currentUser={currentUser} />
@@ -174,7 +314,6 @@ const ChatApp = () => {
             className="hidden"
             onChange={handleImg}
           />
-
           <IoMic className="cursor-pointer hover:text-white" />
           <div className="relative text-lg md:text-xl text-gray-400 flex-shrink-0">
             <HiOutlineEmojiHappy
@@ -199,23 +338,48 @@ const ChatApp = () => {
           value={text}
           onChange={(e) => setText(e.target.value)}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
-          className="flex-1 min-w-0 p-2 md:p-3 rounded-lg bg-gray-700 text-white outline-none placeholder-gray-400 disabled:cursor-not-allowed text-sm md:text-base lg:text-2x"
+          className="flex-1 min-w-0 p-2 md:p-3 rounded-lg bg-gray-700 text-white outline-none placeholder-gray-400 disabled:cursor-not-allowed text-sm md:text-base lg:text-2xl"
         />
-
-
 
         <button
           onClick={handleSend}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
-          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-lg text-white text-sm md:text-base ${isCurrentUserBlocked || isReceiverBlocked
-            ? "bg-blue-600/60 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-500"
-            }`}
+          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-lg text-white text-sm md:text-base ${
+            isCurrentUserBlocked || isReceiverBlocked
+              ? "bg-blue-600/60 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-500"
+          }`}
         >
           <IoSend />
           Send
         </button>
       </div>
+
+      {/* Incoming Call Modal */}
+      {incomingCall && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-6 rounded-xl flex flex-col items-center gap-4 w-80">
+            <h2 className="text-white text-lg font-semibold">Incoming Call</h2>
+            <p className="text-gray-300 text-center">
+              {incomingCall.caller.name} is calling you
+            </p>
+            <div className="flex gap-4 mt-4">
+              <button
+                onClick={handleAcceptCall}
+                className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg text-white font-semibold"
+              >
+                Accept
+              </button>
+              <button
+                onClick={handleDeclineCall}
+                className="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg text-white font-semibold"
+              >
+                Decline
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

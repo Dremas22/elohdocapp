@@ -7,7 +7,6 @@ import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { FiMinus, FiPlus, FiSearch } from "react-icons/fi";
 import AddUser from "./AddUser";
 import { useEffect, useState } from "react";
-import { COLLECTIONS } from "@/constants";
 import { getDisplayName } from "@/lib/getDisplayName";
 
 const ChatList = ({ role }) => {
@@ -29,8 +28,30 @@ const ChatList = ({ role }) => {
         const promises = items.map(async (item) => {
           let user = null;
 
+          // Determine which collections to check based on currentUser's role
+          let collectionsToCheck = [];
+
+          if (currentUser.role === "patient") {
+            // Patients should not be able to see other patients
+            const { consultations, consultationType } = currentUser;
+            if (consultations && consultationType !== "none") {
+              if (consultations.doctor > 0) collectionsToCheck.push("doctors");
+              if (consultations.nurse > 0) collectionsToCheck.push("nurses");
+            }
+          } else if (
+            currentUser.role === "doctor" ||
+            currentUser.role === "nurse"
+          ) {
+            // Doctors & nurses can only chat with patients
+            collectionsToCheck.push("patients");
+          } else if (currentUser.role === "driver") {
+            collectionsToCheck.push("customers");
+          } else if (currentUser.role === "customer") {
+            collectionsToCheck.push("drivers");
+          }
+
           // Check each collection until the user is found
-          for (const col of COLLECTIONS) {
+          for (const col of collectionsToCheck) {
             const userDocRef = doc(db, col, item.receiverId);
             const userDocSnap = await getDoc(userDocRef);
 
@@ -53,13 +74,13 @@ const ChatList = ({ role }) => {
   }, [currentUser?.userId]);
 
   const handleSelect = async (chat) => {
+    if (!chat?.user || !currentUser?.userId) return;
+
     const userChats = chats.map(({ user, ...rest }) => rest);
     const chatIndex = userChats.findIndex(
       (item) => item.chatId === chat.chatId
     );
     userChats[chatIndex].isSeen = true;
-
-    if (!currentUser?.userId) return;
 
     const userChatsRef = doc(db, "userchats", currentUser?.userId);
 
@@ -67,13 +88,27 @@ const ChatList = ({ role }) => {
       await updateDoc(userChatsRef, { chats: userChats });
       changeChat(chat.chatId, chat.user);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
-  const filteredChats = chats.filter((c) =>
-    c.user.fullName.toLowerCase().includes(input.toLowerCase())
-  );
+  const filteredChats = chats.filter((c) => {
+    if (!c?.user || !c?.user?.fullName) return false;
+
+    const matchesInput = c.user.fullName
+      .toLowerCase()
+      .includes(input.toLowerCase());
+
+    // Role restrictions
+    if (currentUser.role === "patient") {
+      return matchesInput && ["doctor", "nurse"].includes(c.user.role);
+    } else if (currentUser.role === "doctor" || currentUser.role === "nurse") {
+      return matchesInput && c.user.role === "patient";
+    }
+
+    // Allow all others
+    return matchesInput;
+  });
 
   return (
     <div className="flex-1 overflow-y-auto bg-gray-900 text-white scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
@@ -103,20 +138,21 @@ const ChatList = ({ role }) => {
       {/* Chat Items */}
       {filteredChats.map((chat) => (
         <div
-          key={chat.chatId}
+          key={chat?.chatId}
           onClick={() => handleSelect(chat)}
-          className={`flex items-center gap-5 p-5 cursor-pointer border-b border-gray-600 transition-colors ${chat?.isSeen
+          className={`flex items-center gap-5 p-5 cursor-pointer border-b border-gray-600 transition-colors ${
+            chat?.isSeen
               ? "bg-transparent hover:bg-gray-800"
               : "bg-blue-600/50 hover:bg-blue-500/60"
-            }`}
+          }`}
         >
           {/* Avatar */}
           {chat.user?.photoUrl &&
-            !chat.user?.blocked.includes(
-              chat?.user?.userId || "deafult_avatar.jpg"
-            ) ? (
+          !chat.user?.blocked.includes(
+            chat?.user?.userId || "/images/default_avatar.jpg"
+          ) ? (
             <img
-              src={chat?.user?.photoUrl || "/images/deafult_avatar.jpg"}
+              src={chat?.user?.photoUrl || "/images/default_avatar.jpg"}
               alt="avatar"
               className="w-12 h-12 rounded-full object-cover"
             />
@@ -131,9 +167,9 @@ const ChatList = ({ role }) => {
             <span className="font-medium">
               {chat.user.blocked.includes(currentUser?.userId || "")
                 ? "User"
-                : getDisplayName(chat.user)}
+                : getDisplayName(chat?.user)}
             </span>
-            <p className="text-sm font-light truncate">{chat.lastMessage}</p>
+            <p className="text-sm font-light truncate">{chat?.lastMessage}</p>
           </div>
         </div>
       ))}
