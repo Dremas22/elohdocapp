@@ -29,7 +29,7 @@ const MeetingRoom = () => {
 
   const isDoctor = doctorId === currentUser?.uid;
   const isPatient = !isDoctor;
-  const room = doctorId;
+  const room = `${doctorId}_${patientId}`;
 
   const [hasJoined, setHasJoined] = useState(false);
   const [meetingClosing, setMeetingClosing] = useState(false);
@@ -55,7 +55,6 @@ const MeetingRoom = () => {
       if (ended && !hasAlreadyHandledEnd.current) {
         hasAlreadyHandledEnd.current = true;
         if (isDoctor) {
-          console.log(userRole, "USER_ROLE_FROM_SNAPSHOT");
           router.push(router.push(`/dashboard/${userRole}`));
         } else {
           router.back();
