@@ -6,7 +6,7 @@ const UserInfo = () => {
   const { currentUser } = useUserStore();
   const fullName = getDisplayName(currentUser);
   return (
-    <div className="flex items-center justify-between p-5">
+    <div className="flex items-center justify-between -mt-6 p-5">
       {/* User Info */}
       <div className="flex items-center gap-5">
         <img
@@ -19,7 +19,7 @@ const UserInfo = () => {
       </div>
 
       {/* Icons: shift left on mobile only */}
-      <div className="pr-7 flex gap-5 text-gray-600">
+      <div className="pr-13 flex lg:gap-5 gap-4 text-gray-600">
         <FiMoreVertical className="w-5 h-5 cursor-pointer hover:text-gray-700 transition-colors" />
         <FiVideo className="w-5 h-5 cursor-pointer hover:text-gray-700 transition-colors" />
         <FiEdit className="w-5 h-5 cursor-pointer hover:text-gray-700 transition-colors" />

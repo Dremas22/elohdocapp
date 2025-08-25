@@ -1,20 +1,18 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
+import { MdOutlinePhoneCallback } from "react-icons/md";
+import { HiOutlinePhoneMissedCall } from "react-icons/hi";
 import {
-  arrayUnion,
-  doc,
-  getDoc,
-  onSnapshot,
-  serverTimestamp,
-  updateDoc,
+  arrayUnion, doc, getDoc,
+  onSnapshot, serverTimestamp, updateDoc,
 } from "firebase/firestore";
 import { useUserStore } from "@/hooks/useUserStore";
 import { useChatStore } from "@/hooks/useChatStore";
 import { db } from "@/db/client";
 import { IoCall, IoVideocam, IoSend, IoImage, IoMic } from "react-icons/io5";
 import { HiOutlineEmojiHappy } from "react-icons/hi";
-import { FiArrowLeft } from "react-icons/fi"; // Back button for mobile
+import { FiArrowLeft } from "react-icons/fi";
 import ChatMessage from "./ChatMessage";
 import { getDisplayName } from "@/lib/getDisplayName";
 import { sendNotificationToDoctor } from "@/lib/sendNotificationToStaff";
@@ -78,7 +76,7 @@ const ChatApp = () => {
       if (!snap.exists()) return setIncomingCall(null);
 
       const data = snap.data();
-      console.log(data, "DATA_XXX");
+
 
       if (
         data?.status === "ringing" &&
@@ -129,7 +127,6 @@ const ChatApp = () => {
       if (img.file) {
         // TODO: implement your upload function
         //imgUrl = await upload(img.file);
-        console.log("Image ready to upload:", img.file);
       }
 
       if (chatId) {
@@ -162,8 +159,7 @@ const ChatApp = () => {
         }
       }
     } catch (err) {
-      console.error(err);
-      toastError("Failed to send message.");
+
     } finally {
       setText("");
       setImg({ file: null, url: "" });
@@ -231,7 +227,6 @@ const ChatApp = () => {
       `/room?staffId=${incomingCall?.doctorId}&patientId=${incomingCall?.patientId}`
     );
 
-    console.log(incomingCall, "INCOMING_CALL");
   };
 
   const handleDeclineCall = async () => {
@@ -250,9 +245,9 @@ const ChatApp = () => {
   };
 
   return (
-    <div className="flex-2 flex flex-col border-x border-gray-700 h-full">
+    <div className="flex-2 flex  flex-col border-x border-gray-700 h-full  ">
       {/* Top */}
-      <div className="flex justify-between items-center p-3 md:p-5 border-b border-gray-700 sticky top-0 bg-gray-900 z-10">
+      <div className="flex justify-between items-center p-2 md:p-5 border-b border-gray-700 sticky top-0 bg-gray-900 z-10 ">
         <div className="flex items-center gap-3 md:gap-4">
           <button
             onClick={() => setChatId(null)}
@@ -266,7 +261,7 @@ const ChatApp = () => {
             className="w-10 h-10 md:w-14 md:h-14 rounded-full object-cover"
           />
           <div className="flex flex-col gap-0.5 md:gap-1">
-            <span className="font-semibold text-sm md:text-lg text-white">
+            <span className="lg:font-semibold text-sm md:text-lg text-white">
               {getDisplayName(user)}
             </span>
             <p className="text-xs text-gray-400 italic tracking-wide">
@@ -344,11 +339,10 @@ const ChatApp = () => {
         <button
           onClick={handleSend}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
-          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-lg text-white text-sm md:text-base ${
-            isCurrentUserBlocked || isReceiverBlocked
-              ? "bg-blue-600/60 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-500"
-          }`}
+          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-lg text-white text-sm md:text-base ${isCurrentUserBlocked || isReceiverBlocked
+            ? "bg-blue-600/60 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-500"
+            }`}
         >
           <IoSend />
           Send
@@ -364,18 +358,25 @@ const ChatApp = () => {
               {incomingCall.caller.name} is calling you
             </p>
             <div className="flex gap-4 mt-4">
+
+
               <button
+                title="Click to accept the call"
                 onClick={handleAcceptCall}
-                className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg text-white font-semibold"
+                className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
               >
-                Accept
+                <MdOutlinePhoneCallback className="w-5 h-5 text-green-500" />
               </button>
+
               <button
+                title="Click to decline the call"
                 onClick={handleDeclineCall}
-                className="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg text-white font-semibold"
+                className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
               >
-                Decline
+                <HiOutlinePhoneMissedCall className="w-5 h-5 text-red-500" />
               </button>
+
+
             </div>
           </div>
         </div>

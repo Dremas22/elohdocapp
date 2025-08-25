@@ -18,10 +18,10 @@ const CategoryFilter = ({ options = [], selected, onChange, className = "" }) =>
 
     return (
         <div className={`relative ${className}`}>
-            <div className="flex justify-center sm:justify-start mb-3 mt-2">
+            <div className="flex justify-start mb-3 mt-2">
                 <select
                     title="Filter list by specialty "
-                    className="w-full sm:w-60 md:w-72 lg:w-80 bg-[#123158] text-white p-3 sm:p-2 rounded-md shadow-md border-2 border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 cursor-pointer"
+                    className="w-[82%] md:w-72 lg:w-80 bg-[#123158] text-white p-3 sm:p-2 rounded-md shadow-md border-2 border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 cursor-pointer"
                     value={selected}
                     onChange={(e) => onChange(e.target.value)}
                     aria-label="Filter by category"
