@@ -62,7 +62,7 @@ const GoogleSignInButton = () => {
   };
 
   return (
-    <div className=" inset-0 w-screen h-screen overflow-x-hidden bg-gradient-to-br from-[#dbeafe] via-white to-[#caf0f8]">
+    <div className=" lg:fixed inset-0 w-screen h-screen -pl-3 overflow-x-hidden bg-gradient-to-br from-[#dbeafe] via-white to-[#caf0f8]">
       {/* Animated glowing blobs */}
       <div
         title="Decorative background"

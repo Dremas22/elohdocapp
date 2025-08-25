@@ -8,11 +8,9 @@ import {
   onSnapshot,
   updateDoc,
 } from "firebase/firestore";
-
 import { useUserStore } from "@/hooks/useUserStore";
 import { useChatStore } from "@/hooks/useChatStore";
 import { db } from "@/db/client";
-
 import {
   IoCall,
   IoVideocam,
@@ -22,7 +20,7 @@ import {
   IoMic,
 } from "react-icons/io5";
 import { HiOutlineEmojiHappy, HiOutlineCamera } from "react-icons/hi";
-//import upload from "@/lib/uploadFile";
+import { FiArrowLeft } from "react-icons/fi"; // Back button for mobile
 import ChatMessage from "./ChatMessage";
 import { getDisplayName } from "@/lib/getDisplayName";
 
@@ -33,7 +31,7 @@ const ChatApp = () => {
   const [img, setImg] = useState({ file: null, url: "" });
 
   const { currentUser } = useUserStore();
-  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } =
+  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, setChatId } =
     useChatStore();
 
   const endRef = useRef(null);
@@ -71,7 +69,6 @@ const ChatApp = () => {
     try {
       if (img.file) {
         //imgUrl = await upload(img.file);
-
         console.log(img);
       }
 
@@ -115,28 +112,25 @@ const ChatApp = () => {
     }
   };
 
-  const handleMakeCall = (callType) => {
-    if (callType === "voice") {
-      alert(`📞 ${currentUser?.fullName} is calling you...`);
-    } else if (callType === "video") {
-      alert(`🎥 ${currentUser?.fullName} is starting a video call with you...`);
-    } else {
-      alert(`${currentUser?.fullName} is trying to reach you...`);
-    }
-  };
-
   return (
-    <div className="flex-2 flex flex-col border-x border-gray-700 h-full">
-      {/* Top */}
-      <div className="flex justify-between items-center p-5 border-b border-gray-700">
-        <div className="flex items-center gap-4">
+    <div className="flex-2 flex flex-col border-x border-gray-700 h-full ">
+      {/* Top (Sticky for mobile) */}
+      <div className="flex justify-between items-center p-3 md:p-5 border-b border-gray-700 sticky top-0 bg-gray-900 z-10">
+        <div className="flex items-center gap-3 md:gap-4">
+          {/* Back button for mobile */}
+          <button
+            onClick={() => setChatId(null)}
+            className="md:hidden p-2 rounded-full bg-gray-800 hover:bg-gray-700"
+          >
+            <FiArrowLeft className="text-white w-5 h-5" />
+          </button>
           <img
             src={user?.photoUrl || "/images/deafult_avatar.jpg"}
             alt="avatar"
-            className="w-14 h-14 rounded-full object-cover"
+            className="w-10 h-10 md:w-14 md:h-14 rounded-full object-cover"
           />
-          <div className="flex flex-col gap-1">
-            <span className="font-bold text-lg text-white">
+          <div className="flex flex-col gap-0.5 md:gap-1">
+            <span className="font-semibold text-sm md:text-lg text-white">
               {getDisplayName(user)}
             </span>
             <p className="text-xs text-gray-400 italic tracking-wide">
@@ -144,21 +138,15 @@ const ChatApp = () => {
             </p>
           </div>
         </div>
-        <div className="flex gap-4 text-gray-400 text-xl">
-          <IoCall
-            className="cursor-pointer hover:text-white"
-            onClick={() => handleMakeCall("voice")}
-          />
-          <IoVideocam
-            className="cursor-pointer hover:text-white"
-            onClick={() => handleMakeCall("video")}
-          />
-          <IoInformationCircle className="cursor-pointer hover:text-white" />
+        <div className="flex gap-3 md:gap-4 text-gray-400 text-lg md:text-xl">
+          <IoCall className="cursor-pointer hover:text-white" />
+          <IoVideocam className="cursor-pointer hover:text-white" />
+
         </div>
       </div>
 
       {/* Center Messages */}
-      <div className="flex-1 flex flex-col p-5 gap-5 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-900">
+      <div className="flex-1 flex flex-col p-3 md:p-5 gap-3 md:gap-5 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-900">
         {chat.messages.map((message, idx) => (
           <ChatMessage key={idx} message={message} currentUser={currentUser} />
         ))}
@@ -167,7 +155,7 @@ const ChatApp = () => {
             <img
               src={img.url}
               alt="preview"
-              className="w-full max-h-72 rounded-lg object-cover"
+              className="w-full max-h-52 md:max-h-72 rounded-lg object-cover"
             />
           </div>
         )}
@@ -175,8 +163,8 @@ const ChatApp = () => {
       </div>
 
       {/* Bottom Input */}
-      <div className="flex items-center gap-4 p-5 border-t border-gray-700">
-        <div className="flex gap-3 text-gray-400 text-xl">
+      <div className="flex items-center gap-2 md:gap-4 p-3 md:p-5 border-t border-gray-700">
+        <div className="flex gap-2 md:gap-3 text-gray-400 text-lg md:text-xl flex-shrink-0">
           <label htmlFor="file" className="cursor-pointer">
             <IoImage className="hover:text-white" />
           </label>
@@ -186,9 +174,21 @@ const ChatApp = () => {
             className="hidden"
             onChange={handleImg}
           />
-          <HiOutlineCamera className="cursor-pointer hover:text-white" />
+
           <IoMic className="cursor-pointer hover:text-white" />
+          <div className="relative text-lg md:text-xl text-gray-400 flex-shrink-0">
+            <HiOutlineEmojiHappy
+              className="cursor-pointer hover:text-white"
+              onClick={() => setOpen((prev) => !prev)}
+            />
+            {open && (
+              <div className="absolute bottom-10 left-0 z-50">
+                <EmojiPicker onEmojiClick={handleEmoji} />
+              </div>
+            )}
+          </div>
         </div>
+
         <input
           type="text"
           placeholder={
@@ -199,27 +199,18 @@ const ChatApp = () => {
           value={text}
           onChange={(e) => setText(e.target.value)}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
-          className="flex-1 p-3 rounded-lg bg-gray-700 text-white outline-none placeholder-gray-400 disabled:cursor-not-allowed"
+          className="flex-1 min-w-0 p-2 md:p-3 rounded-lg bg-gray-700 text-white outline-none placeholder-gray-400 disabled:cursor-not-allowed text-sm md:text-base lg:text-2x"
         />
-        <div className="relative text-xl text-gray-400">
-          <HiOutlineEmojiHappy
-            className="cursor-pointer hover:text-white"
-            onClick={() => setOpen((prev) => !prev)}
-          />
-          {open && (
-            <div className="absolute bottom-10 left-0 z-50">
-              <EmojiPicker onEmojiClick={handleEmoji} />
-            </div>
-          )}
-        </div>
+
+
+
         <button
           onClick={handleSend}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
-          className={`flex items-center gap-1 px-4 py-2 rounded-lg text-white ${
-            isCurrentUserBlocked || isReceiverBlocked
-              ? "bg-blue-600/60 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-500"
-          }`}
+          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-lg text-white text-sm md:text-base ${isCurrentUserBlocked || isReceiverBlocked
+            ? "bg-blue-600/60 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-500"
+            }`}
         >
           <IoSend />
           Send

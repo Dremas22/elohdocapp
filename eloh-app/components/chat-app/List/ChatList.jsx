@@ -105,17 +105,16 @@ const ChatList = ({ role }) => {
         <div
           key={chat.chatId}
           onClick={() => handleSelect(chat)}
-          className={`flex items-center gap-5 p-5 cursor-pointer border-b border-gray-600 transition-colors ${
-            chat?.isSeen
+          className={`flex items-center gap-5 p-5 cursor-pointer border-b border-gray-600 transition-colors ${chat?.isSeen
               ? "bg-transparent hover:bg-gray-800"
               : "bg-blue-600/50 hover:bg-blue-500/60"
-          }`}
+            }`}
         >
           {/* Avatar */}
           {chat.user?.photoUrl &&
-          !chat.user?.blocked.includes(
-            chat?.user?.userId || "deafult_avatar.jpg"
-          ) ? (
+            !chat.user?.blocked.includes(
+              chat?.user?.userId || "deafult_avatar.jpg"
+            ) ? (
             <img
               src={chat?.user?.photoUrl || "/images/deafult_avatar.jpg"}
               alt="avatar"
