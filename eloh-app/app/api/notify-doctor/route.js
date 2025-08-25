@@ -5,7 +5,7 @@ import { getFCMToken } from "@/lib/getFCMToken";
 
 export async function POST(req) {
   try {
-    const { doctorId, patientId } = await req.json();
+    const { doctorId, patientId, payload = {} } = await req.json();
 
     if (!doctorId || !patientId) {
       return NextResponse.json(
@@ -46,16 +46,27 @@ export async function POST(req) {
 
     const patientName = patientData?.fullName || "A patient";
 
+    // default notification text
+    let title = "New Consultation Request";
+    let body = `${patientName} wants to start a video consultation.`;
+    if (payload?.type === "incoming-call" && payload?.caller) {
+      title = "Incoming Video Call";
+      body = `${payload?.caller?.name} is calling you...`;
+    }
+
     try {
       await getMessaging().send({
         token: fcmToken,
         notification: {
-          title: "New Consultation Request",
-          body: `${patientName} wants to start a video consultation.\nJoin here: ${process.env.NEXT_PUBLIC_URL}/room?staffId=${doctorId}&patientId=${patientId}`,
+          title,
+          body,
         },
         data: {
-          roomId: doctorId,
+          doctorId,
           patientId,
+          ...Object.fromEntries(
+            Object.entries(payload).map(([k, v]) => [k, String(v)])
+          ), // ensure all values are strings
         },
         webpush: {
           fcmOptions: {
