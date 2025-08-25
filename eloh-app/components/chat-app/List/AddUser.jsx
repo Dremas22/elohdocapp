@@ -12,41 +12,86 @@ import {
 } from "firebase/firestore";
 import { useUserStore } from "@/hooks/useUserStore";
 import { db } from "@/db/client";
-import { COLLECTIONS } from "@/constants";
 import { getDisplayName } from "@/lib/getDisplayName";
 
 const AddUser = ({ onClick, role }) => {
   const [user, setUser] = useState(null);
+  const [notFound, setNotFound] = useState(false);
   const { currentUser } = useUserStore();
 
   const handleSearch = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const username = formData.get("username");
+    const input = formData.get("username")?.trim();
 
-    if (!username) return;
+    if (!input) return;
 
     try {
+      setUser(null);
+      setNotFound(false);
+
+      let collectionsToCheck = [];
+
+      if (currentUser.role === "patient") {
+        collectionsToCheck.push("doctors", "nurses");
+      } else if (["doctor", "nurse"].includes(currentUser.role)) {
+        collectionsToCheck.push("patients");
+      } else if (currentUser.role === "driver") {
+        collectionsToCheck.push("customers");
+      } else if (currentUser.role === "customer") {
+        collectionsToCheck.push("drivers");
+      }
+
       let foundUser = null;
 
-      for (const col of COLLECTIONS) {
-        const userRef = collection(db, col);
-        const q = query(userRef, where("fullName", "==", username));
-        const querySnapshot = await getDocs(q);
+      const isEmail = input.includes("@");
 
-        if (!querySnapshot.empty) {
-          foundUser = {
-            userId: querySnapshot.docs[0].id,
-            ...querySnapshot.docs[0].data(),
-            collection: col,
-          };
-          break; // stop once we find the user
+      for (const col of collectionsToCheck) {
+        const userRef = collection(db, col);
+
+        let q;
+
+        if (isEmail) {
+          // 🔑 Exact match on email
+          q = query(userRef, where("email", "==", input.toLowerCase()));
+        } else {
+          // 🔍 Case-insensitive & partial match on fullName
+          const snapshot = await getDocs(userRef);
+
+          const match = snapshot.docs.find((docSnap) => {
+            const name = docSnap.data().fullName?.toLowerCase() || "";
+            return name.includes(input.toLowerCase());
+          });
+
+          if (match) {
+            foundUser = {
+              userId: match.id,
+              ...match.data(),
+              collection: col,
+            };
+            break;
+          }
+        }
+
+        if (isEmail) {
+          const querySnapshot = await getDocs(q);
+          if (!querySnapshot.empty) {
+            const docSnap = querySnapshot.docs[0];
+            foundUser = {
+              userId: docSnap.id,
+              ...docSnap.data(),
+              collection: col,
+            };
+            break;
+          }
         }
       }
 
-      setUser(foundUser || null);
+      if (!foundUser) setNotFound(true);
+      setUser(foundUser);
     } catch (err) {
       console.error("Error searching user:", err);
+      setNotFound(true);
     }
   };
 
@@ -103,7 +148,7 @@ const AddUser = ({ onClick, role }) => {
           <input
             type="text"
             name="username"
-            placeholder="Username"
+            placeholder="Enter user email or FullName"
             className="flex-1 p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 outline-none"
           />
           <button
@@ -113,6 +158,12 @@ const AddUser = ({ onClick, role }) => {
             Search
           </button>
         </form>
+
+        {notFound && (
+          <p className="text-red-400 text-sm mb-4">
+            No user found with that email.
+          </p>
+        )}
 
         {user && (
           <div className="flex items-center justify-between bg-gray-700 p-4 rounded-lg">

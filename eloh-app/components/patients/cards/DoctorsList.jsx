@@ -11,30 +11,31 @@ const DoctorsList = ({ doctors, sendNotificationToDoctor }) => {
 
   return (
     <div className="w-full flex justify-center">
-      <div
-        className="flex flex-wrap gap-4 justify-center items-center max-w-7xl px-4 py-5"
-      >
+      <div className="flex flex-wrap gap-4 justify-center items-center max-w-7xl px-4 py-5">
         {doctors.map((doc) => (
           <div
             key={doc.userId}
             title={`Consult with Dr. ${doc.fullName}`}
-            onClick={() => {
+            onClick={async () => {
               if (currentUser?.uid && doc.userId) {
-                sendNotificationToDoctor(doc.userId, currentUser.uid);
+                await sendNotificationToDoctor(doc.userId, currentUser.uid);
                 router.push(
                   `/room?staffId=${doc.userId}&patientId=${currentUser.uid}`
                 );
               }
             }}
             className={`min-w-[260px] sm:min-w-[280px] md:min-w-[300px] rounded-lg p-4 shadow-md flex-shrink-0 flex flex-col items-center gap-4 transition duration-200
-              ${currentUser?.uid && doc.userId
-                ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
-                : "cursor-not-allowed bg-gray-700 opacity-50"
+              ${
+                currentUser?.uid && doc.userId
+                  ? "cursor-pointer bg-[#123158] hover:bg-gray-700"
+                  : "cursor-not-allowed bg-gray-700 opacity-50"
               }
             `}
           >
             <div className="text-center space-y-2">
-              <h3 className="text-lg font-bold text-white">Dr. {doc.fullName}</h3>
+              <h3 className="text-lg font-bold text-white">
+                Dr. {doc.fullName}
+              </h3>
               <p className="text-sm text-gray-300">
                 Practice No:{" "}
                 <span className="font-medium">{doc.practiceNumber}</span>
@@ -47,7 +48,7 @@ const DoctorsList = ({ doctors, sendNotificationToDoctor }) => {
             </div>
 
             <Image
-              src={doc.photoUrl || "/images/deafult_avatar.jpg"}
+              src={doc.photoUrl || "/images/default_avatar.jpg"}
               alt={`Dr. ${doc.fullName}`}
               width={64}
               height={64}
