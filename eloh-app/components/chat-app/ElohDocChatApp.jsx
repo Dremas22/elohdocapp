@@ -43,8 +43,9 @@ const ElohDocChatApp = ({ setOpenChat, role }) => {
       {/* Close chat button only on desktop */}
       {!isMobileView && (
         <button
+          title="Close chat"
           onClick={() => setOpenChat(false)}
-          className="absolute top-10 right-4 bg-black/60 hover:bg-black/80 p-2 rounded-full z-50"
+          className="absolute top-2 right-2 bg-gray-950 hover:bg-gray-700 p-2 rounded-full z-50 scale-80 cursor-pointer "
           aria-label="Close chat"
         >
           <FiX size={24} className="text-red-500" />
