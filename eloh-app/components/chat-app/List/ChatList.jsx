@@ -18,62 +18,88 @@ const ChatList = ({ role }) => {
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   const { currentUser } = useUserStore();
-  const { changeChat } = useChatStore();
+  const { changeChat, updateUnseenCount } = useChatStore();
 
   // Prepare category options for the filter
   const { allOptions, toId } = useMemo(() => {
-    const opts = [{ id: "all", title: "All" }, ...doctorCategories, ...nurseCategories];
+    const opts = [
+      { id: "all", title: "All" },
+      ...doctorCategories,
+      ...nurseCategories,
+    ];
     const map = new Map();
     [...doctorCategories, ...nurseCategories].forEach(({ id, title }) => {
       map.set(id.toLowerCase(), id);
       map.set(title.toLowerCase(), id);
     });
-    return { allOptions: opts, toId: (val) => map.get(String(val || "").toLowerCase()) || null };
+    return {
+      allOptions: opts,
+      toId: (val) => map.get(String(val || "").toLowerCase()) || null,
+    };
   }, []);
 
   useEffect(() => {
     if (!currentUser?.userId) return;
 
-    const unSub = onSnapshot(doc(db, "userchats", currentUser.userId), async (res) => {
-      const items = res.data()?.chats || [];
+    const unSub = onSnapshot(
+      doc(db, "userchats", currentUser.userId),
+      async (res) => {
+        const items = res.data()?.chats || [];
 
-      const promises = items.map(async (item) => {
-        let user = null;
+        const promises = items.map(async (item) => {
+          let user = null;
+          let collectionsToCheck = [];
 
-        // Determine which collections to check based on currentUser's role
-        let collectionsToCheck = [];
-
-        if (currentUser.role === "patient") {
-          const { consultations, consultationType } = currentUser;
-          if (consultations && consultationType !== "none") {
-            if (consultations.doctor > 0) collectionsToCheck.push("doctors");
-            if (consultations.nurse > 0) collectionsToCheck.push("nurses");
+          if (currentUser.role === "patient") {
+            const { consultations, consultationType } = currentUser;
+            if (consultations && consultationType !== "none") {
+              if (consultations.doctor > 0) collectionsToCheck.push("doctors");
+              if (consultations.nurse > 0) collectionsToCheck.push("nurses");
+            }
+          } else if (
+            currentUser.role === "doctor" ||
+            currentUser.role === "nurse"
+          ) {
+            collectionsToCheck.push("patients");
+          } else if (currentUser.role === "driver") {
+            collectionsToCheck.push("customers");
+          } else if (currentUser.role === "customer") {
+            collectionsToCheck.push("drivers");
           }
-        } else if (currentUser.role === "doctor" || currentUser.role === "nurse") {
-          collectionsToCheck.push("patients");
-        } else if (currentUser.role === "driver") {
-          collectionsToCheck.push("customers");
-        } else if (currentUser.role === "customer") {
-          collectionsToCheck.push("drivers");
-        }
 
-        // Check each collection until the user is found
-        for (const col of collectionsToCheck) {
-          const userDocRef = doc(db, col, item.receiverId);
-          const userDocSnap = await getDoc(userDocRef);
+          for (const col of collectionsToCheck) {
+            const userDocRef = doc(db, col, item.receiverId);
+            const userDocSnap = await getDoc(userDocRef);
 
-          if (userDocSnap.exists()) {
-            user = { userId: userDocSnap.id, ...userDocSnap.data() };
-            break;
+            if (userDocSnap.exists()) {
+              user = { userId: userDocSnap.id, ...userDocSnap.data() };
+              break;
+            }
           }
-        }
 
-        return { ...item, user };
-      });
+          return { ...item, user };
+        });
 
-      const chatData = await Promise.all(promises);
-      setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
-    });
+        let chatData = await Promise.all(promises);
+
+        // ✅ Deduplicate by chatId
+        const uniqueChats = new Map();
+        chatData.forEach((c) => {
+          if (c?.user?.userId) {
+            uniqueChats.set(c.user.userId, c);
+          }
+        });
+
+        const finalChats = Array.from(uniqueChats.values()).sort(
+          (a, b) => b.updatedAt - a.updatedAt
+        );
+
+        setChats(finalChats);
+
+        // 🔹 Update global unseen count in Zustand
+        updateUnseenCount(finalChats);
+      }
+    );
 
     return () => unSub();
   }, [currentUser?.userId]);
@@ -81,14 +107,29 @@ const ChatList = ({ role }) => {
   const handleSelect = async (chat) => {
     if (!chat?.user || !currentUser?.userId) return;
 
+    // Map chats to keep only the properties stored in Firestore
     const userChats = chats.map(({ user, ...rest }) => rest);
-    const chatIndex = userChats.findIndex((item) => item.chatId === chat.chatId);
-    userChats[chatIndex].isSeen = true;
+
+    // Deduplicate by receiverId
+    const uniqueChatsMap = new Map();
+    userChats.forEach((c) => {
+      if (c?.receiverId) uniqueChatsMap.set(c.receiverId, c);
+    });
+
+    // Convert back to array
+    const dedupedChats = Array.from(uniqueChatsMap.values());
+
+    // Mark the selected chat as seen
+    const chatIndex = dedupedChats.findIndex((c) => c.chatId === chat.chatId);
+    if (chatIndex !== -1) {
+      dedupedChats[chatIndex].isSeen = true;
+    }
 
     const userChatsRef = doc(db, "userchats", currentUser?.userId);
 
     try {
-      await updateDoc(userChatsRef, { chats: userChats });
+      // Update Firestore with deduplicated chats
+      await updateDoc(userChatsRef, { chats: dedupedChats });
       changeChat(chat.chatId, chat.user);
     } catch (err) {
       console.error(err);
@@ -108,10 +149,14 @@ const ChatList = ({ role }) => {
 
   // Filter chats by search input and category
   const filteredChats = useMemo(() => {
+    // Return all chats if no search input and category is "all"
+    if (!input.trim() && selectedCategory === "all") return chats;
+
     const needle = input.trim().toLowerCase();
 
     return chats.filter((c) => {
       if (!c?.user || !c?.user?.fullName) return false;
+
       const name = c.user.fullName.toLowerCase();
       const matchesInput = !needle || name.includes(needle);
 
@@ -141,7 +186,11 @@ const ChatList = ({ role }) => {
           title="Add new users"
           onClick={() => setAddMode((prev) => !prev)}
         >
-          {addMode ? <FiMinus className="w-5 h-5" /> : <FiPlus className="w-5 h-5" />}
+          {addMode ? (
+            <FiMinus className="w-5 h-5" />
+          ) : (
+            <FiPlus className="w-5 h-5" />
+          )}
         </div>
       </div>
 
@@ -158,8 +207,11 @@ const ChatList = ({ role }) => {
         <div
           key={chat?.chatId}
           onClick={() => handleSelect(chat)}
-          className={`flex items-center gap-5 p-5 cursor-pointer border-b border-gray-600 transition-colors ${chat?.isSeen ? "bg-transparent hover:bg-gray-800" : "bg-blue-600/50 hover:bg-blue-500/60"
-            }`}
+          className={`flex items-center gap-5 p-5 cursor-pointer border-b border-gray-600 transition-colors ${
+            chat?.isSeen
+              ? "bg-transparent hover:bg-gray-800"
+              : "bg-blue-600/50 hover:bg-blue-500/60"
+          }`}
         >
           {/* Avatar */}
           {chat.user?.photoUrl ? (
@@ -177,7 +229,9 @@ const ChatList = ({ role }) => {
           {/* Username & Last Message */}
           <div className="flex flex-col gap-2">
             <span className="font-medium">
-              {chat.user.blocked.includes(currentUser?.userId || "") ? "User" : getDisplayName(chat.user)}
+              {chat.user.blocked.includes(currentUser?.userId || "")
+                ? "User"
+                : getDisplayName(chat.user)}
             </span>
             <p className="text-sm font-light truncate">{chat?.lastMessage}</p>
           </div>
