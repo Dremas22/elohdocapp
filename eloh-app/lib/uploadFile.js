@@ -14,10 +14,11 @@ import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
  *   onProgress: ({ progress }) => console.log(`Upload is ${progress}% done`)
  * }).then(url => console.log("File available at:", url));
  */
-const upload = async (file, options) => {
-  const date = new Date().getTime();
-  const storageRef = ref(storage, `images/${date}-${file.name}`);
-
+const upload = async (file, userId, options) => {
+  const storageRef = ref(
+    storage,
+    `users/${userId}/images/${Date.now()}-${file.name}`
+  );
   const uploadTask = uploadBytesResumable(storageRef, file);
 
   return new Promise((resolve, reject) => {
