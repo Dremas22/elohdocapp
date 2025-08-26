@@ -243,6 +243,9 @@ export const STAFF_EARNING_PER_CONSULTATION = CONSULTATION_FEE - PLATFORM_FEE;
  */
 export const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
+/**
+ * Eloh Doc user collections
+ */
 export const COLLECTIONS = [
   "customers",
   "doctors",

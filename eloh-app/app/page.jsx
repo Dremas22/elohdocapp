@@ -1,7 +1,12 @@
 import LandingPage from "@/components/LandingPage";
+import { COLLECTIONS } from "@/constants";
 import { db, auth } from "@/db/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+
+export const metadata = {
+  title: "ElohApp | Home page",
+};
 
 export default async function Home() {
   const session = await cookies();
@@ -11,16 +16,8 @@ export default async function Home() {
     const decoded = await auth?.verifySessionCookie(sessionCookie, true);
     const userId = decoded.uid;
 
-    const collections = [
-      "doctors",
-      "nurses",
-      "patients",
-      "drivers",
-      "customers",
-    ];
-
-    for (const col of collections) {
-      const docSnap = await db.collection(col).doc(userId).get();
+    for (const col of COLLECTIONS) {
+      const docSnap = await db?.collection(col).doc(userId).get();
       if (docSnap.exists) {
         const role = docSnap.data().role;
 
@@ -29,7 +26,7 @@ export default async function Home() {
         if (role === "patient") redirect("/dashboard/patient");
         if (role === "driver") redirect("/dashboard/driver");
         if (role === "customer") redirect("/dashboard/customer");
-        if (!collections.includes(role)) redirect("/");
+        if (!COLLECTIONS.includes(`${role}s`)) redirect("/");
       }
     }
   }
