@@ -4,8 +4,12 @@ import EmojiPicker from "emoji-picker-react";
 import { MdOutlinePhoneCallback } from "react-icons/md";
 import { HiOutlinePhoneMissedCall } from "react-icons/hi";
 import {
-  arrayUnion, doc, getDoc,
-  onSnapshot, serverTimestamp, updateDoc,
+  arrayUnion,
+  doc,
+  getDoc,
+  onSnapshot,
+  serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { useUserStore } from "@/hooks/useUserStore";
 import { useChatStore } from "@/hooks/useChatStore";
@@ -18,7 +22,7 @@ import { getDisplayName } from "@/lib/getDisplayName";
 import { sendNotificationToDoctor } from "@/lib/sendNotificationToStaff";
 import { toastError } from "@/helpers/toastHelper";
 import { useRouter } from "next/navigation";
-import upload from "@/lib/uploadFile";
+//import upload from "@/lib/uploadFile";
 
 const ChatApp = () => {
   const [chat, setChat] = useState({ messages: [] });
@@ -28,6 +32,7 @@ const ChatApp = () => {
   const [incomingCall, setIncomingCall] = useState(null);
   const [calling, setCalling] = useState(false);
   const [ringtone, setRingtone] = useState(null);
+  const [progressData, setProgressData] = useState(null);
 
   const { currentUser } = useUserStore();
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, setChatId } =
@@ -77,7 +82,6 @@ const ChatApp = () => {
 
       const data = snap.data();
 
-
       if (
         data?.status === "ringing" &&
         data?.caller?.id !== currentUser?.userId
@@ -110,12 +114,18 @@ const ChatApp = () => {
 
   // Handle image selection
   const handleImg = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setImg({
-        file: e.target.files[0],
-        url: URL.createObjectURL(e.target.files[0]),
-      });
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Revoke previous blob URL before creating a new one
+    if (img?.url) {
+      URL.revokeObjectURL(img.url);
     }
+
+    setImg({
+      file,
+      url: URL.createObjectURL(file),
+    });
   };
 
   // Send message
@@ -124,9 +134,13 @@ const ChatApp = () => {
 
     let imgUrl = null;
     try {
-      if (img.file) {
-        // TODO: implement your upload function
-        //imgUrl = await upload(img.file);
+      if (img.file && currentUser?.userId) {
+        //TODO: Uncomment once the firebase storage is set
+        // imgUrl = await upload(img.file, currentUser?.userId, {
+        //   onProgress: (uploadData) => {
+        //     setProgressData(uploadData);
+        //   },
+        // });
       }
 
       if (chatId) {
@@ -159,7 +173,6 @@ const ChatApp = () => {
         }
       }
     } catch (err) {
-
     } finally {
       setText("");
       setImg({ file: null, url: "" });
@@ -226,7 +239,6 @@ const ChatApp = () => {
     router.push(
       `/room?staffId=${incomingCall?.doctorId}&patientId=${incomingCall?.patientId}`
     );
-
   };
 
   const handleDeclineCall = async () => {
@@ -303,7 +315,8 @@ const ChatApp = () => {
           <label htmlFor="file" className="cursor-pointer">
             <IoImage
               title="Select digital files"
-              className="hover:text-white" />
+              className="hover:text-white"
+            />
           </label>
           <input
             type="file"
@@ -313,7 +326,8 @@ const ChatApp = () => {
           />
           <IoMic
             title="Record voice note"
-            className="cursor-pointer hover:text-white" />
+            className="cursor-pointer hover:text-white"
+          />
           <div className="relative text-lg md:text-xl text-gray-400 flex-shrink-0">
             <HiOutlineEmojiHappy
               title="Select Imoji"
@@ -345,11 +359,12 @@ const ChatApp = () => {
           title="Send message"
           onClick={handleSend}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
-          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-xl text-white text-sm md:text-base shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out ${isCurrentUserBlocked || isReceiverBlocked
-            ? "bg-blue-400/60 cursor-not-allowed"
-            : "bg-[#03045e] hover:bg-[#023e8a] cursor-pointer"}
+          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-xl text-white text-sm md:text-base shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out ${
+            isCurrentUserBlocked || isReceiverBlocked
+              ? "bg-blue-400/60 cursor-not-allowed"
+              : "bg-[#03045e] hover:bg-[#023e8a] cursor-pointer"
+          }
             }`}
-
         >
           Send
           <IoSend />
@@ -365,7 +380,6 @@ const ChatApp = () => {
               {incomingCall.caller.name} is calling you
             </p>
             <div className="flex gap-4 mt-4">
-
               <button
                 title="Click to accept the call"
                 onClick={handleAcceptCall}
@@ -381,7 +395,6 @@ const ChatApp = () => {
               >
                 <HiOutlinePhoneMissedCall className="w-5 h-5 text-red-500" />
               </button>
-
             </div>
           </div>
         </div>
