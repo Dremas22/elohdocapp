@@ -16,6 +16,7 @@ import { MdInfo } from "react-icons/md";
 import { FiMessageCircle } from "react-icons/fi";
 import ElohDocChatApp from "@/components/chat-app/ElohDocChatApp";
 import { useUserStore } from "@/hooks/useUserStore";
+import { useChatStore } from "@/hooks/useChatStore";
 
 const PatientDashboard = () => {
   const { currentUser, loading } = useCurrentUser();
@@ -27,6 +28,7 @@ const PatientDashboard = () => {
   const [openChat, setOpenChat] = useState(false);
   const toastShown = useRef(false);
   const { fetchUserInfo } = useUserStore();
+  const { unseenCount } = useChatStore();
 
   useEffect(() => {
     if (!loading && currentUser?.uid) {
@@ -209,9 +211,11 @@ const PatientDashboard = () => {
         <div className="relative">
           <FiMessageCircle size={28} />
           {/* Unseen messages badge */}
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full shadow">
-            3
-          </span>
+          {unseenCount > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full shadow animate-pulse">
+              {unseenCount}
+            </span>
+          )}
         </div>
       </button>
 

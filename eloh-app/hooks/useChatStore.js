@@ -9,6 +9,7 @@ import { useUserStore } from "./useUserStore";
  * - `user`: the chat partner (null if blocked or no active chat)
  * - `isCurrentUserBlocked`: true if the chat partner has blocked the current user
  * - `isReceiverBlocked`: true if the current user has blocked the partner
+ * - `unseenCount`: number of unseen messages
  *
  * Actions:
  * - `changeChat(chatId, user)`: Switch to a new chat. Handles blocked states automatically.
@@ -27,6 +28,7 @@ export const useChatStore = create((set) => ({
   user: null,
   isCurrentUserBlocked: false,
   isReceiverBlocked: false,
+  unseenCount: 0,
 
   changeChat: (chatId, user) => {
     const currentUser = useUserStore.getState().currentUser;
@@ -64,6 +66,16 @@ export const useChatStore = create((set) => ({
       chatId: null,
       user: null,
     });
+  },
+  /**
+   * Update the global unseen count from an array of chats
+   */
+  updateUnseenCount: (chats) => {
+    if (!chats) {
+      set({ unseenCount: 0 });
+    }
+    const count = chats.reduce((acc, chat) => (chat.isSeen ? acc : acc + 1), 0);
+    set({ unseenCount: count });
   },
 
   resetChat: () => {
