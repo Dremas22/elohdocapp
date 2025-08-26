@@ -107,25 +107,27 @@ const Detail = () => {
       {/* Buttons at the bottom */}
       <div className="flex flex-col gap-3 p-5 border-t border-gray-700">
         <button
+          title={`Block ${getDisplayName(user) || "User"}`}
           onClick={handleBlock}
-          className="w-full p-3 bg-red-500 hover:bg-red-600 rounded-md text-white font-medium transition-colors"
+          className="bg-[#03045e] text-[#c51c0a] font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
         >
           {isCurrentUserBlocked
             ? "You are Blocked!"
             : isReceiverBlocked
-            ? "User Blocked"
-            : loading
-            ? "Processing..."
-            : "Block User"}
+              ? "User Blocked"
+              : loading
+                ? "Processing..."
+                : `Block ${getDisplayName(user) || "User"}`}
         </button>
-
         <button
+          title={"Click to Logout your account"}
           onClick={handleAuthAction}
-          className="w-full p-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:opacity-35 disabled:cursor-not-allowed rounded-md text-white font-medium transition-colors"
+          className="bg-[#03045e] text-white font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           disabled={loading}
         >
           {loading ? "Signing out..." : "Logout"}
         </button>
+
       </div>
     </div>
   );

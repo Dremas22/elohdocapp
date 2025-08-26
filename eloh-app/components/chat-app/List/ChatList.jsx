@@ -138,6 +138,7 @@ const ChatList = ({ role }) => {
         </div>
         <div
           className="w-9 h-9 flex items-center justify-center bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors"
+          title="Add new users"
           onClick={() => setAddMode((prev) => !prev)}
         >
           {addMode ? <FiMinus className="w-5 h-5" /> : <FiPlus className="w-5 h-5" />}
