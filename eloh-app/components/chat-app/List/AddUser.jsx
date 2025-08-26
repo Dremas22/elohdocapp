@@ -138,6 +138,7 @@ const AddUser = ({ onClick, role }) => {
       <div className="relative bg-gray-800 p-8 rounded-lg w-full max-w-md">
         {/* Close Button */}
         <button
+          title="Close search"
           onClick={() => onClick(false)}
           className="absolute top-3 right-3 text-red-400 hover:text-white hover:cursor-pointer"
         >
@@ -152,8 +153,9 @@ const AddUser = ({ onClick, role }) => {
             className="flex-1 p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 outline-none"
           />
           <button
+            title="Search for other users"
             type="submit"
-            className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
+            className="bg-[#03045e] text-white font-semibold py-1 px-3 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
             Search
           </button>
@@ -184,11 +186,13 @@ const AddUser = ({ onClick, role }) => {
               </span>
             </div>
             <button
+              title={`Add ${getDisplayName(user) || " "} to your chat list`}
               onClick={handleAdd}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
+              className="bg-[#03045e] text-white font-semibold py-2 px-3 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
             >
               Add User
             </button>
+
           </div>
         )}
       </div>
