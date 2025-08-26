@@ -301,7 +301,9 @@ const ChatApp = () => {
       <div className="flex items-center gap-2 md:gap-4 p-3 md:p-5 border-t border-gray-700">
         <div className="flex gap-2 md:gap-3 text-gray-400 text-lg md:text-xl flex-shrink-0">
           <label htmlFor="file" className="cursor-pointer">
-            <IoImage className="hover:text-white" />
+            <IoImage
+              title="Select digital files"
+              className="hover:text-white" />
           </label>
           <input
             type="file"
@@ -309,9 +311,12 @@ const ChatApp = () => {
             className="hidden"
             onChange={handleImg}
           />
-          <IoMic className="cursor-pointer hover:text-white" />
+          <IoMic
+            title="Record voice note"
+            className="cursor-pointer hover:text-white" />
           <div className="relative text-lg md:text-xl text-gray-400 flex-shrink-0">
             <HiOutlineEmojiHappy
+              title="Select Imoji"
               className="cursor-pointer hover:text-white"
               onClick={() => setOpen((prev) => !prev)}
             />
@@ -333,19 +338,21 @@ const ChatApp = () => {
           value={text}
           onChange={(e) => setText(e.target.value)}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
-          className="flex-1 min-w-0 p-2 md:p-3 rounded-lg bg-gray-700 text-white outline-none placeholder-gray-400 disabled:cursor-not-allowed text-sm md:text-base lg:text-2xl"
+          className="flex-1 min-w-0 p-2 md:p-3 rounded-lg bg-gray-700 text-white outline-none placeholder-gray-400 disabled:cursor-not-allowed text-sm md:text-base lg:text-xl"
         />
 
         <button
+          title="Send message"
           onClick={handleSend}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
-          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-lg text-white text-sm md:text-base ${isCurrentUserBlocked || isReceiverBlocked
-            ? "bg-blue-600/60 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-500"
+          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-xl text-white text-sm md:text-base shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out ${isCurrentUserBlocked || isReceiverBlocked
+            ? "bg-blue-400/60 cursor-not-allowed"
+            : "bg-[#03045e] hover:bg-[#023e8a] cursor-pointer"}
             }`}
+
         >
-          <IoSend />
           Send
+          <IoSend />
         </button>
       </div>
 
@@ -358,7 +365,6 @@ const ChatApp = () => {
               {incomingCall.caller.name} is calling you
             </p>
             <div className="flex gap-4 mt-4">
-
 
               <button
                 title="Click to accept the call"
@@ -375,7 +381,6 @@ const ChatApp = () => {
               >
                 <HiOutlinePhoneMissedCall className="w-5 h-5 text-red-500" />
               </button>
-
 
             </div>
           </div>
