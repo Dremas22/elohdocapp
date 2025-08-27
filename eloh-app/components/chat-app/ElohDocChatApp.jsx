@@ -38,7 +38,7 @@ const ElohDocChatApp = ({ setOpenChat, role }) => {
   }
 
   return (
-    <div className="w-[full]  h-[80vh] max-h-[screen] bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 flex pt-7 overflow-hidden relative">
+    <div className="w-[full] h-[80vh] max-h-[screen] bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 flex pt-7 overflow-hidden relative">
 
 
       {/* Desktop (unchanged) */}

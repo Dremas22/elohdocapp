@@ -117,7 +117,7 @@ const Detail = () => {
               ? "User Blocked"
               : loading
                 ? "Processing..."
-                : `Block ${getDisplayName(user) || "User"}`}
+                : `Block`}
         </button>
         <button
           title={"Click to Logout your account"}
