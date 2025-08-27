@@ -1,7 +1,5 @@
 "use client";
 
-import DoctorDashboardNavbar from "@/app/dashboard/doctor/doctorNav";
-import SidebarMenu from "./doctorSidebar";
 import SearchBar from "@/components/doctors/SearchBar";
 import { useState, useRef, useEffect } from "react";
 import FilteredPatientsTable from "./FilteredPatientsTable";
@@ -104,20 +102,9 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
 
   return (
     <div className="min-h-screen flex flex-col pt-18 relative overflow-hidden">
-      {/* Top Navigation Bar */}
-      <DoctorDashboardNavbar />
 
       {/* Main layout container: Sidebar + Content */}
       <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
-        {/* Desktop Sidebar */}
-        <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-[calc(100vh-5rem)]">
-          <SidebarMenu
-            practiceNumber={practiceNumber}
-            isVerified={isVerified}
-            userDoc={userDocState}
-            setShowEarnings={setShowEarnings}
-          />
-        </aside>
 
         {/* Main Content Area */}
         <main className="w-full lg:w-3/4 flex flex-col items-center md:pl-15 lg:pl-10 text-center bg-transparent overflow-y-auto">
@@ -191,17 +178,6 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
                   />
                 </div>
               )}
-
-              {/* Mobile Sidebar */}
-              <div className="block lg:hidden w-80 mt-10">
-                <SidebarMenu
-                  practiceNumber={practiceNumber}
-                  isVerified={isVerified}
-                  userDoc={userDocState}
-                  setShowEarnings={setShowEarnings}
-                  compact
-                />
-              </div>
 
               {/* Chat Toggle Button */}
               <button

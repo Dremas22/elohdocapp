@@ -38,19 +38,8 @@ const ElohDocChatApp = ({ setOpenChat, role }) => {
   }
 
   return (
-    <div className="w-[80vw] h-[90vh] max-h-[90vh] bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 flex pt-7 overflow-hidden relative">
+    <div className="w-[full]  h-[80vh] max-h-[screen] bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 flex pt-7 overflow-hidden relative">
 
-      {/* Close chat button only on desktop */}
-      {!isMobileView && (
-        <button
-          title="Close chat"
-          onClick={() => setOpenChat(false)}
-          className="absolute top-2 right-2 bg-gray-950 hover:bg-gray-700 p-2 rounded-full z-50 scale-80 cursor-pointer "
-          aria-label="Close chat"
-        >
-          <FiX size={24} className="text-red-500" />
-        </button>
-      )}
 
       {/* Desktop (unchanged) */}
       {!isMobileView ? (
