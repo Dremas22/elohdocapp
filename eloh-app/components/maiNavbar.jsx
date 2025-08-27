@@ -24,7 +24,15 @@ const Navbar = () => {
           <li>
             <Link
               href="/about"
-              className="text-black text-sm font-semibold hover:text-white transition"
+              className="text-black text-xl font-semibold hover:text-white transition"
+            >
+              About Elohdoc
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/ourTeam"
+              className="text-black text-xl font-semibold hover:text-white transition"
             >
               Our Team
             </Link>
@@ -32,7 +40,7 @@ const Navbar = () => {
           <li>
             <Link
               href="/contact"
-              className="text-black text-sm font-semibold hover:text-white transition"
+              className="text-black text-xl font-semibold hover:text-white transition"
             >
               Contact
             </Link>
