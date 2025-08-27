@@ -90,8 +90,8 @@ const ViewPatientsRecords = ({
         ))}
       </div>
 
-      {/* Table Section with Tooltip */}
-      <div className="relative group bg-white rounded-lg shadow-md border mr-2 border-gray-200 lg:w-[60vw] md:w-[75vw] w-[85vw] px-4 sm:px-6 text-sm sm:text-base -ml-8 sm:ml-0">
+      {/* Table Section  */}
+      <div className="relative group bg-white rounded-lg shadow-md border mr-2 border-gray-200 lg:w-[52vw] md:w-[75vw] w-[85vw] px-4 sm:px-6 text-sm sm:text-base -ml-8 sm:ml-0">
 
         <div className="flex justify-end px-3 pt-3">
           <button
