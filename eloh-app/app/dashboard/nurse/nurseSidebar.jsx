@@ -356,7 +356,7 @@ const NurseSidebarMenu = ({
         >
           <IoCloseCircleSharp />
         </button>
-        <Calendar />
+        <Calendar userDoc={userDoc} />
       </div>
     </>
   );

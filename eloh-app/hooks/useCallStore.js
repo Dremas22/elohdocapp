@@ -1,103 +1,106 @@
 "use client";
+
 import { create } from "zustand";
-import { doc, onSnapshot, updateDoc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  updateDoc,
+  doc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "@/db/client";
 
-export const useCallStore = create((set, get) => {
-  let router;
+export const useCallStore = create((set, get) => ({
+  incomingCall: null,
+  ringtone: null,
+  router: null,
 
-  return {
-    incomingCall: null,
-    ringtone: null,
+  setRouter: (router) => set({ router }),
 
-    setRouter: (r) => {
-      router = r; // set router from component
-    },
+  initCallListener: (currentUser) => {
+    if (!currentUser) return;
 
-    initCallListener: (currentUser, peerUser) => {
-      if (!currentUser || !peerUser) return;
+    const callsQuery = query(
+      collection(db, "calls"),
+      where("status", "==", "ringing")
+    );
 
-      let staffId, patientId;
-      if (["doctor", "nurse"].includes(currentUser.role)) {
-        staffId = currentUser.userId;
-        patientId = peerUser.userId;
-      } else {
-        staffId = peerUser.userId;
-        patientId = currentUser.userId;
-      }
+    const unsubscribe = onSnapshot(callsQuery, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const data = change.doc.data();
+        const callId = change.doc.id;
 
-      const callId = `${staffId}_${patientId}`;
-      const callDocRef = doc(db, "calls", callId);
-
-      return onSnapshot(callDocRef, (snap) => {
-        if (!snap.exists()) {
-          set({ incomingCall: null });
-          return;
-        }
-
-        const data = snap.data();
-
-        // Only trigger ringtone if currentUser is the receiver
+        // Ignore calls made by this user
         if (
-          data?.status === "ringing" &&
-          data?.caller?.id !== currentUser.userId
-        ) {
-          if (!get().ringtone) {
-            const audio = new Audio("/ringtones/ringtone.mp3");
-            audio.loop = true;
-            audio.play().catch(() => console.error("Autoplay blocked"));
-            set({ ringtone: audio });
-          }
-          set({ incomingCall: { ...data, id: callId, staffId, patientId } });
-        } else {
-          if (get().ringtone) {
-            get().ringtone.pause();
-            get().ringtone.currentTime = 0;
-            set({ ringtone: null });
-          }
-          set({ incomingCall: null });
+          data.caller?.patientId === currentUser.userId ||
+          data.caller?.staffId === currentUser.userId
+        )
+          return;
+
+        // Only trigger if currentUser is a participant
+        const { staffId, patientId } = data;
+        if (staffId !== currentUser.userId && patientId !== currentUser.userId)
+          return;
+
+        // Determine the other party
+        const otherUserId =
+          staffId === currentUser.userId ? patientId : staffId;
+
+        // Play ringtone if not already
+        if (!get().ringtone) {
+          const audio = new Audio("/ringtones/ringtone.mp3");
+          audio.loop = true;
+          audio.play().catch(() => console.error("Autoplay blocked"));
+          set({ ringtone: audio });
         }
+
+        set({
+          incomingCall: { ...data, id: callId, otherUserId },
+        });
       });
-    },
+    });
 
-    acceptCall: async (callData) => {
-      try {
-        if (!callData?.id) return;
-        const callRef = doc(db, "calls", callData.id);
-        await updateDoc(callRef, { status: "accepted" });
+    return unsubscribe;
+  },
 
-        if (get().ringtone) {
-          get().ringtone.pause();
-          get().ringtone.currentTime = 0;
-          set({ ringtone: null });
-        }
+  acceptCall: async (call) => {
+    if (!call) return;
 
-        if (router) {
-          router.push(
-            `/room?staffId=${callData.staffId}&patientId=${callData.patientId}`
-          );
-        }
-      } catch (err) {
-        console.error("Error accepting call:", err);
-      }
-    },
+    await updateDoc(doc(db, "calls", call.id), {
+      status: "accepted",
+      updatedAt: serverTimestamp(),
+    });
 
-    declineCall: async (callData) => {
-      try {
-        if (!callData?.id) return;
-        const callRef = doc(db, "calls", callData.id);
-        await updateDoc(callRef, { status: "declined" });
-        await deleteDoc(callRef);
+    if (get().ringtone) {
+      get().ringtone.pause();
+      get().ringtone.currentTime = 0;
+      set({ ringtone: null });
+    }
 
-        if (get().ringtone) {
-          get().ringtone.pause();
-          get().ringtone.currentTime = 0;
-          set({ ringtone: null });
-        }
-        set({ incomingCall: null });
-      } catch (err) {
-        console.error("Error declining call:", err);
-      }
-    },
-  };
-});
+    const { router } = get();
+    if (router) {
+      router.push(`/room?staffId=${call.staffId}&patientId=${call.patientId}`);
+    }
+
+    set({ incomingCall: null });
+  },
+
+  declineCall: async (call) => {
+    if (!call) return;
+
+    await updateDoc(doc(db, "calls", call.id), {
+      status: "declined",
+      updatedAt: serverTimestamp(),
+    });
+
+    if (get().ringtone) {
+      get().ringtone.pause();
+      get().ringtone.currentTime = 0;
+      set({ ringtone: null });
+    }
+
+    set({ incomingCall: null });
+  },
+}));

@@ -263,7 +263,7 @@ const DoctorSidebarMenu = ({
         >
           <IoCloseCircleSharp />
         </button>
-        <Calendar />
+        <Calendar userDoc={userDoc} />
       </div>
     </>
   );
