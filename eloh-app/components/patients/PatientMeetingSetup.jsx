@@ -5,9 +5,8 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import ViewMedicalRecords from "../viewMedicalRecords";
-import StaffScroller from "./StaffController";
 import Link from "next/link";
-import { sendNotificationToDoctor } from "@/lib/sendNotificationToStaff";
+import ElohDocChatApp from "../chat-app/ElohDocChatApp";
 
 /**
  * PatientMeetingSetup component
@@ -224,11 +223,12 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
                 <p className="italic">No available nurses at the moment.</p>
               </div>
             )}
-            <StaffScroller
-              doctors={doctors}
-              nurses={nurses}
-              sendNotificationToDoctor={sendNotificationToDoctor}
-            />
+            {/* Main content area with Chat */}
+            <main className="w-full flex lg:-ml-12 flex-col flex-grow h-[90vh] overflow-hidden">
+              <div className="flex flex-col flex-grow overflow-hidden px-2 sm:px-4">
+                <ElohDocChatApp role="patient" />
+              </div>
+            </main>
           </>
         )}
       </div>
