@@ -142,6 +142,8 @@ const Calendar = () => {
     }
   };
 
+  console.log(currentUser, "CURRENT_USER");
+
   return (
     <div className="max-w-md mx-auto p-4 bg-white rounded shadow">
       {/* Month Navigation */}
@@ -300,7 +302,7 @@ const Calendar = () => {
               <li
                 key={appt.id}
                 className="pl-4 border-l-4 border-[#0d6efd] bg-gray-50 p-3 rounded-md cursor-pointer hover:border-[#527cbb]"
-                onClick={() => router.push(appt?.link)}
+                onClick={() => router.push(appt?.meetingLink)}
               >
                 <div className="text-sm">
                   <span className="font-semibold">{appt.date}</span> at{" "}
