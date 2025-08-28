@@ -5,6 +5,7 @@ import DriverMap from "@/components/maps/DriverMap";
 import Script from "next/script";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useUserStore } from "@/hooks/useUserStore";
 import AmbulanceDriverDashboardNavbar from "./driverNav";
 import DriverSidebarMenu from "./driverSidebar";
 import Earnings from "../doctor/doctorEarnings";
@@ -16,6 +17,7 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
   const [mapsReady, setMapsReady] = useState(false);
   const [showEarnings, setShowEarnings] = useState(false);
   const [userDocState, setUserDoc] = useState(userDoc || {});
+  const { fetchUserInfo } = useUserStore();
 
   useEffect(() => {
     if (!userId) return;
@@ -27,6 +29,8 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
           ...prev,
           ...updatedData,
         }));
+
+        fetchUserInfo(updatedData);
       }
     });
 
@@ -111,7 +115,7 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
                           Earnings
                         </h2>
 
-                        <Earnings role="doctor" data={userDocState} />
+                        <Earnings role="driver" data={userDocState} />
                       </div>
                     </div>
                   )}
@@ -136,7 +140,8 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
                 Verification Declined
               </h2>
               <p>
-                We could not verify your account. Please ensure your certificate is valid or contact support for help.
+                We could not verify your account. Please ensure your certificate
+                is valid or contact support for help.
               </p>
             </div>
           )}

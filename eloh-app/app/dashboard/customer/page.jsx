@@ -7,10 +7,12 @@ import { useEffect, useState } from "react";
 import { auth, db } from "@/db/client";
 import { doc, getDoc } from "firebase/firestore";
 import { toastError } from "@/helpers/toastHelper";
+import { useUserStore } from "@/hooks/useUserStore";
 
 const CustomerDashboard = () => {
   const [userDoc, setUserDoc] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { fetchUserInfo } = useUserStore();
 
   useEffect(() => {
     const fetchUserDoc = async () => {
@@ -23,6 +25,7 @@ const CustomerDashboard = () => {
         const docSnap = await getDoc(doc(db, "customers", user.uid));
         if (docSnap.exists()) {
           setUserDoc(docSnap.data());
+          fetchUserInfo(docSnap.data());
         }
       } catch {
         toastError(`Error fetching customer data: `);
