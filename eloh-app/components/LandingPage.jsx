@@ -14,7 +14,7 @@ const LandingPage = () => {
         <Video />
         <ChooseDesignation />
       </div>
-      <AmbulanceButton />
+      {/* <AmbulanceButton /> */}
     </div>
   );
 };

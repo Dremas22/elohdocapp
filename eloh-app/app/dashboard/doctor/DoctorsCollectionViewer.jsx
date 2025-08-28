@@ -1,3 +1,4 @@
+// app/dashboard/doctor/DoctorsCollectionViewer.jsx
 "use client";
 
 import SearchBar from "@/components/doctors/SearchBar";
@@ -14,7 +15,6 @@ import { useUserStore } from "@/hooks/useUserStore";
 import { useChatStore } from "@/hooks/useChatStore";
 
 const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
-  // State to manage search/filter and modals
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -24,12 +24,10 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
   const [userDocState, setUserDoc] = useState(userDoc || {});
   const [openChat, setOpenChat] = useState(false);
 
-  // Ref for scrolling to patient record viewer
   const patientRecordsRef = useRef(null);
   const { fetchUserInfo } = useUserStore();
   const { unseenCount } = useChatStore();
 
-  // Scroll into view when record viewer opens
   useEffect(() => {
     if (openViewPatientRecords && patientRecordsRef.current) {
       patientRecordsRef.current.scrollIntoView({ behavior: "smooth" });
@@ -38,81 +36,57 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
 
   useEffect(() => {
     if (!userId) return;
-
     const unsubscribe = onSnapshot(doc(db, "doctors", userId), (docSnap) => {
       if (docSnap.exists()) {
         const updatedData = docSnap.data();
-        setUserDoc((prev) => ({
-          ...prev,
-          ...updatedData,
-        }));
-
+        setUserDoc((prev) => ({ ...prev, ...updatedData }));
         fetchUserInfo(updatedData);
       }
     });
-
     return () => unsubscribe();
   }, [userId]);
 
-  // Handle patient search by name or ID
   const handleSearch = (query) => {
     if (!query) {
       setFilteredPatients([]);
       return;
     }
-
     const filtered = patients?.filter(
       (p) =>
         p.fullName?.toLowerCase().includes(query.toLowerCase()) ||
         p.idNumber?.toLowerCase().includes(query.toLowerCase()) ||
         p.email?.toLowerCase().includes(query.toLowerCase())
     );
-
     setFilteredPatients(filtered);
   };
 
-  // Show fallback if user document is missing
   if (!userDoc) {
     return (
-      <div className="min-h-screen bg-gray-950 pt-20">
-        <PatientDashboardNavbar />
-        <div className="flex items-center justify-center h-full">
-          <div className="text-center text-blue-600">
-            <p className="text-lg font-medium">No user data found.</p>
-            <p className="text-sm mt-1">
-              Please make sure your account is registered correctly.
-            </p>
-            <div className="flex justify-center mt-6">
-              <Link href="/sign-in?role=doctor" passHref>
-                <button
-                  type="button"
-                  className="bg-[#03045e] text-white py-3 px-6 text-xs md:text-sm font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex items-center justify-center gap-1 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
-                >
-                  Go to Sign In
-                </button>
-              </Link>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gray-950 pt-20 flex items-center justify-center">
+        <div className="text-center text-blue-600">
+          <p className="text-lg font-medium">No user data found.</p>
+          <p className="text-sm mt-1">Please make sure your account is registered correctly.</p>
+          <Link href="/sign-in?role=doctor" passHref>
+            <button className="mt-6 bg-[#03045e] text-white py-3 px-6 text-sm font-semibold rounded-xl shadow-md hover:bg-[#023e8a] transition-all">
+              Go to Sign In
+            </button>
+          </Link>
         </div>
       </div>
     );
   }
 
-  const { practiceNumber, isVerified } = userDocState;
+  const { isVerified } = userDocState;
 
   return (
-    <div className="min-h-screen flex flex-col pt-18 relative overflow-hidden">
-
-      {/* Main layout container: Sidebar + Content */}
+    <div className="min-h-screen w-full flex flex-col pt-18 relative overflow-hidden">
       <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
-
-        {/* Main Content Area */}
-        <main className="w-full lg:w-3/4 flex flex-col items-center md:pl-15 lg:pl-10 text-center bg-transparent overflow-y-auto">
+        <main className="w-full flex flex-col flex-grow overflow-hidden px-4 sm:px-6 lg:px-10">
           {isVerified === true ? (
             <>
-              {/* Sticky Welcome Banner */}
+              {/* Sticky Banner */}
               <div className="sticky top-0 z-20 bg-gray-950 w-full py-6 shadow-md">
-                <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-transparent font-extrabold text-4xl sm:text-5xl md:text-6xl leading-tight">
+                <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-transparent font-extrabold text-4xl sm:text-5xl md:text-6xl leading-tight text-center">
                   Welcome to your virtual surgery.
                 </h1>
               </div>
@@ -120,27 +94,21 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
               {/* Earnings Modal */}
               {showEarnings && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-md z-50 flex items-center justify-center px-4">
-                  <div className="bg-white rounded-xl text-black p-6 w-full max-w-4xl cursor-pointer shadow-lg relative border-t-8 border-[#0d6efd]">
-                    {/* Close button */}
+                  <div className="bg-white rounded-xl text-black p-6 w-full max-w-4xl shadow-lg relative border-t-8 border-[#0d6efd]">
                     <button
                       onClick={() => setShowEarnings(false)}
                       className="absolute top-3 right-4 text-gray-600 hover:text-red-600 text-xl cursor-pointer"
-                      aria-label="Close Earnings Modal"
                     >
                       <FiX />
                     </button>
-
-                    <h2 className="text-2xl font-bold mb-5 text-[#0d6efd] text-center">
-                      Earnings
-                    </h2>
-
+                    <h2 className="text-2xl font-bold mb-5 text-[#0d6efd] text-center">Earnings</h2>
                     <Earnings role="doctor" data={userDocState} />
                   </div>
                 </div>
               )}
 
               {/* Search Bar */}
-              <div className="mt-6 w-full max-w-3xl px-4">
+              <div className="mt-6 w-full max-w-5xl mx-auto">
                 <SearchBar
                   onSearch={handleSearch}
                   query={query}
@@ -151,7 +119,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
               </div>
 
               {/* Search Results Table */}
-              {debouncedQuery ? (
+              {debouncedQuery && (
                 filteredPatients.length > 0 ? (
                   <FilteredPatientsTable
                     patients={filteredPatients}
@@ -159,18 +127,13 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
                     setSelectedPatient={setSelectedPatient}
                   />
                 ) : (
-                  <p className="text-gray-400 mt-4">
-                    No patients found for "{query}".
-                  </p>
+                  <p className="text-gray-400 mt-4 text-center">No patients found for "{query}".</p>
                 )
-              ) : null}
+              )}
 
               {/* Medical Records Viewer */}
               {openViewPatientRecords && (
-                <div
-                  ref={patientRecordsRef}
-                  className="w-full overflow-y-auto max-h-[calc(100vh-5rem)] px-4 mt-6"
-                >
+                <div ref={patientRecordsRef} className="w-full overflow-y-auto mt-6">
                   <ViewPatientsRecords
                     data={selectedPatient?.medicalHistory}
                     setOpenViewPatientRecords={setOpenViewPatientRecords}
@@ -178,58 +141,23 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
                   />
                 </div>
               )}
-
-              {/* Chat Toggle Button */}
-              <button
-                onClick={() => setOpenChat(!openChat)}
-                title="Open Chat"
-                className="fixed bottom-6 right-6 bg-[#0d6efd] hover:bg-[#0b5ed7] text-white p-4 rounded-full shadow-lg z-50"
-                aria-label="Toggle Chat"
-              >
-                <div className="relative">
-                  <FiMessageCircle size={28} />
-                  {/* Unseen messages badge */}
-                  {unseenCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full shadow animate-pulse">
-                      {unseenCount}
-                    </span>
-                  )}
+              {/* Chat Content Area */}
+              <main className="w-[full] -ml-7 flex lg:-ml-14 pt-8 -mr-6 flex-col flex-grow h-screen overflow-hidden">
+                <div className="flex flex-col justify-start flex-grow overflow-hidden px-2 sm:px-4">
+                  <ElohDocChatApp setOpenChat={() => { }} role="doctor" />
                 </div>
-              </button>
+              </main>
 
-              {/* Chat Modal */}
-              {openChat && (
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-[10px] z-[60] flex items-center justify-center chat">
-                  <div className="relative w-[80vw] h-[90vh]">
-                    {/* Chat App */}
-                    <div className="w-full h-full rounded-xl overflow-hidden relative z-[60]">
-                      <ElohDocChatApp setOpenChat={setOpenChat} role="doctor" />
-                    </div>
-                  </div>
-                </div>
-              )}
             </>
           ) : isVerified === false ? (
-            // If account is pending verification
-            <div className="text-gray-600 mt-10">
-              <h2 className="text-lg font-semibold mb-2">
-                Verification Pending
-              </h2>
-              <p>
-                Once your account is verified, you'll access patient information
-                here.
-              </p>
+            <div className="text-gray-600 mt-10 text-center">
+              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
+              <p>Once your account is verified, you'll access patient information here.</p>
             </div>
           ) : (
-            // If account is rejected
-            <div className="text-red-600 mt-10">
-              <h2 className="text-lg font-semibold mb-2">
-                Verification Declined
-              </h2>
-              <p>
-                We could not verify your account. Please ensure your practice
-                number is registered or contact support for help.
-              </p>
+            <div className="text-red-600 mt-10 text-center">
+              <h2 className="text-lg font-semibold mb-2">Verification Declined</h2>
+              <p>We could not verify your account. Please contact support for help.</p>
             </div>
           )}
         </main>

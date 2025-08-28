@@ -89,7 +89,7 @@ const PatientSidebarMenu = ({
   const router = useRouter();
 
   useEffect(() => {
-    let unsubscribe = () => {};
+    let unsubscribe = () => { };
 
     const setupMessaging = async () => {
       const messaging = await messagingPromise;
@@ -181,7 +181,13 @@ const PatientSidebarMenu = ({
       title: "Payments",
       icon: <FaMoneyCheckAlt className="h-6 w-6" />,
       onClick: () => router.push("/payment"),
-      customClass: compact ? "ml-[50px]" : "sm:ml-[0px]",
+      //  customClass: compact ? "ml-[50px]" : "sm:ml-[0px]",
+      showTitle: true,
+    },
+    {
+      title: "appointments",
+      icon: <FaBell className="h-6 w-6" />,
+      onClick: () => router.push("/payment"),
       showTitle: true,
     },
   ];
@@ -210,7 +216,7 @@ const PatientSidebarMenu = ({
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-25 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-25 px-4 w-64 h-[calc(110vh-5rem)] fixed top-1 left-0
           ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
         `}
       >
@@ -251,10 +257,9 @@ const PatientSidebarMenu = ({
         className={`lg:hidden fixed bottom-0 right-0 left-0 z-40
           sm:h-[38vh] h-[26vh] px-4 py-3 overflow-auto backdrop-blur-md flex flex-col items-center gap-7
           transition-transform duration-500 ease-in-out bg-gray-900/20
-          ${
-            mobileSidebarOpen
-              ? "translate-y-0 opacity-100"
-              : "translate-y-full opacity-0 pointer-events-none"
+          ${mobileSidebarOpen
+            ? "translate-y-0 opacity-100"
+            : "translate-y-full opacity-0 pointer-events-none"
           }
         `}
       >

@@ -281,15 +281,21 @@ const ChatApp = () => {
             </p>
           </div>
         </div>
-        <div className="flex gap-3 md:gap-4 text-gray-400 text-lg md:text-xl">
-          <a href={`tel:${user?.phoneNumber}`}>
-            <IoCall className="cursor-pointer hover:text-white" />
+        <div className="flex gap-3 md:gap-4 text-2xl md:text-4xl">
+          <a
+            href={`tel:${user?.phoneNumber}`}
+            title={`Call ${user?.displayName || "this user"}`}
+          >
+            <IoCall className="cursor-pointer text-gray-400 hover:text-white text-3xl md:text-3xl" />
           </a>
           <IoVideocam
-            className="cursor-pointer hover:text-white"
+            className="cursor-pointer hover:text-white text-[#03045e] text-3xl md:text-3xl"
+            title={`Join a video call with ${user?.displayName || "this user"}`}
             onClick={handleMakeCall}
           />
         </div>
+
+
       </div>
 
       {/* Messages */}
@@ -359,11 +365,10 @@ const ChatApp = () => {
           title="Send message"
           onClick={handleSend}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
-          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-xl text-white text-sm md:text-base shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out ${
-            isCurrentUserBlocked || isReceiverBlocked
-              ? "bg-blue-400/60 cursor-not-allowed"
-              : "bg-[#03045e] hover:bg-[#023e8a] cursor-pointer"
-          }
+          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-xl text-white text-sm md:text-base shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out ${isCurrentUserBlocked || isReceiverBlocked
+            ? "bg-blue-400/60 cursor-not-allowed"
+            : "bg-[#03045e] hover:bg-[#023e8a] cursor-pointer"
+            }
             }`}
         >
           Send
