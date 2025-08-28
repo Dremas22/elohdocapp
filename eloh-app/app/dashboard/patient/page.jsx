@@ -186,7 +186,7 @@ const PatientDashboard = () => {
         </div>
 
         {/* Main content area with Chat */}
-        <main className="w-full flex lg:-ml-12 flex-col flex-grow h-[90vh]] overflow-hidden">
+        <main className="w-full flex lg:-ml-12 flex-col flex-grow h-[90vh] overflow-hidden">
           <div className="flex flex-col flex-grow overflow-hidden px-2 sm:px-4">
             <ElohDocChatApp setOpenChat={() => { }} role="patient" />
           </div>
