@@ -154,7 +154,7 @@ const PatientDashboard = () => {
   const nurse = userDoc?.consultations?.nurse || 0;
 
   return (
-    <div className="h-[130vh] flex flex-col pt-18 relative bg-gray-950 text-white overflow-hidden">
+    <div className="h-[150vh] flex flex-col pt-18 relative bg-gray-950 text-white overflow-hidden">
       <PatientDashboardNavbar />
       <SaveStripePayment />
 
@@ -186,7 +186,7 @@ const PatientDashboard = () => {
         </div>
 
         {/* Main content area with Chat */}
-        <main className="w-full flex lg:-ml-12 flex-col flex-grow h-screen overflow-hidden">
+        <main className="w-full flex lg:-ml-12 flex-col flex-grow h-[90vh] overflow-hidden">
           <div className="flex flex-col flex-grow overflow-hidden px-2 sm:px-4">
             <ElohDocChatApp setOpenChat={() => { }} role="patient" />
           </div>
