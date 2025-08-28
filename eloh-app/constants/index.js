@@ -253,3 +253,12 @@ export const COLLECTIONS = [
   "drivers",
   "nurses",
 ];
+
+// Map user role to Firestore collection
+export const ROLE_COLLECTION_MAP = {
+  doctor: "doctors",
+  nurse: "nurses",
+  patient: "patients",
+  driver: "drivers",
+  customer: "customers",
+};

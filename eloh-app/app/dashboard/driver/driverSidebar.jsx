@@ -184,8 +184,9 @@ const DriverSidebarMenu = ({
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex flex-col z-30 bg-[#123158] pt-40 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 transition-transform duration-300 ease-in-out ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"
-          }`}
+        className={`hidden lg:flex flex-col z-30 bg-[#123158] pt-40 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 transition-transform duration-300 ease-in-out ${
+          !isSidebarOpen ? "-translate-x-full" : "translate-x-0"
+        }`}
       >
         {isVerified ? (
           <>
@@ -211,7 +212,6 @@ const DriverSidebarMenu = ({
         )}
       </div>
 
-
       {/* Mobile Toggle Button */}
       <div className="lg:hidden fixed bottom-1 right-1 z-50 flex items-center space-x-2 text-white rounded-full px-2 py-2 backdrop-blur-sm bg-[#03045e]">
         <button
@@ -235,10 +235,11 @@ const DriverSidebarMenu = ({
 
       {/* Mobile Sidebar */}
       <div
-        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[25vh] px-8 py-6 overflow-auto bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-5 transition-transform duration-500 ease-in-out ${mobileSidebarOpen
-          ? "translate-y-0 opacity-100"
-          : "translate-y-full opacity-0 pointer-events-none"
-          }`}
+        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[25vh] px-8 py-6 overflow-auto bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-5 transition-transform duration-500 ease-in-out ${
+          mobileSidebarOpen
+            ? "translate-y-0 opacity-100"
+            : "translate-y-full opacity-0 pointer-events-none"
+        }`}
       >
         {isVerified === true ? (
           <>
@@ -264,13 +265,13 @@ const DriverSidebarMenu = ({
             <p className="text-sm font-medium">Verification status unknown.</p>
           </div>
         )}
-
       </div>
 
       {/* Slide-in Calendar */}
       <div
-        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
+          calendarOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <button
           title="Close Calendar"
@@ -279,7 +280,7 @@ const DriverSidebarMenu = ({
         >
           <IoCloseCircleSharp />
         </button>
-        <Calendar />
+        <Calendar userDoc={userDoc} />
       </div>
     </>
   );

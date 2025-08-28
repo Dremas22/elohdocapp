@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiUser, FiFile, FiChevronUp, FiChevronDown } from "react-icons/fi";
+import {
+  FiUser,
+  FiFile,
+  FiChevronUp,
+  FiChevronDown,
+  FiCalendar,
+} from "react-icons/fi";
 import { FaFilePrescription, FaMoneyCheckAlt } from "react-icons/fa";
 import { CiMedicalClipboard } from "react-icons/ci";
 import { onMessage } from "firebase/messaging";
@@ -9,6 +15,7 @@ import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
 import { useRouter } from "next/navigation";
 import { messagingPromise } from "@/db/client";
+import Appointments from "@/components/Appointments";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
@@ -75,6 +82,7 @@ const PatientSidebarMenu = ({
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [showPayButton, setShowPayButton] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [appointmentOpen, setAppointmentOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -160,6 +168,16 @@ const PatientSidebarMenu = ({
       showTitle: true,
     },
     {
+      title: "Appointments",
+      icon: <FiCalendar className="h-6 w-6" />,
+      onClick: () => {
+        if (setMode) setMode("appointments");
+        if (setAppointmentOpen) setAppointmentOpen((prev) => !prev);
+      },
+      customClass: compact ? "ml-[50px]" : "sm:ml-[0px]",
+      showTitle: true,
+    },
+    {
       title: "Payments",
       icon: <FaMoneyCheckAlt className="h-6 w-6" />,
       onClick: () => router.push("/payment"),
@@ -187,6 +205,8 @@ const PatientSidebarMenu = ({
           loading={profileLoading}
         />
       )}
+
+      {appointmentOpen && <Appointments onClose={setAppointmentOpen} />}
 
       {/* Desktop Sidebar */}
       <div
