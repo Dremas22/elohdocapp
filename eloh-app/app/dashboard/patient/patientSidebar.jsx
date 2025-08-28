@@ -7,6 +7,7 @@ import {
   FiChevronUp,
   FiChevronDown,
   FiCalendar,
+  FiBell,
 } from "react-icons/fi";
 import { FaFilePrescription, FaMoneyCheckAlt } from "react-icons/fa";
 import { CiMedicalClipboard } from "react-icons/ci";
@@ -169,7 +170,7 @@ const PatientSidebarMenu = ({
     },
     {
       title: "Appointments",
-      icon: <FiCalendar className="h-6 w-6" />,
+      icon: <FiBell className="h-6 w-6" />,
       onClick: () => {
         if (setMode) setMode("appointments");
         if (setAppointmentOpen) setAppointmentOpen((prev) => !prev);
@@ -184,12 +185,7 @@ const PatientSidebarMenu = ({
       //  customClass: compact ? "ml-[50px]" : "sm:ml-[0px]",
       showTitle: true,
     },
-    {
-      title: "appointments",
-      icon: <FaBell className="h-6 w-6" />,
-      onClick: () => router.push("/payment"),
-      showTitle: true,
-    },
+
   ];
 
   return (

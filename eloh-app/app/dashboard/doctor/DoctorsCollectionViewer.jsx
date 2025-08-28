@@ -1,11 +1,10 @@
-// app/dashboard/doctor/DoctorsCollectionViewer.jsx
 "use client";
 
 import SearchBar from "@/components/doctors/SearchBar";
 import { useState, useRef, useEffect } from "react";
 import FilteredPatientsTable from "./FilteredPatientsTable";
 import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
-import { FiMessageCircle, FiX } from "react-icons/fi";
+import { FiX } from "react-icons/fi";
 import Link from "next/link";
 import Earnings from "./doctorEarnings";
 import { db } from "@/db/client";
