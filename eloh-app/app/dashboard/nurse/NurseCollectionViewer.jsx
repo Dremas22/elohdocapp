@@ -13,6 +13,7 @@ import { FiX } from "react-icons/fi";
 import FilteredPatientsTable from "../doctor/FilteredPatientsTable";
 import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
 import Earnings from "../doctor/doctorEarnings";
+import { useUserStore } from "@/hooks/useUserStore";
 
 const NurseCollectionViewer = () => {
   const [userDoc, setUserDoc] = useState(null);
@@ -25,6 +26,7 @@ const NurseCollectionViewer = () => {
   const [openViewPatientRecords, setOpenViewPatientRecords] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const patientRecordsRef = useRef(null);
+  const { fetchUserInfo } = useUserStore();
 
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
@@ -46,6 +48,7 @@ const NurseCollectionViewer = () => {
             updatedAt: convertTimestamp(userDataRaw.updatedAt),
           };
           setUserDoc(userData);
+          fetchUserInfo(userData);
         }
       });
 
