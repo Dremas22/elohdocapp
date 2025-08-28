@@ -49,6 +49,7 @@ const UserInfo = () => {
         {/* More Options */}
         <div className="relative" ref={dropdownRef}>
           <FiMoreVertical
+            title="More"
             className="w-5 h-5 cursor-pointer hover:text-gray-700 transition-colors"
             onClick={() => setIsMenuOpen((prev) => !prev)}
           />
@@ -62,14 +63,10 @@ const UserInfo = () => {
                   }}
                   className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
                 >
-                  View Profile
-                </li>
-                <li className="px-4 py-2 hover:bg-gray-700 cursor-pointer">
                   Settings
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-700 cursor-pointer">
-                  Sign Out
-                </li>
+
+
               </ul>
             </div>
           )}
