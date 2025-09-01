@@ -14,8 +14,8 @@ import { onMessage } from "firebase/messaging";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
-    ? "grid grid-cols-3 gap-x-15 w-[110vh] md:w-[110vh] md:pl-15 pr-6 gap-y-8 justify-around" // mobile/tablet
-    : "flex flex-col gap-7 items-center "; // desktop matches patient sidebar
+    ? "grid grid-cols-3 gap-x-15 w-[110vh] md:w-[110vh] md:pl-15 pr-6 gap-y-8 justify-around" // mobile/tablet menu buttons
+    : "flex flex-col gap-7 items-center "; // desktop sidebar buttons
 
   return (
     <div className={`${layout} w-full`}>
