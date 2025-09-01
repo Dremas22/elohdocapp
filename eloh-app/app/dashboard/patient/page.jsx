@@ -42,8 +42,8 @@ const PatientDashboard = () => {
             type === "doctor"
               ? (consultations.doctor || 0) >= 1
               : type === "nurse"
-              ? (consultations.nurse || 0) >= 1
-              : (consultations.doctor || 0) >= 1 ||
+                ? (consultations.nurse || 0) >= 1
+                : (consultations.doctor || 0) >= 1 ||
                 (consultations.nurse || 0) >= 1;
 
           if (hasConsultations && type !== "none") {
@@ -154,7 +154,7 @@ const PatientDashboard = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col pt-18 relative bg-gray-950 text-white overflow-hidden">
+    <div className="h-[150vh] flex flex-col pt-18 relative bg-gray-950 text-white overflow-hidden">
       {/* Fixed Navbar */}
       <PatientDashboardNavbar />
       <SaveStripePayment />
@@ -184,8 +184,8 @@ const PatientDashboard = () => {
         </div>
 
         {/* Main content area */}
-        <main className="w-full lg:w-3/4 flex flex-col flex-grow min-h-0 overflow-hidden">
-          <div className="flex flex-col items-center justify-start flex-grow overflow-hidden">
+        <main className="w-full flex flex-col flex-grow min-h-0 overflow-hidden">
+          <div className="flex flex-col items-center pr-10 justify-start flex-grow overflow-hidden">
             <PatientMeetingSetup
               mode={mode}
               noteOpen={noteOpen}
