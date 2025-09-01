@@ -141,7 +141,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
                 </div>
               )}
               {/* Chat Content Area */}
-              <main className="w-[full] -ml-7 flex lg:-ml-14 pt-8 -mr-6 flex-col flex-grow h-screen overflow-hidden">
+              <main className="w-[full] h-screen -ml-7 flex lg:-ml-14 pt-8 -mr-6 mb-9 flex-col flex-grow overflow-hidden">
                 <div className="flex flex-col justify-start flex-grow overflow-hidden px-2 sm:px-4">
                   <ElohDocChatApp setOpenChat={() => { }} role="doctor" />
                 </div>

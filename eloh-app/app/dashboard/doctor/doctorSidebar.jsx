@@ -9,11 +9,13 @@ import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
 import DoctorToggleButton from "./doctorToggleBtn";
 import { messagingPromise } from "@/db/client";
-import Earnings from "../doctor/doctorEarnings"; // Make sure path is correct
+import Earnings from "../doctor/doctorEarnings";
 import { onMessage } from "firebase/messaging";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
-  const layout = compact ? "grid grid-cols-3 gap-6 justify-around" : "flex flex-col gap-5 items-center";
+  const layout = compact
+    ? "grid grid-cols-3 gap-x-15 w-[110vh] md:w-[110vh] md:pl-15 pr-6 gap-y-8 justify-around" // mobile/tablet
+    : "flex flex-col gap-7 items-center "; // desktop matches patient sidebar
 
   return (
     <div className={`${layout} w-full`}>
@@ -27,24 +29,26 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
             onClick={onClick}
             disabled={isDisabled}
             className={`relative flex flex-col items-center justify-center gap-1
-              rounded-xl text-xs md:pl-29 sm:pr-29 font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1
+              rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1
               transition-all duration-200 ease-in-out cursor-pointer
-              ${compact ? "h-20 w-20" : "w-36 h-20"}
-              bg-[#03045e]/90 hover:bg-[#023e8a] text-white 
+              ${compact ? "h-20 w-20" : "w-35 h-20"}  /* Slightly narrower desktop buttons */
+              bg-[#03045e]/90 hover:bg-[#023e8a] text-white
               ${isDisabled ? "!cursor-not-allowed" : ""}
               ${customClass || ""}
             `}
             aria-label={title}
             type="button"
           >
-            <span className={`flex items-center justify-center ${isDisabled ? "text-gray-600" : "text-white"}`}>
+            <span className={`${isDisabled ? "text-gray-600" : "text-white"}`}>
               {icon}
             </span>
             {showTitle && (
-              <span className="text-white text-[11px] text-center leading-tight">{title}</span>
+              <span className="text-white text-[11px] text-center leading-tight">
+                {title}
+              </span>
             )}
             {hasNotification && notificationCount > 0 && (
-              <span className="absolute bottom-70 scale-150 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white cursor-pointer">
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[11px] font-bold flex items-center justify-center rounded-full border border-white">
                 {notificationCount}
               </span>
             )}
@@ -74,7 +78,7 @@ const DoctorSidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = fals
       const messaging = await messagingPromise;
       if (!messaging) return;
 
-      unsubscribe = onMessage((payload) => {
+      unsubscribe = onMessage(messaging, (payload) => {
         setNotificationPayload(payload);
         setNotificationCount((prev) => prev + 1);
       });
@@ -224,11 +228,19 @@ const DoctorSidebarMenu = ({ practiceNumber, isVerified, userDoc, compact = fals
 
       {/* Mobile Sidebar */}
       <div
-        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 md:h-[22vh] sm:h-[38vh] h-[24vh] md:px-5 px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5 transition-transform duration-500 ease-in-out bg-gray-900/20 ${mobileSidebarOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"
+        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 md:h-[24vh] sm:h-[38vh] h-[24vh] md:px-5 px-6 py-4 overflow-auto backdrop-blur-md flex flex-col items-center gap-5 transition-transform duration-500 ease-in-out bg-gray-900/20 ${mobileSidebarOpen
+          ? "translate-y-0 opacity-100"
+          : "translate-y-full opacity-0 pointer-events-none"
           }`}
       >
-        <ActionButtons buttons={actionButtons} notificationCount={notificationCount} payload={notificationPayload} compact={true} />
-        <DoctorToggleButton />
+        <ActionButtons
+          buttons={actionButtons}
+          notificationCount={notificationCount}
+          payload={notificationPayload}
+          compact={true}
+        />
+        <div className="pr-8"> <DoctorToggleButton /></div>
+
       </div>
 
       {/* Calendar Drawer */}

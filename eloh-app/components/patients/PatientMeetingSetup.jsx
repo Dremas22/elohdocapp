@@ -54,8 +54,8 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
     if (!currentUser?.uid) return;
 
     const patientRef = doc(db, "patients", currentUser.uid);
-    let unsubDoctors = () => {};
-    let unsubNurses = () => {};
+    let unsubDoctors = () => { };
+    let unsubNurses = () => { };
 
     const unsubPatient = onSnapshot(
       patientRef,
@@ -68,7 +68,6 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         }
 
         const { consultationType } = patientSnap.data();
-
         setIsLoading(true);
         setError(null);
         unsubDoctors();
@@ -80,9 +79,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             where("available", "==", true)
           );
           unsubDoctors = onSnapshot(doctorQuery, (snapshot) => {
-            setDoctors(
-              snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-            );
+            setDoctors(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
           });
         }
 
@@ -92,9 +89,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             where("available", "==", true)
           );
           unsubNurses = onSnapshot(nurseQuery, (snapshot) => {
-            setNurses(
-              snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-            );
+            setNurses(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
           });
         }
 
@@ -126,38 +121,37 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-950 relative pb-10">
-      {/* Consultations Remaining Box */}
-      <div className="w-full flex justify-center sm:justify-end px-4 pt-1.5">
-        <div className="bg-gradient-to-br from-[#0b2345] to-[#123158] p-4 rounded-2xl shadow-2xl w-full max-w-xs text-center transform transition-transform duration-300 hover:scale-100 hover:shadow-[#0d6efd]/50 cursor-default">
-          <h2 className="text-sm font-bold mb-2 tracking-wide text-gray-200 drop-shadow-md">
+    <div className="lg:w-[168.5vh] w-full pl-5 min-h-screen bg-gray-950 relative pb-10">
+      {/* Consultations Remaining */}
+      <div className="pt-10 lg:pr-50 flex justify-center">
+        <div className="bg-gradient-to-br from-[#0b2345] to-[#123158] p-4 rounded-2xl shadow-2xl w-full max-w-xs text-center transform transition-transform duration-300 hover:shadow-[#0d6efd]/50">
+          <h2 className="text-sm font-bold mb-2 tracking-wide text-[#90e0ef]">
             Consultations Remaining
           </h2>
-          <div className="text-white text-sm flex justify-center gap-x-6">
+          <div className="text-[#90e0ef] text-lg flex flex-col sm:flex-row justify-center gap-2 sm:gap-x-6">
             <p>
-              Doctor: <span className="font-bold text-gray-300">{doctor}</span>
+              Doctor: <span className="font-bold">{doctor}</span>
             </p>
             <p>
-              Nurse: <span className="font-bold text-gray-300">{nurse}</span>
+              Nurse: <span className="font-bold">{nurse}</span>
             </p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-screen-xl mx-auto px-4 pt-2">
-        {/* Header */}
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto px-2">
-          <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text font-extrabold text-transparent text-3xl sm:text-4xl leading-tight">
-            Virtual Medical Consultations
-          </h1>
-          <p className="mt-4 sm:mt-6 max-w-xl text-gray-300 text-base sm:text-xl">
-            Connect with licensed medical professionals through secure video
-            consultations from home.
-          </p>
-        </div>
+      {/* Welcome Banner (Moved directly below) */}
+      <div className="mt-6 lg:pr-40 px-4 sm:px-6 text-center">
+        <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text font-extrabold text-transparent text-2xl sm:text-3xl md:text-4xl">
+          Welcome to Your Virtual Medical Consultation
+        </h1>
+        <p className="mt-3 sm:mt-4 max-w-xl mx-auto text-gray-300 text-sm sm:text-base md:text-lg">
+          Connect with licensed professionals securely from the comfort of your home.
+        </p>
+      </div>
 
+      <div className="max-w-screen-xl mx-auto px-4 pt-6">
         {/* Hidden Inputs */}
-        <div className="opacity-0 h-0 overflow-hidden mt-6">
+        <div className="opacity-0 h-0 overflow-hidden">
           <input
             type="text"
             readOnly
@@ -173,65 +167,42 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
           />
         </div>
 
-        {/* Medical Records Preview */}
+        {/* Medical Records */}
         {noteOpen && (
-          <div className="mt-8">
-            <ViewMedicalRecords
-              userDoc={userDoc}
-              mode={mode}
-              setNoteOpen={setNoteOpen}
-            />
+          <div className="mt-6">
+            <ViewMedicalRecords userDoc={userDoc} mode={mode} setNoteOpen={setNoteOpen} />
           </div>
         )}
 
-        {/* Loading/Error/Empty State */}
+        {/* State Handling */}
         {isLoading ? (
-          <p className="text-center text-gray-400 mt-20 text-sm sm:text-base">
+          <p className="text-center text-gray-400 mt-12 text-sm sm:text-base">
             Loading doctors & nurses...
           </p>
         ) : error ? (
-          <p className="text-red-600 text-center mt-20 font-semibold">
-            {error}
-          </p>
+          <p className="text-red-600 text-center mt-12 font-semibold">{error}</p>
         ) : doctor === 0 && nurse === 0 ? (
-          <div className="text-center mt-10 text-gray-600 text-sm sm:text-base">
+          <div className="text-center mt-10 text-gray-400">
             <p className="italic mb-2">
               No consultation staff available because no payment has been made.
             </p>
-            <span>
-              Make a{" "}
-              <Link
-                href="/payment"
-                title="Go to payment page"
-                className="text-blue-600 underline hover:text-blue-800 font-medium"
-              >
-                payment
-              </Link>{" "}
-              to continue
-            </span>
+            <Link
+              href="/payment"
+              className="text-blue-500 underline hover:text-blue-700 font-medium"
+            >
+              Make a payment to continue
+            </Link>
           </div>
         ) : (
-          <>
-            {doctor > 0 && doctors.length === 0 && (
-              <div className="text-center text-yellow-500 text-sm sm:text-base">
-                <p className="italic">No available doctors at the moment.</p>
-              </div>
-            )}
-
-            {nurse > 0 && nurses.length === 0 && (
-              <div className="text-center text-yellow-500 text-sm sm:text-base">
-                <p className="italic">No available nurses at the moment.</p>
-              </div>
-            )}
-            {/* Main content area with Chat */}
-            <main className="w-full flex lg:-ml-12 flex-col flex-grow h-[90vh] overflow-hidden">
-              <div className="flex flex-col flex-grow overflow-hidden px-2 sm:px-4">
-                <ElohDocChatApp role="patient" />
-              </div>
-            </main>
-          </>
+          <main className="lg:w-[165vh] w-[46vh] -ml-5.25 flex flex-col flex-grow h-full mt-6">
+            <div className="flex flex-col \flex-grow overflow-hidden px-2 sm:px-4">
+              <ElohDocChatApp role="patient" />
+            </div>
+          </main>
         )}
       </div>
+
+
     </div>
   );
 };

@@ -257,44 +257,54 @@ const ChatApp = () => {
   };
 
   return (
-    <div className="flex-2 flex  flex-col border-x border-gray-700 h-full  ">
+    <div className="flex-2 flex flex-col border-x border-gray-700 lg:h-[80vh] h-[70vh] ">
       {/* Top */}
-      <div className="flex justify-between items-center p-2 md:p-5 border-b border-gray-700 sticky top-0 bg-gray-900 z-10 ">
-        <div className="flex items-center gap-3 md:gap-4">
+      <div>
+        <div className="border-b border-gray-700 bg-gray-900 sticky top-0 z-10">
+
+          {/* Back Button (absolute on mobile) */}
           <button
             onClick={() => setChatId(null)}
-            className="md:hidden p-2 rounded-full bg-gray-800 hover:bg-gray-700"
+            className="md:hidden absolute left-2 -top-6 p-2 rounded-full bg-gray-800 hover:bg-gray-700 z-20"
           >
             <FiArrowLeft className="text-white w-5 h-5" />
           </button>
-          <img
-            src={user?.photoUrl || "/images/default_avatar.jpg"}
-            alt="avatar"
-            className="w-10 h-10 md:w-14 md:h-14 rounded-full object-cover"
-          />
-          <div className="flex flex-col gap-0.5 md:gap-1">
-            <span className="lg:font-semibold text-sm md:text-lg text-white">
-              {getDisplayName(user)}
-            </span>
-            <p className="text-xs text-gray-400 italic tracking-wide">
-              {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)}
-            </p>
+
+          <div className="flex justify-between items-center p-2 md:p-5">
+
+            {/* User Info */}
+            <div className="flex items-center gap-2 md:gap-4 ml-0 md:ml-0">
+              <img
+                src={user?.photoUrl || "/images/default_avatar.jpg"}
+                alt="avatar"
+                className="w-10 h-10 md:w-14 md:h-14 rounded-full object-cover"
+              />
+              <div className="flex flex-col gap-0.5 md:gap-1">
+                <span className="font-semibold text-sm md:text-lg text-white">
+                  {getDisplayName(user)}
+                </span>
+                <p className="text-xs text-gray-400 italic tracking-wide">
+                  {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)}
+                </p>
+              </div>
+            </div>
+
+            {/* Action Icons */}
+            <div className="flex gap-3 md:gap-4 text-2xl md:text-4xl">
+              <a
+                href={`tel:${user?.phoneNumber}`}
+                title={`Call ${user?.displayName || "this user"}`}
+              >
+                <IoCall className="cursor-pointer text-gray-400 hover:text-white lg:text-3xl md:text-3xl text-sm" />
+              </a>
+              <IoVideocam
+                className="cursor-pointer hover:text-white text-[#03045e] lg:text-3xl md:text-3xl text-sm"
+                title={`Join a video call with ${user?.displayName || "this user"}`}
+                onClick={handleMakeCall}
+              />
+            </div>
           </div>
         </div>
-        <div className="flex gap-3 md:gap-4 text-2xl md:text-4xl">
-          <a
-            href={`tel:${user?.phoneNumber}`}
-            title={`Call ${user?.displayName || "this user"}`}
-          >
-            <IoCall className="cursor-pointer text-gray-400 hover:text-white text-3xl md:text-3xl" />
-          </a>
-          <IoVideocam
-            className="cursor-pointer hover:text-white text-[#03045e] text-3xl md:text-3xl"
-            title={`Join a video call with ${user?.displayName || "this user"}`}
-            onClick={handleMakeCall}
-          />
-        </div>
-
 
       </div>
 
@@ -377,34 +387,36 @@ const ChatApp = () => {
       </div>
 
       {/* Incoming Call Modal */}
-      {incomingCall && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-gray-900 p-6 rounded-xl flex flex-col items-center gap-4 w-80">
-            <h2 className="text-white text-lg font-semibold">Incoming Call</h2>
-            <p className="text-gray-300 text-center">
-              {incomingCall.caller.name} is calling you
-            </p>
-            <div className="flex gap-4 mt-4">
-              <button
-                title="Click to accept the call"
-                onClick={handleAcceptCall}
-                className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-              >
-                <MdOutlinePhoneCallback className="w-5 h-5 text-green-500" />
-              </button>
+      {
+        incomingCall && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div className="bg-gray-900 p-6 rounded-xl flex flex-col items-center gap-4 w-80">
+              <h2 className="text-white text-lg font-semibold">Incoming Call</h2>
+              <p className="text-gray-300 text-center">
+                {incomingCall.caller.name} is calling you
+              </p>
+              <div className="flex gap-4 mt-4">
+                <button
+                  title="Click to accept the call"
+                  onClick={handleAcceptCall}
+                  className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+                >
+                  <MdOutlinePhoneCallback className="w-5 h-5 text-green-500" />
+                </button>
 
-              <button
-                title="Click to decline the call"
-                onClick={handleDeclineCall}
-                className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-              >
-                <HiOutlinePhoneMissedCall className="w-5 h-5 text-red-500" />
-              </button>
+                <button
+                  title="Click to decline the call"
+                  onClick={handleDeclineCall}
+                  className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+                >
+                  <HiOutlinePhoneMissedCall className="w-5 h-5 text-red-500" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 };
 
