@@ -165,7 +165,6 @@ const PatientSidebarMenu = ({
         if (setMode) setMode("sick-notes");
         if (setNoteOpen) setNoteOpen((prev) => !prev);
       },
-      customClass: compact ? "ml-[50px]" : "sm:ml-[0px]",
       showTitle: true,
     },
     {
@@ -175,14 +174,12 @@ const PatientSidebarMenu = ({
         if (setMode) setMode("appointments");
         if (setAppointmentOpen) setAppointmentOpen((prev) => !prev);
       },
-      customClass: compact ? "ml-[50px]" : "sm:ml-[0px]",
       showTitle: true,
     },
     {
       title: "Payments",
       icon: <FaMoneyCheckAlt className="h-6 w-6" />,
       onClick: () => router.push("/payment"),
-      //  customClass: compact ? "ml-[50px]" : "sm:ml-[0px]",
       showTitle: true,
     },
 

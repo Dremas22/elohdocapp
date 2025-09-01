@@ -27,7 +27,7 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
               disabled={isDisabled}
               className={`relative flex flex-col items-center justify-center gap-1
                 rounded-xl text-xs font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
-                ${compact ? "h-15 w-24 p-5" : "w-36 h-20"}
+                ${compact ? "h-18 w-24 p-5" : "w-36 h-20"}
                 bg-[#03045e]/90 hover:bg-[#023e8a] text-white
                 ${isDisabled ? "!cursor-not-allowed" : ""}
                 ${customClass || ""}
@@ -79,7 +79,7 @@ const CustomerSidebarMenu = ({
   const router = useRouter();
 
   useEffect(() => {
-    let unsubscribe = () => {};
+    let unsubscribe = () => { };
 
     const setupMessaging = async () => {
       const messaging = await messagingPromise;
@@ -205,10 +205,9 @@ const CustomerSidebarMenu = ({
         className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[20vh] px-8 py-6 overflow-auto
           bg-gray-900/20 backdrop-blur-md flex flex-col md:pl-29 sm:pr-29 md:px-29 sm:px-29 items-center gap-5
           transition-transform duration-500 ease-in-out
-          ${
-            mobileSidebarOpen
-              ? "translate-y-0 opacity-100"
-              : "translate-y-full opacity-0 pointer-events-none"
+          ${mobileSidebarOpen
+            ? "translate-y-0 opacity-100"
+            : "translate-y-full opacity-0 pointer-events-none"
           }`}
       >
         <ActionButtons
