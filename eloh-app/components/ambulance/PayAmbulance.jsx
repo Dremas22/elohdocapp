@@ -2,8 +2,13 @@
 
 import { auth } from "@/db/client";
 import { findNearestAvailableDriver } from "@/helpers";
-import { toastError, toastSuccess } from "@/helpers/toastHelper";
+import { toastError } from "@/helpers/toastHelper";
 import { useState } from "react";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+);
 
 export default function PayAmbulance({
   fare,
@@ -31,52 +36,58 @@ export default function PayAmbulance({
       const tripDetails = {
         fare,
         distance,
-        pickupAddress: pickupLocation.address,
         duration,
         hospital,
         pickupLocation,
         type: "ambulance_request",
+        role: "customer",
+        customerEmail: auth?.currentUser?.email,
       };
 
-      // Send notification to driver
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/send-ambulance-notification`,
+      // Call API to create Stripe checkout session
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/stripe-checkout`,
         {
           method: "POST",
-          body: JSON.stringify({
-            driverId: nearestDriver?.userId || nearestDriver?.id,
-            tripDetails,
-            customerId: auth?.currentUser?.uid,
-          }),
           headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(tripDetails),
         }
       );
 
-      if (!response.ok) {
-        toastError(`Error: ${response.text()}`);
+      const { id: sessionId, error } = await res.json();
+
+      if (error || !sessionId) {
+        throw new Error(error || "Failed to create Stripe session");
       }
 
-      toastSuccess(`Ambulance request sent to driver ${nearestDriver.id}.`);
-    } catch (error) {
-      console.error("Error sending ambulance request:", error);
-      toastError("Failed to send ambulance request. Please try again.", 5000);
+      // Redirect to Stripe Checkout
+      const stripe = await stripePromise;
+      if (!stripe) throw new Error("Stripe failed to initialize");
+
+      await stripe.redirectToCheckout({ sessionId });
+    } catch (err) {
+      console.error("Error initiating ambulance payment:", err);
+      toastError(
+        "Failed to process ambulance payment. Please try again.",
+        5000
+      );
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="flex justify-center  w-full">
+    <div className="flex justify-center w-full">
       <button
         onClick={handleProceed}
         disabled={loading}
         className={`flex justify-center items-center gap-2 px-6 py-2 rounded-2xl font-semibold text-white transition-all duration-300 transform
-          ${loading
-            ? "bg-gray-400 cursor-not-allowed shadow-none"
-            : "bg-green-600 hover:bg-green-700 hover:scale-105 active:scale-95 cursor-pointer shadow-[0_4px_#999] active:shadow-[0_2px_#666]"
+          ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed shadow-none"
+              : "bg-green-600 hover:bg-green-700 hover:scale-105 active:scale-95 cursor-pointer shadow-[0_4px_#999] active:shadow-[0_2px_#666]"
           }`}
       >
-        {/* spinner while loading */}
         {loading && (
           <svg
             className="animate-spin h-5 w-5 text-white"
@@ -99,7 +110,6 @@ export default function PayAmbulance({
             ></path>
           </svg>
         )}
-
         {loading ? "Processing..." : "Pay & Request Ambulance"}
       </button>
     </div>

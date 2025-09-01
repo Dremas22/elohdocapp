@@ -38,7 +38,10 @@ const PayOptions = () => {
     setSelectedPackage(pkg);
     // Scroll down to checkout button
     setTimeout(() => {
-      checkoutRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      checkoutRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     }, 150);
   };
 
@@ -74,6 +77,7 @@ const PayOptions = () => {
           body: JSON.stringify({
             priceId,
             customerEmail: currentUser?.email,
+            role: "patient",
           }),
         }
       );
@@ -106,8 +110,8 @@ const PayOptions = () => {
             Choose Your Consultation
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto text-base sm:text-lg">
-            ElohDoc connects patients with qualified doctors and nurses. Select who
-            you'd like to consult with and proceed to choose a package.
+            ElohDoc connects patients with qualified doctors and nurses. Select
+            who you'd like to consult with and proceed to choose a package.
           </p>
         </div>
 
@@ -118,9 +122,10 @@ const PayOptions = () => {
               key={option.value}
               onClick={() => handleSelect(option.value)}
               className={`px-6 text-sm sm:text-lg py-3 font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
-                ${selectedOption === option.value
-                  ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
-                  : "text-white bg-[#03045e] border border-[#03045e] hover:bg-[#023e8a]"
+                ${
+                  selectedOption === option.value
+                    ? "bg-[#03045e] text-white hover:bg-[#023e8a]"
+                    : "text-white bg-[#03045e] border border-[#03045e] hover:bg-[#023e8a]"
                 }`}
             >
               {option.label}
