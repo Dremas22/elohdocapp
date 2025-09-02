@@ -170,48 +170,45 @@ const ChatList = ({ role }) => {
   return (
     <div className="flex-1 overflow-y-auto bg-gray-900 text-white scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 -pl-8">
       {/* Search Bar */}
-      <div className="flex items-center gap-5 p-5">
-        <div className="flex items-center gap-3 flex-1 bg-gray-800 rounded-lg px-3 py-2">
-          <FiSearch className="w-5 h-5 text-gray-400" />
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-5">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 bg-gray-800 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
+          <FiSearch className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
           <input
             type="text"
             placeholder="Search"
-            className="bg-transparent outline-none border-none flex-1 text-white placeholder-gray-400"
+            className="bg-transparent outline-none border-none flex-1 text-white placeholder-gray-400 text-sm sm:text-base"
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />
         </div>
         <div
-          className="w-9 h-9 flex items-center justify-center bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors"
+          className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors mt-2 sm:mt-0"
           title="Add new users"
           onClick={() => setAddMode((prev) => !prev)}
         >
-          {addMode ? (
-            <FiMinus className="w-5 h-5" />
-          ) : (
-            <FiPlus className="w-5 h-5" />
-          )}
+          {addMode ? <FiMinus className="w-4 h-4 sm:w-5 sm:h-5" /> : <FiPlus className="w-4 h-4 sm:w-5 sm:h-5" />}
         </div>
       </div>
 
-      {/* Category Filter */}
-      <CategoryFilter
-        options={allOptions}
-        selected={selectedCategory}
-        onChange={setSelectedCategory}
-        className="px-5 mb-3"
-      />
+      {/* Category Filter - Only for patients */}
+      {currentUser?.role === "patient" && (
+        <CategoryFilter
+          options={allOptions}
+          selected={selectedCategory}
+          onChange={setSelectedCategory}
+          className="px-5 mb-3"
+        />
+      )}
 
       {/* Chat Items */}
       {filteredChats.map((chat) => (
         <div
           key={chat?.chatId}
           onClick={() => handleSelect(chat)}
-          className={`flex items-center gap-5 p-5 cursor-pointer border-b border-gray-600 transition-colors ${
-            chat?.isSeen
-              ? "bg-transparent hover:bg-gray-800"
-              : "bg-blue-600/50 hover:bg-blue-500/60"
-          }`}
+          className={`flex items-center gap-5 p-5 cursor-pointer border-b border-gray-600 transition-colors ${chat?.isSeen
+            ? "bg-transparent hover:bg-gray-800"
+            : "bg-blue-600/50 hover:bg-blue-500/60"
+            }`}
         >
           {/* Avatar */}
           {chat.user?.photoUrl ? (

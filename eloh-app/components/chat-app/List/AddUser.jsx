@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import {
   arrayUnion,
@@ -43,7 +45,6 @@ const AddUser = ({ onClick, role }) => {
       }
 
       let foundUser = null;
-
       const isEmail = input.includes("@");
 
       for (const col of collectionsToCheck) {
@@ -57,7 +58,6 @@ const AddUser = ({ onClick, role }) => {
         } else {
           // 🔍 Case-insensitive & partial match on fullName
           const snapshot = await getDocs(userRef);
-
           const match = snapshot.docs.find((docSnap) => {
             const name = docSnap.data().fullName?.toLowerCase() || "";
             return name.includes(input.toLowerCase());
@@ -101,7 +101,6 @@ const AddUser = ({ onClick, role }) => {
     try {
       const chatRef = collection(db, "chats");
       const userChatsRef = collection(db, "userchats");
-
       const newChatRef = doc(chatRef);
 
       await setDoc(newChatRef, {
@@ -134,65 +133,65 @@ const AddUser = ({ onClick, role }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
-      <div className="relative bg-gray-800 p-8 rounded-lg w-full max-w-md">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 p-4 sm:p-6">
+      <div className="relative bg-gray-800 rounded-xl w-full max-w-md sm:max-w-lg md:max-w-md p-6 sm:p-8">
         {/* Close Button */}
         <button
           title="Close search"
           onClick={() => onClick(false)}
-          className="absolute top-3 right-3 text-red-400 hover:text-white hover:cursor-pointer"
+          className="absolute top-3 right-3 text-red-400 hover:text-white text-lg sm:text-xl"
         >
           ✖
         </button>
 
-        <form onSubmit={handleSearch} className="flex gap-4 mb-6">
+        {/* Search Form */}
+        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-5">
           <input
             type="text"
             name="username"
-            placeholder="Enter user email or FullName"
-            className="flex-1 p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 outline-none"
+            placeholder="Enter user email or Full Name"
+            className="flex-1 p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 outline-none text-sm sm:text-base"
           />
           <button
             title="Search for other users"
             type="submit"
-            className="bg-[#03045e] text-white font-semibold py-1 px-3 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            className="bg-[#03045e] text-white font-semibold py-2 px-3 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
           >
             Search
           </button>
         </form>
 
         {notFound && (
-          <p className="text-red-400 text-sm mb-4">
-            No user found with that email.
+          <p className="text-red-400 text-sm sm:text-base mb-4 text-center">
+            No user found with that email or name.
           </p>
         )}
 
         {user && (
-          <div className="flex items-center justify-between bg-gray-700 p-4 rounded-lg">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between bg-gray-700 p-4 sm:p-5 rounded-lg gap-3 sm:gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               {user?.photoUrl ? (
                 <img
                   src={user?.photoUrl}
                   alt={user?.fullName}
-                  className="w-12 h-12 rounded-full object-cover"
+                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center text-white font-medium">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gray-600 flex items-center justify-center text-white font-medium text-lg">
                   {user?.fullName?.charAt(0).toUpperCase() || "U"}
                 </div>
               )}
-              <span className="text-white font-medium">
+              <span className="text-white font-medium text-sm sm:text-base">
                 {getDisplayName(user)}
               </span>
             </div>
             <button
-              title={`Add ${getDisplayName(user) || " "} to your chat list`}
+              title={`Add ${getDisplayName(user)} to your chat list`}
               onClick={handleAdd}
-              className="bg-[#03045e] text-white font-semibold py-2 px-3 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+              className="bg-[#03045e] text-white font-semibold py-2 px-4 sm:px-5 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out"
             >
               Add User
             </button>
-
           </div>
         )}
       </div>

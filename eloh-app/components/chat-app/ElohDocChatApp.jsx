@@ -1,6 +1,5 @@
 "use client";
 
-import { FiX, FiArrowLeft } from "react-icons/fi";
 import { useUserStore } from "@/hooks/useUserStore";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
@@ -32,9 +31,10 @@ const ElohDocChatApp = ({ setOpenChat, role }) => {
   if (isLoading || !currentUser) {
     return (
       <div className="w-full max-w-5xl h-auto min-h-[60vh] md:min-h-[70vh] lg:min-h-[80vh] flex items-center justify-center bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 p-4 sm:p-6">
-        <Loading message="Loading chat... Please wait." />
+        <div className="flex justify-start mr-50 w-full h-full">
+          <Loading message="Loading chat... Please wait." />
+        </div>
       </div>
-
     );
   }
 
