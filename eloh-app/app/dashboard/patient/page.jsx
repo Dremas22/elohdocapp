@@ -154,7 +154,7 @@ const PatientDashboard = () => {
   }
 
   return (
-    <div className="h-[150vh] flex flex-col pt-18 relative bg-gray-950 text-white overflow-hidden">
+    <div className="lg:min-h-screen flex flex-col pt-18 relative bg-gray-950 text-white overflow-hidden">
       {/* Fixed Navbar */}
       <PatientDashboardNavbar />
       <SaveStripePayment />
@@ -184,7 +184,7 @@ const PatientDashboard = () => {
         </div>
 
         {/* Main content area */}
-        <main className="w-full flex flex-col flex-grow min-h-0 overflow-hidden">
+        <main className="w-full h-full flex flex-col flex-grow min-h-0 overflow-hidden">
           <div className="flex flex-col items-center pr-10 justify-start flex-grow overflow-hidden">
             <PatientMeetingSetup
               mode={mode}
@@ -196,14 +196,6 @@ const PatientDashboard = () => {
         </main>
       </div>
 
-      {/* Floating Chat Modal */}
-      {showChat && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
-          <div className="w-full max-w-2xl mx-auto p-4">
-            <Chat setShowChat={setShowChat} />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
