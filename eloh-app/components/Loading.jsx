@@ -10,7 +10,7 @@
  */
 const Loading = ({ message = "Loading your meeting room..." }) => {
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-100 text-gray-800 w-[80vw]">
+    <div className="flex h-full items-center justify-center bg-[rgba(13, 20, 32, 0.75)] text-gray-100 w-[80vw]">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 mx-auto mb-4" />
         <p className="text-lg font-semibold">{message}</p>
