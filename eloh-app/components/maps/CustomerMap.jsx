@@ -8,9 +8,17 @@ import {
 } from "@/helpers";
 import { toastError, toastInfo } from "@/helpers/toastHelper";
 import { createCustomerMarker } from "@/lib/ambulance-actions/createCustomerMarker";
-import { collection, getDocs, orderBy, query, limit } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  orderBy,
+  query,
+  limit,
+  onSnapshot,
+  where,
+} from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
-import { auth } from "@/db/client";
+import { auth, db } from "@/db/client";
 import { FaLocationDot } from "react-icons/fa6";
 import { FiMapPin } from "react-icons/fi";
 import PayAmbulance from "../ambulance/PayAmbulance";
@@ -34,15 +42,6 @@ export default function CustomerMap({ userDoc }) {
   const [destMarker, setDestMarker] = useState(null);
   const [locationLoading, setLocationLoading] = useState(true);
   const [showPay, setShowPay] = useState(false);
-
-  useEffect(() => {
-    if (showPay && paySectionRef.current) {
-      paySectionRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  }, [showPay]);
 
   useEffect(() => {
     if (showPay && paySectionRef.current) {
@@ -207,7 +206,6 @@ export default function CustomerMap({ userDoc }) {
     const fallback = { lat: -33.9249, lng: 18.4241 }; // Cape Town fallback
 
     const init = async () => {
-
       setLocationLoading(true);
       try {
         // 1. Init map immediately
@@ -243,12 +241,44 @@ export default function CustomerMap({ userDoc }) {
         console.error("Error during initialization:", error);
       } finally {
         setLocationLoading(false);
-
       }
     };
 
     init();
   }, []);
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const tripsRef = collection(db, "trips");
+    const q = query(
+      tripsRef,
+      where("customerId", "==", user.uid),
+      orderBy("createdAt", "desc"),
+      limit(1)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (snapshot.empty) return;
+      const trip = snapshot.docs[0].data();
+      console.log(trip, "TRIP");
+      if (trip.isPaid && trip.origin && trip.destination) {
+        // 👇 Recreate the route if trip is already paid
+        createRoute(trip.origin, trip.destination, map);
+        setFareDetails({
+          origin: trip.origin,
+          destination: trip.destination,
+          distance: trip.distance,
+          duration: trip.duration,
+          fare: trip.fare,
+        });
+        setRouteReady(true);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [map]); // runs once map is ready
 
   const handleCreateRoute = () => {
     if (!pickupPlace && !currentLocation)
@@ -499,12 +529,12 @@ export default function CustomerMap({ userDoc }) {
             title="Create route"
             onClick={handleCreateRoute}
             disabled={locationLoading}
-            className={`flex-1 ${locationLoading
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-[#03045e] hover:bg-[#023e8a]"
-              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer`}
+            className={`flex-1 ${
+              locationLoading
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-[#03045e] hover:bg-[#023e8a]"
+            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer`}
           >
-
             Create Route
           </button>
 
@@ -533,7 +563,6 @@ export default function CustomerMap({ userDoc }) {
 
         {/* Trip summary (distance/fare) */}
         {calculatingTrip && (
-
           <div className="mt-4 flex items-center justify-center gap-2 p-2 bg-blue-400 text-blue-800 rounded-md border border-blue-300 text-sm font-medium animate-pulse">
             {/* Spinner */}
             <svg
@@ -558,8 +587,6 @@ export default function CustomerMap({ userDoc }) {
             </svg>
             <span>Calculating trip...</span>
           </div>
-
-
         )}
         {fareDetails && (
           <div className="mt-4 bg-gray-50 text-black p-4 rounded border">
@@ -586,10 +613,11 @@ export default function CustomerMap({ userDoc }) {
             title="Request ambulance now"
             onClick={() => setShowPay(true)}
             disabled={!routeReady}
-            className={`w-full ${routeReady
-              ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
-              : "bg-gray-300 cursor-not-allowed"
-              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
+            className={`w-full ${
+              routeReady
+                ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
+                : "bg-gray-300 cursor-not-allowed"
+            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
           >
             Request Ambulance
           </button>

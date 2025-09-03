@@ -78,6 +78,7 @@ const PayOptions = () => {
             priceId,
             customerEmail: currentUser?.email,
             role: "patient",
+            userId: currentUser?.uid,
           }),
         }
       );

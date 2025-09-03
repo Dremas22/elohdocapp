@@ -9,10 +9,12 @@ import {
   limit,
   doc,
   updateDoc,
+  getDoc,
+  setDoc,
 } from "firebase/firestore";
 import { auth, db, messagingPromise } from "@/db/client";
 import { createAmbulanceMarker } from "@/lib/ambulance-actions/createAmbulanceMarker";
-import { toastError, toastInfo } from "@/helpers/toastHelper";
+import { toastError, toastInfo, toastSuccess } from "@/helpers/toastHelper";
 import {
   deleteDriverRoute,
   findNearestAvailableDriver,
@@ -23,6 +25,7 @@ import AmbulanceDriverDashboardNavbar from "@/app/dashboard/driver/driverNav";
 import DriverSidebarMenu from "@/app/dashboard/driver/driverSidebar";
 import ActiveRequest from "../driver/ActiveRequest";
 import AmbulanceRequest from "../driver/AmbulanceRequest";
+import sendArrivalCodeEmail from "@/lib/sendCode";
 
 const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const mapRef = useRef(null);
@@ -33,6 +36,9 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const [ambulanceRequest, setAmbulanceRequest] = useState(null);
   const [excludedDrivers, setExcludedDrivers] = useState([]);
   const [activeRequest, setActiveRequest] = useState(null);
+  const [arrivalCode, setArrivalCode] = useState(null);
+  const [showCodeInput, setShowCodeInput] = useState(false);
+  const [enteredCode, setEnteredCode] = useState("");
 
   useEffect(() => {
     let unsubscribe = () => {};
@@ -53,6 +59,8 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
             pickupLat: parseFloat(payload.data.pickupLat || "0"),
             pickupLng: parseFloat(payload.data.pickupLng || "0"),
             type: payload.data.type,
+            customerId: payload.data.customerId,
+            customerEmail: payload.data.customerEmail,
           };
           setAmbulanceRequest(requestData);
         }
@@ -141,6 +149,31 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     };
 
     await saveDriverRoute(user.uid, { origin, destination });
+    // Create / update trip in Firestore
+    try {
+      const tripRef = doc(db, "trips", request.customerId); // Using customerId as doc ID
+      await updateDoc(tripRef, {
+        driverId: user.uid,
+        status: "accepted",
+        origin,
+        destination,
+        acceptedAt: new Date(),
+      }).catch(async (err) => {
+        // If doc does not exist, create it
+        await setDoc(tripRef, {
+          driverId: user.uid,
+          customerId: request.customerId,
+          status: "accepted",
+          origin,
+          destination,
+          createdAt: new Date(),
+          acceptedAt: new Date(),
+        });
+      });
+    } catch (err) {
+      console.error("Failed to create/update trip doc:", err);
+      toastError("Failed to save trip info");
+    }
 
     const directionsService = new window.google.maps.DirectionsService();
     directionsService.route(
@@ -155,8 +188,8 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
       }
     );
 
-    setActiveRequest(request); // ✅ Keep request visible after acceptance
-    setAmbulanceRequest(null); // remove the popup
+    setActiveRequest({ ...request, driverId: user.uid }); // Keep request visible
+    setAmbulanceRequest(null); // Remove popup
   };
 
   const handleCancelRoute = async () => {
@@ -179,6 +212,37 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     } catch (err) {
       console.error(err);
       toastError("Error cancelling the route");
+    }
+  };
+
+  const handleTripEnded = async () => {
+    const user = auth.currentUser;
+    if (!activeRequest || !user) return;
+
+    try {
+      const tripId = activeRequest?.customerId;
+      const code = await sendArrivalCodeEmail(
+        activeRequest,
+        activeRequest?.customerEmail
+      );
+
+      setArrivalCode(code);
+      setShowCodeInput(true);
+
+      // Update Firestore with arrival code
+      const tripRef = doc(db, "trips", tripId);
+      await updateDoc(tripRef, {
+        arrivalCode: code,
+        status: "driver_arrived",
+        arrivedAt: new Date(),
+        isPaid: true,
+      });
+
+      // TODO: Send code to customer via push/email
+      toastSuccess(`Code sent to customer email`);
+    } catch (err) {
+      console.error("Failed to send arrival code:", err.message);
+      toastError("Failed to notify customer.");
     }
   };
 
@@ -237,6 +301,34 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     setAmbulanceRequest(null);
   };
 
+  const handleCodeVerification = async () => {
+    try {
+      const tripId = activeRequest?.customerId;
+      const tripRef = doc(db, "trips", tripId);
+      const tripSnap = await getDoc(tripRef);
+      const data = tripSnap.data();
+
+      if (!tripSnap.exists() || !data) throw new Error("Trip not found");
+
+      if (enteredCode === data.arrivalCode) {
+        await updateDoc(tripRef, {
+          status: "completed",
+          arrivalCode: null,
+          isPaid: false,
+          updatedAt: new Date(),
+        });
+        toastSuccess("Trip successfully completed!");
+        setActiveRequest(null);
+        setShowCodeInput(false);
+      } else {
+        toastError("Incorrect code. Please try again.");
+      }
+    } catch (err) {
+      console.error("Verification failed:", err.message);
+      toastError("Failed to verify code.");
+    }
+  };
+
   return (
     <div className="flex w-full h-full bg-gray-100 relative">
       {/* Sidebar */}
@@ -280,7 +372,29 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
             <ActiveRequest
               activeRequest={activeRequest}
               handleCancelRoute={handleCancelRoute}
+              onTripEnded={handleTripEnded}
             />
+          )}
+
+          {showCodeInput && (
+            <div className="fixed bottom-24 right-5 z-50 bg-white p-4 rounded-xl shadow-lg flex flex-col gap-2 w-64">
+              <label className="text-sm font-medium text-gray-700">
+                Enter arrival code from customer:
+              </label>
+              <input
+                type="text"
+                value={enteredCode}
+                onChange={(e) => setEnteredCode(e.target.value)}
+                className="border p-2 rounded text-sm text-gray-700"
+                placeholder="6-digit code"
+              />
+              <button
+                onClick={async () => await handleCodeVerification()}
+                className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded shadow text-sm font-semibold"
+              >
+                Verify Code
+              </button>
+            </div>
           )}
         </div>
       </div>

@@ -8,11 +8,20 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { priceId, customerEmail, type, role } = body;
+    const {
+      priceId,
+      customerEmail,
+      type,
+      role,
+      userId,
+      fare,
+      hospital,
+      pickupLocation,
+    } = body;
 
-    if (!customerEmail) {
+    if (!customerEmail || !userId) {
       return NextResponse.json(
-        { error: "Missing customer email" },
+        { error: "Missing customer email or userId" },
         { status: 400 }
       );
     }
@@ -20,7 +29,7 @@ export async function POST(req) {
     let line_items = [];
 
     if (priceId) {
-      // 🔹 Mode 1: Existing flow using a saved Stripe priceId
+      // 🔹 Mode 1: Checkout using a saved Stripe priceId
       line_items = [
         {
           price: priceId,
@@ -29,8 +38,6 @@ export async function POST(req) {
       ];
     } else if (type === "ambulance_request") {
       // 🔹 Mode 2: Dynamic ambulance payment
-      const { fare, hospital, pickupLocation, role } = body;
-
       if (!fare || !hospital || !pickupLocation || !role) {
         return NextResponse.json(
           { error: "Missing ambulance trip details" },
@@ -48,7 +55,7 @@ export async function POST(req) {
               }`,
               description: `Pickup: ${pickupLocation?.address || "Unknown"}`,
             },
-            unit_amount: Math.round(fare * 100), // Stripe needs cents
+            unit_amount: Math.round(fare * 100), // Stripe expects cents
           },
           quantity: 1,
         },
@@ -71,6 +78,11 @@ export async function POST(req) {
         type || "default"
       }`,
       cancel_url: `${process.env.NEXT_PUBLIC_URL}`,
+      metadata: {
+        tripId: userId, // 👈 tripId is the same as userId
+        type: type || "default",
+        role: role || "customer",
+      },
     });
 
     return NextResponse.json({ id: session.id });
