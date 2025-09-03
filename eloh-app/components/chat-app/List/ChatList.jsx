@@ -4,7 +4,7 @@ import { db } from "@/db/client";
 import { useChatStore } from "@/hooks/useChatStore";
 import { useUserStore } from "@/hooks/useUserStore";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
-import { FiMinus, FiPlus, FiSearch, FiX } from "react-icons/fi";
+import { FiMinus, FiPlus, FiSearch } from "react-icons/fi";
 import AddUser from "./AddUser";
 import { useEffect, useMemo, useState } from "react";
 import { getDisplayName } from "@/lib/getDisplayName";
@@ -135,10 +135,6 @@ const ChatList = ({ role }) => {
     }
   };
 
-  // Close chat function
-  const handleCloseChat = () => {
-    changeChat(null, null); // Clear current chat
-  };
 
   // Get user category IDs
   const getUserCategoryIds = (user) => {
@@ -195,16 +191,6 @@ const ChatList = ({ role }) => {
           {addMode ? <FiMinus className="w-4 h-4 sm:w-5 sm:h-5" /> : <FiPlus className="w-4 h-4 sm:w-5 sm:h-5" />}
         </div>
 
-        {/* Close Chat Button - only for driver & customer */}
-        {(currentUser?.role === "driver" || currentUser?.role === "customer") && currentChatId && (
-          <div
-            className="ml-auto w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-red-600 rounded-lg cursor-pointer hover:bg-red-500 transition-colors mt-2 sm:mt-0"
-            title="Close Chat"
-            onClick={handleCloseChat}
-          >
-            <FiX className="w-4 h-4 sm:w-5 sm:h-5" />
-          </div>
-        )}
       </div>
 
       {/* Category Filter For Patients */}

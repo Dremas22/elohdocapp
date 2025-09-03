@@ -1,36 +1,25 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useUserStore } from "@/hooks/useUserStore";
 import { getDisplayName } from "@/lib/getDisplayName";
-import { FiMoreVertical } from "react-icons/fi";
+import { FiX } from "react-icons/fi";
 import PatientProfileModal from "@/components/patients/PatientProfileModal";
+import { useChatStore } from "@/hooks/useChatStore";
 
 const UserInfo = () => {
   const { currentUser } = useUserStore();
+  const { chatId, setChatId } = useChatStore(); // Access chat store
   const fullName = getDisplayName(currentUser);
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-  const dropdownRef = useRef(null);
 
   const handleSave = (updatedData) => {
     console.log("Save profile data:", updatedData);
     setIsEditModalOpen(false);
   };
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  const handleCloseChat = () => {
+    setChatId(null); // Close the current chat
+  };
 
   return (
     <div className="relative flex items-center justify-between -mt-6 p-5">
@@ -44,33 +33,19 @@ const UserInfo = () => {
         <h2 className="hidden sm:block text-lg font-semibold">{fullName}</h2>
       </div>
 
-      {/* Icons */}
-      <div className="pr-13 flex lg:gap-5 gap-4 text-gray-600">
-        {/* More Options */}
-        <div className="relative" ref={dropdownRef}>
-          <FiMoreVertical
-            title="More"
-            className="w-5 h-5 cursor-pointer hover:text-gray-700 transition-colors"
-            onClick={() => setIsMenuOpen((prev) => !prev)}
+      <div className=" flex lg:gap-5 gap-4 red-text">
+
+        {/* Close Button */}
+        <button
+          onClick={handleCloseChat}
+          className="p-2 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center"
+          title="Close chat"
+        >
+          <FiX
+            className="w-5 h-5 text-red-500 hover:text-red-700 transition-colors"
           />
-          {isMenuOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-gray-800 text-white rounded-lg shadow-lg z-50">
-              <ul className="flex flex-col">
-                <li
-                  onClick={() => {
-                    setIsEditModalOpen(true);
-                    setIsMenuOpen(false);
-                  }}
-                  className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
-                >
-                  Settings
-                </li>
+        </button>
 
-
-              </ul>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Render Patient Profile Modal */}
