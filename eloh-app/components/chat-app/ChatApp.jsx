@@ -290,18 +290,20 @@ const ChatApp = () => {
             </div>
 
             {/* Action Icons */}
-            <div className="flex gap-3 md:gap-4 text-2xl md:text-4xl">
-              <a
-                href={`tel:${user?.phoneNumber}`}
-                title={`Call ${user?.displayName || "this user"}`}
-              >
-                <IoCall className="cursor-pointer text-gray-400 hover:text-white lg:text-3xl md:text-3xl text-sm" />
-              </a>
+            <div className="flex gap-3 md:gap-4 text-4xl md:text-4xl">
               <IoVideocam
-                className="cursor-pointer hover:text-white text-[#03045e] lg:text-3xl md:text-3xl text-sm"
-                title={`Join a video call with ${user?.displayName || "this user"}`}
+                className="cursor-pointer hover:text-white text-[#03045e] lg:text-5xl md:text-3xl text-3xl"
+                title={`Start a video consultation with ${getDisplayName(user)}`}
                 onClick={handleMakeCall}
               />
+
+              <a
+                className="lg:pt-2 pt-1"
+                href={`tel:${user?.phoneNumber}`}
+                title={`Click to join a call with ${getDisplayName(user)}`}
+              >
+                <IoCall className="cursor-pointer text-gray-400 hover:text-white lg:text-3xl md:text-3xl text-xl" />
+              </a>
             </div>
           </div>
         </div>

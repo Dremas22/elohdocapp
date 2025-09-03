@@ -31,7 +31,7 @@ const ElohDocChatApp = ({ setOpenChat, role }) => {
   if (isLoading || !currentUser) {
     return (
       <div className="w-full max-w-5xl h-auto min-h-[60vh] md:min-h-[70vh] lg:min-h-[80vh] flex items-center justify-center bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 p-4 sm:p-6">
-        <div className="flex justify-start mr-50 w-full h-full">
+        <div className="bg-flex justify-start lg:mr-50 w-full h-full">
           <Loading message="Loading chat... Please wait." />
         </div>
       </div>
@@ -39,9 +39,9 @@ const ElohDocChatApp = ({ setOpenChat, role }) => {
   }
 
   return (
-    <div className="w-full h-full max-h-full bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 flex pt-7 overflow-hidden relative">
+    <div className="lg:w-[160vh] lg:-ml-50 justify-start w-full h-full max-h-full bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 flex pt-7 overflow-visible relative">
 
-      {/* Desktop (unchanged) */}
+      {/* Desktop Layout */}
       {!isMobileView ? (
         <>
           <List />
@@ -52,10 +52,8 @@ const ElohDocChatApp = ({ setOpenChat, role }) => {
         // Mobile/Tablet flow
         <>
           {!chatId ? (
-            // Show only list
             <List />
           ) : (
-            // Show chat full screen with back button
             <div className="flex flex-col w-full h-full relative">
               <ChatApp role={role} />
             </div>

@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiChevronUp, FiChevronDown, FiPhone } from "react-icons/fi";
-import { FaPills, FaFirstAid } from "react-icons/fa";
+import { FiChevronUp, FiChevronDown, FiPhone, FiMessageCircle } from "react-icons/fi";
+import { FaFirstAid } from "react-icons/fa";
 import { messagingPromise } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
 import { useRouter } from "next/navigation";
+import ElohDocChatApp from "@/components/chat-app/ElohDocChatApp";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
@@ -76,6 +77,7 @@ const CustomerSidebarMenu = ({
   const [profileLoading, setProfileLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -136,9 +138,9 @@ const CustomerSidebarMenu = ({
       showTitle: true,
     },
     {
-      title: "Medication",
-      icon: <FaPills className="h-6 w-6" />,
-      onClick: () => alert("Medication Clicked"),
+      title: "Chat",
+      icon: <FiMessageCircle className="h-6 w-6" />,
+      onClick: () => setShowChat(true), // opens ElohDocChatApp modal
       showTitle: true,
     },
   ];
@@ -161,6 +163,15 @@ const CustomerSidebarMenu = ({
           onClose={() => setProfileOpen(false)}
           loading={profileLoading}
         />
+      )}
+
+      {/* Chat Modal */}
+      {showChat && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+          <div className="w-full max-w-2xl mx-auto p-4">
+            <ElohDocChatApp setShowChat={setShowChat} />
+          </div>
+        </div>
       )}
 
       {/* Desktop Sidebar */}
@@ -201,6 +212,7 @@ const CustomerSidebarMenu = ({
         </button>
       </div>
 
+      {/* Mobile Sidebar */}
       <div
         className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[20vh] px-8 py-6 overflow-auto
           bg-gray-900/20 backdrop-blur-md flex flex-col md:pl-29 sm:pr-29 md:px-29 sm:px-29 items-center gap-5
