@@ -22,7 +22,7 @@ const Video = () => {
                    h-[50%] xs:h-[110%] sm:h-[112%]
                    object-cover
                    translate-y-[-8%] xs:translate-y-[-8%] sm:translate-y-[-5%]"
-        src="/videos/elohdocvid.mp4"
+        src="/videos/elohdocvid2.mp4"
         autoPlay
         loop
         muted

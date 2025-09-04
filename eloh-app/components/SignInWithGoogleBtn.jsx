@@ -33,7 +33,7 @@ const GoogleSignInButton = () => {
       const user = result?.user;
       const token = await user?.getIdToken(true);
 
-      // 🟢 Now safely get FCM token
+      // Now safely get FCM token
       const fcmToken = await getFCMToken();
 
       await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
@@ -62,7 +62,7 @@ const GoogleSignInButton = () => {
   };
 
   return (
-    <div className="fixed inset-0 w-screen h-screen overflow-hidden bg-gradient-to-br from-[#dbeafe] via-white to-[#caf0f8]">
+    <div className=" lg:fixed inset-0 w-screen h-screen -pl-3 overflow-x-hidden bg-gradient-to-br from-[#dbeafe] via-white to-[#caf0f8]">
       {/* Animated glowing blobs */}
       <div
         title="Decorative background"
@@ -89,7 +89,7 @@ const GoogleSignInButton = () => {
           className="text-3xl md:text-4xl font-bold text-[#03045e] mb-1 lg:mb-6"
           title={`Sign in as a ${capitalizedRole}`}
         >
-          {capitalizedRole} Sign-In
+          {capitalizedRole}
         </h2>
 
         <p

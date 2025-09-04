@@ -10,7 +10,7 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
-import { auth, db, messaging } from "@/db/client";
+import { auth, db, messagingPromise } from "@/db/client";
 import { createAmbulanceMarker } from "@/lib/ambulance-actions/createAmbulanceMarker";
 import { toastError, toastInfo } from "@/helpers/toastHelper";
 import {
@@ -35,23 +35,34 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const [activeRequest, setActiveRequest] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onMessage(messaging, (payload) => {
-      if (payload?.data?.type === "ambulance_request") {
-        const requestData = {
-          customerName: payload.data.customerName || "",
-          pickupAddress: payload.data.pickupAddress || "Unknown",
-          fare: parseFloat(payload.data.fare || "0"),
-          distance: payload.data.distance || "0",
-          duration: payload.data.duration || "0",
-          pickupLat: parseFloat(payload.data.pickupLat || "0"),
-          pickupLng: parseFloat(payload.data.pickupLng || "0"),
-          type: payload.data.type,
-        };
-        setAmbulanceRequest(requestData);
-      }
-    });
+    let unsubscribe = () => { };
 
-    return () => unsubscribe();
+    const setupMessaging = async () => {
+      const messaging = await messagingPromise;
+
+      if (!messaging) return;
+
+      unsubscribe = onMessage(messaging, (payload) => {
+        if (payload?.data?.type === "ambulance_request") {
+          const requestData = {
+            customerName: payload.data.customerName || "",
+            pickupAddress: payload.data.pickupAddress || "Unknown",
+            fare: parseFloat(payload.data.fare || "0"),
+            distance: payload.data.distance || "0",
+            duration: payload.data.duration || "0",
+            pickupLat: parseFloat(payload.data.pickupLat || "0"),
+            pickupLng: parseFloat(payload.data.pickupLng || "0"),
+            type: payload.data.type,
+          };
+          setAmbulanceRequest(requestData);
+        }
+      });
+    };
+
+    setupMessaging();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -228,6 +239,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
   return (
     <div className="flex w-full h-full bg-gray-100 relative">
+
       {/* Sidebar */}
       <DriverSidebarMenu
         userDoc={userDoc}
@@ -241,7 +253,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
         {/* Push content below fixed navbar */}
         <div className="w-full flex flex-col items-center mt-5 p-4">
-          <div className="lg:w-[60%] w-[90%] bg-white rounded-2xl shadow-md lg:ml-60 p-6 mb-4">
+          <div className="lg:w-[15%] w-[65%] bg-white rounded-2xl shadow-md lg:ml-60 p-6 mb-4">
             <div className="flex space-x-4">
               <button
                 onClick={handleCancelRoute}
@@ -252,11 +264,13 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
             </div>
           </div>
 
+          {/* Map */}
           <div
             ref={mapRef}
-            className=" lg:ml-80 lg:w-[80%] w-[110%] lg:h-[550px] h-[510px] rounded-lg overflow-hidden"
+            className="w-full max-w-6xl lg:ml-75 sm:ml-15 h-[480px] rounded-lg shadow-lg overflow-hidden"
           />
 
+          {/* Ambulance Requests */}
           {ambulanceRequest && (
             <AmbulanceRequest
               ambulanceRequest={ambulanceRequest}

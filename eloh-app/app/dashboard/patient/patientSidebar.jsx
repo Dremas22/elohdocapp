@@ -6,14 +6,17 @@ import {
   FiFile,
   FiChevronUp,
   FiChevronDown,
+  FiCalendar,
+  FiBell,
 } from "react-icons/fi";
 import { FaFilePrescription, FaMoneyCheckAlt } from "react-icons/fa";
 import { CiMedicalClipboard } from "react-icons/ci";
-import { messaging } from "@/db/client";
 import { onMessage } from "firebase/messaging";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
 import { useRouter } from "next/navigation";
+import { messagingPromise } from "@/db/client";
+import Appointments from "@/components/Appointments";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
@@ -80,19 +83,31 @@ const PatientSidebarMenu = ({
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [showPayButton, setShowPayButton] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [appointmentOpen, setAppointmentOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onMessage(messaging, (payload) => {
-      setNotificationPayload(payload);
-      setHasNotification(true);
-      setNotificationCount((prev) => prev + 1);
-    });
+    let unsubscribe = () => { };
 
-    return () => unsubscribe();
+    const setupMessaging = async () => {
+      const messaging = await messagingPromise;
+      if (!messaging) return;
+
+      unsubscribe = onMessage(messaging, (payload) => {
+        setNotificationPayload(payload);
+        setHasNotification(true);
+        setNotificationCount((prev) => prev + 1);
+      });
+    };
+
+    setupMessaging();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const handleProfileSave = async (updatedData) => {
@@ -150,16 +165,24 @@ const PatientSidebarMenu = ({
         if (setMode) setMode("sick-notes");
         if (setNoteOpen) setNoteOpen((prev) => !prev);
       },
-      customClass: compact ? "ml-[50px]" : "sm:ml-[0px]",
+      showTitle: true,
+    },
+    {
+      title: "Appointments",
+      icon: <FiBell className="h-6 w-6" />,
+      onClick: () => {
+        if (setMode) setMode("appointments");
+        if (setAppointmentOpen) setAppointmentOpen((prev) => !prev);
+      },
       showTitle: true,
     },
     {
       title: "Payments",
       icon: <FaMoneyCheckAlt className="h-6 w-6" />,
       onClick: () => router.push("/payment"),
-      customClass: compact ? "ml-[50px]" : "sm:ml-[0px]",
       showTitle: true,
     },
+
   ];
 
   return (
@@ -182,9 +205,11 @@ const PatientSidebarMenu = ({
         />
       )}
 
+      {appointmentOpen && <Appointments onClose={setAppointmentOpen} />}
+
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-25 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-22 px-4 w-64 h-[calc(110vh-5rem)] fixed top-1 left-0
           ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
         `}
       >
@@ -220,13 +245,15 @@ const PatientSidebarMenu = ({
         </button>
       </div>
 
-
       {/* Slide-up Mobile Sidebar */}
       <div
         className={`lg:hidden fixed bottom-0 right-0 left-0 z-40
           sm:h-[38vh] h-[26vh] px-4 py-3 overflow-auto backdrop-blur-md flex flex-col items-center gap-7
           transition-transform duration-500 ease-in-out bg-gray-900/20
-          ${mobileSidebarOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"}
+          ${mobileSidebarOpen
+            ? "translate-y-0 opacity-100"
+            : "translate-y-full opacity-0 pointer-events-none"
+          }
         `}
       >
         <ActionButtons

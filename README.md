@@ -1,17 +1,19 @@
 # 🏥 Eloh Doc App
 
-Eloh Doc is a modern full-stack healthcare platform built for **Doctors**, **Nurses**, and **Patients**. It provides a secure, cloud-based environment for virtual consultations, medical record management, and real-time collaboration between medical staff and patients.
+Eloh Doc is a modern full-stack healthcare platform built for **Doctors**, **Nurses**, **Patients**, **Ambulance Drivers**, and **Customers**. It provides a secure, cloud-based environment for virtual consultations, medical record management, and real-time collaboration between medical staff, patients, and support staff.
 
 ---
 
 ## 🩺 About Eloh Doc
 
-Eloh Doc empowers healthcare delivery through telemedicine and digital workflows. It supports video consultations, secure messaging, medical data access, and payment handling — all accessible via a web browser.
+Eloh Doc empowers healthcare delivery through telemedicine and digital workflows. It supports video consultations, secure messaging, medical data access, e-hailing services, and payment handling — all accessible via a web browser.
 
 The platform is optimized for:
 - Doctors conducting virtual appointments and tracking earnings
 - Nurses accessing patient records (with verified access)
 - Patients scheduling consultations and reviewing their history
+- Ambulance drivers managing transport requests and real-time locations
+- Customers booking ambulance rides and receiving status updates
 
 ---
 
@@ -33,7 +35,16 @@ The platform is optimized for:
 - Securely pay for services using **Stripe**
 - Access health records, chat with providers, and receive updates
 
----
+### 🚑 Ambulance Drivers
+- Receive and accept transport requests in real-time
+- Track locations and manage trips via integrated maps
+- Communicate with customers for better service
+
+### 🧍 Customers
+- Book ambulance rides quickly and securely
+- Track the status of their requests in real-time
+- Receive notifications about driver arrival and trip updates
+
 
 ## 🔒 Authentication & Security
 
@@ -77,18 +88,12 @@ Eloh Doc uses [LiveKit](https://livekit.io/) for secure, high-quality video/audi
 
 ## 📁 File Structure
 
-# File Tree: eloh-app
-
 ```
 ├── 📁 .next/ 🚫 (auto-hidden)
 ├── 📁 app/
 │   ├── 📁 about/
 │   │   └── 📄 page.jsx
 │   ├── 📁 ambulance/
-│   │   ├── 📁 customers/
-│   │   │   └── 📄 page.jsx
-│   │   ├── 📁 drivers/
-│   │   │   └── 📄 page.jsx
 │   │   └── 📄 page.jsx
 │   ├── 📁 api/
 │   │   ├── 📁 ambulance/
@@ -143,6 +148,8 @@ Eloh Doc uses [LiveKit](https://livekit.io/) for secure, high-quality video/audi
 │   │   └── 📄 page.jsx
 │   ├── 📁 dashboard/
 │   │   ├── 📁 customer/
+│   │   │   ├── 📄 CustomerDashboardNavbar.jsx
+│   │   │   ├── 📄 CustomerSidebar.jsx
 │   │   │   └── 📄 page.jsx
 │   │   ├── 📁 doctor/
 │   │   │   ├── 📄 DoctorsCollectionViewer.jsx
@@ -153,6 +160,9 @@ Eloh Doc uses [LiveKit](https://livekit.io/) for secure, high-quality video/audi
 │   │   │   ├── 📄 doctorToggleBtn.jsx
 │   │   │   └── 📄 page.jsx
 │   │   ├── 📁 driver/
+│   │   │   ├── 📄 DriverCollectionViewer.jsx
+│   │   │   ├── 📄 driverNav.jsx
+│   │   │   ├── 📄 driverSidebar.jsx
 │   │   │   └── 📄 page.jsx
 │   │   ├── 📁 nurse/
 │   │   │   ├── 📄 NurseCollectionViewer.jsx
@@ -191,11 +201,25 @@ Eloh Doc uses [LiveKit](https://livekit.io/) for secure, high-quality video/audi
 │   │   ├── 📁 drivers/
 │   │   │   └── 📄 DriversRegistrationForm.jsx
 │   │   ├── 📄 AmbulanceLandingPage.jsx
+│   │   ├── 📄 DriverAvailabilityButton.jsx
 │   │   └── 📄 PayAmbulance.jsx
+│   ├── 📁 chat-app/
+│   │   ├── 📁 List/
+│   │   │   ├── 📄 AddUser.jsx
+│   │   │   ├── 📄 ChatList.jsx
+│   │   │   ├── 📄 List.jsx
+│   │   │   └── 📄 UserInfo.jsx
+│   │   ├── 📄 ChatApp.jsx
+│   │   ├── 📄 ChatMessage.jsx
+│   │   ├── 📄 Detail.jsx
+│   │   └── 📄 ElohDocChatApp.jsx
 │   ├── 📁 doctors/
 │   │   ├── 📄 DoctorsRegistrationForm.jsx
 │   │   ├── 📄 SearchBar.jsx
 │   │   └── 📄 viewPatientsRecords.jsx
+│   ├── 📁 driver/
+│   │   ├── 📄 ActiveRequest.jsx
+│   │   └── 📄 AmbulanceRequest.jsx
 │   ├── 📁 editor/
 │   │   ├── 📄 DownloadButton.jsx
 │   │   ├── 📄 MeetingRoomNavbar.jsx
@@ -242,6 +266,7 @@ Eloh Doc uses [LiveKit](https://livekit.io/) for secure, high-quality video/audi
 │   ├── 📄 LandingPage.jsx
 │   ├── 📄 LanguageSelector.jsx
 │   ├── 📄 Loading.jsx
+│   ├── 📄 MessageBanner.jsx
 │   ├── 📄 NotificationModal.jsx
 │   ├── 📄 ProfileModal.jsx
 │   ├── 📄 SaveStripePayment.js
@@ -261,19 +286,24 @@ Eloh Doc uses [LiveKit](https://livekit.io/) for secure, high-quality video/audi
 │   ├── 📄 index.js
 │   └── 📄 toastHelper.js
 ├── 📁 hooks/
+│   ├── 📄 useChatStore.js
 │   ├── 📄 useCurrentUser.js
-│   └── 📄 useSaveMedicalHistory.js
+│   ├── 📄 useSaveMedicalHistory.js
+│   └── 📄 useUserStore.js
 ├── 📁 lib/
 │   ├── 📁 ambulance-actions/
 │   │   ├── 📄 createAmbulanceMarker.js
 │   │   └── 📄 createCustomerMarker.js
 │   ├── 📄 convertFirebaseDate.js
 │   ├── 📄 convertOKLCHtoRGB.js
+│   ├── 📄 getDisplayName.js
 │   ├── 📄 getFCMToken.js
+│   ├── 📄 getMessageDate.js
 │   ├── 📄 postMeetingUpdates.js
 │   ├── 📄 queries.js
 │   ├── 📄 session-signout.js
-│   └── 📄 truncate.js
+│   ├── 📄 truncate.js
+│   └── 📄 uploadFile.js
 ├── 📁 node_modules/ 🚫 (auto-hidden)
 ├── 📁 public/
 │   ├── 📁 images/
@@ -297,7 +327,9 @@ Eloh Doc uses [LiveKit](https://livekit.io/) for secure, high-quality video/audi
 └── 📄 postcss.config.mjs
 ```
 
----
+
+
+```
 
 ### ================================
 ### 🏥 Eloh Doc App Environment Variables (Example Values)
@@ -308,7 +340,7 @@ Eloh Doc uses [LiveKit](https://livekit.io/) for secure, high-quality video/audi
 
 ### 🔗 Frontend Configuration
 
-```
+
 NEXT_PUBLIC_URL=http://localhost:3000
 NEXT_PUBLIC_FIREBASE_API_KEY=example-api-key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=example-auth-domain

@@ -29,7 +29,7 @@ const MeetingRoom = () => {
 
   const isDoctor = doctorId === currentUser?.uid;
   const isPatient = !isDoctor;
-  const room = doctorId;
+  const room = `${doctorId}_${patientId}`;
 
   const [hasJoined, setHasJoined] = useState(false);
   const [meetingClosing, setMeetingClosing] = useState(false);
@@ -55,7 +55,7 @@ const MeetingRoom = () => {
       if (ended && !hasAlreadyHandledEnd.current) {
         hasAlreadyHandledEnd.current = true;
         if (isDoctor) {
-          router.push(`/dashboard/${docSnap.data()?.role || "doctor"}`);
+          router.push(router.push(`/dashboard/${userRole}`));
         } else {
           router.back();
         }
@@ -161,7 +161,7 @@ const MeetingRoom = () => {
       );
 
       if (isDoctor) {
-        router.push(`/dashboard/${userRole}`);
+        router.push(`/dashboard/${staffRole || userRole}`);
       } else {
         router.back();
       }

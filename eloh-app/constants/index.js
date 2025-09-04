@@ -242,3 +242,23 @@ export const STAFF_EARNING_PER_CONSULTATION = CONSULTATION_FEE - PLATFORM_FEE;
  * Useful for session expiry, scheduling, and caching.
  */
 export const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Eloh Doc user collections
+ */
+export const COLLECTIONS = [
+  "customers",
+  "doctors",
+  "patients",
+  "drivers",
+  "nurses",
+];
+
+// Map user role to Firestore collection
+export const ROLE_COLLECTION_MAP = {
+  doctor: "doctors",
+  nurse: "nurses",
+  patient: "patients",
+  driver: "drivers",
+  customer: "customers",
+};

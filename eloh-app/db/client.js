@@ -31,24 +31,61 @@ const db = getFirestore(app);
 const googleAuth = new GoogleAuthProvider();
 const storage = getStorage(app);
 
-// Optional: Analytics
-let analytics;
-if (typeof window !== "undefined") {
-  analyticsSupported().then((supported) => {
-    if (supported) {
-      analytics = getAnalytics(app);
-    }
-  });
-}
+/**
+ * Initializes Firebase Analytics safely and asynchronously.
+ *
+ * @description
+ * This promise-based IIFE ensures that Firebase Analytics is only initialized
+ * in supported environments (i.e., in the browser). It prevents runtime errors
+ * during server-side rendering or in browsers that do not support Analytics.
+ * By returning a promise that resolves to either an Analytics instance or `null`,
+ * it allows the app to safely await this value without crashing.
+ *
+ * @returns {Promise<Analytics|null>} A promise that resolves to the Analytics
+ * instance if supported, otherwise null.
+ */
+const analyticsPromise = (async () => {
+  if (typeof window === "undefined") return null;
+  try {
+    const supported = await analyticsSupported();
+    return supported ? getAnalytics(app) : null;
+  } catch (err) {
+    console.warn("Analytics not supported:", err.message);
+    return null;
+  }
+})();
 
-// Optional: Messaging
-let messaging;
-if (typeof window !== "undefined") {
-  messagingSupported().then((supported) => {
-    if (supported) {
-      messaging = getMessaging(app);
-    }
-  });
-}
+/**
+ * Initializes Firebase Cloud Messaging safely and asynchronously.
+ *
+ * @description
+ * This promise-based IIFE ensures that Firebase Messaging is only initialized
+ * in environments that support it (i.e., browsers with service worker support).
+ * It prevents errors in server-side contexts or unsupported browsers.
+ * By returning a promise that resolves to either a Messaging instance or `null`,
+ * it allows the rest of the app to safely integrate messaging features
+ * like push notifications without risking crashes.
+ *
+ * @returns {Promise<Messaging|null>} A promise that resolves to the Messaging
+ * instance if supported, otherwise null.
+ */
+const messagingPromise = (async () => {
+  if (typeof window === "undefined") return null;
+  try {
+    const supported = await messagingSupported();
+    return supported ? getMessaging(app) : null;
+  } catch (err) {
+    console.warn("Messaging not supported:", err.message);
+    return null;
+  }
+})();
 
-export { app, db, auth, storage, googleAuth, analytics, messaging };
+export {
+  app,
+  db,
+  auth,
+  storage,
+  googleAuth,
+  messagingPromise,
+  analyticsPromise,
+};

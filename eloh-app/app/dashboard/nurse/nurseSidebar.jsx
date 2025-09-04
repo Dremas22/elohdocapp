@@ -10,12 +10,12 @@ import {
 } from "react-icons/fi";
 import { IoCloseCircleSharp } from "react-icons/io5";
 import { onMessage } from "firebase/messaging";
-import { messaging } from "@/db/client";
 import Calendar from "@/components/calendar";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
 import NurseToggleButton from "@/components/nurses/NurseAvailbilityBtn";
 import { useRouter } from "next/navigation";
+import { messagingPromise } from "@/db/client";
 
 /**
  * ActionButtons renders a responsive set of action buttons for both desktop and mobile.
@@ -54,8 +54,9 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
             type="button"
           >
             <span
-              className={`flex items-center justify-center ${isDisabled ? "text-gray-600" : "text-white"
-                }`}
+              className={`flex items-center justify-center ${
+                isDisabled ? "text-gray-600" : "text-white"
+              }`}
             >
               {icon}
             </span>
@@ -114,13 +115,24 @@ const NurseSidebarMenu = ({
    * Listen to Firebase Cloud Messaging for real-time notifications.
    */
   useEffect(() => {
-    const unsubscribe = onMessage(messaging, (payload) => {
-      setNotificationPayload(payload);
-      setHasNotification(true);
-      setNotificationCount((prev) => prev + 1);
-    });
+    let unsubscribe = () => {};
 
-    return () => unsubscribe();
+    const setupMessaging = async () => {
+      const messaging = await messagingPromise;
+      if (!messaging) return;
+
+      unsubscribe = onMessage(messaging, (payload) => {
+        setNotificationPayload(payload);
+        setHasNotification(true);
+        setNotificationCount((prev) => prev + 1);
+      });
+    };
+
+    setupMessaging();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -237,8 +249,9 @@ const NurseSidebarMenu = ({
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"
-          }`}
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 ${
+          !isSidebarOpen ? "-translate-x-full" : "translate-x-0"
+        }`}
       >
         {/* Verification Message */}
         {isVerified === false && (
@@ -309,9 +322,10 @@ const NurseSidebarMenu = ({
         className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 sm:h-[35vh] md:h-[27vh] h-[25vh] px-8 py-6 overflow-auto
           bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-5
           transition-transform duration-500 ease-in-out
-          ${mobileSidebarOpen
-            ? "translate-y-0 opacity-100"
-            : "translate-y-full opacity-0 pointer-events-none"
+          ${
+            mobileSidebarOpen
+              ? "translate-y-0 opacity-100"
+              : "translate-y-full opacity-0 pointer-events-none"
           }`}
       >
         <ActionButtons
@@ -331,8 +345,9 @@ const NurseSidebarMenu = ({
 
       {/* Slide-in Calendar Drawer */}
       <div
-        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
+          calendarOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <button
           title="Close Calendar"
@@ -341,7 +356,7 @@ const NurseSidebarMenu = ({
         >
           <IoCloseCircleSharp />
         </button>
-        <Calendar />
+        <Calendar userDoc={userDoc} />
       </div>
     </>
   );

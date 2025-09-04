@@ -1,6 +1,4 @@
-import { doc, getDoc, updateDoc, increment, setDoc } from "firebase/firestore";
-import { auth, db } from "@/db/client";
-import { PLATFORM_FEE, STAFF_EARNING_PER_CONSULTATION } from "@/constants";
+import { auth } from "@/db/client";
 
 /**
  * Handles end of a meeting:

@@ -3,9 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(req, { params }) {
   try {
-    const context = await params;
-
-    const patientId = context.patientId;
+    const { patientId } = params;
 
     if (!patientId) {
       return NextResponse.json(
@@ -14,6 +12,7 @@ export async function GET(req, { params }) {
       );
     }
 
+    // Fetch patient doc
     const patientRef = db.collection("patients").doc(patientId);
     const patientSnap = await patientRef.get();
 
@@ -23,7 +22,23 @@ export async function GET(req, { params }) {
 
     const patientData = patientSnap.data();
 
-    return NextResponse.json(patientData, { status: 200 });
+    // Fetch appointments subcollection
+    const appointmentsRef = patientRef.collection("appointments");
+    const appointmentsSnap = await appointmentsRef.orderBy("date", "asc").get();
+
+    const appointments = appointmentsSnap.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // Merge into patientData
+    const fullPatientData = {
+      id: patientSnap.id,
+      ...patientData,
+      appointments,
+    };
+
+    return NextResponse.json({ patientData: fullPatientData }, { status: 200 });
   } catch (error) {
     console.error("Error fetching patient:", error);
     return NextResponse.json(

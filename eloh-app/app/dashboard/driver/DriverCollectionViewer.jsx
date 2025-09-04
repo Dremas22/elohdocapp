@@ -5,6 +5,7 @@ import DriverMap from "@/components/maps/DriverMap";
 import Script from "next/script";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useUserStore } from "@/hooks/useUserStore";
 import AmbulanceDriverDashboardNavbar from "./driverNav";
 import DriverSidebarMenu from "./driverSidebar";
 import Earnings from "../doctor/doctorEarnings";
@@ -16,6 +17,7 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
   const [mapsReady, setMapsReady] = useState(false);
   const [showEarnings, setShowEarnings] = useState(false);
   const [userDocState, setUserDoc] = useState(userDoc || {});
+  const { fetchUserInfo } = useUserStore();
 
   useEffect(() => {
     if (!userId) return;
@@ -27,6 +29,8 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
           ...prev,
           ...updatedData,
         }));
+
+        fetchUserInfo(updatedData);
       }
     });
 
@@ -74,7 +78,6 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
 
       <div className="flex flex-col lg:flex-row w-full flex-grow relative">
         {/* Sidebar only shows if verified */}
-
         <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:min-h-[calc(100vh-5rem)] fixed top-20 left-0 z-20">
           <DriverSidebarMenu
             userDoc={userDocState}
@@ -84,7 +87,7 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
         </aside>
 
         {/* Main content */}
-        <main className={`w-full flex flex-col items-center mt-16`}>
+        <main className="w-full flex flex-col items-center mt-16">
           {isVerified === true ? (
             <>
               {mapsReady ? (
@@ -111,13 +114,15 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
                           Earnings
                         </h2>
 
-                        <Earnings role="doctor" data={userDocState} />
+                        <Earnings role="driver" data={userDocState} />
                       </div>
                     </div>
                   )}
                 </div>
               ) : (
-                <Loading message="Loading Map..." />
+                <div className="flex items-center lg:pl-55 justify-center w-full h-[80vh]">
+                  <Loading message={<span className="text-gray-800">Loading Map...</span>} />
+                </div>
               )}
             </>
           ) : isVerified === false ? (
@@ -136,7 +141,8 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
                 Verification Declined
               </h2>
               <p>
-                We could not verify your account. Please ensure your certificate is valid or contact support for help.
+                We could not verify your account. Please ensure your certificate
+                is valid or contact support for help.
               </p>
             </div>
           )}

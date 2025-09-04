@@ -1,27 +1,65 @@
 "use client";
 
-import { FiX } from "react-icons/fi";
+import { useUserStore } from "@/hooks/useUserStore";
+import { useRouter } from "next/navigation";
+import Loading from "@/components/Loading";
+import { useChatStore } from "@/hooks/useChatStore";
+import Detail from "./Detail";
+import List from "./List/List";
+import ChatApp from "./ChatApp";
+import { useState, useEffect } from "react";
 
-const ElohDocChatApp = ({ setOpenChat }) => {
+const ElohDocChatApp = ({ setOpenChat, role }) => {
+  const { currentUser, isLoading } = useUserStore();
+  const { chatId, setChatId } = useChatStore();
+  const router = useRouter();
+  const [isMobileView, setIsMobileView] = useState(false);
+
+  // Detect mobile/tablet view
+  useEffect(() => {
+    const handleResize = () => setIsMobileView(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  if (!isLoading && !currentUser) {
+    router.push(`/sign-in?role=${role}`);
+    return null;
+  }
+
+  if (isLoading || !currentUser) {
+    return (
+      <div className="w-full max-w-5xl h-auto min-h-[60vh] md:min-h-[70vh] lg:min-h-[80vh] flex items-center justify-center bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 p-4 sm:p-6">
+        <div className="bg-flex justify-start lg:mr-50 w-full h-full">
+          <Loading message="Loading chat... Please wait." />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-[80vw] h-[90vh] max-h-[90vh] bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 flex flex-col mt-12 overflow-y-auto p-6">
-      {/* Close button */}
-      <button
-        onClick={() => setOpenChat(false)}
-        className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 p-2 rounded-full z-60"
-      >
-        <FiX size={24} className="text-red-500" />
-      </button>
-      <h1 className="text-2xl font-bold mb-4">ElohDoc Chat App</h1>
-      <p className="text-center max-w-lg mx-auto leading-relaxed">
-        This is where the{" "}
-        <span className="font-semibold">ElohDoc Chat App</span> will be
-        displayed. All <span className="italic">customers</span> (e-hailing
-        customers) and <span className="italic">patients</span> will be able to
-        chat directly with <span className="font-semibold">drivers</span> and
-        healthcare staff (<span className="italic">doctors</span> &{" "}
-        <span className="italic">nurses</span>).
-      </p>
+    <div className="lg:w-[145vh] w-full lgh-full max-h-full justify-center bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 flex pt-7 overflow-visible relative">
+
+      {/* Desktop Layout */}
+      {!isMobileView ? (
+        <>
+          <List />
+          {chatId && <ChatApp role={role} />}
+          {chatId && <Detail role={role} />}
+        </>
+      ) : (
+        // Mobile/Tablet flow
+        <>
+          {!chatId ? (
+            <List />
+          ) : (
+            <div className="flex flex-col w-full h-full relative">
+              <ChatApp role={role} />
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

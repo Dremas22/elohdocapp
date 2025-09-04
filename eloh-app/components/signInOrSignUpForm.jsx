@@ -90,8 +90,8 @@ const SignInOrSignUpForm = ({ role: selectedRole }) => {
   };
 
   return (
-    <div className="flex items-center justify-center w-full px-4">
-      <div className="w-full max-w-md backdrop-blur-md bg-white/70 border border-gray-200 rounded-2xl shadow-xl p-8">
+    <div className="flex items-center justify-center w-fullpl-3 px-4">
+      <div className="w-full max-w-md backdrop-blur-md bg-white/70 border border-gray-200 rounded-2xl shadow-xl p-10 ">
         <div className="flex mb-6 rounded-lg overflow-hidden shadow-sm">
           <button
             onClick={() => setActiveForm("signin")}
