@@ -5,6 +5,7 @@ const AmbulanceRequest = ({
   handleDecline,
   handleAcceptRequest,
 }) => {
+  console.log(ambulanceRequest, "AMBULANCE_REQ");
   return (
     <div
       className="fixed bottom-3 right-3 z-50 animate-slide-up
@@ -22,7 +23,9 @@ const AmbulanceRequest = ({
             <strong>Customer:</strong> {ambulanceRequest.customerName}
           </p>
           <p>
-            <strong>Pickup:</strong> {ambulanceRequest.pickupAddress}
+            <strong>Pickup:</strong>{" "}
+            {ambulanceRequest.pickupAddress ||
+              ambulanceRequest.pickupLocation.address}
           </p>
           <p>
             <strong>Fare:</strong>{" "}

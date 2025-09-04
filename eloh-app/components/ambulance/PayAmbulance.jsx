@@ -1,9 +1,10 @@
 "use client";
 
-import { auth } from "@/db/client";
 import { toastError, toastSuccess } from "@/helpers/toastHelper";
+import useCurrentUser from "@/hooks/useCurrentUser";
 import { loadStripe } from "@stripe/stripe-js";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -15,72 +16,27 @@ export default function PayAmbulance({
   duration,
   hospital,
   pickupLocation,
+  userDoc,
 }) {
   const [loading, setLoading] = useState(false);
-
-  // 🔹 Call confirm API
-  const confirmPayment = async (sessionId) => {
-    try {
-      const tripDetails = {
-        fare,
-        distance,
-        duration,
-        hospital,
-        pickupLocation,
-        type: "ambulance_request",
-      };
-
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/confirm-ambulance-payment`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            sessionId,
-            tripData: tripDetails,
-            userId: auth?.currentUser?.uid,
-          }),
-        }
-      );
-
-      if (!res.ok) {
-        const err = await res.json();
-        toastError(`Payment confirm failed: ${err.error}`);
-        return;
-      }
-
-      toastSuccess("Payment successful! Ambulance dispatched 🚑");
-    } catch (err) {
-      console.error("Confirm payment error:", err);
-      toastError("Something went wrong confirming your payment");
-    }
-  };
-
-  // 🔹 Confirm payment after redirect
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const sessionId = urlParams.get("session_id");
-    const type = urlParams.get("type");
-
-    if (sessionId && type === "ambulance_request" && auth?.currentUser?.uid) {
-      confirmPayment(sessionId);
-      // cleanup URL
-      const cleanUrl = window.location.origin + window.location.pathname;
-      window.history.replaceState({}, document.title, cleanUrl);
-    }
-  }, []);
+  const { currentUser } = useCurrentUser();
 
   // 🔹 Start Stripe checkout
   const handleProceed = async () => {
     setLoading(true);
     try {
+      const destination = { lat: hospital.lat, lng: hospital.lng };
       const tripDetails = {
         fare,
         distance,
         duration,
         hospital,
         pickupLocation,
+        destination,
         type: "ambulance_request",
+        customerName: userDoc?.fullName,
+        customerEmail: currentUser?.email || userDoc?.email,
+        customerId: userDoc?.userId,
       };
 
       const response = await fetch(
@@ -90,8 +46,8 @@ export default function PayAmbulance({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             ...tripDetails,
-            customerEmail: auth?.currentUser?.email,
-            userId: auth?.currentUser?.uid,
+            customerEmail: currentUser?.email || userDoc?.email,
+            userId: currentUser?.uid,
             role: "customer",
           }),
         }
@@ -119,12 +75,11 @@ export default function PayAmbulance({
       <button
         onClick={handleProceed}
         disabled={loading}
-        className={`flex justify-center items-center gap-2 px-6 py-2 rounded-2xl font-semibold text-white transition-all duration-300 transform
-          ${
-            loading
-              ? "bg-gray-400 cursor-not-allowed shadow-none"
-              : "bg-green-600 hover:bg-green-700 hover:scale-105 active:scale-95 cursor-pointer shadow-[0_4px_#999] active:shadow-[0_2px_#666]"
-          }`}
+        className={`flex justify-center items-center gap-2 px-6 py-2 rounded-2xl font-semibold text-white transition-all duration-300 transform ${
+          loading
+            ? "bg-gray-400 cursor-not-allowed shadow-none"
+            : "bg-green-600 hover:bg-green-700 hover:scale-105 active:scale-95 cursor-pointer shadow-[0_4px_#999] active:shadow-[0_2px_#666]"
+        }`}
       >
         {loading ? (
           <>

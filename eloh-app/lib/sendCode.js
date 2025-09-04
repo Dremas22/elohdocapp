@@ -32,11 +32,17 @@ const sendArrivalCodeEmail = async (activeRequest, customerEmail) => {
   try {
     const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
 
+    console.log(code, "START_CODE");
+
     const templateParams = {
       customer_name: activeRequest.customerName,
       code: code,
-      pickup_address: activeRequest.pickupAddress,
-      destination_address: activeRequest.destinationAddress || "N/A",
+      pickup_address:
+        activeRequest.pickupAddress || activeRequest.pickupLocation.address,
+      destination_address:
+        activeRequest.destinationAddress ||
+        activeRequest.hospital.address ||
+        "N/A",
       fare: activeRequest.fare,
       customer_email: customerEmail,
     };
@@ -47,6 +53,8 @@ const sendArrivalCodeEmail = async (activeRequest, customerEmail) => {
       templateParams,
       process.env.NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY
     );
+
+    console.log(result, "EMAIL_JS RESULTS", code);
 
     toastInfo(`${result.text} : Arrival code sent to ${customerEmail} `);
 

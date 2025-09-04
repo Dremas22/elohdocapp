@@ -79,7 +79,7 @@ export async function POST(req) {
       }`,
       cancel_url: `${process.env.NEXT_PUBLIC_URL}`,
       metadata: {
-        tripId: userId, // 👈 tripId is the same as userId
+        tripId: userId,
         type: type || "default",
         role: role || "customer",
       },

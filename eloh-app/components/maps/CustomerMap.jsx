@@ -18,17 +18,26 @@ import {
   where,
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
-import { auth, db } from "@/db/client";
+import { db } from "@/db/client";
 import { FaLocationDot } from "react-icons/fa6";
 import { FiMapPin } from "react-icons/fi";
 import PayAmbulance from "../ambulance/PayAmbulance";
 import CustomerSidebarMenu from "@/app/dashboard/customer/CustomerSidebar";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { useSearchParams } from "next/navigation";
+import confirmPayment from "@/lib/confirmPayment";
+
+const RATE_PER_KM = 10;
 
 export default function CustomerMap({ userDoc }) {
   const mapRef = useRef(null);
   const pickupInputRef = useRef(null);
   const destInputRef = useRef(null);
   const paySectionRef = useRef(null);
+  const { currentUser } = useCurrentUser();
+  const searchParams = useSearchParams();
+  const sessionId = searchParams.get("session_id");
+  const type = searchParams.get("type");
 
   const [calculatingTrip, setCalculatingTrip] = useState(false);
   const [map, setMap] = useState(null);
@@ -52,7 +61,53 @@ export default function CustomerMap({ userDoc }) {
     }
   }, [showPay]);
 
-  const RATE_PER_KM = 10; // change to your rate
+  useEffect(() => {
+    const confirmPay = async () => {
+      if (!currentUser || !sessionId || type !== "ambulance_request") return;
+      if (!sessionId.startsWith("cs_")) return;
+
+      let tripData = fareDetails;
+
+      // 🔹 Recover from localStorage if missing
+      if (!tripData) {
+        const stored = localStorage.getItem("fareDetails");
+        if (stored) {
+          tripData = JSON.parse(stored);
+          setFareDetails(tripData); // sync back to state
+        } else {
+          console.warn("No fareDetails found for confirming payment");
+          return;
+        }
+      }
+
+      // 🔹 Add safe fallbacks for required fields
+      tripData = {
+        ...tripData,
+        customerId: currentUser?.uid || userDoc?.userId,
+        customerName:
+          userDoc?.fullName || currentUser?.displayName || "Unknown",
+        customerEmail:
+          currentUser?.email || userDoc?.email || "unknown@email.com",
+        destination:
+          destinationPlace || tripData?.hospital || tripData?.destination,
+        type: "ambulance_request",
+        pickupLocation: pickupPlace,
+      };
+
+      // Small delay so Firestore writes can settle
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      await confirmPayment(sessionId, tripData, tripData.customerId);
+
+      // Clean URL so refresh doesn’t confirm again
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+
+      localStorage.removeItem("fareDetails");
+    };
+
+    confirmPay();
+  }, [currentUser, sessionId, type, fareDetails]);
 
   // Initialize map + autocomplete
   useEffect(() => {
@@ -248,13 +303,12 @@ export default function CustomerMap({ userDoc }) {
   }, []);
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (!user) return;
+    if (!currentUser) return;
 
     const tripsRef = collection(db, "trips");
     const q = query(
       tripsRef,
-      where("customerId", "==", user.uid),
+      where("customerId", "==", currentUser?.uid),
       orderBy("createdAt", "desc"),
       limit(1)
     );
@@ -263,22 +317,20 @@ export default function CustomerMap({ userDoc }) {
       if (snapshot.empty) return;
       const trip = snapshot.docs[0].data();
       console.log(trip, "TRIP");
-      if (trip.isPaid && trip.origin && trip.destination) {
+      if (
+        trip?.isPaid &&
+        (trip?.pickupLocation || trip.origin) &&
+        (trip?.hospital || trip?.destination)
+      ) {
         // 👇 Recreate the route if trip is already paid
-        createRoute(trip.origin, trip.destination, map);
-        setFareDetails({
-          origin: trip.origin,
-          destination: trip.destination,
-          distance: trip.distance,
-          duration: trip.duration,
-          fare: trip.fare,
-        });
+        createRoute(trip.pickupLocation, trip.hospital, map);
+        setFareDetails(trip);
         setRouteReady(true);
       }
     });
 
     return () => unsubscribe();
-  }, [map]); // runs once map is ready
+  }, [map, currentUser?.uid]); // runs once map/currentUser is ready
 
   const handleCreateRoute = () => {
     if (!pickupPlace && !currentLocation)
@@ -362,19 +414,39 @@ export default function CustomerMap({ userDoc }) {
               },
               distance: distanceKm.toFixed(2),
               duration: durationMin.toFixed(0),
-              fare: fare,
+              fare,
+              customerId: currentUser?.uid || userDoc?.userId, // ✅ always set
+              customerName:
+                userDoc?.fullName || currentUser?.displayName || "Unknown", // ✅ fallback
+              customerEmail:
+                currentUser?.email || userDoc?.email || "unknown@email.com",
+              pickupLocation: {
+                lat: origin.lat,
+                lng: origin.lng,
+                address: originAddress,
+              },
+              hospital: {
+                lat: destination.lat,
+                lng: destination.lng,
+                address: destinationAddress,
+              },
+              type: "ambulance_request",
             };
 
             // Save route to Firestore
             try {
-              const user = auth.currentUser;
-              if (!user) throw new Error("User not authenticated");
-              await saveCustomerRoute(user?.uid, routeData);
+              if (!currentUser) throw new Error("User not authenticated");
+              await saveCustomerRoute(currentUser?.uid, routeData);
+
+              // Save to localStorage for persistence across page reloads
+              localStorage.setItem("fareDetails", JSON.stringify(routeData));
               // set UI
               setFareDetails(routeData);
               setRouteReady(true);
             } catch (saveErr) {
               console.error("Failed to save route:", saveErr.message);
+              // still save locally so user can see cost even if save failed
+              localStorage.setItem("fareDetails", JSON.stringify(routeData));
               // still set fareDetails so user can see cost even if save failed
               setFareDetails(routeData);
               setRouteReady(true);
@@ -450,11 +522,9 @@ export default function CustomerMap({ userDoc }) {
     setDestinationPlace(null);
     if (destInputRef.current) destInputRef.current.value = "";
     try {
-      const user = auth.currentUser;
+      if (!currentUser) throw new Error("User not authenticated");
 
-      if (!user) throw new Error("User not authenticated");
-
-      const routesRef = collection(db, "customers", user?.uid, "routes");
+      const routesRef = collection(db, "customers", currentUser?.uid, "routes");
       const q = query(routesRef, orderBy("createdAt", "desc"), limit(1));
       const snapshot = await getDocs(q);
 
@@ -470,6 +540,7 @@ export default function CustomerMap({ userDoc }) {
     }
   };
 
+  console.log(fareDetails, "fare-XXXX_XXXX");
   return (
     <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 lg:pt-140 pt-170 lg:pl-66 p-4">
       {/* Sidebar */}
@@ -593,16 +664,17 @@ export default function CustomerMap({ userDoc }) {
             <h3 className="font-semibold mb-2">Trip summary</h3>
             <p>
               <strong>Destination:</strong>{" "}
-              {fareDetails.destination.address || fareDetails.destination.name}
+              {fareDetails?.hospital?.address ||
+                fareDetails?.destination?.address}
             </p>
             <p>
-              <strong>Distance:</strong> {fareDetails.distance} km
+              <strong>Distance:</strong> {fareDetails?.distance} km
             </p>
             <p>
-              <strong>Duration:</strong> {fareDetails.duration} min
+              <strong>Duration:</strong> {fareDetails?.duration} min
             </p>
             <p>
-              <strong>Fare:</strong> R{fareDetails.fare}
+              <strong>Fare:</strong> R{fareDetails?.fare}
             </p>
           </div>
         )}
@@ -642,6 +714,7 @@ export default function CustomerMap({ userDoc }) {
             duration={fareDetails?.duration}
             pickupLocation={fareDetails?.origin}
             hospital={fareDetails?.destination}
+            userDoc={userDoc}
           />
         </div>
       )}

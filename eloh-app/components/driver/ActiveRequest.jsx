@@ -20,7 +20,9 @@ const ActiveRequest = ({ activeRequest, handleCancelRoute, onTripEnded }) => {
             <strong>Customer:</strong> {activeRequest.customerName}
           </p>
           <p>
-            <strong>Pickup:</strong> {activeRequest.pickupAddress}
+            <strong>Pickup:</strong>{" "}
+            {activeRequest.pickupAddress ||
+              activeRequest.pickupLocation.address}
           </p>
           <p>
             <strong>Fare:</strong> R{activeRequest.fare}
