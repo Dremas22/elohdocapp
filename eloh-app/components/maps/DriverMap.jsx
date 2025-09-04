@@ -35,7 +35,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const [activeRequest, setActiveRequest] = useState(null);
 
   useEffect(() => {
-    let unsubscribe = () => {};
+    let unsubscribe = () => { };
 
     const setupMessaging = async () => {
       const messaging = await messagingPromise;
@@ -239,6 +239,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
   return (
     <div className="flex w-full h-full bg-gray-100 relative">
+
       {/* Sidebar */}
       <DriverSidebarMenu
         userDoc={userDoc}
@@ -263,11 +264,13 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
             </div>
           </div>
 
+          {/* Map */}
           <div
             ref={mapRef}
-            className=" lg:ml-80 md:ml-20 lg:w-[80%] w-[110%] lg:h-[550px] h-[510px] rounded-lg overflow-hidden"
+            className="w-full max-w-6xl lg:ml-75 sm:ml-15 h-[480px] rounded-lg shadow-lg overflow-hidden"
           />
 
+          {/* Ambulance Requests */}
           {ambulanceRequest && (
             <AmbulanceRequest
               ambulanceRequest={ambulanceRequest}
