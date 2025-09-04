@@ -78,7 +78,6 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
 
       <div className="flex flex-col lg:flex-row w-full flex-grow relative">
         {/* Sidebar only shows if verified */}
-
         <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:min-h-[calc(100vh-5rem)] fixed top-20 left-0 z-20">
           <DriverSidebarMenu
             userDoc={userDocState}
@@ -88,7 +87,7 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
         </aside>
 
         {/* Main content */}
-        <main className={`w-full flex flex-col items-center mt-16`}>
+        <main className="w-full flex flex-col items-center mt-16">
           {isVerified === true ? (
             <>
               {mapsReady ? (
@@ -121,7 +120,9 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
                   )}
                 </div>
               ) : (
-                <Loading message="Loading Map..." />
+                <div className="flex items-center lg:pl-55 justify-center w-full h-[80vh]">
+                  <Loading message={<span className="text-gray-800">Loading Map...</span>} />
+                </div>
               )}
             </>
           ) : isVerified === false ? (

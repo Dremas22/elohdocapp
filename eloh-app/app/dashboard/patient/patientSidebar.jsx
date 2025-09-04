@@ -209,7 +209,7 @@ const PatientSidebarMenu = ({
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-25 px-4 w-64 h-[calc(110vh-5rem)] fixed top-1 left-0
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-22 px-4 w-64 h-[calc(110vh-5rem)] fixed top-1 left-0
           ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
         `}
       >
