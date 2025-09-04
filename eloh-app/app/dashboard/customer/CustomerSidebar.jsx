@@ -146,12 +146,12 @@ const CustomerSidebarMenu = ({
       onClick: () => setShowChat(true),
       showTitle: true,
     },
-    {
-      title: "Schedule",
-      icon: <FiCalendar className="h-6 w-6" />,
-      onClick: () => setCalendarOpen(true),
-      customClass: "ml-28 sm:mt-0"
-    }
+    // {
+    //   title: "Schedule",
+    //   icon: <FiCalendar className="h-6 w-6" />,
+    //   onClick: () => setCalendarOpen(true),
+    //   customClass: "lg:ml-28"
+    // }
   ];
 
   return (
