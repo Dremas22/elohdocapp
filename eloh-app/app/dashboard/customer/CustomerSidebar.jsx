@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import {
   FiChevronUp,
   FiChevronDown,
-  FiPhone,
   FiMessageCircle,
   FiCalendar,
+  FiUser,
 } from "react-icons/fi";
 import { IoCloseCircleSharp } from "react-icons/io5";
 import { FaFirstAid } from "react-icons/fa";
@@ -137,7 +137,7 @@ const CustomerSidebarMenu = ({
   const actionButtons = [
     {
       title: "Profile",
-      icon: <FiPhone className="h-6 w-6" />,
+      icon: <FiUser className="h-6 w-6" />,
       onClick: () => setProfileOpen(true),
       showTitle: true,
     },
@@ -231,8 +231,8 @@ const CustomerSidebarMenu = ({
       {/* Mobile Sidebar */}
       <div
         className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[19vh] px-4 sm:px-6 md:px-8 py-4 overflow-auto bg-gray-900/80 backdrop-blur-md flex flex-col items-center gap-4 rounded-t-2xl shadow-lg transition-transform duration-500 ease-in-out ${mobileSidebarOpen
-            ? "translate-y-0 opacity-100"
-            : "translate-y-full opacity-0 pointer-events-none"
+          ? "translate-y-0 opacity-100"
+          : "translate-y-full opacity-0 pointer-events-none"
           }`}
       >
         <ActionButtons
