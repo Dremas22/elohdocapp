@@ -22,7 +22,10 @@ const AmbulanceRequest = ({
             <strong>Customer:</strong> {ambulanceRequest.customerName}
           </p>
           <p>
-            <strong>Pickup:</strong> {ambulanceRequest.pickupAddress}
+            <strong>Pickup:</strong>{" "}
+            {ambulanceRequest.pickupAddress ||
+              ambulanceRequest.pickupLocation.address ||
+              ambulanceRequest.hospital.address}
           </p>
           <p>
             <strong>Fare:</strong>{" "}

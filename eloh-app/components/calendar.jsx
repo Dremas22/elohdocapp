@@ -52,11 +52,10 @@ const Calendar = () => {
         // auto-select first patient if available
         if (data.patients?.length) setSelectedPatient(data.patients[0]);
       } else {
-        toast.error("Failed to load appointments.");
+        return;
       }
     } catch (err) {
       console.error("Error fetching appointments:", err);
-      toast.error("Error loading appointments.");
     }
   };
 
@@ -134,15 +133,12 @@ const Calendar = () => {
         setNote("");
         fetchAppointments(); // refresh
       } else {
-        toast.error(data.error || "Failed to save appointment.");
+        return;
       }
     } catch (error) {
       console.error("Error scheduling appointment:", error);
-      toast.error("Failed to save appointment.");
     }
   };
-
-  console.log(currentUser, "CURRENT_USER");
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white rounded shadow">
