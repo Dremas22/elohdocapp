@@ -18,7 +18,7 @@ const ChatList = ({ role }) => {
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   const { currentUser } = useUserStore();
-  const { changeChat, updateUnseenCount } = useChatStore();
+  const { changeChat, updateUnseenCount, currentChatId } = useChatStore();
 
   // Prepare category options for the filter
   const { allOptions, toId } = useMemo(() => {
@@ -82,7 +82,7 @@ const ChatList = ({ role }) => {
 
         let chatData = await Promise.all(promises);
 
-        // ✅ Deduplicate by chatId
+        // Deduplicate by chatId
         const uniqueChats = new Map();
         chatData.forEach((c) => {
           if (c?.user?.userId) {
@@ -96,7 +96,7 @@ const ChatList = ({ role }) => {
 
         setChats(finalChats);
 
-        // 🔹 Update global unseen count in Zustand
+        // Update global unseen count in Zustand
         updateUnseenCount(finalChats);
       }
     );
@@ -128,13 +128,13 @@ const ChatList = ({ role }) => {
     const userChatsRef = doc(db, "userchats", currentUser?.userId);
 
     try {
-      // Update Firestore with deduplicated chats
       await updateDoc(userChatsRef, { chats: dedupedChats });
       changeChat(chat.chatId, chat.user);
     } catch (err) {
       console.error(err);
     }
   };
+
 
   // Get user category IDs
   const getUserCategoryIds = (user) => {
@@ -149,7 +149,6 @@ const ChatList = ({ role }) => {
 
   // Filter chats by search input and category
   const filteredChats = useMemo(() => {
-    // Return all chats if no search input and category is "all"
     if (!input.trim() && selectedCategory === "all") return chats;
 
     const needle = input.trim().toLowerCase();
@@ -169,7 +168,8 @@ const ChatList = ({ role }) => {
 
   return (
     <div className="flex-1 overflow-y-auto bg-gray-900 text-white scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 -pl-8">
-      {/* Search Bar */}
+
+      {/* Top Bar with Search and Add/Close Buttons */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-5">
         <div className="flex items-center gap-2 sm:gap-3 flex-1 bg-gray-800 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
           <FiSearch className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
@@ -181,6 +181,8 @@ const ChatList = ({ role }) => {
             onChange={(e) => setInput(e.target.value)}
           />
         </div>
+
+        {/* Add User Button */}
         <div
           className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors mt-2 sm:mt-0"
           title="Add new users"
@@ -188,9 +190,10 @@ const ChatList = ({ role }) => {
         >
           {addMode ? <FiMinus className="w-4 h-4 sm:w-5 sm:h-5" /> : <FiPlus className="w-4 h-4 sm:w-5 sm:h-5" />}
         </div>
+
       </div>
 
-      {/* Category Filter - Only for patients */}
+      {/* Category Filter For Patients */}
       {currentUser?.role === "patient" && (
         <CategoryFilter
           options={allOptions}
@@ -226,7 +229,7 @@ const ChatList = ({ role }) => {
           {/* Username & Last Message */}
           <div className="flex flex-col gap-2">
             <span className="font-medium">
-              {chat.user.blocked.includes(currentUser?.userId || "")
+              {chat.user?.blocked?.includes(currentUser?.userId || "")
                 ? "User"
                 : getDisplayName(chat.user)}
             </span>

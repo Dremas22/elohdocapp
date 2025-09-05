@@ -406,11 +406,13 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
             </div>
           </div>
 
+          {/* Map */}
           <div
             ref={mapRef}
-            className=" lg:ml-80 md:ml-20 lg:w-[80%] w-[110%] lg:h-[550px] h-[510px] rounded-lg overflow-hidden"
+            className="w-full max-w-6xl lg:ml-75 sm:ml-15 h-[480px] rounded-lg shadow-lg overflow-hidden"
           />
 
+          {/* Ambulance Requests */}
           {ambulanceRequest && (
             <AmbulanceRequest
               ambulanceRequest={ambulanceRequest}

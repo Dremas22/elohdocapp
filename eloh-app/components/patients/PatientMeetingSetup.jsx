@@ -139,8 +139,8 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         </div>
       </div>
 
-      {/* Welcome Banner (Moved directly below) */}
-      <div className="mt-6 lg:pr-40 px-4 sm:px-6 text-center">
+      {/* Welcome Banner */}
+      <div className="mt-6 lg:pr-50 px-4 sm:px-6 text-center">
         <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text font-extrabold text-transparent text-2xl sm:text-3xl md:text-4xl">
           Welcome to Your Virtual Medical Consultation
         </h1>
@@ -182,7 +182,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         ) : error ? (
           <p className="text-red-600 text-center mt-12 font-semibold">{error}</p>
         ) : doctor === 0 && nurse === 0 ? (
-          <div className="text-center mt-10 text-gray-400">
+          <div className="text-center lg:pr-40 mt-10 text-gray-400">
             <p className="italic mb-2">
               No consultation staff available because no payment has been made.
             </p>
@@ -194,11 +194,12 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             </Link>
           </div>
         ) : (
-          <main className="lg:w-[165vh] w-[46vh] -ml-5.25 flex flex-col flex-grow h-full mt-6">
-            <div className="flex flex-col flex-grow overflow-hidden px-2 sm:px-4">
+          <main className="lg:w-[90vw] w-full lg:ml-[50px] flex flex-col flex-grow h-full mt-6">
+            <div className="flex flex-col flex-grow overflow-auto px-2 sm:px-4">
               <ElohDocChatApp role="patient" />
             </div>
           </main>
+
         )}
       </div>
     </div>
