@@ -24,7 +24,8 @@ const AmbulanceRequest = ({
           <p>
             <strong>Pickup:</strong>{" "}
             {ambulanceRequest.pickupAddress ||
-              ambulanceRequest.pickupLocation.address}
+              ambulanceRequest.pickupLocation.address ||
+              ambulanceRequest.hospital.address}
           </p>
           <p>
             <strong>Fare:</strong>{" "}
