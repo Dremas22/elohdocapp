@@ -1,7 +1,7 @@
 import { db, auth } from "@/db/server";
 import { NextResponse } from "next/server";
 
-export async function POST(request, { params }) {
+export async function POST(request) {
   try {
     const cookieToken = request.cookies.get("session")?.value;
     const headerToken = request.headers
@@ -13,54 +13,66 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const decodedToken = await auth?.verifySessionCookie(token, true);
+    const decodedToken = await auth.verifySessionCookie(token, true);
 
-    const data = await request.json();
-    const { routeData } = data;
-    const { driverId } = await params;
+    const { routeData, driverId } = await request.json();
 
-    if (!driverId || decodedToken.uid !== driverId || !routeData) {
+    if (!driverId || !routeData) {
       return NextResponse.json(
-        { error: "Invalid or missing fields" },
+        { error: "Missing driverId or routeData" },
         { status: 400 }
       );
     }
 
-    const routesRef = db
-      ?.collection("drivers")
-      .doc(driverId)
-      .collection("routes");
+    const originLat = routeData.origin?.lat;
+    const originLng = routeData.origin?.lng;
+    const destLat = routeData.destination?.lat;
+    const destLng = routeData.destination?.lng;
 
-    const destinationLat = routeData.destination.lat.toFixed(5);
-    const destinationLng = routeData.destination.lng.toFixed(5);
-
-    const snapshot = await routesRef.get();
-
-    for (const doc of snapshot.docs) {
-      const existing = doc.data();
-      const existingLat = existing.destination?.lat?.toFixed(5);
-      const existingLng = existing.destination?.lng?.toFixed(5);
-
-      if (existingLat === destinationLat && existingLng === destinationLng) {
-        return NextResponse.json({
-          isNew: false,
-          routeData: existing,
-          routeId: doc.id,
-        });
-      }
+    if (
+      originLat == null ||
+      originLng == null ||
+      destLat == null ||
+      destLng == null
+    ) {
+      return NextResponse.json(
+        { error: "Origin or destination coordinates missing" },
+        { status: 400 }
+      );
     }
 
-    const newDocRef = await routesRef.add({
+    const originLatFixed = Number(originLat.toFixed(5));
+    const originLngFixed = Number(originLng.toFixed(5));
+    const destLatFixed = Number(destLat.toFixed(5));
+    const destLngFixed = Number(destLng.toFixed(5));
+
+    // 4️⃣ Check for existing trip for this driver & destination
+    const snapshot = await db
+      .collection("trips")
+      .where("driverId", "==", driverId)
+      .where("destination.lat", "==", destLatFixed)
+      .where("destination.lng", "==", destLngFixed)
+      .get();
+
+    if (!snapshot.empty) {
+      const existingTrip = snapshot.docs[0].data();
+      return NextResponse.json({
+        isNew: false,
+        tripData: existingTrip,
+        tripId: snapshot.docs[0].id,
+      });
+    }
+
+    // 5️⃣ Create new trip
+    const newDocRef = await db.collection("trips").add({
       ...routeData,
+      driverId,
+      customerId: decodedToken.uid,
       createdAt: new Date(),
     });
 
     return NextResponse.json(
-      {
-        isNew: true,
-        routeData,
-        routeId: newDocRef.id,
-      },
+      { isNew: true, tripData: routeData, tripId: newDocRef.id },
       { status: 201 }
     );
   } catch (error) {
@@ -72,44 +84,30 @@ export async function POST(request, { params }) {
   }
 }
 
-export async function DELETE(request, { params }) {
+export async function GET(request) {
   try {
-    const cookieToken = request.cookies.get("session")?.value;
-    const headerToken = request.headers
-      .get("authorization")
-      ?.split("Bearer ")[1];
-    const token = cookieToken || headerToken;
+    const url = new URL(request.url);
+    const driverId = url.searchParams.get("driverId");
+    const customerId = url.searchParams.get("customerId");
 
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    let queryRef = db.collection("trips");
+
+    if (driverId) {
+      queryRef = queryRef.where("driverId", "==", driverId);
     }
 
-    const decodedToken = await auth?.verifySessionCookie(token, true);
-
-    const data = await request.json();
-    const { routeId } = data;
-    const { driverId } = await params;
-
-    if (!driverId || !routeId || decodedToken.uid !== driverId) {
-      return NextResponse.json(
-        { error: "Invalid or missing fields" },
-        { status: 400 }
-      );
+    if (customerId) {
+      queryRef = queryRef.where("customerId", "==", customerId);
     }
 
-    const routeDocRef = db
-      .collection("drivers")
-      .doc(driverId)
-      .collection("routes")
-      .doc(routeId);
-    await routeDocRef.delete();
+    // order by creation date descending
+    const snapshot = await queryRef.orderBy("createdAt", "desc").get();
 
-    return NextResponse.json(
-      { message: `Route ${routeId} successfully deleted` },
-      { status: 200 }
-    );
+    const trips = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+    return NextResponse.json({ trips }, { status: 200 });
   } catch (error) {
-    console.error("API DELETE Error:", error);
+    console.error("API GET Error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

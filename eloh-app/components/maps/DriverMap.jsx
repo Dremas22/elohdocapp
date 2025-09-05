@@ -9,20 +9,22 @@ import {
   limit,
   doc,
   updateDoc,
+  getDoc,
+  setDoc,
+  onSnapshot,
+  where,
 } from "firebase/firestore";
-import { auth, db, messagingPromise } from "@/db/client";
+import { auth, db } from "@/db/client";
 import { createAmbulanceMarker } from "@/lib/ambulance-actions/createAmbulanceMarker";
-import { toastError, toastInfo } from "@/helpers/toastHelper";
-import {
-  deleteDriverRoute,
-  findNearestAvailableDriver,
-  saveDriverRoute,
-} from "@/helpers";
-import { onMessage } from "firebase/messaging";
+import { toastError, toastInfo, toastSuccess } from "@/helpers/toastHelper";
+import { deleteDriverRoute, findNearestAvailableDriver } from "@/helpers";
+
 import AmbulanceDriverDashboardNavbar from "@/app/dashboard/driver/driverNav";
 import DriverSidebarMenu from "@/app/dashboard/driver/driverSidebar";
 import ActiveRequest from "../driver/ActiveRequest";
 import AmbulanceRequest from "../driver/AmbulanceRequest";
+import sendArrivalCodeEmail from "@/lib/sendCode";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const mapRef = useRef(null);
@@ -33,37 +35,52 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const [ambulanceRequest, setAmbulanceRequest] = useState(null);
   const [excludedDrivers, setExcludedDrivers] = useState([]);
   const [activeRequest, setActiveRequest] = useState(null);
+  const [arrivalCode, setArrivalCode] = useState(null);
+  const [showCodeInput, setShowCodeInput] = useState(false);
+  const [enteredCode, setEnteredCode] = useState("");
+  const { currentUser } = useCurrentUser();
 
   useEffect(() => {
-    let unsubscribe = () => { };
+    if (!currentUser?.uid) return;
 
-    const setupMessaging = async () => {
-      const messaging = await messagingPromise;
+    const tripsRef = collection(db, "trips");
+    const q = query(
+      tripsRef,
+      where("driverId", "==", currentUser.uid),
+      orderBy("createdAt", "desc"),
+      limit(1)
+    );
 
-      if (!messaging) return;
-
-      unsubscribe = onMessage(messaging, (payload) => {
-        if (payload?.data?.type === "ambulance_request") {
-          const requestData = {
-            customerName: payload.data.customerName || "",
-            pickupAddress: payload.data.pickupAddress || "Unknown",
-            fare: parseFloat(payload.data.fare || "0"),
-            distance: payload.data.distance || "0",
-            duration: payload.data.duration || "0",
-            pickupLat: parseFloat(payload.data.pickupLat || "0"),
-            pickupLng: parseFloat(payload.data.pickupLng || "0"),
-            type: payload.data.type,
-          };
-          setAmbulanceRequest(requestData);
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        if (snapshot.empty) {
+          setAmbulanceRequest(null);
+          return;
         }
-      });
-    };
 
-    setupMessaging();
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, []);
+        const tripDoc = snapshot.docs[0];
+        const trip = { id: tripDoc.id, ...tripDoc.data() };
+
+        // Optional: you can remove isPaid check during debugging
+        if (
+          (trip?.pickupLocation || trip?.origin) &&
+          (trip?.hospital || trip?.destination) &&
+          trip?.isPaid
+        ) {
+          setAmbulanceRequest(trip);
+        } else {
+          toastError("Trip missing origin or destination:");
+        }
+      },
+      (error) => {
+        console.error("Error fetching driver trips:", error);
+        toastError("Failed to fetch trips.");
+      }
+    );
+
+    return () => unsubscribe();
+  }, [currentUser?.uid, map]);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -131,16 +148,49 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     newRenderer.setMap(map);
     setDirectionsRenderer(newRenderer);
 
-    const user = auth.currentUser;
-    if (!user) return toastError("User not authenticated");
+    if (!currentUser) return toastError("User not authenticated");
 
     const origin = currentLocation;
     const destination = {
-      lat: parseFloat(request.pickupLat),
-      lng: parseFloat(request.pickupLng),
+      lat: parseFloat(
+        request?.pickupLat ||
+          request?.destination.lat ||
+          request?.pickupLocation?.lat
+      ),
+      lng: parseFloat(
+        request?.pickupLng ||
+          request?.destination?.lng ||
+          request?.pickupLocation?.lng
+      ),
     };
 
-    await saveDriverRoute(user.uid, { origin, destination });
+    //await saveDriverRoute(request?.driverId, request);
+
+    // Create / update trip in Firestore
+    try {
+      const tripRef = doc(db, "trips", request?.customerId); // Using customerId as doc ID
+      await updateDoc(tripRef, {
+        driverId: request?.driverId,
+        status: "accepted",
+        origin,
+        destination,
+        acceptedAt: new Date(),
+      }).catch(async (err) => {
+        // If doc does not exist, create it
+        await setDoc(tripRef, {
+          driverId: request?.driverId,
+          customerId: request?.customerId,
+          status: "accepted",
+          origin,
+          destination,
+          createdAt: new Date(),
+          acceptedAt: new Date(),
+        });
+      });
+    } catch (err) {
+      console.error("Failed to create/update trip doc:", err);
+      toastError("Failed to save trip info");
+    }
 
     const directionsService = new window.google.maps.DirectionsService();
     directionsService.route(
@@ -155,8 +205,8 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
       }
     );
 
-    setActiveRequest(request); // ✅ Keep request visible after acceptance
-    setAmbulanceRequest(null); // remove the popup
+    setActiveRequest({ ...request, driverId: currentUser?.uid }); // Keep request visible
+    setAmbulanceRequest(null); // Remove popup
   };
 
   const handleCancelRoute = async () => {
@@ -165,20 +215,48 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     setActiveRequest(null);
 
     try {
-      const user = auth.currentUser;
-      if (!user) throw new Error("User not authenticated");
+      if (!currentUser) throw new Error("User not authenticated");
 
-      const routesRef = collection(db, "drivers", user.uid, "routes");
+      const routesRef = collection(db, "trips", currentUser.uid);
       const q = query(routesRef, orderBy("createdAt", "desc"), limit(1));
       const snapshot = await getDocs(q);
       if (snapshot.empty) return toastError("No route found");
 
       const routeDoc = snapshot.docs[0];
-      await deleteDriverRoute(user.uid, routeDoc.id);
+      await deleteDriverRoute(currentUser.uid, routeDoc.id);
       toastInfo("Route cancelled");
     } catch (err) {
       console.error(err);
       toastError("Error cancelling the route");
+    }
+  };
+
+  const handleTripEnded = async () => {
+    if (!activeRequest || !currentUser) return;
+
+    try {
+      const tripId = activeRequest?.customerId;
+      const code = await sendArrivalCodeEmail(
+        activeRequest,
+        activeRequest?.customerEmail
+      );
+
+      setArrivalCode(code);
+      setShowCodeInput(true);
+      alert(`${code} here`);
+      // Update Firestore with arrival code
+      const tripRef = doc(db, "trips", tripId);
+      await updateDoc(tripRef, {
+        arrivalCode: code,
+        status: "driver_arrived",
+        arrivedAt: new Date(),
+      });
+
+      // TODO: Send code to customer via push/email
+      toastSuccess(`Code sent to customer email`);
+    } catch (err) {
+      console.error("Failed to send arrival code:", err.message);
+      toastError("Failed to notify customer.");
     }
   };
 
@@ -237,9 +315,36 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     setAmbulanceRequest(null);
   };
 
+  const handleCodeVerification = async () => {
+    try {
+      const tripId = activeRequest?.customerId;
+      const tripRef = doc(db, "trips", tripId);
+      const tripSnap = await getDoc(tripRef);
+      const data = tripSnap.data();
+
+      if (!tripSnap.exists() || !data) throw new Error("Trip not found");
+
+      if (enteredCode === data.arrivalCode) {
+        await updateDoc(tripRef, {
+          status: "completed",
+          arrivalCode: null,
+          isPaid: false,
+          updatedAt: new Date(),
+        });
+        toastSuccess("Trip successfully completed!");
+        setActiveRequest(null);
+        setShowCodeInput(false);
+      } else {
+        toastError("Incorrect code. Please try again.");
+      }
+    } catch (err) {
+      console.error("Verification failed:", err.message);
+      toastError("Failed to verify code.");
+    }
+  };
+
   return (
     <div className="flex w-full h-full bg-gray-100 relative">
-
       {/* Sidebar */}
       <DriverSidebarMenu
         userDoc={userDoc}
@@ -283,7 +388,29 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
             <ActiveRequest
               activeRequest={activeRequest}
               handleCancelRoute={handleCancelRoute}
+              onTripEnded={handleTripEnded}
             />
+          )}
+
+          {showCodeInput && (
+            <div className="fixed bottom-24 right-5 z-50 bg-white p-4 rounded-xl shadow-lg flex flex-col gap-2 w-64">
+              <label className="text-sm font-medium text-gray-700">
+                Enter arrival code from customer:
+              </label>
+              <input
+                type="text"
+                value={enteredCode}
+                onChange={(e) => setEnteredCode(e.target.value)}
+                className="border p-2 rounded text-sm text-gray-700"
+                placeholder="6-digit code"
+              />
+              <button
+                onClick={async () => await handleCodeVerification()}
+                className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded shadow text-sm font-semibold"
+              >
+                Verify Code
+              </button>
+            </div>
           )}
         </div>
       </div>

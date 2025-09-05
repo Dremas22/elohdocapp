@@ -3,7 +3,14 @@
 import { db } from "@/db/client";
 import { useChatStore } from "@/hooks/useChatStore";
 import { useUserStore } from "@/hooks/useUserStore";
-import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
 import { FiMinus, FiPlus, FiSearch } from "react-icons/fi";
 import AddUser from "./AddUser";
 import { useEffect, useMemo, useState } from "react";
@@ -16,6 +23,7 @@ const ChatList = ({ role }) => {
   const [addMode, setAddMode] = useState(false);
   const [input, setInput] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [activeSubType, setActiveSubType] = useState("doctor");
 
   const { currentUser } = useUserStore();
   const { changeChat, updateUnseenCount, currentChatId } = useChatStore();
@@ -41,21 +49,49 @@ const ChatList = ({ role }) => {
   useEffect(() => {
     if (!currentUser?.userId) return;
 
-    const unSub = onSnapshot(
+    // Keep unsubscribers so we can clean up
+    const unsubs = [];
+
+    let userChatsData = [];
+    let defaultUsersData = [];
+
+    const mergeAndSet = () => {
+      const unique = new Map();
+
+      // Merge default users
+      defaultUsersData.forEach((u) => {
+        if (u?.user?.userId) unique.set(u.user.userId, u);
+      });
+
+      // Merge existing chats (overwrite defaults if same userId)
+      userChatsData.forEach((c) => {
+        if (c?.user?.userId) unique.set(c.user.userId, c);
+      });
+
+      const finalChats = Array.from(unique.values()).sort(
+        (a, b) => b.updatedAt - a.updatedAt
+      );
+
+      setChats(finalChats);
+      updateUnseenCount(finalChats);
+    };
+
+    // 🔹 Listen to userchats
+    const unSubChats = onSnapshot(
       doc(db, "userchats", currentUser.userId),
       async (res) => {
         const items = res.data()?.chats || [];
 
-        const promises = items.map(async (item) => {
+        const chatPromises = items.map(async (item) => {
           let user = null;
-          let collectionsToCheck = [];
 
+          // Determine the collection to lookup
+          let collectionsToCheck = [];
           if (currentUser.role === "patient") {
-            const { consultations, consultationType } = currentUser;
-            if (consultations && consultationType !== "none") {
-              if (consultations.doctor > 0) collectionsToCheck.push("doctors");
-              if (consultations.nurse > 0) collectionsToCheck.push("nurses");
-            }
+            if (item.receiverRole === "doctor")
+              collectionsToCheck.push("doctors");
+            if (item.receiverRole === "nurse")
+              collectionsToCheck.push("nurses");
           } else if (
             currentUser.role === "doctor" ||
             currentUser.role === "nurse"
@@ -68,9 +104,7 @@ const ChatList = ({ role }) => {
           }
 
           for (const col of collectionsToCheck) {
-            const userDocRef = doc(db, col, item.receiverId);
-            const userDocSnap = await getDoc(userDocRef);
-
+            const userDocSnap = await getDoc(doc(db, col, item.receiverId));
             if (userDocSnap.exists()) {
               user = { userId: userDocSnap.id, ...userDocSnap.data() };
               break;
@@ -80,29 +114,58 @@ const ChatList = ({ role }) => {
           return { ...item, user };
         });
 
-        let chatData = await Promise.all(promises);
-
-        // Deduplicate by chatId
-        const uniqueChats = new Map();
-        chatData.forEach((c) => {
-          if (c?.user?.userId) {
-            uniqueChats.set(c.user.userId, c);
-          }
-        });
-
-        const finalChats = Array.from(uniqueChats.values()).sort(
-          (a, b) => b.updatedAt - a.updatedAt
-        );
-
-        setChats(finalChats);
-
-        // Update global unseen count in Zustand
-        updateUnseenCount(finalChats);
+        userChatsData = await Promise.all(chatPromises);
+        mergeAndSet();
       }
     );
 
-    return () => unSub();
-  }, [currentUser?.userId]);
+    unsubs.push(unSubChats);
+
+    const collectionsToListen = [];
+
+    if (currentUser.role === "patient") {
+      const { consultations, consultationType } = currentUser;
+      if (consultations && consultationType !== "none") {
+        if (consultationType === "doctor" && consultations.doctor > 0) {
+          collectionsToListen.push("doctors");
+        } else if (consultationType === "nurse" && consultations.nurse > 0) {
+          collectionsToListen.push("nurses");
+        } else if (consultationType === "all") {
+          if (activeSubType === "doctor" && consultations.doctor > 0) {
+            collectionsToListen.push("doctors");
+          } else if (activeSubType === "nurse" && consultations.nurse > 0) {
+            collectionsToListen.push("nurses");
+          }
+        }
+      }
+    } else if (currentUser.role === "doctor" || currentUser.role === "nurse") {
+      collectionsToListen.push("patients");
+    } else if (currentUser.role === "driver") {
+      collectionsToListen.push("customers");
+    } else if (currentUser.role === "customer") {
+      collectionsToListen.push("drivers");
+    }
+
+    collectionsToListen.forEach((col) => {
+      const unSubCol = onSnapshot(collection(db, col), (snap) => {
+        const defaults = snap.docs.map((docSnap) => ({
+          chatId: `default-${docSnap.id}`,
+          receiverId: docSnap.id,
+          lastMessage: "",
+          updatedAt: 0,
+          isSeen: true,
+          user: { userId: docSnap.id, ...docSnap.data() },
+        }));
+
+        defaultUsersData = defaults;
+        mergeAndSet();
+      });
+
+      unsubs.push(unSubCol);
+    });
+
+    return () => unsubs.forEach((fn) => fn());
+  }, [currentUser?.userId, currentUser?.role, activeSubType]);
 
   const handleSelect = async (chat) => {
     if (!chat?.user || !currentUser?.userId) return;
@@ -135,8 +198,12 @@ const ChatList = ({ role }) => {
     }
   };
 
-
-  // Get user category IDs
+  /**
+   * Get user category IDs
+   *
+   * @param {*} user - The user chat
+   * @returns An array of categories
+   */
   const getUserCategoryIds = (user) => {
     if (!user) return [];
     const raw = user.category ?? user.categories ?? user.specialty ?? [];
@@ -149,8 +216,6 @@ const ChatList = ({ role }) => {
 
   // Filter chats by search input and category
   const filteredChats = useMemo(() => {
-    if (!input.trim() && selectedCategory === "all") return chats;
-
     const needle = input.trim().toLowerCase();
 
     return chats.filter((c) => {
@@ -159,8 +224,10 @@ const ChatList = ({ role }) => {
       const name = c.user.fullName.toLowerCase();
       const matchesInput = !needle || name.includes(needle);
 
+      // ✅ If "all", don’t restrict by category
       if (selectedCategory === "all") return matchesInput;
 
+      // ✅ Otherwise check user categories
       const userCats = getUserCategoryIds(c.user);
       return matchesInput && userCats.includes(selectedCategory);
     });
@@ -168,7 +235,6 @@ const ChatList = ({ role }) => {
 
   return (
     <div className="flex-1 overflow-y-auto bg-gray-900 text-white scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 -pl-8">
-
       {/* Top Bar with Search and Add/Close Buttons */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-5">
         <div className="flex items-center gap-2 sm:gap-3 flex-1 bg-gray-800 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
@@ -188,30 +254,63 @@ const ChatList = ({ role }) => {
           title="Add new users"
           onClick={() => setAddMode((prev) => !prev)}
         >
-          {addMode ? <FiMinus className="w-4 h-4 sm:w-5 sm:h-5" /> : <FiPlus className="w-4 h-4 sm:w-5 sm:h-5" />}
+          {addMode ? (
+            <FiMinus className="w-4 h-4 sm:w-5 sm:h-5" />
+          ) : (
+            <FiPlus className="w-4 h-4 sm:w-5 sm:h-5" />
+          )}
         </div>
-
       </div>
 
       {/* Category Filter For Patients */}
-      {currentUser?.role === "patient" && (
-        <CategoryFilter
-          options={allOptions}
-          selected={selectedCategory}
-          onChange={setSelectedCategory}
-          className="px-5 mb-3"
-        />
-      )}
+      {currentUser?.role === "patient" &&
+        currentUser?.consultations &&
+        currentUser?.consultationType !== "none" && (
+          <CategoryFilter
+            options={allOptions}
+            selected={selectedCategory}
+            onChange={setSelectedCategory}
+            className="px-5 mb-3"
+          />
+        )}
+
+      {currentUser?.role === "patient" &&
+        currentUser?.consultations &&
+        currentUser?.consultationType === "all" && (
+          <div className="flex gap-3 px-5 mb-3">
+            <button
+              className={`px-4 py-2 rounded-lg ${
+                activeSubType === "doctor"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-700 text-gray-300"
+              }`}
+              onClick={() => setActiveSubType("doctor")}
+            >
+              Doctors
+            </button>
+            <button
+              className={`px-4 py-2 rounded-lg ${
+                activeSubType === "nurse"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-700 text-gray-300"
+              }`}
+              onClick={() => setActiveSubType("nurse")}
+            >
+              Nurses
+            </button>
+          </div>
+        )}
 
       {/* Chat Items */}
       {filteredChats.map((chat) => (
         <div
           key={chat?.chatId}
           onClick={() => handleSelect(chat)}
-          className={`flex items-center gap-5 p-5 cursor-pointer border-b border-gray-600 transition-colors ${chat?.isSeen
-            ? "bg-transparent hover:bg-gray-800"
-            : "bg-blue-600/50 hover:bg-blue-500/60"
-            }`}
+          className={`flex items-center gap-5 p-5 cursor-pointer border-b border-gray-600 transition-colors ${
+            chat?.isSeen
+              ? "bg-transparent hover:bg-gray-800"
+              : "bg-blue-600/50 hover:bg-blue-500/60"
+          }`}
         >
           {/* Avatar */}
           {chat.user?.photoUrl ? (
