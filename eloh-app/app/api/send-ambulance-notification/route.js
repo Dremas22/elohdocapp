@@ -14,7 +14,7 @@ export async function POST(req) {
       );
     }
 
-    const driverDoc = await db.collection("drivers").doc(driverId).get();
+    const driverDoc = await db?.collection("drivers").doc(driverId).get();
     if (!driverDoc.exists) {
       return NextResponse.json({ error: "Driver not found" }, { status: 404 });
     }
@@ -28,6 +28,7 @@ export async function POST(req) {
     }
 
     let customerName = "A customer";
+    let customerEmail = "";
 
     if (customerId) {
       const customerDoc = await db
@@ -36,6 +37,7 @@ export async function POST(req) {
         .get();
       if (customerDoc.exists) {
         customerName = customerDoc.data()?.fullName || customerName;
+        customerEmail = customerDoc.data()?.email || "";
       }
     }
 
@@ -56,6 +58,8 @@ export async function POST(req) {
           pickupLng: String(tripDetails.pickupLocation.lng || ""),
           tripId: tripDetails.tripId || customerId || "",
           link: `${process.env.NEXT_PUBLIC_URL}/dashboard/driver`,
+          customerEmail,
+          customerId,
         },
         webpush: {
           fcmOptions: {

@@ -1,6 +1,6 @@
 "use client";
 
-import Navbar from "@/components/maiNavbar";
+import Navbar from "@/components/MainNavbar";
 import { FaHeartbeat, FaUserMd, FaStethoscope } from "react-icons/fa";
 
 

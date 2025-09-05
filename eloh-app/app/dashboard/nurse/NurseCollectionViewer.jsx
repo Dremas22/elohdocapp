@@ -14,6 +14,7 @@ import FilteredPatientsTable from "../doctor/FilteredPatientsTable";
 import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
 import Earnings from "../doctor/doctorEarnings";
 import { useUserStore } from "@/hooks/useUserStore";
+import ElohDocChatApp from "@/components/chat-app/ElohDocChatApp";
 
 const NurseCollectionViewer = () => {
   const [userDoc, setUserDoc] = useState(null);
@@ -230,6 +231,12 @@ const NurseCollectionViewer = () => {
                   compact
                 />
               </div>
+
+              <main className="lg:w-full w-[45vh] -ml-5 h-full flex lg:-ml-13 pt-8 -mr-6 mb-9 flex-col flex-grow overflow-hidden">
+                <div className="flex flex-col justify-start flex-grow overflow-hidden px-2 sm:px-4">
+                  <ElohDocChatApp  />
+                </div>
+              </main>
             </>
           ) : isVerified === false ? (
             <div className="text-gray-400 text-center">

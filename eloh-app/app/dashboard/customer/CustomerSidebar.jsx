@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiChevronUp, FiChevronDown, FiPhone, FiMessageCircle, FiCalendar } from "react-icons/fi";
+import {
+  FiChevronUp,
+  FiChevronDown,
+  FiMessageCircle,
+  FiCalendar,
+  FiUser,
+} from "react-icons/fi";
 import { IoCloseCircleSharp } from "react-icons/io5";
 import { FaFirstAid } from "react-icons/fa";
 import { messagingPromise } from "@/db/client";
@@ -81,6 +87,7 @@ const CustomerSidebarMenu = ({
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [openChat, setOpenChat] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -130,7 +137,7 @@ const CustomerSidebarMenu = ({
   const actionButtons = [
     {
       title: "Profile",
-      icon: <FiPhone className="h-6 w-6" />,
+      icon: <FiUser className="h-6 w-6" />,
       onClick: () => setProfileOpen(true),
       showTitle: true,
     },
@@ -143,7 +150,7 @@ const CustomerSidebarMenu = ({
     {
       title: "Chat",
       icon: <FiMessageCircle className="h-6 w-6" />,
-      onClick: () => setShowChat(true),
+      onClick: () => setOpenChat(true),
       showTitle: true,
     },
     // {
@@ -175,10 +182,10 @@ const CustomerSidebarMenu = ({
       )}
 
       {/* Chat Modal */}
-      {showChat && (
+      {openChat && (
         <div className="fixed text-white inset-0 z-50 lg:-ml-68 bg-black/40 backdrop-blur-sm flex items-center justify-center">
           <div className="w-full max-w-2xl mx-auto p-4">
-            <ElohDocChatApp setShowChat={setShowChat} />
+            <ElohDocChatApp setOpenChat={setOpenChat} role="customer" />
           </div>
         </div>
       )}
@@ -222,8 +229,18 @@ const CustomerSidebarMenu = ({
       </div>
 
       {/* Mobile Sidebar */}
-      <div className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[28vh] px-4 sm:px-6 md:px-8 py-4 overflow-auto bg-gray-900/80 backdrop-blur-md flex flex-col items-center gap-4 rounded-t-2xl shadow-lg transition-transform duration-500 ease-in-out ${mobileSidebarOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"}`}>
-        <ActionButtons buttons={actionButtons} notificationCount={notificationCount} payload={notificationPayload} compact={true} />
+      <div
+        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[19vh] px-4 sm:px-6 md:px-8 py-4 overflow-auto bg-gray-900/80 backdrop-blur-md flex flex-col items-center gap-4 rounded-t-2xl shadow-lg transition-transform duration-500 ease-in-out ${mobileSidebarOpen
+          ? "translate-y-0 opacity-100"
+          : "translate-y-full opacity-0 pointer-events-none"
+          }`}
+      >
+        <ActionButtons
+          buttons={actionButtons}
+          notificationCount={notificationCount}
+          payload={notificationPayload}
+          compact={true}
+        />
       </div>
 
       {/* Slide-in Calendar */}
@@ -241,7 +258,6 @@ const CustomerSidebarMenu = ({
         <Calendar userDoc={userDoc} />
       </div>
     </>
-
   );
 };
 

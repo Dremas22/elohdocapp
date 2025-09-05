@@ -39,12 +39,11 @@ const ElohDocChatApp = ({ setOpenChat, role }) => {
   }
 
   return (
-    <div className="lg:w-[145vh] w-full lgh-full max-h-full justify-center bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 flex pt-7 overflow-visible relative">
-
+    <div className="lg:w-[145vh] w-full h-[50vh] lg:h-full max-h-full justify-center bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 flex pt-7 overflow-visible relative">
       {/* Desktop Layout */}
       {!isMobileView ? (
         <>
-          <List />
+          <List setOpenChat={setOpenChat} />
           {chatId && <ChatApp role={role} />}
           {chatId && <Detail role={role} />}
         </>
