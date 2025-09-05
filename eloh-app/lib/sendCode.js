@@ -46,8 +46,8 @@ const sendArrivalCodeEmail = async (activeRequest, customerEmail) => {
     };
 
     const result = await emailjs.send(
-      process.env.NEXT_PUBLIC_EMAIL_JS_SERVICE_ID,
-      process.env.NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID,
+      process.env.NEXT_PUBLIC_EMAIL_JS_SERVICE_ID_CODE,
+      process.env.NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID_CODE,
       templateParams,
       process.env.NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY
     );
