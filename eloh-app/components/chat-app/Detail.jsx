@@ -85,7 +85,7 @@ const Detail = () => {
     }
   };
   return (
-    <div className="flex flex-col h-full bg-gray-900 text-white">
+    <div className="flex flex-col lg:h-[80vh] bg-gray-900 text-white">
       {/* User Info at top */}
       <div className="flex flex-col items-center gap-4 p-8 border-b border-gray-700">
         <img
