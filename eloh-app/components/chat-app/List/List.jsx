@@ -1,10 +1,10 @@
 import ChatList from "./ChatList";
 import UserInfo from "./UserInfo";
 
-const List = () => {
+const List = ({ setOpenChat }) => {
   return (
     <div className="flex flex-1 flex-col">
-      <UserInfo />
+      <UserInfo setOpenChat={setOpenChat} />
       <ChatList />
     </div>
   );

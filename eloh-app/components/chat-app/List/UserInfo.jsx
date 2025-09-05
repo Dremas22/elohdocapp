@@ -5,7 +5,7 @@ import { FiX } from "react-icons/fi";
 import PatientProfileModal from "@/components/patients/PatientProfileModal";
 import { useChatStore } from "@/hooks/useChatStore";
 
-const UserInfo = () => {
+const UserInfo = ({ setOpenChat }) => {
   const { currentUser } = useUserStore();
   const { chatId, setChatId } = useChatStore(); // Access chat store
   const fullName = getDisplayName(currentUser);
@@ -18,7 +18,8 @@ const UserInfo = () => {
   };
 
   const handleCloseChat = () => {
-    setChatId(null); // Close the current chat
+    setChatId(null);
+    setOpenChat(false);
   };
 
   return (
@@ -33,20 +34,18 @@ const UserInfo = () => {
         <h2 className="hidden sm:block text-lg font-semibold">{fullName}</h2>
       </div>
 
-      <div className=" flex lg:gap-5 gap-4 red-text">
-
-        {/* Close Button */}
-        <button
-          onClick={handleCloseChat}
-          className="p-2 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center"
-          title="Close chat"
-        >
-          <FiX
-            className="w-5 h-5 text-red-500 hover:text-red-700 transition-colors"
-          />
-        </button>
-
-      </div>
+      {(currentUser?.role === "driver" || currentUser?.role === "customer") && (
+        <div className="flex lg:gap-5 gap-4 red-text">
+          {/* Close Button */}
+          <button
+            onClick={handleCloseChat}
+            className="p-2 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center"
+            title="Close chat"
+          >
+            <FiX className="w-5 h-5 text-red-500 hover:text-red-700 transition-colors" />
+          </button>
+        </div>
+      )}
 
       {/* Render Patient Profile Modal */}
       <PatientProfileModal

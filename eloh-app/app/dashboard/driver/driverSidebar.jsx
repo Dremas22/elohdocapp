@@ -64,6 +64,7 @@ const DriverSidebarMenu = ({
   const [isSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [openChat, setOpenChat] = useState(false);
 
   const [fetching, setFetching] = useState(false);
   const [isAvailable, setIsAvailable] = useState(false);
@@ -139,7 +140,7 @@ const DriverSidebarMenu = ({
     {
       title: "Chat",
       icon: <FiMessageCircle className="h-6 w-6" />,
-      onClick: () => setShowChat(true),
+      onClick: () => setOpenChat(true),
     },
     {
       title: "Schedule",
@@ -161,18 +162,19 @@ const DriverSidebarMenu = ({
       )}
 
       {/* Chat Modal */}
-      {showChat && (
-        <div className="fixed inset-0 z-50 lg:-ml-68 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+      {openChat && (
+        <div className="fixed text-white inset-0 z-50 lg:-ml-68 bg-black/40 backdrop-blur-sm flex items-center justify-center">
           <div className="w-full max-w-2xl mx-auto p-4">
-            <ElohDocChatApp setShowChat={setShowChat} role={userDoc.role} />
+            <ElohDocChatApp setOpenChat={setOpenChat} role="driver" />
           </div>
         </div>
       )}
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex flex-col z-30 bg-[#123158] pt-30 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 transition-transform duration-300 ease-in-out ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"
-          }`}
+        className={`hidden lg:flex flex-col z-30 bg-[#123158] pt-30 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 transition-transform duration-300 ease-in-out ${
+          !isSidebarOpen ? "-translate-x-full" : "translate-x-0"
+        }`}
       >
         {isVerified ? (
           <>
@@ -221,16 +223,17 @@ const DriverSidebarMenu = ({
 
       {/* Mobile Sidebar */}
       <div
-        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[33vh] px-4 py-4 overflow-auto bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-4 transition-transform duration-500 ease-in-out ${mobileSidebarOpen
-          ? "translate-y-0 opacity-100"
-          : "translate-y-full opacity-0 pointer-events-none"
-          }`}
+        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[33vh] px-4 py-4 overflow-auto bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-4 transition-transform duration-500 ease-in-out ${
+          mobileSidebarOpen
+            ? "translate-y-0 opacity-100"
+            : "translate-y-full opacity-0 pointer-events-none"
+        }`}
       >
         {isVerified && (
           <>
             {/* Other buttons except Schedule */}
             <ActionButtons
-              buttons={actionButtons.filter(btn => btn.title !== "Schedule")}
+              buttons={actionButtons.filter((btn) => btn.title !== "Schedule")}
               compact={true}
             />
 
@@ -238,7 +241,9 @@ const DriverSidebarMenu = ({
             <div className="flex justify-center items-center gap-2 mt-2">
               <div className="mr-[-4px]">
                 <ActionButtons
-                  buttons={actionButtons.filter(btn => btn.title === "Schedule")}
+                  buttons={actionButtons.filter(
+                    (btn) => btn.title === "Schedule"
+                  )}
                   compact={true}
                 />
               </div>
@@ -256,8 +261,9 @@ const DriverSidebarMenu = ({
 
       {/* Slide-in Calendar */}
       <div
-        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
+          calendarOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <button
           title="Close Calendar"
