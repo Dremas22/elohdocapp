@@ -123,7 +123,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   return (
     <div className="lg:w-[168.5vh] w-full pl-5 min-h-screen bg-gray-950 relative pb-10">
       {/* Consultations Remaining */}
-      <div className="pt-10 lg:pr-50 flex justify-center">
+      <div className="pt-10 lg:pr-50 -mr-3 flex justify-center">
         <div className="bg-gradient-to-br from-[#0b2345] to-[#123158] p-4 rounded-2xl shadow-2xl w-full max-w-xs text-center transform transition-transform duration-300 hover:shadow-[#0d6efd]/50">
           <h2 className="text-sm font-bold mb-2 tracking-wide text-[#90e0ef]">
             Consultations Remaining
@@ -194,7 +194,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             </Link>
           </div>
         ) : (
-          <main className="lg:w-[90vw] w-full lg:ml-[50px] flex flex-col flex-grow h-full mt-6">
+          <main className="lg:w-[90vw] w-[49.5vh] lg:ml-[50px] -ml-[40px] flex flex-col flex-grow h-full mt-6">
             <div className="flex flex-col flex-grow overflow-auto px-2 sm:px-4">
               <ElohDocChatApp role="patient" />
             </div>

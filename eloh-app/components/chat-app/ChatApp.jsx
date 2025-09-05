@@ -380,12 +380,12 @@ const ChatApp = () => {
           className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-xl text-white text-sm md:text-base shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out ${isCurrentUserBlocked || isReceiverBlocked
             ? "bg-blue-400/60 cursor-not-allowed"
             : "bg-[#03045e] hover:bg-[#023e8a] cursor-pointer"
-            }
             }`}
         >
-          Send
+          <span className="hidden md:inline">Send</span>
           <IoSend />
         </button>
+
       </div>
 
       {/* Incoming Call Modal */}
