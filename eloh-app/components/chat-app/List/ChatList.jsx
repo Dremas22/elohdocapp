@@ -170,9 +170,9 @@ const ChatList = ({ role }) => {
   }, [chats, input, selectedCategory]);
 
   return (
-    <div className="flex-1 overflow-y-auto bg-gray-900 text-white scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 -pl-8">
-      {/* Top Bar with Search and Add/Close Buttons */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-5">
+    <div className="flex flex-col h-full max-h-[70vh] bg-gray-900 text-white rounded-lg overflow-hidden">
+      {/* Top Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-4 sm:p-5 flex-shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 flex-1 bg-gray-800 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
           <FiSearch className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
           <input
@@ -206,6 +206,23 @@ const ChatList = ({ role }) => {
           onChange={setSelectedCategory}
           className="px-5 mb-3"
         />
+      )}
+
+      {currentUser?.role === "patient" && currentUser?.consultations && currentUser?.consultationType === "all" && (
+        <div className="flex gap-3 px-5 mb-3 flex-shrink-0">
+          <button
+            className={`shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer px-4 py-2 rounded-lg ${activeSubType === "doctor" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"}`}
+            onClick={() => setActiveSubType("doctor")}
+          >
+            Doctors
+          </button>
+          <button
+            className={` shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer px-4 py-2 rounded-lg ${activeSubType === "nurse" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"}`}
+            onClick={() => setActiveSubType("nurse")}
+          >
+            Nurses
+          </button>
+        </div>
       )}
 
       {/* Chat Items */}
