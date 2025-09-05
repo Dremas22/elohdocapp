@@ -91,7 +91,7 @@ const CustomerSidebarMenu = ({
   const router = useRouter();
 
   useEffect(() => {
-    let unsubscribe = () => {};
+    let unsubscribe = () => { };
 
     const setupMessaging = async () => {
       const messaging = await messagingPromise;
@@ -230,11 +230,10 @@ const CustomerSidebarMenu = ({
 
       {/* Mobile Sidebar */}
       <div
-        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[28vh] px-4 sm:px-6 md:px-8 py-4 overflow-auto bg-gray-900/80 backdrop-blur-md flex flex-col items-center gap-4 rounded-t-2xl shadow-lg transition-transform duration-500 ease-in-out ${
-          mobileSidebarOpen
+        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[19vh] px-4 sm:px-6 md:px-8 py-4 overflow-auto bg-gray-900/80 backdrop-blur-md flex flex-col items-center gap-4 rounded-t-2xl shadow-lg transition-transform duration-500 ease-in-out ${mobileSidebarOpen
             ? "translate-y-0 opacity-100"
             : "translate-y-full opacity-0 pointer-events-none"
-        }`}
+          }`}
       >
         <ActionButtons
           buttons={actionButtons}
@@ -246,9 +245,8 @@ const CustomerSidebarMenu = ({
 
       {/* Slide-in Calendar */}
       <div
-        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
-          calendarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <button
           title="Close Calendar"
