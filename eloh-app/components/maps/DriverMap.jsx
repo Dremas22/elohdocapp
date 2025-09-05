@@ -14,15 +14,11 @@ import {
   onSnapshot,
   where,
 } from "firebase/firestore";
-import { auth, db, messagingPromise } from "@/db/client";
+import { auth, db } from "@/db/client";
 import { createAmbulanceMarker } from "@/lib/ambulance-actions/createAmbulanceMarker";
 import { toastError, toastInfo, toastSuccess } from "@/helpers/toastHelper";
-import {
-  deleteDriverRoute,
-  findNearestAvailableDriver,
-  saveDriverRoute,
-} from "@/helpers";
-import { onMessage } from "firebase/messaging";
+import { deleteDriverRoute, findNearestAvailableDriver } from "@/helpers";
+
 import AmbulanceDriverDashboardNavbar from "@/app/dashboard/driver/driverNav";
 import DriverSidebarMenu from "@/app/dashboard/driver/driverSidebar";
 import ActiveRequest from "../driver/ActiveRequest";
@@ -43,39 +39,6 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const [showCodeInput, setShowCodeInput] = useState(false);
   const [enteredCode, setEnteredCode] = useState("");
   const { currentUser } = useCurrentUser();
-
-  // useEffect(() => {
-  //   let unsubscribe = () => {};
-
-  //   const setupMessaging = async () => {
-  //     const messaging = await messagingPromise;
-
-  //     if (!messaging) return;
-
-  //     unsubscribe = onMessage(messaging, (payload) => {
-  //       if (payload?.data?.type === "ambulance_request") {
-  //         const requestData = {
-  //           customerName: payload.data.customerName || "",
-  //           pickupAddress: payload.data.pickupAddress || "Unknown",
-  //           fare: parseFloat(payload.data.fare || "0"),
-  //           distance: payload.data.distance || "0",
-  //           duration: payload.data.duration || "0",
-  //           pickupLat: parseFloat(payload.data.pickupLat || "0"),
-  //           pickupLng: parseFloat(payload.data.pickupLng || "0"),
-  //           type: payload.data.type,
-  //           customerId: payload.data.customerId,
-  //           customerEmail: payload.data.customerEmail,
-  //         };
-  //         setAmbulanceRequest(requestData);
-  //       }
-  //     });
-  //   };
-
-  //   setupMessaging();
-  //   return () => {
-  //     if (unsubscribe) unsubscribe();
-  //   };
-  // }, []);
 
   useEffect(() => {
     if (!currentUser?.uid) return;

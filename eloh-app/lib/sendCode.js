@@ -54,11 +54,7 @@ const sendArrivalCodeEmail = async (activeRequest, customerEmail) => {
 
     toastInfo(`${result.text} : Arrival code sent to ${customerEmail} `);
 
-    // TODO: Remove the above, I just added the line below for customers using fake emails(testing purposes)
-
-    alert(`Code: ${code}`);
-
-    return code; // return code so you can save it to Firestore
+    return code;
   } catch (err) {
     console.error("Failed to send email:", err);
     toastError("Failed to send code via email");
