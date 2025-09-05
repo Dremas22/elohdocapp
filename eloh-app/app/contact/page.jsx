@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
 
-import Navbar from "@/components/maiNavbar";
+import Navbar from "@/components/MainNavbar";
 import { toastError, toastSuccess } from "@/helpers/toastHelper";
 const Contact = () => {
   const [submitting, setSubmitting] = useState(false);
