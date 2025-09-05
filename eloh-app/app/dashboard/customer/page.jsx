@@ -63,7 +63,7 @@ const CustomerDashboard = () => {
       <CustomerDashboardNavbar userDoc={userDoc} loading={loading} />
 
       {/* Map content */}
-      <div className="flex flex-1 items-center justify-center">
+      <div className="flex flex-1 items-center justify-center h-full">
         <Suspense fallback={<div>Loading map...</div>}>
           <CustomerMap userDoc={userDoc} />
         </Suspense>

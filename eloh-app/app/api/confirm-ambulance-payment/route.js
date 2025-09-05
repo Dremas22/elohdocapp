@@ -36,8 +36,6 @@ export async function POST(req) {
       pickupLocation
     );
 
-    console.log(nearestDriver, "NEAREST_DRIVER", pickupLocation);
-
     // 3️⃣ Save trip with driverId
     const tripRef = db?.collection("trips").doc(tripData.customerId);
     await tripRef.set(

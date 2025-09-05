@@ -5,7 +5,6 @@ const AmbulanceRequest = ({
   handleDecline,
   handleAcceptRequest,
 }) => {
-  console.log(ambulanceRequest, "AMBULANCE_REQ");
   return (
     <div
       className="fixed bottom-3 right-3 z-50 animate-slide-up

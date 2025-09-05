@@ -316,7 +316,7 @@ export default function CustomerMap({ userDoc }) {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (snapshot.empty) return;
       const trip = snapshot.docs[0].data();
-      console.log(trip, "TRIP");
+
       if (
         trip?.isPaid &&
         (trip?.pickupLocation || trip.origin) &&
@@ -540,7 +540,6 @@ export default function CustomerMap({ userDoc }) {
     }
   };
 
-  console.log(fareDetails, "fare-XXXX_XXXX");
   return (
     <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 lg:pt-140 pt-170 lg:pl-66 p-4">
       {/* Sidebar */}

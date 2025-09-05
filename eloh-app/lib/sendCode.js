@@ -32,8 +32,6 @@ const sendArrivalCodeEmail = async (activeRequest, customerEmail) => {
   try {
     const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
 
-    console.log(code, "START_CODE");
-
     const templateParams = {
       customer_name: activeRequest.customerName,
       code: code,
@@ -54,9 +52,11 @@ const sendArrivalCodeEmail = async (activeRequest, customerEmail) => {
       process.env.NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY
     );
 
-    console.log(result, "EMAIL_JS RESULTS", code);
-
     toastInfo(`${result.text} : Arrival code sent to ${customerEmail} `);
+
+    // TODO: Remove the above, I just added the line below for customers using fake emails(testing purposes)
+
+    alert(`Code: ${code}`);
 
     return code; // return code so you can save it to Firestore
   } catch (err) {

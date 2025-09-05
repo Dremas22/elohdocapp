@@ -140,8 +140,6 @@ const Calendar = () => {
     }
   };
 
-  console.log(currentUser, "CURRENT_USER");
-
   return (
     <div className="max-w-md mx-auto p-4 bg-white rounded shadow">
       {/* Month Navigation */}

@@ -91,20 +91,13 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        console.log(
-          "Driver trips snapshot:",
-          snapshot.docs.map((d) => ({ id: d.id, ...d.data() }))
-        );
-
         if (snapshot.empty) {
-          console.log("No trips found for driver:", currentUser.uid);
           setAmbulanceRequest(null);
           return;
         }
 
         const tripDoc = snapshot.docs[0];
         const trip = { id: tripDoc.id, ...tripDoc.data() };
-        console.log("Latest trip for driver:", trip);
 
         // Optional: you can remove isPaid check during debugging
         if (
@@ -114,7 +107,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
         ) {
           setAmbulanceRequest(trip);
         } else {
-          console.warn("Trip missing origin or destination:", trip);
+          toastError("Trip missing origin or destination:");
         }
       },
       (error) => {
@@ -209,7 +202,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     };
 
     //await saveDriverRoute(request?.driverId, request);
-    console.log(request, "REQUEST_HANDLE_ACCEPT");
+
     // Create / update trip in Firestore
     try {
       const tripRef = doc(db, "trips", request?.customerId); // Using customerId as doc ID
@@ -277,8 +270,6 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
   const handleTripEnded = async () => {
     if (!activeRequest || !currentUser) return;
-
-    console.log(activeRequest, "ACTIVE_REQUEST");
 
     try {
       const tripId = activeRequest?.customerId;
