@@ -1,6 +1,8 @@
 "use client";
 
-const ActiveRequest = ({ activeRequest, handleCancelRoute }) => {
+import { FiCheck } from "react-icons/fi";
+
+const ActiveRequest = ({ activeRequest, handleCancelRoute, onTripEnded }) => {
   return (
     <div
       className="fixed bottom-3 right-3 z-50 animate-slide-up
@@ -18,7 +20,9 @@ const ActiveRequest = ({ activeRequest, handleCancelRoute }) => {
             <strong>Customer:</strong> {activeRequest.customerName}
           </p>
           <p>
-            <strong>Pickup:</strong> {activeRequest.pickupAddress}
+            <strong>Pickup:</strong>{" "}
+            {activeRequest.pickupAddress ||
+              activeRequest.pickupLocation.address}
           </p>
           <p>
             <strong>Fare:</strong> R{activeRequest.fare}
@@ -31,13 +35,23 @@ const ActiveRequest = ({ activeRequest, handleCancelRoute }) => {
           </p>
         </div>
 
-        {/* Cancel button */}
+        {/* Cancel & Arrived buttons */}
         <div className="flex flex-col sm:flex-row justify-end mt-3 sm:mt-6 gap-2 sm:gap-3">
+          {/* Cancel Trip */}
           <button
             onClick={handleCancelRoute}
-            className="w-full sm:w-auto bg-red-600 text-white py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl shadow hover:bg-red-700 transition cursor-pointer text-sm sm:text-base"
+            className="flex-1 sm:flex-none w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-xl shadow transition-all duration-200 ease-in-out text-sm sm:text-base font-semibold"
           >
             Cancel Trip
+          </button>
+
+          {/* Arrived */}
+          <button
+            onClick={onTripEnded}
+            className="flex-1 sm:flex-none w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-xl shadow transition-all duration-200 ease-in-out text-sm sm:text-base font-semibold flex items-center justify-center gap-2"
+          >
+            <FiCheck className="h-5 w-5" />
+            Arrived
           </button>
         </div>
       </div>
