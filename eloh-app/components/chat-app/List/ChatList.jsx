@@ -7,7 +7,6 @@ import {
   collection,
   doc,
   getDoc,
-  getDocs,
   onSnapshot,
   updateDoc,
 } from "firebase/firestore";
@@ -26,15 +25,10 @@ const ChatList = ({ role }) => {
   const [activeSubType, setActiveSubType] = useState("doctor");
 
   const { currentUser } = useUserStore();
-  const { changeChat, updateUnseenCount, currentChatId } = useChatStore();
+  const { changeChat, updateUnseenCount } = useChatStore();
 
-  // Prepare category options for the filter
   const { allOptions, toId } = useMemo(() => {
-    const opts = [
-      { id: "all", title: "All" },
-      ...doctorCategories,
-      ...nurseCategories,
-    ];
+    const opts = [{ id: "all", title: "All" }, ...doctorCategories, ...nurseCategories];
     const map = new Map();
     [...doctorCategories, ...nurseCategories].forEach(({ id, title }) => {
       map.set(id.toLowerCase(), id);
@@ -48,107 +42,74 @@ const ChatList = ({ role }) => {
 
   useEffect(() => {
     if (!currentUser?.userId) return;
-
-    // Keep unsubscribers so we can clean up
     const unsubs = [];
-
     let userChatsData = [];
     let defaultUsersData = [];
 
     const mergeAndSet = () => {
       const unique = new Map();
-
-      // Merge default users
       defaultUsersData.forEach((u) => {
         if (u?.user?.userId) unique.set(u.user.userId, u);
       });
-
-      // Merge existing chats (overwrite defaults if same userId)
       userChatsData.forEach((c) => {
         if (c?.user?.userId) unique.set(c.user.userId, c);
       });
-
       const finalChats = Array.from(unique.values()).sort(
         (a, b) => b.updatedAt - a.updatedAt
       );
-
       setChats(finalChats);
       updateUnseenCount(finalChats);
     };
 
-    // 🔹 Listen to userchats
-    const unSubChats = onSnapshot(
-      doc(db, "userchats", currentUser.userId),
-      async (res) => {
-        const items = res.data()?.chats || [];
+    const unSubChats = onSnapshot(doc(db, "userchats", currentUser.userId), async (res) => {
+      const items = res.data()?.chats || [];
+      const chatPromises = items.map(async (item) => {
+        let user = null;
 
-        const chatPromises = items.map(async (item) => {
-          let user = null;
+        // Determine the collection to lookup
+        let collectionsToCheck = [];
+        if (currentUser.role === "patient") {
+          if (item.receiverRole === "doctor") collectionsToCheck.push("doctors");
+          if (item.receiverRole === "nurse") collectionsToCheck.push("nurses");
+        } else if (["doctor", "nurse"].includes(currentUser.role)) {
+          collectionsToCheck.push("patients");
+        } else if (currentUser.role === "driver") collectionsToCheck.push("customers");
+        else if (currentUser.role === "customer") collectionsToCheck.push("drivers");
 
-          // Determine the collection to lookup
-          let collectionsToCheck = [];
-          if (currentUser.role === "patient") {
-            if (item.receiverRole === "doctor")
-              collectionsToCheck.push("doctors");
-            if (item.receiverRole === "nurse")
-              collectionsToCheck.push("nurses");
-          } else if (
-            currentUser.role === "doctor" ||
-            currentUser.role === "nurse"
-          ) {
-            collectionsToCheck.push("patients");
-          } else if (currentUser.role === "driver") {
-            collectionsToCheck.push("customers");
-          } else if (currentUser.role === "customer") {
-            collectionsToCheck.push("drivers");
+        for (const col of collectionsToCheck) {
+          const userDocSnap = await getDoc(doc(db, col, item.receiverId));
+          if (userDocSnap.exists()) {
+            user = { userId: userDocSnap.id, ...userDocSnap.data() };
+            break;
           }
+        }
+        return { ...item, user };
+      });
 
-          for (const col of collectionsToCheck) {
-            const userDocSnap = await getDoc(doc(db, col, item.receiverId));
-            if (userDocSnap.exists()) {
-              user = { userId: userDocSnap.id, ...userDocSnap.data() };
-              break;
-            }
-          }
-
-          return { ...item, user };
-        });
-
-        userChatsData = await Promise.all(chatPromises);
-        mergeAndSet();
-      }
-    );
+      userChatsData = await Promise.all(chatPromises);
+      mergeAndSet();
+    });
 
     unsubs.push(unSubChats);
 
     const collectionsToListen = [];
-
     if (currentUser.role === "patient") {
       const { consultations, consultationType } = currentUser;
       if (consultations && consultationType !== "none") {
-        if (consultationType === "doctor" && consultations.doctor > 0) {
-          collectionsToListen.push("doctors");
-        } else if (consultationType === "nurse" && consultations.nurse > 0) {
-          collectionsToListen.push("nurses");
-        } else if (consultationType === "all") {
-          if (activeSubType === "doctor" && consultations.doctor > 0) {
-            collectionsToListen.push("doctors");
-          } else if (activeSubType === "nurse" && consultations.nurse > 0) {
-            collectionsToListen.push("nurses");
-          }
+        if (consultationType === "doctor" && consultations.doctor > 0) collectionsToListen.push("doctors");
+        else if (consultationType === "nurse" && consultations.nurse > 0) collectionsToListen.push("nurses");
+        else if (consultationType === "all") {
+          if (activeSubType === "doctor" && consultations.doctor > 0) collectionsToListen.push("doctors");
+          else if (activeSubType === "nurse" && consultations.nurse > 0) collectionsToListen.push("nurses");
         }
       }
-    } else if (currentUser.role === "doctor" || currentUser.role === "nurse") {
-      collectionsToListen.push("patients");
-    } else if (currentUser.role === "driver") {
-      collectionsToListen.push("customers");
-    } else if (currentUser.role === "customer") {
-      collectionsToListen.push("drivers");
-    }
+    } else if (["doctor", "nurse"].includes(currentUser.role)) collectionsToListen.push("patients");
+    else if (currentUser.role === "driver") collectionsToListen.push("customers");
+    else if (currentUser.role === "customer") collectionsToListen.push("drivers");
 
     collectionsToListen.forEach((col) => {
       const unSubCol = onSnapshot(collection(db, col), (snap) => {
-        const defaults = snap.docs.map((docSnap) => ({
+        defaultUsersData = snap.docs.map((docSnap) => ({
           chatId: `default-${docSnap.id}`,
           receiverId: docSnap.id,
           lastMessage: "",
@@ -156,54 +117,32 @@ const ChatList = ({ role }) => {
           isSeen: true,
           user: { userId: docSnap.id, ...docSnap.data() },
         }));
-
-        defaultUsersData = defaults;
         mergeAndSet();
       });
-
       unsubs.push(unSubCol);
     });
 
     return () => unsubs.forEach((fn) => fn());
-  }, [currentUser?.userId, currentUser?.role, activeSubType]);
+  }, [currentUser?.userId, currentUser?.role, activeSubType, updateUnseenCount]);
 
   const handleSelect = async (chat) => {
     if (!chat?.user || !currentUser?.userId) return;
-
-    // Map chats to keep only the properties stored in Firestore
     const userChats = chats.map(({ user, ...rest }) => rest);
-
-    // Deduplicate by receiverId
     const uniqueChatsMap = new Map();
     userChats.forEach((c) => {
       if (c?.receiverId) uniqueChatsMap.set(c.receiverId, c);
     });
-
-    // Convert back to array
     const dedupedChats = Array.from(uniqueChatsMap.values());
-
-    // Mark the selected chat as seen
     const chatIndex = dedupedChats.findIndex((c) => c.chatId === chat.chatId);
-    if (chatIndex !== -1) {
-      dedupedChats[chatIndex].isSeen = true;
-    }
-
-    const userChatsRef = doc(db, "userchats", currentUser?.userId);
-
+    if (chatIndex !== -1) dedupedChats[chatIndex].isSeen = true;
     try {
-      await updateDoc(userChatsRef, { chats: dedupedChats });
+      await updateDoc(doc(db, "userchats", currentUser.userId), { chats: dedupedChats });
       changeChat(chat.chatId, chat.user);
     } catch (err) {
       console.error(err);
     }
   };
 
-  /**
-   * Get user category IDs
-   *
-   * @param {*} user - The user chat
-   * @returns An array of categories
-   */
   const getUserCategoryIds = (user) => {
     if (!user) return [];
     const raw = user.category ?? user.categories ?? user.specialty ?? [];
@@ -214,29 +153,22 @@ const ChatList = ({ role }) => {
       .filter(Boolean);
   };
 
-  // Filter chats by search input and category
   const filteredChats = useMemo(() => {
     const needle = input.trim().toLowerCase();
-
     return chats.filter((c) => {
-      if (!c?.user || !c?.user?.fullName) return false;
-
+      if (!c?.user?.fullName) return false;
       const name = c.user.fullName.toLowerCase();
       const matchesInput = !needle || name.includes(needle);
-
-      // ✅ If "all", don’t restrict by category
       if (selectedCategory === "all") return matchesInput;
-
-      // ✅ Otherwise check user categories
       const userCats = getUserCategoryIds(c.user);
       return matchesInput && userCats.includes(selectedCategory);
     });
   }, [chats, input, selectedCategory]);
 
   return (
-    <div className="flex-1 overflow-y-auto bg-gray-900 text-white scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 -pl-8">
-      {/* Top Bar with Search and Add/Close Buttons */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-5">
+    <div className="flex flex-col h-full max-h-[82vh] bg-gray-900 text-white rounded-lg overflow-hidden">
+      {/* Top Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-4 sm:p-5 flex-shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 flex-1 bg-gray-800 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
           <FiSearch className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
           <input
@@ -248,94 +180,72 @@ const ChatList = ({ role }) => {
           />
         </div>
 
-        {/* Add User Button */}
         <div
           className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors mt-2 sm:mt-0"
           title="Add new users"
           onClick={() => setAddMode((prev) => !prev)}
         >
-          {addMode ? (
-            <FiMinus className="w-4 h-4 sm:w-5 sm:h-5" />
-          ) : (
-            <FiPlus className="w-4 h-4 sm:w-5 sm:h-5" />
-          )}
+          {addMode ? <FiMinus className="w-4 h-4 sm:w-5 sm:h-5" /> : <FiPlus className="w-4 h-4 sm:w-5 sm:h-5" />}
         </div>
       </div>
 
-      {/* Category Filter For Patients */}
-      {currentUser?.role === "patient" &&
-        currentUser?.consultations &&
-        currentUser?.consultationType !== "none" && (
-          <CategoryFilter
-            options={allOptions}
-            selected={selectedCategory}
-            onChange={setSelectedCategory}
-            className="px-5 mb-3"
-          />
-        )}
+      {/* Category Filter */}
+      {currentUser?.role === "patient" && currentUser?.consultations && currentUser?.consultationType !== "none" && (
+        <CategoryFilter
+          options={allOptions}
+          selected={selectedCategory}
+          onChange={setSelectedCategory}
+          className="px-5 mb-3 flex-shrink-0"
+        />
+      )}
 
-      {currentUser?.role === "patient" &&
-        currentUser?.consultations &&
-        currentUser?.consultationType === "all" && (
-          <div className="flex gap-3 px-5 mb-3">
-            <button
-              className={`px-4 py-2 rounded-lg ${
-                activeSubType === "doctor"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-700 text-gray-300"
-              }`}
-              onClick={() => setActiveSubType("doctor")}
-            >
-              Doctors
-            </button>
-            <button
-              className={`px-4 py-2 rounded-lg ${
-                activeSubType === "nurse"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-700 text-gray-300"
-              }`}
-              onClick={() => setActiveSubType("nurse")}
-            >
-              Nurses
-            </button>
-          </div>
-        )}
-
-      {/* Chat Items */}
-      {filteredChats.map((chat) => (
-        <div
-          key={chat?.chatId}
-          onClick={() => handleSelect(chat)}
-          className={`flex items-center gap-5 p-5 cursor-pointer border-b border-gray-600 transition-colors ${
-            chat?.isSeen
-              ? "bg-transparent hover:bg-gray-800"
-              : "bg-blue-600/50 hover:bg-blue-500/60"
-          }`}
-        >
-          {/* Avatar */}
-          {chat.user?.photoUrl ? (
-            <img
-              src={chat.user.photoUrl || "/images/default_avatar.jpg"}
-              alt="avatar"
-              className="w-12 h-12 rounded-full object-cover"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center text-white font-medium">
-              {chat?.user?.fullName?.charAt(0)?.toUpperCase() || "U"}
-            </div>
-          )}
-
-          {/* Username & Last Message */}
-          <div className="flex flex-col gap-2">
-            <span className="font-medium">
-              {chat.user?.blocked?.includes(currentUser?.userId || "")
-                ? "User"
-                : getDisplayName(chat.user)}
-            </span>
-            <p className="text-sm font-light truncate">{chat?.lastMessage}</p>
-          </div>
+      {currentUser?.role === "patient" && currentUser?.consultations && currentUser?.consultationType === "all" && (
+        <div className="flex gap-3 px-5 mb-3 flex-shrink-0">
+          <button
+            className={`px-4 py-2 rounded-lg ${activeSubType === "doctor" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"}`}
+            onClick={() => setActiveSubType("doctor")}
+          >
+            Doctors
+          </button>
+          <button
+            className={`px-4 py-2 rounded-lg ${activeSubType === "nurse" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"}`}
+            onClick={() => setActiveSubType("nurse")}
+          >
+            Nurses
+          </button>
         </div>
-      ))}
+      )}
+
+      {/* Chat List - Scrollable */}
+      <div className="flex-1 overflow-y-auto px-2 sm:px-5 space-y-2">
+        {filteredChats.map((chat) => (
+          <div
+            key={chat?.chatId}
+            onClick={() => handleSelect(chat)}
+            className={`flex items-center gap-5 p-3 sm:p-5 cursor-pointer border-b border-gray-600 transition-colors ${chat?.isSeen ? "bg-transparent hover:bg-gray-800" : "bg-blue-600/50 hover:bg-blue-500/60"
+              }`}
+          >
+            {chat.user?.photoUrl ? (
+              <img
+                src={chat.user.photoUrl || "/images/default_avatar.jpg"}
+                alt="avatar"
+                className="w-12 h-12 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center text-white font-medium">
+                {chat?.user?.fullName?.charAt(0)?.toUpperCase() || "U"}
+              </div>
+            )}
+
+            <div className="flex flex-col gap-1">
+              <span className="font-medium">
+                {chat.user?.blocked?.includes(currentUser?.userId || "") ? "User" : getDisplayName(chat.user)}
+              </span>
+              <p className="text-sm font-light truncate">{chat?.lastMessage}</p>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {/* Add User Modal */}
       {addMode && <AddUser onClick={() => setAddMode(false)} role={role} />}

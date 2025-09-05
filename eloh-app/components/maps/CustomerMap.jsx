@@ -541,7 +541,7 @@ export default function CustomerMap({ userDoc }) {
   };
 
   return (
-    <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 lg:pt-140 pt-170 lg:pl-66 p-4">
+    <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 pt-20 lg:pl-66 p-4">
       {/* Sidebar */}
       <CustomerSidebarMenu userDoc={userDoc} />
 
@@ -599,11 +599,10 @@ export default function CustomerMap({ userDoc }) {
             title="Create route"
             onClick={handleCreateRoute}
             disabled={locationLoading}
-            className={`flex-1 ${
-              locationLoading
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-[#03045e] hover:bg-[#023e8a]"
-            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer`}
+            className={`flex-1 ${locationLoading
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-[#03045e] hover:bg-[#023e8a]"
+              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer`}
           >
             Create Route
           </button>
@@ -684,11 +683,10 @@ export default function CustomerMap({ userDoc }) {
             title="Request ambulance now"
             onClick={() => setShowPay(true)}
             disabled={!routeReady}
-            className={`w-full ${
-              routeReady
-                ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
-                : "bg-gray-300 cursor-not-allowed"
-            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
+            className={`w-full ${routeReady
+              ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
+              : "bg-gray-300 cursor-not-allowed"
+              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
           >
             Request Ambulance
           </button>
