@@ -422,23 +422,23 @@ const DriversRegistrationForm = () => {
             <p className="text-sm text-red-600 mt-1">{errors.certificate}</p>
           )}
         </div>
-
         {/* Submit and Cancel Buttons */}
-        <div className="flex justify-center mt-6 gap-4">
+        <div className="flex flex-col sm:flex-row justify-center mt-6 gap-3 sm:gap-4">
           {/* Register Button */}
           <button
             type="submit"
             disabled={loading || submitting}
             title="Click to register as an ambulance driver"
-            className="bg-[#03045e] hover:bg-[#0077b6] text-white flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-400"
+            className="bg-[#03045e] hover:bg-[#0077b6] text-white flex items-center justify-center gap-2 py-2.5 px-4 sm:py-3 sm:px-6 text-sm sm:text-lg font-semibold rounded-lg sm:rounded-xl shadow-[0_6px_#999] active:shadow-[0_4px_#666] active:translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-400 w-full sm:w-auto"
           >
             {submitting ? "Submitting..." : "Register"}
           </button>
+
           {/* Cancel Registration Button */}
           <button
             type="button"
             onClick={() => router.push("/ambulance")}
-            className="bg-red-700 hover:bg-red-400 text-gray-100 flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transition-all duration-200 ease-in-out cursor-pointer"
+            className="bg-red-700 hover:bg-red-400 text-gray-100 flex items-center justify-center gap-2 py-2.5 px-4 sm:py-3 sm:px-6 text-sm sm:text-lg font-semibold rounded-lg sm:rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer disabled:cursor-not-allowed w-full sm:w-auto"
             title="Cancel registration and discard changes"
             disabled={submitting}
           >
