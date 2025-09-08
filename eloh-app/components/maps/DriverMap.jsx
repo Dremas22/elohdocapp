@@ -260,13 +260,68 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     }
   };
 
+  // const handleDecline = async () => {
+  //   if (!ambulanceRequest) return;
+
+  //   // Add current driver to excluded list
+  //   const currentDriverId = auth.currentUser?.uid;
+  //   const updatedExclusions = [...excludedDrivers, currentDriverId];
+  //   setExcludedDrivers(updatedExclusions);
+  //   const pickupLocation = {
+  //     lat: parseFloat(ambulanceRequest?.pickupLat),
+  //     lng: parseFloat(ambulanceRequest?.pickupLng),
+  //   };
+
+  //   const reqData = {
+  //     customerName: ambulanceRequest?.customerName,
+  //     pickupAddress: ambulanceRequest?.pickupAddress,
+  //     fare: parseFloat(ambulanceRequest?.fare),
+  //     distance: ambulanceRequest?.distance,
+  //     duration: ambulanceRequest?.duration,
+  //     pickupLocation,
+  //     type: ambulanceRequest?.type,
+  //   };
+
+  //   // Find next nearest driver
+  //   const nextDriver = await findNearestAvailableDriver(
+  //     pickupLocation,
+  //     updatedExclusions
+  //   );
+
+  //   if (nextDriver) {
+  //     // Send notification to driver
+  //     const response = await fetch(
+  //       `${process.env.NEXT_PUBLIC_URL}/api/send-ambulance-notification`,
+  //       {
+  //         method: "POST",
+  //         body: JSON.stringify({
+  //           driverId: nextDriver?.userId || nextDriver?.id,
+  //           tripDetails: reqData,
+  //           customerId: auth?.currentUser?.uid,
+  //         }),
+  //         headers: { "Content-Type": "application/json" },
+  //       }
+  //     );
+
+  //     if (!response.ok) {
+  //       toastError(`Error: ${response.text()}`);
+  //     }
+  //     toastInfo(`Request reassigned to driver ${nextDriver.id}`);
+  //   } else {
+  //     toastInfo("No other available drivers nearby.");
+  //   }
+
+  //   // Optionally clear current request from this driver's view
+  //   setAmbulanceRequest(null);
+  // };
+
   const handleDecline = async () => {
     if (!ambulanceRequest) return;
 
-    // Add current driver to excluded list
     const currentDriverId = auth.currentUser?.uid;
     const updatedExclusions = [...excludedDrivers, currentDriverId];
     setExcludedDrivers(updatedExclusions);
+
     const pickupLocation = {
       lat: parseFloat(ambulanceRequest?.pickupLat),
       lng: parseFloat(ambulanceRequest?.pickupLng),
@@ -282,36 +337,42 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
       type: ambulanceRequest?.type,
     };
 
-    // Find next nearest driver
-    const nextDriver = await findNearestAvailableDriver(
-      pickupLocation,
-      updatedExclusions
-    );
-
-    if (nextDriver) {
-      // Send notification to driver
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/send-ambulance-notification`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            driverId: nextDriver?.userId || nextDriver?.id,
-            tripDetails: reqData,
-            customerId: auth?.currentUser?.uid,
-          }),
-          headers: { "Content-Type": "application/json" },
-        }
+    try {
+      const nextDriver = await findNearestAvailableDriver(
+        pickupLocation,
+        updatedExclusions
       );
 
-      if (!response.ok) {
-        toastError(`Error: ${response.text()}`);
+      if (nextDriver) {
+        // 🔄 Reassign trip to next driver
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/send-ambulance-notification`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              driverId: nextDriver?.userId || nextDriver?.id,
+              tripDetails: reqData,
+              customerId: auth?.currentUser?.uid,
+              excludedDrivers: updatedExclusions, // ✅ Pass along the exclusions
+            }),
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+
+        toastInfo(`Request reassigned to driver ${nextDriver.id}`);
+      } else {
+        toastInfo("No other available drivers nearby.");
       }
-      toastInfo(`Request reassigned to driver ${nextDriver.id}`);
-    } else {
-      toastInfo("No other available drivers nearby.");
+    } catch (err) {
+      console.error("Error reassigning request:", err);
+      toastError("Failed to reassign request.");
     }
 
-    // Optionally clear current request from this driver's view
+    // Clear current driver's view
     setAmbulanceRequest(null);
   };
 

@@ -3,13 +3,7 @@
 import { db } from "@/db/client";
 import { useChatStore } from "@/hooks/useChatStore";
 import { useUserStore } from "@/hooks/useUserStore";
-import {
-  collection,
-  doc,
-  getDoc,
-  onSnapshot,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { FiMinus, FiPlus, FiSearch } from "react-icons/fi";
 import AddUser from "./AddUser";
 import { useEffect, useMemo, useState } from "react";
@@ -22,13 +16,17 @@ const ChatList = ({ role }) => {
   const [addMode, setAddMode] = useState(false);
   const [input, setInput] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [activeSubType, setActiveSubType] = useState("doctor");
 
   const { currentUser } = useUserStore();
   const { changeChat, updateUnseenCount } = useChatStore();
 
+  // Prepare category options for the filter
   const { allOptions, toId } = useMemo(() => {
-    const opts = [{ id: "all", title: "All" }, ...doctorCategories, ...nurseCategories];
+    const opts = [
+      { id: "all", title: "All" },
+      ...doctorCategories,
+      ...nurseCategories,
+    ];
     const map = new Map();
     [...doctorCategories, ...nurseCategories].forEach(({ id, title }) => {
       map.set(id.toLowerCase(), id);
@@ -42,107 +40,106 @@ const ChatList = ({ role }) => {
 
   useEffect(() => {
     if (!currentUser?.userId) return;
-    const unsubs = [];
-    let userChatsData = [];
-    let defaultUsersData = [];
 
-    const mergeAndSet = () => {
-      const unique = new Map();
-      defaultUsersData.forEach((u) => {
-        if (u?.user?.userId) unique.set(u.user.userId, u);
-      });
-      userChatsData.forEach((c) => {
-        if (c?.user?.userId) unique.set(c.user.userId, c);
-      });
-      const finalChats = Array.from(unique.values()).sort(
-        (a, b) => b.updatedAt - a.updatedAt
-      );
-      setChats(finalChats);
-      updateUnseenCount(finalChats);
-    };
+    const unSub = onSnapshot(
+      doc(db, "userchats", currentUser.userId),
+      async (res) => {
+        const items = res.data()?.chats || [];
 
-    const unSubChats = onSnapshot(doc(db, "userchats", currentUser.userId), async (res) => {
-      const items = res.data()?.chats || [];
-      const chatPromises = items.map(async (item) => {
-        let user = null;
+        const promises = items.map(async (item) => {
+          let user = null;
+          let collectionsToCheck = [];
 
-        // Determine the collection to lookup
-        let collectionsToCheck = [];
-        if (currentUser.role === "patient") {
-          if (item.receiverRole === "doctor") collectionsToCheck.push("doctors");
-          if (item.receiverRole === "nurse") collectionsToCheck.push("nurses");
-        } else if (["doctor", "nurse"].includes(currentUser.role)) {
-          collectionsToCheck.push("patients");
-        } else if (currentUser.role === "driver") collectionsToCheck.push("customers");
-        else if (currentUser.role === "customer") collectionsToCheck.push("drivers");
-
-        for (const col of collectionsToCheck) {
-          const userDocSnap = await getDoc(doc(db, col, item.receiverId));
-          if (userDocSnap.exists()) {
-            user = { userId: userDocSnap.id, ...userDocSnap.data() };
-            break;
+          // 🔹 Patient can have multiple consultation roles
+          if (currentUser.role === "patient") {
+            const { consultations } = currentUser || {};
+            if (consultations) {
+              if (consultations.doctor > 0) collectionsToCheck.push("doctors");
+              if (consultations.nurse > 0) collectionsToCheck.push("nurses");
+              if (consultations.driver > 0) collectionsToCheck.push("drivers");
+              if (consultations.customer > 0)
+                collectionsToCheck.push("customers");
+            }
+          } else if (
+            currentUser.role === "doctor" ||
+            currentUser.role === "nurse"
+          ) {
+            collectionsToCheck.push("patients");
+          } else if (currentUser.role === "driver") {
+            collectionsToCheck.push("customers");
+          } else if (currentUser.role === "customer") {
+            collectionsToCheck.push("drivers");
           }
-        }
-        return { ...item, user };
-      });
 
-      userChatsData = await Promise.all(chatPromises);
-      mergeAndSet();
-    });
+          for (const col of collectionsToCheck) {
+            const userDocRef = doc(db, col, item.receiverId);
+            const userDocSnap = await getDoc(userDocRef);
 
-    unsubs.push(unSubChats);
+            if (userDocSnap.exists()) {
+              user = { userId: userDocSnap.id, ...userDocSnap.data() };
+              break;
+            }
+          }
 
-    const collectionsToListen = [];
-    if (currentUser.role === "patient") {
-      const { consultations, consultationType } = currentUser;
-      if (consultations && consultationType !== "none") {
-        if (consultationType === "doctor" && consultations.doctor > 0) collectionsToListen.push("doctors");
-        else if (consultationType === "nurse" && consultations.nurse > 0) collectionsToListen.push("nurses");
-        else if (consultationType === "all") {
-          if (activeSubType === "doctor" && consultations.doctor > 0) collectionsToListen.push("doctors");
-          else if (activeSubType === "nurse" && consultations.nurse > 0) collectionsToListen.push("nurses");
-        }
+          return { ...item, user };
+        });
+
+        let chatData = await Promise.all(promises);
+
+        // Deduplicate by chatId
+        const uniqueChats = new Map();
+        chatData.forEach((c) => {
+          if (c?.user?.userId) {
+            uniqueChats.set(c.chatId, c);
+          }
+        });
+
+        const finalChats = Array.from(uniqueChats.values()).sort(
+          (a, b) => b.updatedAt - a.updatedAt
+        );
+
+        setChats(finalChats);
+
+        // Update global unseen count in Zustand
+        updateUnseenCount(finalChats);
       }
-    } else if (["doctor", "nurse"].includes(currentUser.role)) collectionsToListen.push("patients");
-    else if (currentUser.role === "driver") collectionsToListen.push("customers");
-    else if (currentUser.role === "customer") collectionsToListen.push("drivers");
+    );
 
-    collectionsToListen.forEach((col) => {
-      const unSubCol = onSnapshot(collection(db, col), (snap) => {
-        defaultUsersData = snap.docs.map((docSnap) => ({
-          chatId: `default-${docSnap.id}`,
-          receiverId: docSnap.id,
-          lastMessage: "",
-          updatedAt: 0,
-          isSeen: true,
-          user: { userId: docSnap.id, ...docSnap.data() },
-        }));
-        mergeAndSet();
-      });
-      unsubs.push(unSubCol);
-    });
-
-    return () => unsubs.forEach((fn) => fn());
-  }, [currentUser?.userId, currentUser?.role, activeSubType, updateUnseenCount]);
+    return () => unSub();
+  }, [currentUser?.userId]);
 
   const handleSelect = async (chat) => {
     if (!chat?.user || !currentUser?.userId) return;
+
+    // Map chats to keep only the properties stored in Firestore
     const userChats = chats.map(({ user, ...rest }) => rest);
+
+    // Deduplicate by receiverId
     const uniqueChatsMap = new Map();
     userChats.forEach((c) => {
       if (c?.receiverId) uniqueChatsMap.set(c.receiverId, c);
     });
+
+    // Convert back to array
     const dedupedChats = Array.from(uniqueChatsMap.values());
+
+    // Mark the selected chat as seen
     const chatIndex = dedupedChats.findIndex((c) => c.chatId === chat.chatId);
-    if (chatIndex !== -1) dedupedChats[chatIndex].isSeen = true;
+    if (chatIndex !== -1) {
+      dedupedChats[chatIndex].isSeen = true;
+    }
+
+    const userChatsRef = doc(db, "userchats", currentUser?.userId);
+
     try {
-      await updateDoc(doc(db, "userchats", currentUser.userId), { chats: dedupedChats });
+      await updateDoc(userChatsRef, { chats: dedupedChats });
       changeChat(chat.chatId, chat.user);
     } catch (err) {
       console.error(err);
     }
   };
 
+  // Get user category IDs
   const getUserCategoryIds = (user) => {
     if (!user) return [];
     const raw = user.category ?? user.categories ?? user.specialty ?? [];
@@ -153,13 +150,20 @@ const ChatList = ({ role }) => {
       .filter(Boolean);
   };
 
+  // Filter chats by search input and category
   const filteredChats = useMemo(() => {
+    if (!input.trim() && selectedCategory === "all") return chats;
+
     const needle = input.trim().toLowerCase();
+
     return chats.filter((c) => {
-      if (!c?.user?.fullName) return false;
+      if (!c?.user || !c?.user?.fullName) return false;
+
       const name = c.user.fullName.toLowerCase();
       const matchesInput = !needle || name.includes(needle);
+
       if (selectedCategory === "all") return matchesInput;
+
       const userCats = getUserCategoryIds(c.user);
       return matchesInput && userCats.includes(selectedCategory);
     });
@@ -185,12 +189,16 @@ const ChatList = ({ role }) => {
           title="Add new users"
           onClick={() => setAddMode((prev) => !prev)}
         >
-          {addMode ? <FiMinus className="w-4 h-4 sm:w-5 sm:h-5" /> : <FiPlus className="w-4 h-4 sm:w-5 sm:h-5" />}
+          {addMode ? (
+            <FiMinus className="w-4 h-4 sm:w-5 sm:h-5" />
+          ) : (
+            <FiPlus className="w-4 h-4 sm:w-5 sm:h-5" />
+          )}
         </div> */}
       </div>
 
-      {/* Category Filter */}
-      {currentUser?.role === "patient" && currentUser?.consultations && currentUser?.consultationType !== "none" && (
+      {/* Category Filter For Patients */}
+      {currentUser?.role === "patient" && (
         <CategoryFilter
           options={allOptions}
           selected={selectedCategory}
@@ -223,36 +231,40 @@ const ChatList = ({ role }) => {
 
       )}
 
-      {/* Chat List - Scrollable */}
-      <div className="flex-1 overflow-y-auto px-2 sm:px-5 space-y-2">
-        {filteredChats.map((chat) => (
-          <div
-            key={chat?.chatId}
-            onClick={() => handleSelect(chat)}
-            className={`flex items-center gap-5 p-3 sm:p-5 cursor-pointer border-b border-gray-600 transition-colors ${chat?.isSeen ? "bg-transparent hover:bg-gray-800" : "bg-blue-600/50 hover:bg-blue-500/60"
-              }`}
-          >
-            {chat.user?.photoUrl ? (
-              <img
-                src={chat.user.photoUrl || "/images/default_avatar.jpg"}
-                alt="avatar"
-                className="w-12 h-12 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center text-white font-medium">
-                {chat?.user?.fullName?.charAt(0)?.toUpperCase() || "U"}
-              </div>
-            )}
-
-            <div className="flex flex-col gap-1">
-              <span className="font-medium">
-                {chat.user?.blocked?.includes(currentUser?.userId || "") ? "User" : getDisplayName(chat.user)}
-              </span>
-              <p className="text-sm font-light truncate">{chat?.lastMessage}</p>
+      {/* Chat Items */}
+      {filteredChats.map((chat) => (
+        <div
+          key={chat?.chatId}
+          onClick={() => handleSelect(chat)}
+          className={`flex items-center gap-5 p-5 cursor-pointer border-b border-gray-600 transition-colors ${chat?.isSeen
+              ? "bg-transparent hover:bg-gray-800"
+              : "bg-blue-600/50 hover:bg-blue-500/60"
+            }`}
+        >
+          {/* Avatar */}
+          {chat.user?.photoUrl ? (
+            <img
+              src={chat.user.photoUrl || "/images/default_avatar.jpg"}
+              alt="avatar"
+              className="w-12 h-12 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center text-white font-medium">
+              {chat?.user?.fullName?.charAt(0)?.toUpperCase() || "U"}
             </div>
+          )}
+
+          {/* Username & Last Message */}
+          <div className="flex flex-col gap-2">
+            <span className="font-medium">
+              {chat.user?.blocked?.includes(currentUser?.userId || "")
+                ? "User"
+                : getDisplayName(chat.user)}
+            </span>
+            <p className="text-sm font-light truncate">{chat?.lastMessage}</p>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
 
       {/* Add User Modal */}
       {addMode && <AddUser onClick={() => setAddMode(false)} role={role} />}
