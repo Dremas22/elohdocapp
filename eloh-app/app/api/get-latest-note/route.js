@@ -1,32 +1,35 @@
 import { db, auth } from "@/db/server";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
-export const POST = async (req) => {
+export async function POST(req) {
   try {
-    // Get token from cookies or Authorization header
-    const cookieToken = req.cookies.get("session")?.value;
-    const headerToken = req.headers.get("authorization")?.split("Bearer ")[1];
-    const token = cookieToken || headerToken;
+    // ✅ Get session cookie from Next.js cookies()
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("session")?.value;
 
-    if (!token) {
+    if (!sessionCookie) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verify Firebase session
+    // ✅ Verify Firebase session cookie
     let decodedToken;
     try {
-      decodedToken = await auth.verifySessionCookie(token, true);
+      decodedToken = await auth.verifySessionCookie(sessionCookie, true);
     } catch (err) {
       console.error("Session verification failed:", err);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // For example, check if the user is a doctor
-    if (decodedToken.role !== "doctor") {
+    console.log({ decodedToken }, "DECODED_TOKEN");
+
+    // ✅ Explicit role whitelist (hard guard)
+    const allowedRoles = ["doctor", "nurse"];
+    if (!allowedRoles.includes(decodedToken.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Parse request body
+    // ✅ Parse request body
     const { patientId, noteType } = await req.json();
 
     if (!patientId || !noteType) {
@@ -36,7 +39,7 @@ export const POST = async (req) => {
       );
     }
 
-    // Get patient document
+    // ✅ Fetch patient doc
     const patientDoc = await db.collection("patients").doc(patientId).get();
 
     if (!patientDoc.exists) {
@@ -61,7 +64,7 @@ export const POST = async (req) => {
       );
     }
 
-    // Sort by createdAt (descending) and get the latest
+    // ✅ Sort and return latest
     const latest = notes
       .filter((n) => n.createdAt)
       .sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis())[0];
@@ -74,4 +77,4 @@ export const POST = async (req) => {
       { status: 500 }
     );
   }
-};
+}
