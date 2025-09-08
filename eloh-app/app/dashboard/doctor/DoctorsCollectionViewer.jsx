@@ -78,7 +78,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
   const { isVerified } = userDocState;
 
   return (
-    <div className="min-h-screen w-full flex flex-col pt-18 relative overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col lg:pt-15 pt-5 relative overflow-hidden">
       <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
         <main className="w-full flex flex-col flex-grow overflow-hidden px-4 sm:px-6 lg:px-10">
           {isVerified === true ? (

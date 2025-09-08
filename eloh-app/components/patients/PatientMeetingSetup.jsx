@@ -140,7 +140,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
       </div>
 
       {/* Welcome Banner */}
-      <div className="mt-6 lg:pr-50 px-4 sm:px-6 text-center">
+      <div className="mt-5 lg:pr-50 px-4 sm:px-6 text-center">
         <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text font-extrabold text-transparent text-2xl sm:text-3xl md:text-4xl">
           Welcome to Your Virtual Medical Consultation
         </h1>
@@ -194,7 +194,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             </Link>
           </div>
         ) : (
-          <main className="lg:w-[90vw] w-[49.5vh] lg:ml-[50px] -ml-[40px] flex flex-col flex-grow h-full mt-6">
+          <main className="lg:w-[90vw] w-[49.5vh] lg:ml-[50px] -ml-[40px] flex flex-col flex-grow h-full lg:mt-6">
             <div className="flex flex-col flex-grow overflow-auto px-2 sm:px-4">
               <ElohDocChatApp role="patient" />
             </div>
