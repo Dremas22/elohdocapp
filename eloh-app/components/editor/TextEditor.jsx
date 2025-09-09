@@ -56,7 +56,7 @@ const RichTextEditor = ({ roomID }) => {
         );
         if (!res.ok) throw new Error("Failed to fetch patient data");
         const data = await res.json();
-        setPatientData(data);
+        setPatientData(data?.patientData);
       } catch (error) {
         console.error("Error fetching patient:", error);
       }
