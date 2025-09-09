@@ -9,6 +9,7 @@ import {
   getDoc,
   onSnapshot,
   serverTimestamp,
+  setDoc,
   updateDoc,
 } from "firebase/firestore";
 import { useUserStore } from "@/hooks/useUserStore";
@@ -50,7 +51,15 @@ const ChatApp = () => {
   useEffect(() => {
     if (!chatId) return;
     const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
-      if (res.exists()) setChat(res.data());
+      if (res.exists()) {
+        const data = res.data();
+        setChat({
+          ...data,
+          messages: data.messages || [], // always array
+        });
+      } else {
+        setChat({ messages: [] });
+      }
     });
     return () => unSub();
   }, [chatId]);
@@ -143,17 +152,22 @@ const ChatApp = () => {
         // });
       }
 
-      if (chatId) {
-        await updateDoc(doc(db, "chats", chatId), {
+      // 👇 Define chatRef before using it
+      const chatRef = doc(db, "chats", chatId);
+
+      await setDoc(
+        chatRef,
+        {
           messages: arrayUnion({
             senderId: currentUser?.userId,
-            text,
+            text: text.trim(),
             createdAt: new Date(),
             photoURL: currentUser?.photoUrl || "/images/default_avatar.jpg",
             ...(imgUrl && { img: imgUrl }),
           }),
-        });
-      }
+        },
+        { merge: true } // 👈 ensures doc exists
+      );
 
       // Update lastMessage and isSeen in userchats
       const userIDs = [currentUser?.userId, user?.userId];
@@ -269,6 +283,8 @@ const ChatApp = () => {
     }
     setIncomingCall(null);
   };
+
+  console.log(chat, "CHATS_123");
 
   return (
     <div className="flex-2 flex flex-col border-x border-gray-700 lg:h-[80vh] h-[70vh] ">
