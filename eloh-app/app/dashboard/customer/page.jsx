@@ -13,7 +13,7 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 const CustomerDashboard = () => {
   const [userDoc, setUserDoc] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { fetchUserInfo } = useUserStore();
+  const { fetchUserInfo, currentUser: customer } = useUserStore();
   const { currentUser } = useCurrentUser();
 
   useEffect(() => {
@@ -22,16 +22,17 @@ const CustomerDashboard = () => {
       return;
     }
 
-    const docRef = doc(db, "customers", currentUser.uid);
+    const docRef = doc(db, "customers", currentUser?.uid);
 
     // 🔹 Subscribe to live updates
     const unsubscribe = onSnapshot(
       docRef,
       (docSnap) => {
         if (docSnap.exists()) {
-          const data = { id: docSnap.id, ...docSnap.data() };
-          setUserDoc(data);
-          fetchUserInfo(data);
+          const resp = { id: docSnap.id, ...docSnap.data() };
+          console.log({ resp, customer }, "DATA_CUSTOMER_USER-DOC");
+          setUserDoc(resp.data);
+          fetchUserInfo(resp);
         } else {
           console.warn(
             "Customer document not found for user:",
@@ -48,7 +49,7 @@ const CustomerDashboard = () => {
     );
 
     return () => unsubscribe();
-  }, [currentUser, fetchUserInfo]);
+  }, [currentUser?.uid, fetchUserInfo]);
 
   return (
     <div className="flex flex-col w-full min-h-screen text-black">
@@ -65,7 +66,7 @@ const CustomerDashboard = () => {
       {/* Map content */}
       <div className="flex flex-1 items-center justify-center h-full">
         <Suspense fallback={<div>Loading map...</div>}>
-          <CustomerMap userDoc={userDoc} />
+          <CustomerMap userDoc={userDoc || customer} />
         </Suspense>
       </div>
     </div>

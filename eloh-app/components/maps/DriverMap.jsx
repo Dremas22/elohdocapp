@@ -164,8 +164,6 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
       ),
     };
 
-    //await saveDriverRoute(request?.driverId, request);
-
     // Create / update trip in Firestore
     try {
       const tripRef = doc(db, "trips", request?.customerId); // Using customerId as doc ID

@@ -55,7 +55,7 @@ export async function POST(req) {
               }`,
               description: `Pickup: ${pickupLocation?.address || "Unknown"}`,
             },
-            unit_amount: Math.round(fare * 100), // Stripe expects cents
+            unit_amount: Math.round(fare * 100),
           },
           quantity: 1,
         },
