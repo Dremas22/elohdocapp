@@ -70,7 +70,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
         ) {
           setAmbulanceRequest(trip);
         } else {
-          toastError("Trip missing origin or destination:");
+          return null;
         }
       },
       (error) => {

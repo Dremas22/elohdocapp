@@ -284,8 +284,6 @@ const ChatApp = () => {
     setIncomingCall(null);
   };
 
-  console.log(chat, "CHATS_123");
-
   return (
     <div className="flex-2 flex flex-col border-x border-gray-700 lg:h-[80vh] h-[70vh] ">
       {/* Top */}
