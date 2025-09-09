@@ -317,13 +317,15 @@ const ChatApp = () => {
 
             {/* Action Icons */}
             <div className="flex gap-3 md:gap-4 text-4xl md:text-4xl">
-              <IoVideocam
-                className="cursor-pointer hover:text-white text-[#03045e] lg:text-5xl md:text-3xl text-3xl"
-                title={`Start a video consultation with ${getDisplayName(
-                  user
-                )}`}
-                onClick={handleMakeCall}
-              />
+              {!["customer", "driver"].includes(currentUser?.role) && (
+                <IoVideocam
+                  className="cursor-pointer hover:text-white text-[#03045e] lg:text-5xl md:text-3xl text-3xl"
+                  title={`Start a video consultation with ${getDisplayName(
+                    user
+                  )}`}
+                  onClick={handleMakeCall}
+                />
+              )}
 
               <a
                 className="lg:pt-2 pt-1"
