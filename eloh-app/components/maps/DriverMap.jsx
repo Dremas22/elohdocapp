@@ -258,61 +258,6 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     }
   };
 
-  // const handleDecline = async () => {
-  //   if (!ambulanceRequest) return;
-
-  //   // Add current driver to excluded list
-  //   const currentDriverId = auth.currentUser?.uid;
-  //   const updatedExclusions = [...excludedDrivers, currentDriverId];
-  //   setExcludedDrivers(updatedExclusions);
-  //   const pickupLocation = {
-  //     lat: parseFloat(ambulanceRequest?.pickupLat),
-  //     lng: parseFloat(ambulanceRequest?.pickupLng),
-  //   };
-
-  //   const reqData = {
-  //     customerName: ambulanceRequest?.customerName,
-  //     pickupAddress: ambulanceRequest?.pickupAddress,
-  //     fare: parseFloat(ambulanceRequest?.fare),
-  //     distance: ambulanceRequest?.distance,
-  //     duration: ambulanceRequest?.duration,
-  //     pickupLocation,
-  //     type: ambulanceRequest?.type,
-  //   };
-
-  //   // Find next nearest driver
-  //   const nextDriver = await findNearestAvailableDriver(
-  //     pickupLocation,
-  //     updatedExclusions
-  //   );
-
-  //   if (nextDriver) {
-  //     // Send notification to driver
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_URL}/api/send-ambulance-notification`,
-  //       {
-  //         method: "POST",
-  //         body: JSON.stringify({
-  //           driverId: nextDriver?.userId || nextDriver?.id,
-  //           tripDetails: reqData,
-  //           customerId: auth?.currentUser?.uid,
-  //         }),
-  //         headers: { "Content-Type": "application/json" },
-  //       }
-  //     );
-
-  //     if (!response.ok) {
-  //       toastError(`Error: ${response.text()}`);
-  //     }
-  //     toastInfo(`Request reassigned to driver ${nextDriver.id}`);
-  //   } else {
-  //     toastInfo("No other available drivers nearby.");
-  //   }
-
-  //   // Optionally clear current request from this driver's view
-  //   setAmbulanceRequest(null);
-  // };
-
   const handleDecline = async () => {
     if (!ambulanceRequest) return;
 
@@ -336,6 +281,10 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     };
 
     try {
+      /**
+       * TODO: Make a fetch call to /api/confirm-ambulance-payment instead
+       * of using the client use (await findNearestAvailableDriverServer())
+       */
       const nextDriver = await findNearestAvailableDriver(
         pickupLocation,
         updatedExclusions
