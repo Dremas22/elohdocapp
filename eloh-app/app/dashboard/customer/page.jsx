@@ -30,7 +30,6 @@ const CustomerDashboard = () => {
       (docSnap) => {
         if (docSnap.exists()) {
           const resp = { id: docSnap.id, ...docSnap.data() };
-          console.log({ resp, customer }, "DATA_CUSTOMER_USER-DOC");
           setUserDoc(resp.data);
           fetchUserInfo(resp);
         } else {
