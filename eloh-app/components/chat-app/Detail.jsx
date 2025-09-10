@@ -1,4 +1,5 @@
 "use client";
+
 import { COLLECTIONS } from "@/constants";
 import { auth, db } from "@/db/client";
 import { useChatStore } from "@/hooks/useChatStore";
@@ -93,7 +94,7 @@ const Detail = () => {
         {/* User Info at top */}
         <div className="flex flex-col items-center gap-4 p-8 border-b border-gray-700">
           <img
-            src={user?.photoURL | "/images/deafult_avatart.jpg"}
+            src={user?.photoURL || "/images/default_avatar.jpg"}
             alt="avatar"
             className="w-24 h-24 rounded-full object-cover"
           />
@@ -115,7 +116,8 @@ const Detail = () => {
           <button
             title={`Block ${getDisplayName(user) || "User"}`}
             onClick={handleBlock}
-            className="bg-[#03045e] text-[#c51c0a] font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            disabled={loading}
+            className="bg-[#03045e] text-[#c51c0a] font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isCurrentUserBlocked
               ? "You are Blocked!"
@@ -123,13 +125,13 @@ const Detail = () => {
                 ? "User Blocked"
                 : loading
                   ? "Processing..."
-                  : `Block`}
+                  : "Block"}
           </button>
           <button
             title="Click to Logout your account"
             onClick={handleAuthAction}
-            className="bg-[#03045e] text-white font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
             disabled={loading}
+            className="bg-[#03045e] text-white font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Signing out..." : "Logout"}
           </button>
