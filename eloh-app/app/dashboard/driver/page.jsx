@@ -5,6 +5,12 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import DriverCollectionViewer from "./DriverCollectionViewer";
 
+export const metadata = {
+  title: "Ambulance Driver Dashboard | ElohApp",
+  description:
+    "Access your ambulance driver dashboard on ElohApp to manage emergency requests, assist patients, and stay connected with the response team.",
+};
+
 const DriversDashboard = async () => {
   const cookieStore = await cookies();
   const session = cookieStore?.get("session")?.value;

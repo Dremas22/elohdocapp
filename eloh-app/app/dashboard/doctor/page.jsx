@@ -1,4 +1,3 @@
-// app/dashboard/doctor/page.jsx
 import { auth, db } from "@/db/server";
 import { cookies } from "next/headers";
 import DoctorsCollectionViewer from "./DoctorsCollectionViewer";
@@ -8,11 +7,18 @@ import Link from "next/link";
 import DoctorDashboardNavbar from "@/app/dashboard/doctor/doctorNav";
 import SidebarMenu from "./doctorSidebar";
 
+export const metadata = {
+  title: "Doctor Dashboard | ElohApp",
+  description:
+    "Access your doctor dashboard on ElohApp to manage patients, view details, and stay connected.",
+};
+
 const DoctorsDashboard = async () => {
   const cookieStore = await cookies();
   const session = cookieStore?.get("session")?.value;
 
-  if (!session) return <p className="text-center mt-20 text-red-600">Unauthorized</p>;
+  if (!session)
+    return <p className="text-center mt-20 text-red-600">Unauthorized</p>;
 
   try {
     const decoded = await auth.verifySessionCookie(session, true);
@@ -25,7 +31,10 @@ const DoctorsDashboard = async () => {
     let patients = [];
     if (doctorData.isVerified) {
       const patientsSnap = await db.collection("patients").get();
-      patients = patientsSnap.docs.map((doc) => ({ id: doc.id, ...serializeData(doc.data()) }));
+      patients = patientsSnap.docs.map((doc) => ({
+        id: doc.id,
+        ...serializeData(doc.data()),
+      }));
     }
 
     return (
@@ -54,7 +63,11 @@ const DoctorsDashboard = async () => {
 
           {/* Main content */}
           <main className="w-full flex flex-col flex-grow overflow-hidden px-4 sm:px-6 lg:px-8">
-            <DoctorsCollectionViewer userDoc={doctorData} patients={patients} userId={uid} />
+            <DoctorsCollectionViewer
+              userDoc={doctorData}
+              patients={patients}
+              userId={uid}
+            />
           </main>
         </div>
       </div>
@@ -64,9 +77,12 @@ const DoctorsDashboard = async () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-950 px-4 py-12">
         <div className="bg-white shadow-xl rounded-2xl p-10 max-w-2xl w-full text-center border border-red-200">
-          <h1 className="text-2xl font-bold text-red-600 mb-2">Something went wrong</h1>
+          <h1 className="text-2xl font-bold text-red-600 mb-2">
+            Something went wrong
+          </h1>
           <p className="text-gray-600 mb-6">
-            We encountered a server error while loading your dashboard. Please try again later.
+            We encountered a server error while loading your dashboard. Please
+            try again later.
           </p>
           <Link
             href="/"
