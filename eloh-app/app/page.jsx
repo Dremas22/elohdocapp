@@ -5,7 +5,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "ElohApp | Home page",
+  title: "Home | ElohApp",
+  description:
+    "Welcome to ElohApp – your platform for accessing healthcare services, booking consultations, and connecting with doctors, nurses, and ambulance services.",
 };
 
 export default async function Home() {

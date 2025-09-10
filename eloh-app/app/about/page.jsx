@@ -1,9 +1,11 @@
-"use client";
-
 import Navbar from "@/components/MainNavbar";
 import { FaHeartbeat, FaUserMd, FaStethoscope } from "react-icons/fa";
 
-
+export const metadata = {
+  title: "About Us | ElohApp",
+  description:
+    "Learn more about ElohApp — our mission, vision, and team dedicated to providing accessible and high-quality telehealth services across Africa.",
+};
 const About = () => {
   return (
     <>
@@ -11,10 +13,10 @@ const About = () => {
 
       <div className="min-h-screen bg-gradient-to-br from-[#e0f7fa] to-[#f0f4f8] flex flex-col items-center justify-center text-gray-800 px-6 py-10">
         <div className="max-w-5xl w-full text-center space-y-8">
-
           {/* Tagline */}
           <p className="text-lg md:text-xl text-gray-600">
-            Bringing healthcare to your fingertips — Your health is one click away.
+            Bringing healthcare to your fingertips — Your health is one click
+            away.
           </p>
 
           {/* About Text */}
@@ -23,9 +25,9 @@ const About = () => {
             <p>
               <strong>Elohdoc</strong> is a cutting-edge telehealth platform
               committed to revolutionizing access to medical care across Africa
-              and beyond. Whether you're a patient seeking consultation,
-              a nurse managing care, or a doctor delivering quality healthcare —
-              Elohdoc connects you seamlessly.
+              and beyond. Whether you're a patient seeking consultation, a nurse
+              managing care, or a doctor delivering quality healthcare — Elohdoc
+              connects you seamlessly.
             </p>
 
             <h2 className="text-2xl font-bold text-[#0077b6]">Our Mission</h2>
@@ -50,7 +52,8 @@ const About = () => {
               </div>
               <h3 className="text-lg font-semibold mb-1">Expert Doctors</h3>
               <p className="text-sm text-gray-600">
-                Consult with licensed, experienced professionals from your device.
+                Consult with licensed, experienced professionals from your
+                device.
               </p>
             </div>
 

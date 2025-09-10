@@ -5,6 +5,12 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
+export const metadata = {
+  title: "Nurse Dashboard | ElohApp",
+  description:
+    "Access your nurse dashboard on ElohApp to manage patients, view details, and stay connected.",
+};
+
 const NurseDashboardPage = async () => {
   const cookieStore = await cookies();
   const session = cookieStore?.get("session")?.value;
@@ -64,7 +70,8 @@ const NurseDashboardPage = async () => {
             Something went wrong
           </h1>
           <p className="text-gray-600 mb-6">
-            We encountered a server error while loading your dashboard. Please try again later.
+            We encountered a server error while loading your dashboard. Please
+            try again later.
           </p>
 
           <div className="relative group inline-block">
