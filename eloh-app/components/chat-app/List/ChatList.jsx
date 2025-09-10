@@ -232,9 +232,9 @@ const ChatList = ({ role }) => {
             className={`flex items-center gap-5 p-3 sm:p-5 cursor-pointer border-b border-gray-600 transition-colors ${chat?.isSeen ? "bg-transparent hover:bg-gray-800" : "bg-blue-600/50 hover:bg-blue-500/60"
               }`}
           >
-            {chat.user?.photoUrl ? (
+            {chat.user?.photoURL ? (
               <img
-                src={chat.user.photoUrl || "/images/default_avatar.jpg"}
+                src={chat.user.photoURL || "/images/default_avatar.jpg"}
                 alt="avatar"
                 className="w-12 h-12 rounded-full object-cover"
               />

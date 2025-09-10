@@ -149,7 +149,7 @@ const ChatApp = () => {
             senderId: currentUser?.userId,
             text,
             createdAt: new Date(),
-            photoURL: currentUser?.photoUrl || "/images/default_avatar.jpg",
+            photoURL: currentUser?.photoURL || "/images/default_avatar.jpg",
             ...(imgUrl && { img: imgUrl }),
           }),
         });
@@ -221,7 +221,7 @@ const ChatApp = () => {
         caller: {
           id: caller.userId,
           name: caller.fullName,
-          photoUrl: caller.photoUrl || "/images/default_avatar.jpg",
+          photoURL: caller.photoURL || "/images/default_avatar.jpg",
         },
       });
 
@@ -287,7 +287,7 @@ const ChatApp = () => {
             {/* User Info */}
             <div className="flex items-center gap-2 md:gap-4 ml-0 md:ml-0">
               <img
-                src={user?.photoUrl || "/images/default_avatar.jpg"}
+                src={user?.photoURL || "/images/default_avatar.jpg"}
                 alt="avatar"
                 className="w-10 h-10 md:w-14 md:h-14 rounded-full object-cover"
               />
@@ -390,11 +390,10 @@ const ChatApp = () => {
           title="Send message"
           onClick={handleSend}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
-          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-xl text-white text-sm md:text-base shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out ${
-            isCurrentUserBlocked || isReceiverBlocked
-              ? "bg-blue-400/60 cursor-not-allowed"
-              : "bg-[#03045e] hover:bg-[#023e8a] cursor-pointer"
-          }`}
+          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-xl text-white text-sm md:text-base shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out ${isCurrentUserBlocked || isReceiverBlocked
+            ? "bg-blue-400/60 cursor-not-allowed"
+            : "bg-[#03045e] hover:bg-[#023e8a] cursor-pointer"
+            }`}
         >
           <span className="hidden md:inline">Send</span>
           <IoSend />

@@ -13,7 +13,7 @@ const ChatMessage = ({ message, currentUser }) => {
       {/* Receiver Avatar (only if not sender) */}
       {!isSender && (
         <img
-          src={message?.photoUrl || "/images/default_avatar.jpg"}
+          src={message?.photoURL || "/images/default_avatar.jpg"}
           alt="Sender Avatar"
           className="w-8 h-8 rounded-full object-cover"
         />
