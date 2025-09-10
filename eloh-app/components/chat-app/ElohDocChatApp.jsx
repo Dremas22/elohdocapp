@@ -13,11 +13,19 @@ const ElohDocChatApp = ({ setOpenChat, role }) => {
   const { currentUser, isLoading } = useUserStore();
   const { chatId, setChatId } = useChatStore();
   const router = useRouter();
-  const [isMobileView, setIsMobileView] = useState(false);
+  const [viewMode, setViewMode] = useState("desktop");
 
-  // Detect mobile/tablet view
+  // Detect view mode (mobile, tablet, desktop)
   useEffect(() => {
-    const handleResize = () => setIsMobileView(window.innerWidth < 768);
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setViewMode("mobile");
+      } else if (window.innerWidth < 1024) {
+        setViewMode("tablet");
+      } else {
+        setViewMode("desktop");
+      }
+    };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -39,21 +47,32 @@ const ElohDocChatApp = ({ setOpenChat, role }) => {
   }
 
   return (
-    <div className="lg:w-[145vh] w-full h-full max-h-full justify-center bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 flex pt-7 overflow-visible relative">
+    <div className="lg:w-[145vh] md:w-[95vh] w-full h-full max-h-full justify-center bg-[rgba(17,25,40,0.75)] backdrop-blur-[19px] saturate-180 rounded-xl border border-white/20 flex pt-7 overflow-visible relative">
       {/* Desktop Layout */}
-      {!isMobileView ? (
+      {viewMode === "desktop" && (
         <>
           <List setOpenChat={setOpenChat} />
           {chatId && <ChatApp role={role} />}
           {chatId && <Detail role={role} />}
         </>
-      ) : (
-        // Mobile/Tablet flow
+      )}
+
+      {/* Tablet Layout */}
+      {viewMode === "tablet" && (
+        <>
+          <List setOpenChat={setOpenChat} />
+          {chatId && <ChatApp role={role} />}
+          {/* No Detail panel on tablet to avoid cramping */}
+        </>
+      )}
+
+      {/* Mobile Layout */}
+      {viewMode === "mobile" && (
         <>
           {!chatId ? (
             <List />
           ) : (
-            <div className="flex flex-col w-full h-[50vh] relative">
+            <div className="flex flex-col w-full h-[60vh] relative">
               <ChatApp role={role} />
             </div>
           )}
