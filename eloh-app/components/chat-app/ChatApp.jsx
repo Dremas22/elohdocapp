@@ -9,6 +9,7 @@ import {
   getDoc,
   onSnapshot,
   serverTimestamp,
+  setDoc,
   updateDoc,
 } from "firebase/firestore";
 import { useUserStore } from "@/hooks/useUserStore";
@@ -50,7 +51,15 @@ const ChatApp = () => {
   useEffect(() => {
     if (!chatId) return;
     const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
-      if (res.exists()) setChat(res.data());
+      if (res.exists()) {
+        const data = res.data();
+        setChat({
+          ...data,
+          messages: data.messages || [], // always array
+        });
+      } else {
+        setChat({ messages: [] });
+      }
     });
     return () => unSub();
   }, [chatId]);
@@ -143,17 +152,22 @@ const ChatApp = () => {
         // });
       }
 
-      if (chatId) {
-        await updateDoc(doc(db, "chats", chatId), {
+      // 👇 Define chatRef before using it
+      const chatRef = doc(db, "chats", chatId);
+
+      await setDoc(
+        chatRef,
+        {
           messages: arrayUnion({
             senderId: currentUser?.userId,
-            text,
+            text: text.trim(),
             createdAt: new Date(),
             photoURL: currentUser?.photoURL || "/images/default_avatar.jpg",
             ...(imgUrl && { img: imgUrl }),
           }),
-        });
-      }
+        },
+        { merge: true } // 👈 ensures doc exists
+      );
 
       // Update lastMessage and isSeen in userchats
       const userIDs = [currentUser?.userId, user?.userId];
@@ -303,13 +317,15 @@ const ChatApp = () => {
 
             {/* Action Icons */}
             <div className="flex gap-3 md:gap-4 text-4xl md:text-4xl">
-              <IoVideocam
-                className="cursor-pointer hover:text-white text-[#03045e] lg:text-5xl md:text-3xl text-3xl"
-                title={`Start a video consultation with ${getDisplayName(
-                  user
-                )}`}
-                onClick={handleMakeCall}
-              />
+              {!["customer", "driver"].includes(currentUser?.role) && (
+                <IoVideocam
+                  className="cursor-pointer hover:text-white text-[#03045e] lg:text-5xl md:text-3xl text-3xl"
+                  title={`Start a video consultation with ${getDisplayName(
+                    user
+                  )}`}
+                  onClick={handleMakeCall}
+                />
+              )}
 
               <a
                 className="lg:pt-2 pt-1"

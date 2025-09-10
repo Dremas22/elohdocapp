@@ -70,7 +70,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
         ) {
           setAmbulanceRequest(trip);
         } else {
-          toastError("Trip missing origin or destination:");
+          return null;
         }
       },
       (error) => {
@@ -163,8 +163,6 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
           request?.pickupLocation?.lng
       ),
     };
-
-    //await saveDriverRoute(request?.driverId, request);
 
     // Create / update trip in Firestore
     try {

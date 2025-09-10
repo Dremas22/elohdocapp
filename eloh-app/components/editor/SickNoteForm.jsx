@@ -189,11 +189,6 @@ const SickNoteForm = ({ patientData, doctorId, mode, patientId }) => {
         )}
       </div>
 
-      {error && <MessageBanner type="error" message={error} />}
-      {successMessage && (
-        <MessageBanner type="success" message={successMessage} />
-      )}
-
       {/* Buttons container for submit and preview */}
       <div className="flex flex-wrap justify-between items-center gap-4 pt-4">
         {!signature && !showSignaturePad && (

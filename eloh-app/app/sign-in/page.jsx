@@ -1,6 +1,12 @@
 import GoogleSignInButton from "@/components/SignInWithGoogleBtn";
 import { redirect } from "next/navigation";
 
+export const metadata = {
+  title: "Sign In / Sign Up | ElohApp",
+  description:
+    "Sign in or create an ElohApp account to access your dashboard, request services, or join as a doctor, nurse, patient, customers, or driver.",
+};
+
 const SignInPage = async ({ searchParams }) => {
   const role = (await searchParams).role;
 
