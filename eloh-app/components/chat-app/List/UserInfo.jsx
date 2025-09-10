@@ -27,7 +27,7 @@ const UserInfo = ({ setOpenChat }) => {
       {/* User Info */}
       <div className="flex items-center lg:gap-5 gap-3">
         <img
-          src={currentUser?.photoUrl || "/images/default_avatar.jpg"}
+          src={currentUser?.photoURL || "/images/default_avatar.jpg"}
           alt="User Avatar"
           className="lg:w-12 lg:h-12 w-10 h-10 rounded-full object-cover"
         />
