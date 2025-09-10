@@ -19,7 +19,7 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
   const [signature, setSignature] = useState(null);
   const [showSignaturePad, setShowSignaturePad] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [instructions, setInstructions] = useState("");
   const [medications, setMedications] = useState([]);
   const [fieldErrors, setFieldErrors] = useState({});
@@ -247,11 +247,6 @@ const PrescriptionForm = ({ patientData, doctorId, mode, patientId }) => {
       )}
       {fieldErrors.signature && (
         <p className="text-red-600 text-xs mt-2">{fieldErrors.signature}</p>
-      )}
-
-      {error && <MessageBanner type="error" message={error} />}
-      {successMessage && (
-        <MessageBanner type="success" message={successMessage} />
       )}
 
       {/* Buttons container */}

@@ -68,6 +68,8 @@ export default function CustomerMap({ userDoc }) {
 
       let tripData = fareDetails;
 
+      console.log(tripData, "TRIP_DATA_XXX123");
+
       // 🔹 Recover from localStorage if missing
       if (!tripData) {
         const stored = localStorage.getItem("fareDetails");
@@ -84,8 +86,6 @@ export default function CustomerMap({ userDoc }) {
       tripData = {
         ...tripData,
         customerId: currentUser?.uid || userDoc?.userId,
-        customerName:
-          userDoc?.fullName || currentUser?.displayName || "Unknown",
         customerEmail:
           currentUser?.email || userDoc?.email || "unknown@email.com",
         destination:
@@ -599,10 +599,11 @@ export default function CustomerMap({ userDoc }) {
             title="Create route"
             onClick={handleCreateRoute}
             disabled={locationLoading}
-            className={`flex-1 ${locationLoading
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-[#03045e] hover:bg-[#023e8a]"
-              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer`}
+            className={`flex-1 ${
+              locationLoading
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-[#03045e] hover:bg-[#023e8a]"
+            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer`}
           >
             Create Route
           </button>
@@ -683,10 +684,11 @@ export default function CustomerMap({ userDoc }) {
             title="Request ambulance now"
             onClick={() => setShowPay(true)}
             disabled={!routeReady}
-            className={`w-full ${routeReady
-              ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
-              : "bg-gray-300 cursor-not-allowed"
-              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
+            className={`w-full ${
+              routeReady
+                ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
+                : "bg-gray-300 cursor-not-allowed"
+            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
           >
             Request Ambulance
           </button>

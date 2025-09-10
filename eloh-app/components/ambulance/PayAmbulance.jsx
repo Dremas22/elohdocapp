@@ -5,6 +5,8 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { loadStripe } from "@stripe/stripe-js";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { getAddressFromLatLng } from "@/helpers";
+import { useUserStore } from "@/hooks/useUserStore";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -20,10 +22,21 @@ export default function PayAmbulance({
 }) {
   const [loading, setLoading] = useState(false);
   const { currentUser } = useCurrentUser();
+  const { currentUser: user } = useUserStore();
 
   // 🔹 Start Stripe checkout
   const handleProceed = async () => {
     setLoading(true);
+
+    const pickUpddress = getAddressFromLatLng(
+      pickupLocation?.lat,
+      pickupLocation?.lng
+    );
+
+    const dropOffAddress = getAddressFromLatLng(hospital?.lat, hospital?.lng);
+
+    console.log(pickUpddress, "PICK_UP_ADDRESS");
+    console.log(dropOffAddress, "DROP_OFF_ADDRESS");
     try {
       const destination = { lat: hospital.lat, lng: hospital.lng };
       const tripDetails = {
@@ -31,10 +44,16 @@ export default function PayAmbulance({
         distance,
         duration,
         hospital,
-        pickupLocation,
-        destination,
+        pickupLocation: {
+          ...pickupLocation,
+          adress: pickUpddress,
+        },
+        destination: {
+          ...destination,
+          address: dropOffAddress,
+        },
         type: "ambulance_request",
-        customerName: userDoc?.fullName,
+        customerName: userDoc?.fullName || user?.fullName,
         customerEmail: currentUser?.email || userDoc?.email,
         customerId: userDoc?.userId,
       };
