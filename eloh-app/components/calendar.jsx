@@ -41,9 +41,7 @@ const Calendar = () => {
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/appointments`,
-        {
-          method: "GET",
-        }
+        { method: "GET" }
       );
       const data = await res.json();
       if (res.ok && data.authenticated) {
@@ -51,8 +49,6 @@ const Calendar = () => {
         setPatients(data.patients || []);
         // auto-select first patient if available
         if (data.patients?.length) setSelectedPatient(data.patients[0]);
-      } else {
-        return;
       }
     } catch (err) {
       console.error("Error fetching appointments:", err);
@@ -132,8 +128,6 @@ const Calendar = () => {
         setTime("");
         setNote("");
         fetchAppointments(); // refresh
-      } else {
-        return;
       }
     } catch (error) {
       console.error("Error scheduling appointment:", error);
@@ -141,7 +135,7 @@ const Calendar = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 bg-white rounded shadow">
+    <div className="max-w-md mx-auto p-4 bg-white rounded shadow h-[90vh] flex flex-col overflow-y-auto">
       {/* Month Navigation */}
       <div className="flex justify-between items-center mb-4">
         <button
@@ -192,13 +186,12 @@ const Calendar = () => {
             <button
               key={day}
               onClick={() => handleDateClick(day)}
-              className={`py-2 rounded ${
-                isSelected
-                  ? "bg-blue-600 text-white"
-                  : isToday
+              className={`py-2 rounded ${isSelected
+                ? "bg-blue-600 text-white"
+                : isToday
                   ? "border border-blue-600"
                   : "hover:bg-gray-200"
-              }`}
+                }`}
             >
               {day}
             </button>
@@ -276,10 +269,10 @@ const Calendar = () => {
             />
           </div>
 
-          <div className="text-right">
+          <div className="text-right mt-4">
             <button
               onClick={handleSchedule}
-              className="bg-[#03045e] hover:bg-[#023e8a] text-white font-semibold px-6 py-2 rounded-lg"
+              className="bg-[#03045e] hover:bg-[#023e8a] text-white font-semibold px-6 py-2 rounded-lg shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
             >
               Save Appointment
             </button>
@@ -289,7 +282,7 @@ const Calendar = () => {
 
       {/* Appointments List */}
       {scheduledAppointments.length > 0 && (
-        <div className="mt-8 bg-white border border-gray-200 rounded-xl p-6 shadow-sm overflow-y-auto">
+        <div className="mt-8 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <h3 className="text-lg font-bold text-[#03045e] mb-4">
             Scheduled Appointments
           </h3>
