@@ -15,15 +15,18 @@ export async function POST(req) {
     // ✅ Verify Firebase session cookie
     let decodedToken;
     try {
-      decodedToken = await auth.verifySessionCookie(sessionCookie, true);
+      decodedToken = await auth?.verifySessionCookie(sessionCookie, true);
     } catch (err) {
       console.error("Session verification failed:", err);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // ✅ Explicit role whitelist (hard guard)
+    // Ensure decodedToken has the correct role
+    const role = decodedToken?.role || decodedToken?.customClaims?.role;
+
     const allowedRoles = ["doctor", "nurse"];
-    if (!allowedRoles.includes(decodedToken.role)) {
+    if (!role || !allowedRoles.includes(role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -44,28 +47,31 @@ export async function POST(req) {
       return NextResponse.json({ error: "Patient not found" }, { status: 404 });
     }
 
-    const medicalHistory = patientDoc.data().medicalHistory;
+    const medicalHistory = patientDoc.data().medicalHistory || {};
 
-    if (!medicalHistory || !Array.isArray(medicalHistory[noteType])) {
-      return NextResponse.json(
-        { error: `No ${noteType} found` },
-        { status: 404 }
-      );
-    }
-
-    const notes = medicalHistory[noteType];
-
-    if (notes.length === 0) {
+    if (
+      !Array.isArray(medicalHistory[noteType]) ||
+      medicalHistory[noteType].length === 0
+    ) {
       return NextResponse.json(
         { message: `No ${noteType} found` },
         { status: 404 }
       );
     }
 
-    // ✅ Sort and return latest
+    const notes = medicalHistory[noteType];
+
+    // ✅ Filter valid notes with createdAt and sort descending
     const latest = notes
-      .filter((n) => n.createdAt)
+      .filter((n) => n?.createdAt?.toMillis)
       .sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis())[0];
+
+    if (!latest) {
+      return NextResponse.json(
+        { message: `No ${noteType} found with valid timestamp` },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({ note: latest }, { status: 200 });
   } catch (error) {
