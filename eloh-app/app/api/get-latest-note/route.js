@@ -21,7 +21,6 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // ✅ Explicit role whitelist (hard guard)
     // Ensure decodedToken has the correct role
     const role = decodedToken?.role || decodedToken?.customClaims?.role;
 
