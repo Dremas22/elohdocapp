@@ -52,7 +52,7 @@ export async function POST(req) {
 
     // 🔐 Ensure correct custom claims
     if (!decodedToken.role || decodedToken.role !== role) {
-      await auth.setCustomUserClaims(uid, { role });
+      await auth.setCustomUserClaims(uid, { role: role || decodedToken?.role });
     }
 
     // 📝 Only update FCM/status if user is in doctors/nurses/drivers collection

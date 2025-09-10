@@ -170,9 +170,9 @@ const AddUser = ({ onClick, role }) => {
         {user && (
           <div className="flex flex-col sm:flex-row items-center justify-between bg-gray-700 p-4 sm:p-5 rounded-lg gap-3 sm:gap-4">
             <div className="flex items-center gap-3 sm:gap-4">
-              {user?.photoUrl ? (
+              {user?.photoURL ? (
                 <img
-                  src={user?.photoUrl}
+                  src={user?.photoURL}
                   alt={user?.fullName}
                   className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
                 />

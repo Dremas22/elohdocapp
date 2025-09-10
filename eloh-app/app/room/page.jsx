@@ -2,6 +2,12 @@ import MeetingRoom from "@/components/video-conferencing/MeetingRoom";
 import { Suspense } from "react";
 import Loading from "@/components/Loading";
 
+export const metadata = {
+  title: "Consultation Meeting Room | ElohApp",
+  description:
+    "Join a secure video consultation with your doctor or nurse on ElohApp to discuss your health, get advice, and receive care remotely.",
+};
+
 /**
  * RoomPage Component
  *

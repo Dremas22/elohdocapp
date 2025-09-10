@@ -9,6 +9,7 @@ import {
   getDoc,
   onSnapshot,
   serverTimestamp,
+  setDoc,
   updateDoc,
 } from "firebase/firestore";
 import { useUserStore } from "@/hooks/useUserStore";
@@ -50,7 +51,15 @@ const ChatApp = () => {
   useEffect(() => {
     if (!chatId) return;
     const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
-      if (res.exists()) setChat(res.data());
+      if (res.exists()) {
+        const data = res.data();
+        setChat({
+          ...data,
+          messages: data.messages || [], // always array
+        });
+      } else {
+        setChat({ messages: [] });
+      }
     });
     return () => unSub();
   }, [chatId]);
@@ -143,17 +152,22 @@ const ChatApp = () => {
         // });
       }
 
-      if (chatId) {
-        await updateDoc(doc(db, "chats", chatId), {
+      // 👇 Define chatRef before using it
+      const chatRef = doc(db, "chats", chatId);
+
+      await setDoc(
+        chatRef,
+        {
           messages: arrayUnion({
             senderId: currentUser?.userId,
-            text,
+            text: text.trim(),
             createdAt: new Date(),
-            photoURL: currentUser?.photoUrl || "/images/default_avatar.jpg",
+            photoURL: currentUser?.photoURL || "/images/default_avatar.jpg",
             ...(imgUrl && { img: imgUrl }),
           }),
-        });
-      }
+        },
+        { merge: true } // 👈 ensures doc exists
+      );
 
       // Update lastMessage and isSeen in userchats
       const userIDs = [currentUser?.userId, user?.userId];
@@ -163,13 +177,27 @@ const ChatApp = () => {
         const userChatsSnap = await getDoc(userChatsRef);
         if (userChatsSnap.exists()) {
           const data = userChatsSnap.data();
-          const chatIndex = data.chats.findIndex((c) => c.chatId === chatId);
+          let chatIndex = data.chats.findIndex((c) => c.chatId === chatId);
           if (chatIndex >= 0) {
-            data.chats[chatIndex].lastMessage = text || "Image";
-            data.chats[chatIndex].isSeen = id === currentUser?.userId;
-            data.chats[chatIndex].updatedAt = Date.now();
-            await updateDoc(userChatsRef, { chats: data.chats });
+            // Existing chat: update lastMessage
+            data.chats[chatIndex] = {
+              ...data.chats[chatIndex],
+              lastMessage: text || "Image",
+              isSeen: id === currentUser?.userId,
+              updatedAt: Date.now(),
+            };
+          } else {
+            // New chat (driver ↔ customer): initialize chat object
+            data.chats.push({
+              chatId,
+              receiverId:
+                id === currentUser.userId ? user.userId : currentUser.userId,
+              lastMessage: text || "Image",
+              isSeen: id === currentUser?.userId,
+              updatedAt: Date.now(),
+            });
           }
+          await updateDoc(userChatsRef, { chats: data.chats });
         }
       }
     } catch (err) {
@@ -207,7 +235,7 @@ const ChatApp = () => {
         caller: {
           id: caller.userId,
           name: caller.fullName,
-          photoUrl: caller.photoUrl || "/images/default_avatar.jpg",
+          photoURL: caller.photoURL || "/images/default_avatar.jpg",
         },
       });
 
@@ -261,7 +289,6 @@ const ChatApp = () => {
       {/* Top */}
       <div>
         <div className="border-b border-gray-700 bg-gray-900 sticky top-0 z-10">
-
           {/* Back Button (absolute on mobile) */}
           <button
             onClick={() => setChatId(null)}
@@ -271,11 +298,10 @@ const ChatApp = () => {
           </button>
 
           <div className="flex justify-between items-center p-2 md:p-5">
-
             {/* User Info */}
             <div className="flex items-center gap-2 md:gap-4 ml-0 md:ml-0">
               <img
-                src={user?.photoUrl || "/images/default_avatar.jpg"}
+                src={user?.photoURL || "/images/default_avatar.jpg"}
                 alt="avatar"
                 className="w-10 h-10 md:w-14 md:h-14 rounded-full object-cover"
               />
@@ -291,11 +317,15 @@ const ChatApp = () => {
 
             {/* Action Icons */}
             <div className="flex gap-3 md:gap-4 text-4xl md:text-4xl">
-              <IoVideocam
-                className="cursor-pointer hover:text-white text-[#03045e] lg:text-5xl md:text-3xl text-3xl"
-                title={`Start a video consultation with ${getDisplayName(user)}`}
-                onClick={handleMakeCall}
-              />
+              {!["customer", "driver"].includes(currentUser?.role) && (
+                <IoVideocam
+                  className="cursor-pointer hover:text-white text-[#03045e] lg:text-5xl md:text-3xl text-3xl"
+                  title={`Start a video consultation with ${getDisplayName(
+                    user
+                  )}`}
+                  onClick={handleMakeCall}
+                />
+              )}
 
               <a
                 className="lg:pt-2 pt-1"
@@ -307,7 +337,6 @@ const ChatApp = () => {
             </div>
           </div>
         </div>
-
       </div>
 
       {/* Messages */}
@@ -385,40 +414,37 @@ const ChatApp = () => {
           <span className="hidden md:inline">Send</span>
           <IoSend />
         </button>
-
       </div>
 
       {/* Incoming Call Modal */}
-      {
-        incomingCall && (
-          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-            <div className="bg-gray-900 p-6 rounded-xl flex flex-col items-center gap-4 w-80">
-              <h2 className="text-white text-lg font-semibold">Incoming Call</h2>
-              <p className="text-gray-300 text-center">
-                {incomingCall.caller.name} is calling you
-              </p>
-              <div className="flex gap-4 mt-4">
-                <button
-                  title="Click to accept the call"
-                  onClick={handleAcceptCall}
-                  className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-                >
-                  <MdOutlinePhoneCallback className="w-5 h-5 text-green-500" />
-                </button>
+      {incomingCall && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-6 rounded-xl flex flex-col items-center gap-4 w-80">
+            <h2 className="text-white text-lg font-semibold">Incoming Call</h2>
+            <p className="text-gray-300 text-center">
+              {incomingCall.caller.name} is calling you
+            </p>
+            <div className="flex gap-4 mt-4">
+              <button
+                title="Click to accept the call"
+                onClick={handleAcceptCall}
+                className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+              >
+                <MdOutlinePhoneCallback className="w-5 h-5 text-green-500" />
+              </button>
 
-                <button
-                  title="Click to decline the call"
-                  onClick={handleDeclineCall}
-                  className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-                >
-                  <HiOutlinePhoneMissedCall className="w-5 h-5 text-red-500" />
-                </button>
-              </div>
+              <button
+                title="Click to decline the call"
+                onClick={handleDeclineCall}
+                className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+              >
+                <HiOutlinePhoneMissedCall className="w-5 h-5 text-red-500" />
+              </button>
             </div>
           </div>
-        )
-      }
-    </div >
+        </div>
+      )}
+    </div>
   );
 };
 

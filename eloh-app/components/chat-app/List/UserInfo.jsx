@@ -23,13 +23,13 @@ const UserInfo = ({ setOpenChat }) => {
   };
 
   return (
-    <div className="relative flex items-center justify-between -mt-6 p-5">
+    <div className="relative flex items-center justify-between lg:-mt-6 -mt-8 p-4">
       {/* User Info */}
-      <div className="flex items-center gap-5">
+      <div className="flex items-center lg:gap-5 gap-3">
         <img
-          src={currentUser?.photoUrl || "/images/default_avatar.jpg"}
+          src={currentUser?.photoURL || "/images/default_avatar.jpg"}
           alt="User Avatar"
-          className="w-12 h-12 rounded-full object-cover"
+          className="lg:w-12 lg:h-12 w-10 h-10 rounded-full object-cover"
         />
         <h2 className="hidden sm:block text-lg font-semibold">{fullName}</h2>
       </div>

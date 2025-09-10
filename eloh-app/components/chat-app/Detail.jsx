@@ -1,4 +1,5 @@
 "use client";
+
 import { COLLECTIONS } from "@/constants";
 import { auth, db } from "@/db/client";
 import { useChatStore } from "@/hooks/useChatStore";
@@ -33,7 +34,6 @@ const Detail = () => {
    */
   const handleBlock = async () => {
     if (!user || !currentUser) return;
-
     setLoading(true);
 
     try {
@@ -69,6 +69,9 @@ const Detail = () => {
     }
   };
 
+  /**
+   * Handles user sign-out and session cleanup.
+   */
   const handleAuthAction = async () => {
     setLoading(true);
     try {
@@ -84,50 +87,55 @@ const Detail = () => {
       setLoading(false);
     }
   };
+
   return (
-    <div className="flex flex-col lg:h-[80vh] bg-gray-900 text-white">
-      {/* User Info at top */}
-      <div className="flex flex-col items-center gap-4 p-8 border-b border-gray-700">
-        <img
-          src={user?.photoUrl || "/images/deafult_avatart.jpg"}
-          alt="avatar"
-          className="w-24 h-24 rounded-full object-cover"
-        />
-        <h2 className="text-xl font-bold">{getDisplayName(user)}</h2>
-        <p className="text-gray-400 text-sm">
-          {user?.role?.[0]?.toUpperCase() + user?.role?.slice(1)}
-        </p>
-      </div>
+    <div className="flex justify-center">
+      <div className="flex flex-col w-full max-w-lg lg:max-w-2xl lg:h-[80vh] bg-gray-900 text-white rounded-xl shadow-lg">
+        {/* User Info at top */}
+        <div className="flex flex-col items-center gap-4 p-8 border-b border-gray-700">
+          <img
+            src={user?.photoURL || "/images/default_avatar.jpg"}
+            alt="avatar"
+            className="w-24 h-24 rounded-full object-cover"
+          />
+          <h2 className="text-xl lg:text-2xl font-bold text-center">
+            {getDisplayName(user)}
+          </h2>
+          <p className="text-gray-400 text-sm">
+            {user?.role?.[0]?.toUpperCase() + user?.role?.slice(1)}
+          </p>
+        </div>
 
-      {/* Middle scrollable content */}
-      <div className="flex-1 flex items-center justify-center p-5 text-gray-400 text-center overflow-y-auto">
-        <p>More content will be added here soon...</p>
-      </div>
+        {/* Middle scrollable content */}
+        <div className="flex-1 flex items-center justify-center p-5 text-gray-400 text-center overflow-y-auto">
+          <p>More content will be added here soon...</p>
+        </div>
 
-      {/* Buttons at the bottom */}
-      <div className="flex flex-col gap-3 p-5 border-t border-gray-700">
-        <button
-          title={`Block ${getDisplayName(user) || "User"}`}
-          onClick={handleBlock}
-          className="bg-[#03045e] text-[#c51c0a] font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-        >
-          {isCurrentUserBlocked
-            ? "You are Blocked!"
-            : isReceiverBlocked
-              ? "User Blocked"
-              : loading
-                ? "Processing..."
-                : `Block`}
-        </button>
-        <button
-          title={"Click to Logout your account"}
-          onClick={handleAuthAction}
-          className="bg-[#03045e] text-white font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-          disabled={loading}
-        >
-          {loading ? "Signing out..." : "Logout"}
-        </button>
-
+        {/* Buttons at the bottom */}
+        <div className="flex flex-col gap-3 p-5 border-t border-gray-700">
+          <button
+            title={`Block ${getDisplayName(user) || "User"}`}
+            onClick={handleBlock}
+            disabled={loading}
+            className="bg-[#03045e] text-[#c51c0a] font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isCurrentUserBlocked
+              ? "You are Blocked!"
+              : isReceiverBlocked
+                ? "User Blocked"
+                : loading
+                  ? "Processing..."
+                  : "Block"}
+          </button>
+          <button
+            title="Click to Logout your account"
+            onClick={handleAuthAction}
+            disabled={loading}
+            className="bg-[#03045e] text-white font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Signing out..." : "Logout"}
+          </button>
+        </div>
       </div>
     </div>
   );

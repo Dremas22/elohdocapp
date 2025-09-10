@@ -1,6 +1,13 @@
 import { noteTypeMap } from "@/constants";
 import { useState } from "react";
 
+// 🔹 Add human-readable labels
+const noteLabelMap = {
+  note: "Note",
+  "sick-note": "Sick Note",
+  prescription: "Prescription",
+};
+
 /**
  * useSaveMedicalHistory hook for managing creation and retrieval of patient medical notes.
  *
@@ -19,7 +26,6 @@ import { useState } from "react";
  * @property {Function} resetSuccess - Clears the success message state
  * @property {Array|null} allNotes - Retrieved notes from the server
  */
-
 const useSaveMedicalHistory = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -85,7 +91,8 @@ const useSaveMedicalHistory = () => {
       }
 
       const result = await res.json();
-      const msg = "Note saved successfully.";
+
+      const msg = `${noteLabelMap[mode] || "Note"} saved successfully.`;
       setSuccessMessage(msg);
 
       return { success: true, data: result, message: msg };

@@ -78,7 +78,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
   const { isVerified } = userDocState;
 
   return (
-    <div className="min-h-screen w-full flex flex-col pt-18 relative overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col lg:pt-15 pt-5 relative overflow-hidden">
       <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
         <main className="w-full flex flex-col flex-grow overflow-hidden px-4 sm:px-6 lg:px-10">
           {isVerified === true ? (
@@ -140,12 +140,10 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
                   />
                 </div>
               )}
-              {/* Chat Content Area */}
-              <main className="lg:w-full w-[45vh] -ml-5 h-full flex lg:-ml-13 pt-8 -mr-6 mb-9 flex-col flex-grow overflow-hidden">
-                <div className="flex flex-col justify-start flex-grow overflow-hidden px-2 sm:px-4">
-                  <ElohDocChatApp setOpenChat={() => { }} role="doctor" />
-                </div>
-              </main>
+              {/* Chat App */}
+              <div className="lg:w-[185vh] md:w-[90vh] w-[44vh] lg:-ml-5 md:-ml-5 -ml-3 h-auto flex flex-col pt-8 mb-25 flex-grow">
+                <ElohDocChatApp />
+              </div>
 
             </>
           ) : isVerified === false ? (

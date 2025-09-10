@@ -8,9 +8,9 @@ import {
   doc,
   getDoc,
   onSnapshot,
-  updateDoc,
+  setDoc,
 } from "firebase/firestore";
-import { FiMinus, FiPlus, FiSearch } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 import AddUser from "./AddUser";
 import { useEffect, useMemo, useState } from "react";
 import { getDisplayName } from "@/lib/getDisplayName";
@@ -28,7 +28,11 @@ const ChatList = ({ role }) => {
   const { changeChat, updateUnseenCount } = useChatStore();
 
   const { allOptions, toId } = useMemo(() => {
-    const opts = [{ id: "all", title: "All" }, ...doctorCategories, ...nurseCategories];
+    const opts = [
+      { id: "all", title: "All" },
+      ...doctorCategories,
+      ...nurseCategories,
+    ];
     const map = new Map();
     [...doctorCategories, ...nurseCategories].forEach(({ id, title }) => {
       map.set(id.toLowerCase(), id);
@@ -42,9 +46,18 @@ const ChatList = ({ role }) => {
 
   useEffect(() => {
     if (!currentUser?.userId) return;
+
     const unsubs = [];
     let userChatsData = [];
     let defaultUsersData = [];
+
+    const asMillis = (val) => {
+      if (!val) return 0;
+      if (typeof val === "number") return val;
+      if (val?.toMillis) return val.toMillis();
+      const parsed = Date.parse(val);
+      return isNaN(parsed) ? 0 : parsed;
+    };
 
     const mergeAndSet = () => {
       const unique = new Map();
@@ -54,66 +67,132 @@ const ChatList = ({ role }) => {
       userChatsData.forEach((c) => {
         if (c?.user?.userId) unique.set(c.user.userId, c);
       });
-      const finalChats = Array.from(unique.values()).sort(
-        (a, b) => b.updatedAt - a.updatedAt
-      );
+
+      let finalChats = Array.from(unique.values());
+
+      // 🔹 filter by active subtype if consultationType === "all"
+      if (
+        currentUser.role === "patient" &&
+        currentUser.consultationType === "all"
+      ) {
+        finalChats = finalChats.filter((c) => {
+          if (activeSubType === "doctor") {
+            return c.user?.role === "doctor";
+          }
+          if (activeSubType === "nurse") {
+            return c.user?.role === "nurse";
+          }
+          return true;
+        });
+      }
+
+      finalChats.sort((a, b) => asMillis(b.updatedAt) - asMillis(a.updatedAt));
       setChats(finalChats);
       updateUnseenCount(finalChats);
     };
 
-    const unSubChats = onSnapshot(doc(db, "userchats", currentUser.userId), async (res) => {
-      const items = res.data()?.chats || [];
-      const chatPromises = items.map(async (item) => {
-        let user = null;
+    // 🔹 Listen to the current user's chats
+    const unSubChats = onSnapshot(
+      doc(db, "userchats", currentUser.userId),
+      async (res) => {
+        const items = res.exists() ? res.data()?.chats || [] : [];
 
-        // Determine the collection to lookup
-        let collectionsToCheck = [];
-        if (currentUser.role === "patient") {
-          if (item.receiverRole === "doctor") collectionsToCheck.push("doctors");
-          if (item.receiverRole === "nurse") collectionsToCheck.push("nurses");
-        } else if (["doctor", "nurse"].includes(currentUser.role)) {
-          collectionsToCheck.push("patients");
-        } else if (currentUser.role === "driver") collectionsToCheck.push("customers");
-        else if (currentUser.role === "customer") collectionsToCheck.push("drivers");
-
-        for (const col of collectionsToCheck) {
-          const userDocSnap = await getDoc(doc(db, col, item.receiverId));
-          if (userDocSnap.exists()) {
-            user = { userId: userDocSnap.id, ...userDocSnap.data() };
-            break;
-          }
+        if (!items.length) {
+          userChatsData = [];
+          mergeAndSet();
+          return;
         }
-        return { ...item, user };
-      });
 
-      userChatsData = await Promise.all(chatPromises);
-      mergeAndSet();
-    });
+        const chatPromises = items.map(async (item) => {
+          let user = null;
+          let collectionsToCheck = [];
+
+          switch (currentUser.role) {
+            case "patient":
+              collectionsToCheck = ["doctors", "nurses"];
+              break;
+            case "doctor":
+            case "nurse":
+              collectionsToCheck = ["patients"];
+              break;
+            case "driver":
+              collectionsToCheck = ["customers"];
+              break;
+            case "customer":
+              collectionsToCheck = ["drivers"];
+              break;
+            default:
+              collectionsToCheck = [
+                "doctors",
+                "nurses",
+                "patients",
+                "drivers",
+                "customers",
+              ];
+          }
+
+          for (const col of collectionsToCheck) {
+            try {
+              const userDocSnap = await getDoc(doc(db, col, item.receiverId));
+              if (userDocSnap.exists()) {
+                user = { userId: userDocSnap.id, ...userDocSnap.data() };
+                break;
+              }
+            } catch (err) {
+              console.error(
+                "Error fetching user doc",
+                col,
+                item.receiverId,
+                err
+              );
+            }
+          }
+
+          return { ...item, user };
+        });
+
+        userChatsData = await Promise.all(chatPromises);
+        mergeAndSet();
+      }
+    );
 
     unsubs.push(unSubChats);
 
+    // 🔹 Default listeners (fallback users)
     const collectionsToListen = [];
+
     if (currentUser.role === "patient") {
-      const { consultations, consultationType } = currentUser;
-      if (consultations && consultationType !== "none") {
-        if (consultationType === "doctor" && consultations.doctor > 0) collectionsToListen.push("doctors");
-        else if (consultationType === "nurse" && consultations.nurse > 0) collectionsToListen.push("nurses");
-        else if (consultationType === "all") {
-          if (activeSubType === "doctor" && consultations.doctor > 0) collectionsToListen.push("doctors");
-          else if (activeSubType === "nurse" && consultations.nurse > 0) collectionsToListen.push("nurses");
+      const consultations = currentUser.consultations ?? {};
+      const consultationType = currentUser.consultationType ?? "none";
+
+      if (consultationType === "doctor" && consultations.doctor > 0) {
+        collectionsToListen.push("doctors");
+      } else if (consultationType === "nurse" && consultations.nurse > 0) {
+        collectionsToListen.push("nurses");
+      } else if (consultationType === "all") {
+        // ✅ Respect activeSubType toggle
+        if (activeSubType === "doctor" && consultations.doctor > 0) {
+          collectionsToListen.push("doctors");
+        }
+        if (activeSubType === "nurse" && consultations.nurse > 0) {
+          collectionsToListen.push("nurses");
         }
       }
-    } else if (["doctor", "nurse"].includes(currentUser.role)) collectionsToListen.push("patients");
-    else if (currentUser.role === "driver") collectionsToListen.push("customers");
-    else if (currentUser.role === "customer") collectionsToListen.push("drivers");
+    } else if (["doctor", "nurse"].includes(currentUser.role)) {
+      collectionsToListen.push("patients");
+    } else if (currentUser.role === "driver") {
+      collectionsToListen.push("customers");
+    } else if (currentUser.role === "customer") {
+      collectionsToListen.push("drivers");
+    }
 
     collectionsToListen.forEach((col) => {
       const unSubCol = onSnapshot(collection(db, col), (snap) => {
         defaultUsersData = snap.docs.map((docSnap) => ({
-          chatId: `default-${docSnap.id}`,
+          chatId: docSnap.id,
           receiverId: docSnap.id,
           lastMessage: "",
-          updatedAt: 0,
+          updatedAt: new Date(),
           isSeen: true,
           user: { userId: docSnap.id, ...docSnap.data() },
         }));
@@ -123,23 +202,40 @@ const ChatList = ({ role }) => {
     });
 
     return () => unsubs.forEach((fn) => fn());
-  }, [currentUser?.userId, currentUser?.role, activeSubType, updateUnseenCount]);
+  }, [
+    currentUser?.userId,
+    currentUser?.role,
+    activeSubType,
+    updateUnseenCount,
+  ]);
 
   const handleSelect = async (chat) => {
     if (!chat?.user || !currentUser?.userId) return;
-    const userChats = chats.map(({ user, ...rest }) => rest);
+
+    const userChats = chats.map(({ user, ...rest }) => ({
+      ...rest,
+      receiverId: rest.receiverId,
+    }));
+
     const uniqueChatsMap = new Map();
     userChats.forEach((c) => {
       if (c?.receiverId) uniqueChatsMap.set(c.receiverId, c);
     });
+
     const dedupedChats = Array.from(uniqueChatsMap.values());
     const chatIndex = dedupedChats.findIndex((c) => c.chatId === chat.chatId);
     if (chatIndex !== -1) dedupedChats[chatIndex].isSeen = true;
+
     try {
-      await updateDoc(doc(db, "userchats", currentUser.userId), { chats: dedupedChats });
+      await setDoc(
+        doc(db, "userchats", currentUser.userId),
+        { chats: dedupedChats },
+        { merge: true }
+      );
+
       changeChat(chat.chatId, chat.user);
     } catch (err) {
-      console.error(err);
+      console.error("Error updating chats:", err);
     }
   };
 
@@ -168,8 +264,8 @@ const ChatList = ({ role }) => {
   return (
     <div className="flex flex-col h-full max-h-[70vh] bg-gray-900 text-white rounded-lg overflow-hidden">
       {/* Top Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-4 sm:p-5 flex-shrink-0">
-        <div className="flex items-center gap-2 sm:gap-3 flex-1 bg-gray-800 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-3 sm:p-5 flex-shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 bg-gray-800 rounded-lg px-2 sm:px-3 py-3 sm:py-2">
           <FiSearch className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
           <input
             type="text"
@@ -179,67 +275,75 @@ const ChatList = ({ role }) => {
             onChange={(e) => setInput(e.target.value)}
           />
         </div>
-
-        <div
-          className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors mt-2 sm:mt-0"
-          title="Add new users"
-          onClick={() => setAddMode((prev) => !prev)}
-        >
-          {addMode ? <FiMinus className="w-4 h-4 sm:w-5 sm:h-5" /> : <FiPlus className="w-4 h-4 sm:w-5 sm:h-5" />}
-        </div>
       </div>
 
-      {/* Category Filter */}
-      {currentUser?.role === "patient" && currentUser?.consultations && currentUser?.consultationType !== "none" && (
-        <CategoryFilter
-          options={allOptions}
-          selected={selectedCategory}
-          onChange={setSelectedCategory}
-          className="px-5 mb-3 flex-shrink-0"
-        />
-      )}
+      {/* Category Filter (patients only) */}
+      {currentUser?.role === "patient" &&
+        currentUser?.consultations &&
+        currentUser?.consultationType !== "none" && (
+          <CategoryFilter
+            options={allOptions}
+            selected={selectedCategory}
+            onChange={setSelectedCategory}
+            className="px-5 lg:mb-3 mb-1 flex-shrink-0"
+          />
+        )}
 
-      {currentUser?.role === "patient" && currentUser?.consultations && currentUser?.consultationType === "all" && (
-        <div className="flex gap-3 px-5 mb-3 flex-shrink-0">
-          <button
-            className={`shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer px-4 py-2 rounded-lg ${activeSubType === "doctor" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"}`}
-            onClick={() => setActiveSubType("doctor")}
-          >
-            Doctors
-          </button>
-          <button
-            className={` shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer px-4 py-2 rounded-lg ${activeSubType === "nurse" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"}`}
-            onClick={() => setActiveSubType("nurse")}
-          >
-            Nurses
-          </button>
-        </div>
-      )}
+      {currentUser?.role === "patient" &&
+        currentUser?.consultations &&
+        currentUser?.consultationType === "all" && (
+          <div className="flex gap-2 py-1.5 px-4 lg:mb-3 -mt-2 mb-1 flex-shrink-0">
+            <button
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg ${
+                activeSubType === "doctor"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-700 text-gray-300"
+              }`}
+              onClick={() => setActiveSubType("doctor")}
+            >
+              Doctors
+            </button>
+            <button
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg ${
+                activeSubType === "nurse"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-700 text-gray-300"
+              }`}
+              onClick={() => setActiveSubType("nurse")}
+            >
+              Nurses
+            </button>
+          </div>
+        )}
 
-      {/* Chat List - Scrollable */}
+      {/* Chat List */}
       <div className="flex-1 overflow-y-auto px-2 sm:px-5 space-y-2">
         {filteredChats.map((chat) => (
           <div
             key={chat?.chatId}
             onClick={() => handleSelect(chat)}
-            className={`flex items-center gap-5 p-3 sm:p-5 cursor-pointer border-b border-gray-600 transition-colors ${chat?.isSeen ? "bg-transparent hover:bg-gray-800" : "bg-blue-600/50 hover:bg-blue-500/60"
-              }`}
+            className={`flex items-center gap-5 p-3 sm:p-5 cursor-pointer border-b border-gray-600 transition-colors ${
+              chat?.isSeen
+                ? "bg-transparent hover:bg-gray-800"
+                : "bg-blue-600/50 hover:bg-blue-500/60"
+            }`}
           >
-            {chat.user?.photoUrl ? (
+            {chat.user?.photoURL ? (
               <img
-                src={chat.user.photoUrl || "/images/default_avatar.jpg"}
+                src={chat.user.photoURL || "/images/default_avatar.jpg"}
                 alt="avatar"
                 className="w-12 h-12 rounded-full object-cover"
               />
             ) : (
-              <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center text-white font-medium">
+              <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center">
                 {chat?.user?.fullName?.charAt(0)?.toUpperCase() || "U"}
               </div>
             )}
-
             <div className="flex flex-col gap-1">
               <span className="font-medium">
-                {chat.user?.blocked?.includes(currentUser?.userId || "") ? "User" : getDisplayName(chat.user)}
+                {chat.user?.blocked?.includes(currentUser?.userId || "")
+                  ? "User"
+                  : getDisplayName(chat.user)}
               </span>
               <p className="text-sm font-light truncate">{chat?.lastMessage}</p>
             </div>
@@ -247,7 +351,6 @@ const ChatList = ({ role }) => {
         ))}
       </div>
 
-      {/* Add User Modal */}
       {addMode && <AddUser onClick={() => setAddMode(false)} role={role} />}
     </div>
   );
