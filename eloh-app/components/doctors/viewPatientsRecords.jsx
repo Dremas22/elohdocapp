@@ -62,13 +62,13 @@ const ViewPatientsRecords = ({
   }
 
   return (
-    <div className="text-[#333] p-4 pr-2 w-full max-w-6xl mx-auto">
-      <h1 className="text-2xl text-gray-200 font-bold mb-6 text-center">
+    <div className="text-[#333] p-4 pr-5 w-full max-w-6xl mx-auto">
+      <h1 className="text-2xl pr-7 text-gray-200 font-bold mb-6 text-center">
         Patient Medical Records
       </h1>
 
       {/* Toggle Buttons with Tooltip */}
-      <div className="flex justify-center gap-4 mb-6">
+      <div className="flex justify-center pr-25 gap-4 mb-6">
         {noteTypes.map(({ id, type, label }) => (
           <div key={id} className="relative group">
             <button
@@ -91,7 +91,7 @@ const ViewPatientsRecords = ({
       </div>
 
       {/* Table Section  */}
-      <div className="relative group bg-white rounded-lg shadow-md border mr-2 border-gray-200 lg:w-[52vw] md:w-[75vw] w-[85vw] px-4 sm:px-6 text-sm sm:text-base -ml-8 sm:ml-0">
+      <div className="relative group bg-white rounded-lg shadow-md border lg:ml-10 border-gray-200 lg:w-[52vw] md:w-[75vw] w-[85vw] px-4 sm:px-6 text-sm sm:text-base -ml-8 sm:ml-0">
 
         <div className="flex justify-end px-3 pt-3">
           <button
@@ -108,7 +108,7 @@ const ViewPatientsRecords = ({
           </button>
         </div>
 
-        <table className="min-w-full bg-white table-fixed">
+        <table className="min-w-full  bg-white table-fixed">
           <thead className="bg-gray-100">
             <tr>
               <th className="px-2 py-3 text-sm font-semibold text-gray-600 text-center break-words">

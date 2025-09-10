@@ -195,7 +195,7 @@ const NurseCollectionViewer = () => {
               {/* Search Results Table */}
               {debouncedQuery ? (
                 filteredPatients.length > 0 ? (
-                  <FilteredPatientsTable
+                  < FilteredPatientsTable
                     patients={filteredPatients}
                     setOpenViewPatientRecords={setOpenViewPatientRecords}
                     setSelectedPatient={setSelectedPatient}
@@ -207,11 +207,12 @@ const NurseCollectionViewer = () => {
                 )
               ) : null}
 
+
               {/* Medical Records Viewer */}
               {openViewPatientRecords && (
                 <div
                   ref={patientRecordsRef}
-                  className="w-full overflow-y-auto max-h-[calc(100vh-5rem)] px-4 mt-6"
+                  className="w-full pl-25 overflow-y-auto max-h-[calc(150vh-rem)] px-4 mt-6"
                 >
                   <ViewPatientsRecords
                     data={selectedPatient?.medicalHistory}
@@ -222,7 +223,7 @@ const NurseCollectionViewer = () => {
               )}
 
               {/* Mobile Sidebar under main content */}
-              <div className="block lg:hidden w-80 mt-10">
+              <div className="block lg:hidden w-80 mt-10 ">
                 <NurseSidebarMenu
                   practiceNumber={practiceNumber}
                   isVerified={isVerified}
@@ -232,11 +233,11 @@ const NurseCollectionViewer = () => {
                 />
               </div>
 
-              <main className="lg:w-full w-[45vh] -ml-5 h-full flex lg:-ml-13 pt-8 -mr-6 mb-9 flex-col flex-grow overflow-hidden">
-                <div className="flex flex-col justify-start flex-grow overflow-hidden px-2 sm:px-4">
-                  <ElohDocChatApp  />
-                </div>
-              </main>
+              {/* Chat App */}
+              <div className="lg:w-[185vh] md:w-[90vh] w-[45vh] lg:ml-69 md:-ml-5 ml-0 h-auto flex flex-col pt-8 mb-9 flex-grow">
+                <ElohDocChatApp />
+              </div>
+
             </>
           ) : isVerified === false ? (
             <div className="text-gray-400 text-center">

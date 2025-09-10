@@ -29,7 +29,7 @@ import { messagingPromise } from "@/db/client";
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
     ? "grid grid-cols-3 gap-6 justify-around"
-    : "flex flex-col gap-5 items-center";
+    : "flex flex-col gap-7 items-center ";
 
   return (
     <div className={`${layout} w-full`}>
@@ -43,9 +43,7 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
             title={title}
             onClick={onClick}
             disabled={isDisabled}
-            className={`relative flex flex-col items-center justify-center gap-1
-  rounded-xl text-xs md:pl-29 lg:h-20 md:h-20 sm:pr-29 font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1
-  transition-all duration-200 ease-in-out cursor-pointer
+            className={`relative flex flex-col items-center justify-center gap-1 rounded-xl text-xs md:pl-15 lg:h-20 md:h-20 sm:pr-15 font-semibold shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer
   ${compact ? "h-20 w-20" : "w-36 h-20"}
   bg-[#03045e]/90 hover:bg-[#023e8a] text-white 
   ${isDisabled ? "!cursor-not-allowed" : ""}
@@ -54,9 +52,8 @@ const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
             type="button"
           >
             <span
-              className={`flex items-center justify-center ${
-                isDisabled ? "text-gray-600" : "text-white"
-              }`}
+              className={`flex items-center justify-center ${isDisabled ? "text-gray-600" : "text-white"
+                }`}
             >
               {icon}
             </span>
@@ -115,7 +112,7 @@ const NurseSidebarMenu = ({
    * Listen to Firebase Cloud Messaging for real-time notifications.
    */
   useEffect(() => {
-    let unsubscribe = () => {};
+    let unsubscribe = () => { };
 
     const setupMessaging = async () => {
       const messaging = await messagingPromise;
@@ -249,9 +246,8 @@ const NurseSidebarMenu = ({
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 ${
-          !isSidebarOpen ? "-translate-x-full" : "translate-x-0"
-        }`}
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"
+          }`}
       >
         {/* Verification Message */}
         {isVerified === false && (
@@ -322,10 +318,9 @@ const NurseSidebarMenu = ({
         className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 sm:h-[35vh] md:h-[27vh] h-[25vh] px-8 py-6 overflow-auto
           bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-5
           transition-transform duration-500 ease-in-out
-          ${
-            mobileSidebarOpen
-              ? "translate-y-0 opacity-100"
-              : "translate-y-full opacity-0 pointer-events-none"
+          ${mobileSidebarOpen
+            ? "translate-y-0 opacity-100"
+            : "translate-y-full opacity-0 pointer-events-none"
           }`}
       >
         <ActionButtons
@@ -345,9 +340,8 @@ const NurseSidebarMenu = ({
 
       {/* Slide-in Calendar Drawer */}
       <div
-        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
-          calendarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <button
           title="Close Calendar"
