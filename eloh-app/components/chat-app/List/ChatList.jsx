@@ -328,9 +328,9 @@ const ChatList = ({ role }) => {
                 : "bg-blue-600/50 hover:bg-blue-500/60"
             }`}
           >
-            {chat.user?.photoURL ? (
+            {chat.user?.photoUrl ? (
               <img
-                src={chat.user.photoURL || "/images/default_avatar.jpg"}
+                src={chat.user.photoUrl || "/images/default_avatar.jpg"}
                 alt="avatar"
                 className="w-12 h-12 rounded-full object-cover"
               />

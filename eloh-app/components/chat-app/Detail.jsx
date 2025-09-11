@@ -94,7 +94,7 @@ const Detail = () => {
         {/* User Info at top */}
         <div className="flex flex-col items-center gap-4 p-8 border-b border-gray-700">
           <img
-            src={user?.photoURL || "/images/default_avatar.jpg"}
+            src={user?.photoUrl || "/images/default_avatar.jpg"}
             alt="avatar"
             className="w-24 h-24 rounded-full object-cover"
           />
@@ -122,10 +122,10 @@ const Detail = () => {
             {isCurrentUserBlocked
               ? "You are Blocked!"
               : isReceiverBlocked
-                ? "User Blocked"
-                : loading
-                  ? "Processing..."
-                  : "Block"}
+              ? "User Blocked"
+              : loading
+              ? "Processing..."
+              : "Block"}
           </button>
           <button
             title="Click to Logout your account"
