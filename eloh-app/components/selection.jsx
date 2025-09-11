@@ -20,13 +20,37 @@ const ChooseDesignation = () => {
 
   // Define user roles with titles, routes, icons, and tooltip descriptions
   const designations = [
-    { id: 1, title: "DOCTOR", role: "doctor", icon: <FaUserMd className="mr-2" />, tooltip: "Access your doctor dashboard and start consulting patients" },
-    { id: 2, title: "NURSE", role: "nurse", icon: <FaUserNurse className="mr-2" />, tooltip: "Access your nurse dashboard and manage patient care" },
-    { id: 3, title: "PATIENT", role: "patient", icon: <FaUser className="mr-2" />, tooltip: "Access your patient dashboard and receive treatment" },
-    { id: 4, title: "AMBULANCE", role: "ambulance", icon: <FaAmbulance className="mr-2" />, tooltip: "Access ambulance dashboard to request/respond to emergencies" },
+    {
+      id: 1,
+      title: "DOCTOR",
+      role: "doctor",
+      icon: <FaUserMd className="mr-2" />,
+      tooltip: "Access your doctor dashboard and start consulting patients",
+    },
+    {
+      id: 2,
+      title: "NURSE",
+      role: "nurse",
+      icon: <FaUserNurse className="mr-2" />,
+      tooltip: "Access your nurse dashboard and manage patient care",
+    },
+    {
+      id: 3,
+      title: "PATIENT",
+      role: "patient",
+      icon: <FaUser className="mr-2" />,
+      tooltip: "Access your patient dashboard and receive treatment",
+    },
+    {
+      id: 4,
+      title: "AMBULANCE",
+      role: "ambulance",
+      icon: <FaAmbulance className="mr-2" />,
+      tooltip: "Access ambulance dashboard to request/respond to emergencies",
+    },
   ];
 
-  // Navigate to the sign-in page with the selected role 
+  // Navigate to the sign-in page with the selected role
   const handleSelect = (role) => {
     if (role === "ambulance") {
       router.push("/ambulance");
@@ -45,7 +69,7 @@ const ChooseDesignation = () => {
 
       {/* Section heading */}
       <h2 className="text-xl sm:text-3xl md:text-4xl font-bold text-[#03045e] text-center mb-4 sm:mb-6 z-10">
-        Sign Up / Sign In as a...
+        Sign Up / Sign In
       </h2>
 
       {/* Responsive button grid with tooltips and icons */}
@@ -62,6 +86,7 @@ const ChooseDesignation = () => {
           </button>
         ))}
       </div>
+      
     </div>
   );
 };
