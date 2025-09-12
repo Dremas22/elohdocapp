@@ -1,17 +1,31 @@
 "use client";
 
-import SearchBar from "@/components/doctors/SearchBar";
 import { useState, useRef, useEffect } from "react";
-import FilteredPatientsTable from "./FilteredPatientsTable";
-import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
-import { FiX } from "react-icons/fi";
+
 import Link from "next/link";
-import Earnings from "./doctorEarnings";
 import { db } from "@/db/client";
 import { doc, onSnapshot } from "firebase/firestore";
-import ElohDocChatApp from "@/components/chat-app/ElohDocChatApp";
 import { useUserStore } from "@/hooks/useUserStore";
 import { useChatStore } from "@/hooks/useChatStore";
+import { FiX } from "react-icons/fi";
+import DoctorDashboardNavbar from "@/app/dashboard/doctor/doctorNav";
+import SidebarMenu from "./doctorSidebar";
+import Earnings from "./doctorEarnings";
+import SearchBar from "@/components/doctors/SearchBar";
+import FilteredPatientsTable from "./FilteredPatientsTable";
+import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
+import ElohDocChatApp from "@/components/chat-app/ElohDocChatApp";
+
+/**
+ * DoctorsCollectionViewer
+ * Main component for displaying doctor dashboard including:
+ * - Navbar
+ * - Sidebar (desktop & mobile)
+ * - Patient search & table
+ * - Patient medical records viewer
+ * - Chat app
+ * - Earnings modal
+ */
 
 const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
   const [filteredPatients, setFilteredPatients] = useState([]);
@@ -27,12 +41,14 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
   const { fetchUserInfo } = useUserStore();
   const { unseenCount } = useChatStore();
 
+  // Scroll to patient records when opened
   useEffect(() => {
     if (openViewPatientRecords && patientRecordsRef.current) {
       patientRecordsRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [openViewPatientRecords]);
 
+  // Listen to real-time doctor document updates
   useEffect(() => {
     if (!userId) return;
     const unsubscribe = onSnapshot(doc(db, "doctors", userId), (docSnap) => {
@@ -45,6 +61,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
     return () => unsubscribe();
   }, [userId]);
 
+  // Handle patient search
   const handleSearch = (query) => {
     if (!query) {
       setFilteredPatients([]);
@@ -59,6 +76,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
     setFilteredPatients(filtered);
   };
 
+  // If no doctor data
   if (!userDoc) {
     return (
       <div className="min-h-screen bg-gray-950 pt-20 flex items-center justify-center">
@@ -75,12 +93,35 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
     );
   }
 
-  const { isVerified } = userDocState;
+  const { isVerified, practiceNumber } = userDocState;
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:pt-15 pt-5 relative overflow-hidden">
-      <div className="relative z-10 flex flex-col lg:flex-row w-full bg-gray-950 flex-grow">
-        <main className="w-full flex flex-col flex-grow overflow-hidden px-4 sm:px-6 lg:px-10">
+    <div className="min-h-screen flex flex-col bg-gray-950 text-white relative overflow-hidden">
+      {/* Navbar */}
+      <DoctorDashboardNavbar />
+
+      <div className="relative z-10 flex flex-col lg:flex-row flex-grow min-h-0 mt-6">
+        {/* Sidebar */}
+        <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-0">
+          <SidebarMenu
+            practiceNumber={practiceNumber}
+            isVerified={isVerified}
+            userDoc={userDocState}
+          />
+        </aside>
+
+        {/* Mobile Sidebar */}
+        <div className="block lg:hidden w-full max-w-xs pl-7 mt-10">
+          <SidebarMenu
+            practiceNumber={practiceNumber}
+            isVerified={isVerified}
+            userDoc={userDocState}
+            compact
+          />
+        </div>
+
+        {/* Main Content */}
+        <main className="w-full flex flex-col flex-grow overflow-hidden px-4 sm:px-6 lg:px-8">
           {isVerified === true ? (
             <>
               {/* Sticky Banner */}
@@ -140,11 +181,11 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
                   />
                 </div>
               )}
+
               {/* Chat App */}
               <div className="lg:w-[185vh] md:w-[90vh] w-[44vh] lg:-ml-5 md:-ml-5 -ml-3 h-auto flex flex-col pt-8 mb-25 flex-grow">
                 <ElohDocChatApp />
               </div>
-
             </>
           ) : isVerified === false ? (
             <div className="text-gray-600 mt-10 text-center">

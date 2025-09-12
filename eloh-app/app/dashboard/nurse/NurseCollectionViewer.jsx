@@ -1,19 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { auth, db } from "@/db/client";
 import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
-
 import { convertTimestamp } from "@/lib/convertFirebaseDate";
+import { useUserStore } from "@/hooks/useUserStore";
+import { FiX } from "react-icons/fi";
 import NurseDashboardNavbar from "@/app/dashboard/nurse/nurseNav";
 import NurseSidebarMenu from "./nurseSidebar";
-import Link from "next/link";
+import Earnings from "../doctor/doctorEarnings";
 import SearchBar from "@/components/doctors/SearchBar";
-import { FiX } from "react-icons/fi";
 import FilteredPatientsTable from "../doctor/FilteredPatientsTable";
 import ViewPatientsRecords from "@/components/doctors/viewPatientsRecords";
-import Earnings from "../doctor/doctorEarnings";
-import { useUserStore } from "@/hooks/useUserStore";
 import ElohDocChatApp from "@/components/chat-app/ElohDocChatApp";
 
 const NurseCollectionViewer = () => {
