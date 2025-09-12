@@ -20,7 +20,7 @@ export default function GlobalError({ error, reset }) {
   };
 
   return (
-    <html>
+    <html lang="en">
       <head>
         <title>Error 🚨</title>
         <meta

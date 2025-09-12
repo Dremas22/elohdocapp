@@ -26,6 +26,10 @@ import CustomerSidebarMenu from "@/app/dashboard/customer/CustomerSidebar";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useSearchParams } from "next/navigation";
 import confirmPayment from "@/lib/confirmPayment";
+import FareDetails from "./FareDetails";
+import CalculatingTrip from "./CalculatingTrip";
+import { getLatestTripWithDriver } from "@/lib/getDriverById";
+import { createRouteCustomerToDriver } from "@/lib/createRouteCustomerToDriver";
 
 const RATE_PER_KM = 10;
 
@@ -51,6 +55,7 @@ export default function CustomerMap({ userDoc }) {
   const [destMarker, setDestMarker] = useState(null);
   const [locationLoading, setLocationLoading] = useState(true);
   const [showPay, setShowPay] = useState(false);
+  const [acceptedDriver, setAcceptedDriver] = useState(null);
 
   useEffect(() => {
     if (showPay && paySectionRef.current) {
@@ -67,8 +72,6 @@ export default function CustomerMap({ userDoc }) {
       if (!sessionId.startsWith("cs_")) return;
 
       let tripData = fareDetails;
-
-      console.log(tripData, "TRIP_DATA_XXX123");
 
       // 🔹 Recover from localStorage if missing
       if (!tripData) {
@@ -92,18 +95,27 @@ export default function CustomerMap({ userDoc }) {
           destinationPlace || tripData?.hospital || tripData?.destination,
         type: "ambulance_request",
         pickupLocation: pickupPlace,
+        sessionId,
       };
 
       // Small delay so Firestore writes can settle
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      await confirmPayment(sessionId, tripData, tripData.customerId);
+      const driver = await confirmPayment(
+        sessionId,
+        tripData,
+        tripData.customerId
+      );
 
-      // Clean URL so refresh doesn’t confirm again
-      const cleanUrl = window.location.origin + window.location.pathname;
-      window.history.replaceState({}, document.title, cleanUrl);
+      setAcceptedDriver(driver);
 
-      localStorage.removeItem("fareDetails");
+      if (driver) {
+        // Clean URL so refresh doesn’t confirm again
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+
+        localStorage.removeItem("fareDetails");
+      }
     };
 
     confirmPay();
@@ -332,6 +344,38 @@ export default function CustomerMap({ userDoc }) {
     return () => unsubscribe();
   }, [map, currentUser?.uid]); // runs once map/currentUser is ready
 
+  useEffect(() => {
+    if (!map) return; // ensure map is initialized
+    if (!pickupPlace && !destinationPlace && !currentLocation) return;
+
+    const location = destinationPlace || pickupPlace || currentLocation;
+    trackAmbulances(location, map, 450);
+  }, [map, currentLocation, pickupPlace, destinationPlace]);
+
+  useEffect(() => {
+    if (!currentUser || !map) return;
+
+    const fetchAndRoute = async () => {
+      const { trip, driver } = await getLatestTripWithDriver(currentUser.uid);
+
+      if (!trip || !driver) return;
+
+      const customerLocation = trip.origin;
+      const driverLocation = driver.location;
+
+      if (!driverLocation || !customerLocation) return;
+
+      createRouteCustomerToDriver(
+        driverLocation,
+        customerLocation,
+        map,
+        setDirectionsRenderer
+      );
+    };
+
+    fetchAndRoute();
+  }, [currentUser?.uid, map]);
+
   const handleCreateRoute = () => {
     if (!pickupPlace && !currentLocation)
       return toastError("Pickup location missing");
@@ -431,6 +475,7 @@ export default function CustomerMap({ userDoc }) {
                 address: destinationAddress,
               },
               type: "ambulance_request",
+              sessionId,
             };
 
             // Save route to Firestore
@@ -569,9 +614,7 @@ export default function CustomerMap({ userDoc }) {
           <button
             title="Set pickup location to your current location"
             onClick={useMyLocation}
-            className="bg-[#03045e] text-white font-semibold py-2 px-8 rounded-xl shadow-[0_4px_#999] 
-             active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] 
-             transition-all duration-200 ease-in-out cursor-pointer flex items-center gap-2 -mt-2"
+            className="bg-[#03045e] text-white font-semibold py-2 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer flex items-center gap-2 -mt-2"
           >
             <FaLocationDot className="h-4 w-5" />
             <span>Use Current Location</span>
@@ -607,91 +650,37 @@ export default function CustomerMap({ userDoc }) {
           >
             Create Route
           </button>
-
-          <button
-            title="Discard changes"
-            onClick={handleCancelRoute}
-            className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-          >
-            Cancel Route
-          </button>
-
-          <button
-            title="Track nearby ambulances"
-            onClick={async () =>
-              await trackAmbulances(
-                destinationPlace || pickupPlace || currentLocation,
-                map,
-                450
-              )
-            }
-            className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-          >
-            Track Ambulances (450km)
-          </button>
+          {fareDetails && (
+            <button
+              title="Discard changes"
+              onClick={handleCancelRoute}
+              className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            >
+              Cancel Route
+            </button>
+          )}
         </div>
 
         {/* Trip summary (distance/fare) */}
-        {calculatingTrip && (
-          <div className="mt-4 flex items-center justify-center gap-2 p-2 bg-blue-400 text-blue-800 rounded-md border border-blue-300 text-sm font-medium animate-pulse">
-            {/* Spinner */}
-            <svg
-              className="w-4 h-4 text-blue-800 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-              ></path>
-            </svg>
-            <span>Calculating trip...</span>
-          </div>
-        )}
-        {fareDetails && (
-          <div className="mt-4 bg-gray-50 text-black p-4 rounded border">
-            <h3 className="font-semibold mb-2">Trip summary</h3>
-            <p>
-              <strong>Destination:</strong>{" "}
-              {fareDetails?.hospital?.address ||
-                fareDetails?.destination?.address}
-            </p>
-            <p>
-              <strong>Distance:</strong> {fareDetails?.distance} km
-            </p>
-            <p>
-              <strong>Duration:</strong> {fareDetails?.duration} min
-            </p>
-            <p>
-              <strong>Fare:</strong> R{fareDetails?.fare}
-            </p>
-          </div>
-        )}
+        {calculatingTrip && <CalculatingTrip />}
+        {fareDetails && <FareDetails fareDetails={fareDetails} />}
 
         {/* Request Ambulance */}
         <div className="mt-4">
-          <button
-            title="Request ambulance now"
-            onClick={() => setShowPay(true)}
-            disabled={!routeReady}
-            className={`w-full ${
-              routeReady
-                ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
-                : "bg-gray-300 cursor-not-allowed"
-            } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
-          >
-            Request Ambulance
-          </button>
+          {fareDetails && (
+            <button
+              title="Request ambulance now"
+              onClick={() => setShowPay(true)}
+              disabled={!routeReady}
+              className={`w-full ${
+                routeReady
+                  ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
+                  : "bg-gray-300 cursor-not-allowed"
+              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
+            >
+              Request Ambulance
+            </button>
+          )}
         </div>
       </div>
 

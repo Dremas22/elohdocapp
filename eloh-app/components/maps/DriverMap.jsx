@@ -25,6 +25,7 @@ import ActiveRequest from "../driver/ActiveRequest";
 import AmbulanceRequest from "../driver/AmbulanceRequest";
 import sendArrivalCodeEmail from "@/lib/sendCode";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import confirmPayment from "@/lib/confirmPayment";
 
 const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const mapRef = useRef(null);
@@ -278,6 +279,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
       duration: ambulanceRequest?.duration,
       pickupLocation,
       type: ambulanceRequest?.type,
+      sessionId: ambulanceRequest?.sessionId,
     };
 
     try {
@@ -285,9 +287,11 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
        * TODO: Make a fetch call to /api/confirm-ambulance-payment instead
        * of using the client use (await findNearestAvailableDriverServer())
        */
-      const nextDriver = await findNearestAvailableDriver(
-        pickupLocation,
-        updatedExclusions
+      const nextDriver = await confirmPayment(
+        ambulanceRequest?.sessionId,
+        reqData,
+        ambulanceRequest?.customerId,
+        excludedDrivers
       );
 
       if (nextDriver) {
@@ -366,17 +370,6 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
         {/* Push content below fixed navbar */}
         <div className="w-full flex flex-col items-center mt-5 p-4">
-          <div className="lg:w-[15%] w-[65%] bg-white rounded-2xl shadow-md lg:ml-60 p-6 mb-4">
-            <div className="flex space-x-4">
-              <button
-                onClick={handleCancelRoute}
-                className="bg-[#03045e] text-white font-semibold py-3 px-4 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex-1/2 cursor-pointer"
-              >
-                Cancel Route
-              </button>
-            </div>
-          </div>
-
           {/* Map */}
           <div
             ref={mapRef}
