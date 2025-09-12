@@ -1,13 +1,18 @@
 import { toastError, toastSuccess } from "@/helpers/toastHelper";
 
-const confirmPayment = async (sessionId, tripData, userId) => {
+const confirmPayment = async (
+  sessionId,
+  tripData,
+  userId,
+  excludedDrivers = []
+) => {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_URL}/api/confirm-ambulance-payment`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, tripData, userId }),
+        body: JSON.stringify({ sessionId, tripData, userId, excludedDrivers }),
       }
     );
 
@@ -20,6 +25,7 @@ const confirmPayment = async (sessionId, tripData, userId) => {
     const driver = await res.json();
 
     toastSuccess("Payment successful! Ambulance dispatched 🚑");
+    return driver;
   } catch (err) {
     console.error("Confirm payment error:", err);
     toastError("Something went wrong confirming your payment");

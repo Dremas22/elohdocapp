@@ -30,7 +30,7 @@ const Navbar = () => {
               href="/about"
               className="text-black text-xl font-semibold hover:text-white transition"
             >
-              About Elohdoc
+              About Us
             </Link>
           </li>
           <li>

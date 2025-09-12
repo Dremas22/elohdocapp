@@ -186,12 +186,13 @@ const Calendar = () => {
             <button
               key={day}
               onClick={() => handleDateClick(day)}
-              className={`py-2 rounded ${isSelected
-                ? "bg-blue-600 text-white"
-                : isToday
+              className={`py-2 rounded ${
+                isSelected
+                  ? "bg-blue-600 text-white"
+                  : isToday
                   ? "border border-blue-600"
                   : "hover:bg-gray-200"
-                }`}
+              }`}
             >
               {day}
             </button>
@@ -272,7 +273,7 @@ const Calendar = () => {
           <div className="text-right mt-4">
             <button
               onClick={handleSchedule}
-              className="bg-[#03045e] hover:bg-[#023e8a] text-white font-semibold px-6 py-2 rounded-lg shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+              className="bg-[#03045e] text-white font-semibold px-6 py-2 rounded-lg shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
             >
               Save Appointment
             </button>
