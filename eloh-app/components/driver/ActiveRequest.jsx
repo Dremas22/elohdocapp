@@ -8,47 +8,17 @@ const ActiveRequest = ({ activeRequest, handleCancelRoute, onTripEnded }) => {
       className="fixed bottom-3 right-3 z-50 animate-slide-up
                  w-[95%] max-w-sm mx-auto sm:bottom-10 sm:right-10"
     >
-      <div className="bg-white rounded-2xl shadow-2xl border-l-4 border-green-600 p-3 sm:p-6 relative overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl border-l-4 border-green-600 p-3 sm:p-4 relative overflow-hidden">
         {/* Header */}
-        <h3 className="text-base sm:text-xl font-bold mb-2 sm:mb-3 text-black">
+        <h3 className="text-base sm:text-lg text-center font-bold mb-2 sm:mb-3 text-black">
           🚑 Active Ambulance Trip
         </h3>
 
-        {/* Info */}
-        <div className="space-y-1 sm:space-y-2 text-gray-700 text-xs sm:text-sm">
-          <p>
-            <strong>Customer:</strong> {activeRequest.customerName}
-          </p>
-          <p>
-            <strong>Pickup:</strong>{" "}
-            {activeRequest.pickupAddress ||
-              activeRequest.pickupLocation.address}
-          </p>
-          <p>
-            <strong>Fare:</strong> R{activeRequest.fare}
-          </p>
-          <p>
-            <strong>Distance:</strong> {activeRequest.distance} km
-          </p>
-          <p>
-            <strong>Duration:</strong> {activeRequest.duration} min
-          </p>
-        </div>
-
-        {/* Cancel & Arrived buttons */}
-        <div className="flex flex-col sm:flex-row justify-end mt-3 sm:mt-6 gap-2 sm:gap-3">
-          {/* Cancel Trip */}
-          <button
-            onClick={handleCancelRoute}
-            className="flex-1 sm:flex-none w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-xl shadow transition-all duration-200 ease-in-out text-sm sm:text-base font-semibold"
-          >
-            Cancel Trip
-          </button>
-
-          {/* Arrived */}
+        {/* Arrived button */}
+        <div className="flex justify-center mt-3 sm:mt-4">
           <button
             onClick={onTripEnded}
-            className="flex-1 sm:flex-none w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-xl shadow transition-all duration-200 ease-in-out text-sm sm:text-base font-semibold flex items-center justify-center gap-2"
+            className="bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-xl shadow transition-all duration-200 ease-in-out text-xs sm:text-sm font-medium flex items-center justify-center gap-1 shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
             <FiCheck className="h-5 w-5" />
             Arrived

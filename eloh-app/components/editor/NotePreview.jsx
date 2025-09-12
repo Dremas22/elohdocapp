@@ -159,6 +159,7 @@ const NotePreview = ({
               medicalHistory={medicalHistory}
               socialHistory={socialHistory}
               loading={loading}
+              onClose={() => setShowFullRecord(false)} // ✅ pass the close function
             />
           </div>
         </div>
@@ -268,7 +269,7 @@ const NotePreview = ({
                       Prescribed Medication(s):
                     </p>
                     {previewData.content?.medications &&
-                    Object.values(previewData.content.medications).length >
+                      Object.values(previewData.content.medications).length >
                       0 ? (
                       <p className="text-gray-800">
                         {Object.values(previewData.content.medications).join(

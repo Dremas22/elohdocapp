@@ -5,7 +5,12 @@ import { findNearestAvailableDriverServer } from "@/lib/server-actions";
 
 export async function POST(req) {
   try {
-    const { sessionId, tripData, userId } = await req.json();
+    const {
+      sessionId,
+      tripData,
+      userId,
+      excludedDrivers = [],
+    } = await req.json();
 
     if (!sessionId || !tripData || !userId) {
       return NextResponse.json(
@@ -33,8 +38,17 @@ export async function POST(req) {
     // 2️⃣ Find nearest driver
     const { pickupLocation } = tripData;
     const nearestDriver = await findNearestAvailableDriverServer(
-      pickupLocation
+      pickupLocation,
+      excludedDrivers
     );
+
+    // 🚨 Handle case where no driver is found
+    if (!nearestDriver) {
+      return NextResponse.json(
+        { message: "No available drivers at the moment" },
+        { status: 404 }
+      );
+    }
 
     // 3️⃣ Save trip with driverId
     const tripRef = db?.collection("trips").doc(tripData.customerId);
@@ -42,7 +56,7 @@ export async function POST(req) {
       {
         ...tripData,
         userId,
-        driverId: nearestDriver?.userId || nearestDriver?.id || null,
+        driverId: nearestDriver?.userId || nearestDriver?.id,
         status: "paid",
         isPaid: true,
         paymentIntentId: session.payment_intent,
