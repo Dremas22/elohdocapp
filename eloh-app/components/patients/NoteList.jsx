@@ -19,6 +19,7 @@ import {
  * - items (array): Array of medical note objects
  * - type (string): One of "sickNotes", "prescriptions", or "generalNotes"
  */
+
 const NoteList = ({ items, type }) => {
   if (!items || items.length === 0) {
     return (
@@ -45,9 +46,8 @@ const NoteList = ({ items, type }) => {
                 key={idx}
                 className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow hover:shadow-lg transition-shadow duration-300"
                 role="region"
-                aria-label={`Sick Note for ${
-                  item.patientName || "Unknown Patient"
-                }`}
+                aria-label={`Sick Note for ${item.patientName || "Unknown Patient"
+                  }`}
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base text-gray-800">
                   <NoteLine
@@ -88,9 +88,8 @@ const NoteList = ({ items, type }) => {
                 key={idx}
                 className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow hover:shadow-lg transition-shadow duration-300"
                 role="region"
-                aria-label={`Prescription for ${
-                  item.patientName || "Unknown Patient"
-                }`}
+                aria-label={`Prescription for ${item.patientName || "Unknown Patient"
+                  }`}
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm sm:text-base text-gray-800">
                   <NoteLine
@@ -132,9 +131,8 @@ const NoteList = ({ items, type }) => {
                 key={idx}
                 className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 shadow hover:shadow-lg transition-shadow duration-300"
                 role="region"
-                aria-label={`General Note for ${
-                  item.patientName || "Unknown Patient"
-                }`}
+                aria-label={`General Note for ${item.patientName || "Unknown Patient"
+                  }`}
               >
                 <p className="text-gray-800 text-sm sm:text-base whitespace-pre-wrap leading-relaxed">
                   {item.content || "N/A"}
@@ -183,9 +181,8 @@ const NoteList = ({ items, type }) => {
 const NoteLine = ({ icon, label, value, full = false }) => {
   return (
     <div
-      className={`flex flex-col xs:flex-row gap-1 xs:gap-2 ${
-        full ? "col-span-full" : ""
-      }`}
+      className={`flex flex-col xs:flex-row gap-1 xs:gap-2 ${full ? "col-span-full" : ""
+        }`}
     >
       <div className="flex items-center gap-1 text-[#023e8a]">
         <span>{icon}</span>
