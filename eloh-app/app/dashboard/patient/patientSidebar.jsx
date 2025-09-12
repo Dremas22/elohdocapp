@@ -222,7 +222,7 @@ const PatientSidebarMenu = ({
       </div>
 
       {/* Mobile Sidebar Toggle Button */}
-      <div className="lg:hidden fixed bottom-1 -right-2 z-50 group cursor-pointer flex items-center space-x-2 bg-blue-300/20 text-white rounded-full px-2 py-2 shadow-sm select-none scale-80 backdrop-blur-sm">
+      <div className="lg:hidden fixed bottom-1 -right-2 z-50 group cursor-pointer flex items-center space-x-2 bg-blue-300/1 text-white rounded-full px-2 py-2 shadow-sm select-none scale-80 backdrop-blur-sm">
         <button
           onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
           title={mobileSidebarOpen ? "Hide menu options" : "Show menu options"}
@@ -248,7 +248,7 @@ const PatientSidebarMenu = ({
       {/* Slide-up Mobile Sidebar */}
       <div
         className={`lg:hidden fixed bottom-0 right-0 left-0 z-40
-          sm:h-[38vh] h-[26vh] px-4 py-3 overflow-auto backdrop-blur-md flex flex-col items-center gap-7
+          sm:h-[38vh] h-[33vh] px-4 py-3 overflow-auto backdrop-blur-md flex flex-col items-center gap-7
           transition-transform duration-500 ease-in-out bg-gray-900/20
           ${mobileSidebarOpen
             ? "translate-y-0 opacity-100"
