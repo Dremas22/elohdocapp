@@ -87,49 +87,83 @@ export async function POST(req) {
   }
 }
 
-export async function DELETE(req) {
+// export async function DELETE(req) {
+//   try {
+//     const cookieStore = await cookies();
+//     const sessionCookie = cookieStore?.get("session")?.value;
+
+//     if (!sessionCookie) {
+//       return NextResponse.json(
+//         { error: "No session cookie found" },
+//         { status: 401 }
+//       );
+//     }
+
+//     // Verify and decode the session
+//     const decodedClaims = await auth?.verifySessionCookie(sessionCookie, true);
+//     const { uid, role } = decodedClaims;
+
+//     // Update Firestore: mark user offline and remove FCM token
+//     if (role) {
+//       const userRef = db?.collection(`${role}s`).doc(uid);
+//       const userSnap = await userRef.get();
+//       if (userSnap.exists) {
+//         await userRef.set(
+//           {
+//             online: false,
+//             updatedAt: new Date(),
+//           },
+//           { merge: true }
+//         );
+//       }
+//     }
+
+//     // Prepare response and clear the session cookie
+//     const response = NextResponse.json({ success: true });
+//     response.cookies.set("session", "", {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === "production",
+//       path: "/",
+//       maxAge: 0, // Expire immediately
+//     });
+
+//     return response;
+//   } catch (err) {
+//     console.error("Session deletion error:", err);
+//     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+//   }
+// }
+
+export async function DELETE() {
   try {
-    const cookieStore = await cookies();
-    const sessionCookie = cookieStore?.get("session")?.value;
+    // 🔑 Create response
+    const res = NextResponse.json({ success: true });
 
-    if (!sessionCookie) {
-      return NextResponse.json(
-        { error: "No session cookie found" },
-        { status: 401 }
-      );
-    }
-
-    // Verify and decode the session
-    const decodedClaims = await auth?.verifySessionCookie(sessionCookie, true);
-    const { uid, role } = decodedClaims;
-
-    // Update Firestore: mark user offline and remove FCM token
-    if (role) {
-      const userRef = db?.collection(`${role}s`).doc(uid);
-      const userSnap = await userRef.get();
-      if (userSnap.exists) {
-        await userRef.set(
-          {
-            online: false,
-            updatedAt: new Date(),
-          },
-          { merge: true }
-        );
-      }
-    }
-
-    // Prepare response and clear the session cookie
-    const response = NextResponse.json({ success: true });
-    response.cookies.set("session", "", {
+    // 🔥 Expire the cookie
+    res.cookies.set("session", "", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       path: "/",
-      maxAge: 0, // Expire immediately
+      maxAge: 0,
+      expires: new Date(0),
     });
 
-    return response;
+    return res;
   } catch (err) {
     console.error("Session deletion error:", err);
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // Even on error, return a response that clears the cookie
+    const res = NextResponse.json({ error: "Cleanup done" }, { status: 200 });
+    res.cookies.set("session", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 0,
+      expires: new Date(0),
+    });
+
+    return res;
   }
 }

@@ -142,6 +142,7 @@ const useCurrentUser = () => {
 
       await fetch(`${process.env.NEXT_PUBLIC_URL}/api/session`, {
         method: "DELETE",
+        credentials: "include",
       });
 
       toast.success("Logged out successfully", {
