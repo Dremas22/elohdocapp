@@ -42,8 +42,8 @@ const PatientDashboard = () => {
             type === "doctor"
               ? (consultations.doctor || 0) >= 1
               : type === "nurse"
-                ? (consultations.nurse || 0) >= 1
-                : (consultations.doctor || 0) >= 1 ||
+              ? (consultations.nurse || 0) >= 1
+              : (consultations.doctor || 0) >= 1 ||
                 (consultations.nurse || 0) >= 1;
 
           if (hasConsultations && type !== "none") {
@@ -155,6 +155,26 @@ const PatientDashboard = () => {
 
   return (
     <div className="lg:min-h-screen flex flex-col pt-18 relative bg-gray-950 text-white overflow-hidden">
+      
+        {/* <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg h-[80vh] relative">
+            
+            <button
+              onClick={() => setShowChat(false)}
+              className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            >
+              ✕
+            </button>
+
+            <Chat
+              showChat={showChat}
+              setShowChat={setShowChat}
+              userDoc={userDoc}
+              currentUser={currentUser}
+            />
+          </div>
+        </div> */}
+
       {/* Fixed Navbar */}
       <PatientDashboardNavbar />
       <SaveStripePayment />
@@ -195,7 +215,6 @@ const PatientDashboard = () => {
           </div>
         </main>
       </div>
-
     </div>
   );
 };
