@@ -26,6 +26,7 @@ import AmbulanceRequest from "../driver/AmbulanceRequest";
 import sendArrivalCodeEmail from "@/lib/sendCode";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import confirmPayment from "@/lib/confirmPayment";
+import { FiLoader } from "react-icons/fi";
 
 const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const mapRef = useRef(null);
@@ -39,6 +40,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const [arrivalCode, setArrivalCode] = useState(null);
   const [showCodeInput, setShowCodeInput] = useState(false);
   const [enteredCode, setEnteredCode] = useState("");
+  const [verifying, setVerifying] = useState(false);
   const { currentUser } = useCurrentUser();
 
   useEffect(() => {
@@ -328,6 +330,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   };
 
   const handleCodeVerification = async () => {
+    setVerifying(true);
     try {
       const tripId = activeRequest?.customerId;
       const tripRef = doc(db, "trips", tripId);
@@ -352,6 +355,8 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     } catch (err) {
       console.error("Verification failed:", err.message);
       toastError("Failed to verify code.");
+    } finally {
+      setVerifying(false);
     }
   };
 
@@ -407,9 +412,19 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
               />
               <button
                 onClick={async () => await handleCodeVerification()}
-                className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded shadow text-sm font-semibold"
+                disabled={verifying}
+                className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded shadow text-sm font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                Verify Code
+                {verifying ? (
+                  <span className="flex items-center justify-center gap-2 text-white">
+                    <FiLoader className="animate-spin h-5 w-5" />
+                    Verifying...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2 text-white">
+                    Verify Code
+                  </span>
+                )}
               </button>
             </div>
           )}
