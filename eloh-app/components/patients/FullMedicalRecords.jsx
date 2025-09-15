@@ -14,17 +14,16 @@ const FullMedicalRecords = ({
   // Loading state
   if (loading)
     return (
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
         <p className="text-sm text-gray-500 italic px-4 py-2 bg-yellow-50 rounded-md text-center">
           Loading medical records...
         </p>
       </div>
     );
 
-  // No data found
   if (!medicalHistory || !socialHistory)
     return (
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
         <p className="text-red-500 px-4 py-2 bg-red-50 rounded-md text-center">
           No data found for this patient.
         </p>
@@ -40,24 +39,21 @@ const FullMedicalRecords = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black backdrop-blur-sm flex items-center justify-center">
-      {/* Modal container */}
-      <div
-        className={`bg-white rounded-2xl shadow-xl w-full max-w-6xl h-[90vh] overflow-hidden relative flex flex-col
-        ${doctor ? "lg:ml-72 lg:mr-auto" : ""}`}
-      >
+    <div className="fixed mt-20 inset-0 bg-black backdrop-blur-sm z-[9999] flex items-center justify-center px-2 sm:px-4">
+      {/* Modal content */}
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-6xl h-[90vh] overflow-hidden relative flex flex-col">
         {/* Close button */}
         <button
           title="Close the medical records portal"
           onClick={onClose}
-          className="absolute top-10 right-4 text-gray-500 hover:text-gray-800 text-xl cursor-pointer z-50"
+          className="absolute top-1 right-1.5 text-gray-500 hover:text-gray-800 text-xl cursor-pointer z-50"
         >
           <FaTimes />
         </button>
 
-        {/* Main content wrapper */}
+        {/* Content wrapper */}
         <div className="flex flex-col lg:flex-row gap-4 h-full overflow-y-auto p-4 md:p-6">
-          {/* Left: Dynamic medical & social sections */}
+          {/* Left - Dynamic Medical & Social Sections */}
           <div className="w-full lg:w-3/4 flex flex-col gap-4">
             <section className="bg-white rounded-xl shadow p-4">
               <ToggleMedicalSection medicalHistory={medicalHistory} />
@@ -68,8 +64,8 @@ const FullMedicalRecords = ({
             </section>
           </div>
 
-          {/* Right: Static sections */}
-          <aside className="w-full lg:mt-6 lg:w-1/4 flex flex-col gap-4">
+          {/* Right - Static Sections */}
+          <aside className="w-full lg:mt-6  lg:w-1/4 flex flex-col gap-4">
             {Object.entries(staticSections).map(([key, title]) => (
               <div
                 key={key}

@@ -211,7 +211,7 @@ const NurseCollectionViewer = () => {
               {openViewPatientRecords && (
                 <div
                   ref={patientRecordsRef}
-                  className="w-full pl-25 overflow-y-auto max-h-[calc(150vh-rem)] px-4 mt-6"
+                  className="w-full overflow-y-auto mt-8"
                 >
                   <ViewPatientsRecords
                     data={selectedPatient?.medicalHistory}

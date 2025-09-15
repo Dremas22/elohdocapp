@@ -125,7 +125,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
           {isVerified === true ? (
             <>
               {/* Sticky Banner */}
-              <div className="sticky top-0 z-20 bg-gray-950 w-full py-6 shadow-md">
+              <div className="sticky top-0 mt-15 z-20 bg-gray-950 w-full py-6 shadow-md">
                 <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text text-transparent font-extrabold text-4xl sm:text-5xl md:text-6xl leading-tight text-center">
                   Welcome to your virtual surgery.
                 </h1>
@@ -173,7 +173,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
 
               {/* Medical Records Viewer */}
               {openViewPatientRecords && (
-                <div ref={patientRecordsRef} className="w-full overflow-y-auto mt-6">
+                <div ref={patientRecordsRef} className="w-full overflow-y-auto mt-8">
                   <ViewPatientsRecords
                     data={selectedPatient?.medicalHistory}
                     setOpenViewPatientRecords={setOpenViewPatientRecords}
@@ -183,7 +183,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
               )}
 
               {/* Chat App */}
-              <div className="lg:w-[185vh] md:w-[90vh] w-[44vh] lg:-ml-5 md:-ml-5 -ml-3 h-auto flex flex-col pt-8 mb-25 flex-grow">
+              <div className="lg:w-[185vh] md:w-[90vh] w-[44vh] lg:ml-10 md:-ml-5 -ml-3 h-auto flex flex-col pt-8 mb-25 flex-grow">
                 <ElohDocChatApp />
               </div>
             </>
