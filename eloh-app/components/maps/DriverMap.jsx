@@ -40,6 +40,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const [arrivalCode, setArrivalCode] = useState(null); // Code sent to customer on arrival
   const [showCodeInput, setShowCodeInput] = useState(false); // Whether to show code input
   const [enteredCode, setEnteredCode] = useState(""); // Input from driver
+  const [verifying, setVerifying] = useState(false);
   const { currentUser } = useCurrentUser();
 
   // Listen to latest trips for the current driver

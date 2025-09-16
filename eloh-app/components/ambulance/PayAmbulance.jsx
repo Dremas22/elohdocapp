@@ -35,8 +35,6 @@ export default function PayAmbulance({
 
     const dropOffAddress = getAddressFromLatLng(hospital?.lat, hospital?.lng);
 
-    console.log(pickUpddress, "PICK_UP_ADDRESS");
-    console.log(dropOffAddress, "DROP_OFF_ADDRESS");
     try {
       const destination = { lat: hospital.lat, lng: hospital.lng };
       const tripDetails = {
