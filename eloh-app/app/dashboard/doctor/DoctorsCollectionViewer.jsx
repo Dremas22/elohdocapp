@@ -97,6 +97,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-950 text-white relative overflow-hidden">
+
       {/* Navbar */}
       <DoctorDashboardNavbar />
 
