@@ -213,7 +213,9 @@ export async function findNearestAvailableDriver(
   return nearestDriver;
 }
 
-export const saveCustomerRoute = async (userId, routeData) => {
+export const saveCustomerTrip = async (userId, tripData) => {
+  if (!userId) throw new Error("Missing userId");
+
   const token = await auth.currentUser.getIdToken();
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_URL}/api/ambulance/customers/${userId}`,
@@ -223,19 +225,21 @@ export const saveCustomerRoute = async (userId, routeData) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ routeData }),
+      body: JSON.stringify({ routeData: tripData }), // backend expects `routeData`
     }
   );
 
   if (!res.ok) {
     const errorData = await res.json();
-    throw new Error(errorData.error || "Failed to save route");
+    throw new Error(errorData.error || "Failed to save trip");
   }
 
   return await res.json();
 };
 
-export const deleteCustomerRoute = async (userId, routeId) => {
+export const deleteCustomerRoute = async (userId, tripId) => {
+  if (!userId || !tripId) throw new Error("Missing userId or tripId");
+
   const token = await auth.currentUser.getIdToken();
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_URL}/api/ambulance/customers/${userId}`,
@@ -245,13 +249,13 @@ export const deleteCustomerRoute = async (userId, routeId) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ routeId }),
+      body: JSON.stringify({ tripId }),
     }
   );
 
   if (!res.ok) {
     const errorData = await res.json();
-    throw new Error(errorData.error || "Failed to delete route");
+    throw new Error(errorData.error || "Failed to delete trip");
   }
 
   return await res.json();

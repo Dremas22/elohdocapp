@@ -137,7 +137,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
     const watchId = navigator.geolocation.watchPosition(
       ({ coords }) => updateDriverLocation(coords),
-      (error) => toastError(`Geolocation error: ${error}`, 5000),
+      (error) => console.error(`Geolocation error: ${error}`),
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
     );
 
@@ -338,6 +338,8 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
           status: "completed",
           arrivalCode: null,
           isPaid: false,
+          sessionId: null,
+          isRatings: true,
           updatedAt: new Date(),
         });
         toastSuccess("Trip successfully completed!");
