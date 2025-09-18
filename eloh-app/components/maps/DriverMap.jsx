@@ -69,7 +69,8 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
         if (
           (trip?.pickupLocation || trip?.origin) &&
           (trip?.hospital || trip?.destination) &&
-          trip?.isPaid
+          trip?.isPaid &&
+          trip?.status !== "completed"
         ) {
           setAmbulanceRequest(trip);
         }
@@ -330,7 +331,10 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
       const tripSnap = await getDoc(tripRef);
       const data = tripSnap.data();
 
-      if (!tripSnap.exists() || !data) throw new Error("Trip not found");
+      if (!tripSnap.exists() || !data) {
+        toastError("Trip not found");
+        return;
+      }
 
       if (enteredCode === data.arrivalCode) {
         await updateDoc(tripRef, {
@@ -341,8 +345,38 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
           isRatings: true,
           updatedAt: new Date(),
         });
+
+        const driverId = data.driverId || currentUser?.uid;
+        if (!driverId) return toastError("Driver ID missing");
+
+        const driverRef = doc(db, "drivers", driverId);
+        const driverSnap = await getDoc(driverRef);
+        const driverData = driverSnap.exists() ? driverSnap.data() : {};
+
+        const previousEarnings = parseFloat(driverData.earnings || 0);
+        const previousTrips = parseInt(driverData.numberOfTrips || 0);
+        const fare = parseFloat(activeRequest?.fare || 0);
+
+        await setDoc(
+          driverRef,
+          {
+            earnings: previousEarnings + fare,
+            numberOfTrips: previousTrips + 1,
+            totalPlatformFees: (driverData.totalPlatformFees || 0) + fare * 0.1,
+            earningsUpdatedAt: new Date(),
+          },
+          { merge: true }
+        );
+
+        // ✅ Clear map directions
+        if (directionsRenderer) {
+          directionsRenderer.setMap(null);
+          setDirectionsRenderer(null);
+        }
+
         toastSuccess("Trip successfully completed!");
         setActiveRequest(null);
+        setAmbulanceRequest(null);
         setShowCodeInput(false);
       } else {
         toastError("Incorrect code. Please try again.");
