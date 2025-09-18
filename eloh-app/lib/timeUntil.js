@@ -41,3 +41,19 @@ export const getTimeUntil = (dateStr, timeStr) => {
     return `${minutes}m ago`;
   }
 };
+
+/**
+ * Returns the number of days in a given month of a specific year.
+ *
+ * @function getDaysInMonth
+ * @param {number} year - The full year (e.g., 2025).
+ * @param {number} month - The month index (0 = January, 11 = December).
+ * @returns {number} The number of days in the given month.
+ *
+ * @example
+ * getDaysInMonth(2025, 1); // 28 (February 2025 has 28 days)
+ * getDaysInMonth(2024, 1); // 29 (February 2024 is a leap year)
+ */
+export function getDaysInMonth(year, month) {
+  return new Date(year, month + 1, 0).getDate();
+}

@@ -121,7 +121,11 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
                 </div>
               ) : (
                 <div className="flex items-center lg:pl-55 justify-center w-full h-[80vh]">
-                  <Loading message={<span className="text-gray-800">Loading Map...</span>} />
+                  <Loading
+                    message={
+                      <span className="text-gray-800">Loading Map...</span>
+                    }
+                  />
                 </div>
               )}
             </>
