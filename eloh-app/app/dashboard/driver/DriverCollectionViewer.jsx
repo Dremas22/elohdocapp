@@ -8,10 +8,10 @@ import { useEffect, useState } from "react";
 import { useUserStore } from "@/hooks/useUserStore";
 import AmbulanceDriverDashboardNavbar from "./driverNav";
 import DriverSidebarMenu from "./driverSidebar";
-import Earnings from "../doctor/doctorEarnings";
 import { FiX } from "react-icons/fi";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/db/client";
+import DriverEarnings from "./DriverEarnings";
 
 const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
   const [mapsReady, setMapsReady] = useState(false);
@@ -114,7 +114,7 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
                           Earnings
                         </h2>
 
-                        <Earnings role="driver" data={userDocState} />
+                        <DriverEarnings data={userDocState} />
                       </div>
                     </div>
                   )}

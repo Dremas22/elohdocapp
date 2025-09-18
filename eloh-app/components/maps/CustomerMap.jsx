@@ -22,7 +22,7 @@ import { db } from "@/db/client";
 import PayAmbulance from "../ambulance/PayAmbulance";
 import CustomerSidebarMenu from "@/app/dashboard/customer/CustomerSidebar";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getLatestTripWithDriver } from "@/lib/getDriverById";
 import { createRouteCustomerToDriver } from "@/lib/createRouteCustomerToDriver";
 import { normalizeLatLng } from "@/lib/normalizeLatLng";
@@ -39,6 +39,7 @@ export default function CustomerMap({ userDoc }) {
   const destInputRef = useRef(null);
   const paySectionRef = useRef(null);
   const lastTripRef = useRef(null);
+  const tripCompletedRef = useRef(false);
 
   const { currentUser } = useCurrentUser();
   const searchParams = useSearchParams();
@@ -58,6 +59,8 @@ export default function CustomerMap({ userDoc }) {
   const [locationLoading, setLocationLoading] = useState(true);
   const [showPay, setShowPay] = useState(false);
   const [confirmingPayment, setConfirmingPayment] = useState(false);
+
+  const router = useRouter();
 
   // Scroll to payment section
   useEffect(() => {
@@ -274,13 +277,34 @@ export default function CustomerMap({ userDoc }) {
       if (snapshot.empty) return;
 
       const trip = snapshot.docs[0].data();
+      // Only handle trip completion once
+      if (
+        trip.arrivalCode === null &&
+        trip.status === "completed" &&
+        !tripCompletedRef.current
+      ) {
+        tripCompletedRef.current = true; // ✅ mark as handled
+
+        // Refresh the page once
+        router.refresh();
+
+        // Optional: clear state (in case you don't reload)
+        setFareDetails(null);
+        setRouteReady(false);
+        setDestinationPlace(null);
+        if (destInputRef.current) destInputRef.current.value = "";
+      }
 
       // If trip already paid → set once, only draw route (skip state updates later)
       if (trip.isPaid) {
         setFareDetails(trip);
         setRouteReady(true);
 
-        if (trip.pickupLocation && trip.hospital) {
+        if (
+          trip.pickupLocation &&
+          trip.hospital &&
+          trip.status !== "completed"
+        ) {
           createRoute(trip.pickupLocation, trip.hospital, map, {
             skipState: true,
             skipSave: true,
@@ -301,7 +325,11 @@ export default function CustomerMap({ userDoc }) {
         setFareDetails(trip);
         setRouteReady(true);
 
-        if (trip.pickupLocation && trip.hospital) {
+        if (
+          trip.pickupLocation &&
+          trip.hospital &&
+          trip.status !== "completed"
+        ) {
           createRoute(trip.pickupLocation, trip.hospital, map, {
             skipSave: true,
           });
@@ -324,7 +352,7 @@ export default function CustomerMap({ userDoc }) {
 
     const fetchAndRoute = async () => {
       const { trip, driver } = await getLatestTripWithDriver(currentUser.uid);
-      if (!trip || !driver) return;
+      if (!trip || !driver || trip.status === "completed") return;
 
       // Clear previous driver → customer route
       if (window.driverRouteRenderer) {
@@ -487,6 +515,7 @@ export default function CustomerMap({ userDoc }) {
                 customerId: currentUser?.uid,
                 createdAt: new Date(),
                 sessionId,
+                status: "pending",
               };
 
               if (!skipState) setFareDetails(newFareDetails);

@@ -37,7 +37,6 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const [ambulanceRequest, setAmbulanceRequest] = useState(null); // Incoming requests
   const [excludedDrivers, setExcludedDrivers] = useState([]); // Drivers declined for current request
   const [activeRequest, setActiveRequest] = useState(null); // Request currently being serviced
-  const [arrivalCode, setArrivalCode] = useState(null); // Code sent to customer on arrival
   const [showCodeInput, setShowCodeInput] = useState(false); // Whether to show code input
   const [enteredCode, setEnteredCode] = useState(""); // Input from driver
   const [verifying, setVerifying] = useState(false);
@@ -66,12 +65,22 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
         const tripDoc = snapshot.docs[0];
         const trip = { id: tripDoc.id, ...tripDoc.data() };
 
+        // Show code input if showInput is true
+        setShowCodeInput(trip.showInput ?? false);
+
         if (
           (trip?.pickupLocation || trip?.origin) &&
           (trip?.hospital || trip?.destination) &&
-          trip?.isPaid
+          trip?.isPaid &&
+          trip?.status !== "completed" &&
+          trip?.status !== "driver_arrived"
         ) {
           setAmbulanceRequest(trip);
+        }
+
+        // Persist activeRequest if trip is paid and not completed
+        if (trip?.isPaid && trip?.status === "driver_arrived") {
+          setActiveRequest(trip);
         }
       },
       (error) => {
@@ -242,7 +251,6 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
       const tripId = activeRequest?.customerId;
       const code = await sendArrivalCodeEmail(activeRequest);
 
-      setArrivalCode(code);
       setShowCodeInput(true);
       toastSuccess("Code sent to customer");
 
@@ -251,6 +259,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
         arrivalCode: code,
         status: "driver_arrived",
         arrivedAt: new Date(),
+        showInput: true,
       });
 
       toastSuccess(
@@ -330,7 +339,10 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
       const tripSnap = await getDoc(tripRef);
       const data = tripSnap.data();
 
-      if (!tripSnap.exists() || !data) throw new Error("Trip not found");
+      if (!tripSnap.exists() || !data) {
+        toastError("Trip not found");
+        return;
+      }
 
       if (enteredCode === data.arrivalCode) {
         await updateDoc(tripRef, {
@@ -340,9 +352,40 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
           sessionId: null,
           isRatings: true,
           updatedAt: new Date(),
+          showInput: false,
         });
+
+        const driverId = data.driverId || currentUser?.uid;
+        if (!driverId) return toastError("Driver ID missing");
+
+        const driverRef = doc(db, "drivers", driverId);
+        const driverSnap = await getDoc(driverRef);
+        const driverData = driverSnap.exists() ? driverSnap.data() : {};
+
+        const previousEarnings = parseFloat(driverData.earnings || 0);
+        const previousTrips = parseInt(driverData.numberOfTrips || 0);
+        const fare = parseFloat(activeRequest?.fare || 0);
+
+        await setDoc(
+          driverRef,
+          {
+            earnings: previousEarnings + fare,
+            numberOfTrips: previousTrips + 1,
+            totalPlatformFees: (driverData.totalPlatformFees || 0) + fare * 0.1,
+            earningsUpdatedAt: new Date(),
+          },
+          { merge: true }
+        );
+
+        // ✅ Clear map directions
+        if (directionsRenderer) {
+          directionsRenderer.setMap(null);
+          setDirectionsRenderer(null);
+        }
+
         toastSuccess("Trip successfully completed!");
         setActiveRequest(null);
+        setAmbulanceRequest(null);
         setShowCodeInput(false);
       } else {
         toastError("Incorrect code. Please try again.");
@@ -394,35 +437,35 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
             />
           )}
 
-          {/* Arrival code verification */}
+          {/* Arrival code verification overlay */}
           {showCodeInput && (
-            <div className="fixed bottom-24 right-5 z-50 bg-white p-4 rounded-xl shadow-lg flex flex-col gap-2 w-64">
-              <label className="text-sm font-medium text-gray-700">
-                Enter arrival code from customer:
-              </label>
-              <input
-                type="text"
-                value={enteredCode}
-                onChange={(e) => setEnteredCode(e.target.value)}
-                className="border p-2 rounded text-sm text-gray-700"
-                placeholder="6-digit code"
-              />
-              <button
-                onClick={async () => await handleCodeVerification()}
-                disabled={verifying}
-                className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded shadow text-sm font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                {verifying ? (
-                  <span className="flex items-center justify-center gap-2 text-white">
-                    <FiLoader className="animate-spin h-5 w-5" />
-                    Verifying...
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2 text-white">
-                    Verify Code
-                  </span>
-                )}
-              </button>
+            <div className="fixed inset-0 z-[9999] bg-black bg-opacity-30 flex items-end justify-end p-6 pointer-events-auto">
+              <div className="bg-white p-4 rounded-xl shadow-lg w-72 flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Enter arrival code from customer:
+                </label>
+                <input
+                  type="text"
+                  value={enteredCode}
+                  onChange={(e) => setEnteredCode(e.target.value)}
+                  className="border p-2 rounded text-sm text-gray-700 w-full"
+                  placeholder="6-digit code"
+                />
+                <button
+                  onClick={async () => await handleCodeVerification()}
+                  disabled={verifying}
+                  className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded shadow text-sm font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed w-full"
+                >
+                  {verifying ? (
+                    <span className="flex items-center justify-center gap-2 text-white">
+                      <FiLoader className="animate-spin h-5 w-5" />
+                      Verifying...
+                    </span>
+                  ) : (
+                    "Verify Code"
+                  )}
+                </button>
+              </div>
             </div>
           )}
         </div>
