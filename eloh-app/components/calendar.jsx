@@ -4,12 +4,9 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useUserStore } from "@/hooks/useUserStore";
 import { useRouter } from "next/navigation";
-
-const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-function getDaysInMonth(year, month) {
-  return new Date(year, month + 1, 0).getDate();
-}
+import { daysOfWeek } from "@/constants";
+import { getDaysInMonth } from "@/lib/timeUntil";
+import AppointmentCard from "./appointment/Appointment";
 
 const roleTargets = {
   doctor: "patient",
@@ -289,22 +286,7 @@ const Calendar = () => {
           </h3>
           <ul className="space-y-4 text-gray-700">
             {scheduledAppointments.map((appt) => (
-              <li
-                key={appt.id}
-                className="pl-4 border-l-4 border-[#0d6efd] bg-gray-50 p-3 rounded-md cursor-pointer hover:border-[#527cbb]"
-                onClick={() => router.push(appt?.meetingLink)}
-              >
-                <div className="text-sm">
-                  <span className="font-semibold">{appt.date}</span> at{" "}
-                  <span className="font-semibold">{appt.time}</span> (
-                  {appt.targetRole})
-                </div>
-                {appt.note && (
-                  <div className="text-xs text-gray-500 mt-1">
-                    Note: {appt.note}
-                  </div>
-                )}
-              </li>
+              <AppointmentCard key={appt.id} appt={appt} />
             ))}
           </ul>
         </div>

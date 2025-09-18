@@ -3,7 +3,7 @@
 import {
   deleteCustomerRoute,
   getAddressFromLatLng,
-  saveCustomerRoute,
+  saveCustomerTrip,
   trackAmbulances,
 } from "@/helpers";
 import { toastError, toastInfo } from "@/helpers/toastHelper";
@@ -19,13 +19,17 @@ import {
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import { db } from "@/db/client";
-import { FaLocationDot } from "react-icons/fa6";
-import { FiMapPin } from "react-icons/fi";
 import PayAmbulance from "../ambulance/PayAmbulance";
 import CustomerSidebarMenu from "@/app/dashboard/customer/CustomerSidebar";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useSearchParams } from "next/navigation";
+import { getLatestTripWithDriver } from "@/lib/getDriverById";
+import { createRouteCustomerToDriver } from "@/lib/createRouteCustomerToDriver";
+import { normalizeLatLng } from "@/lib/normalizeLatLng";
+import PaymentConfirmationLoader from "../ambulance/customers/PaymentConfirmationLoader";
+import RequestSection from "./RequestSection";
 import confirmPayment from "@/lib/confirmPayment";
+import ArrivalCodeModal from "./ArrivalCodeModal";
 
 const RATE_PER_KM = 10;
 
@@ -34,6 +38,8 @@ export default function CustomerMap({ userDoc }) {
   const pickupInputRef = useRef(null);
   const destInputRef = useRef(null);
   const paySectionRef = useRef(null);
+  const lastTripRef = useRef(null);
+
   const { currentUser } = useCurrentUser();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
@@ -46,12 +52,14 @@ export default function CustomerMap({ userDoc }) {
   const [destinationPlace, setDestinationPlace] = useState(null);
   const [directionsRenderer, setDirectionsRenderer] = useState(null);
   const [routeReady, setRouteReady] = useState(false);
+  const [destMarker, setDestMarker] = useState(null);
   const [fareDetails, setFareDetails] = useState(null);
   const [pickupMarker, setPickupMarker] = useState(null);
-  const [destMarker, setDestMarker] = useState(null);
   const [locationLoading, setLocationLoading] = useState(true);
   const [showPay, setShowPay] = useState(false);
+  const [confirmingPayment, setConfirmingPayment] = useState(false);
 
+  // Scroll to payment section
   useEffect(() => {
     if (showPay && paySectionRef.current) {
       paySectionRef.current.scrollIntoView({
@@ -61,49 +69,41 @@ export default function CustomerMap({ userDoc }) {
     }
   }, [showPay]);
 
+  // Confirm payment if session_id exists
   useEffect(() => {
     const confirmPay = async () => {
       if (!currentUser || !sessionId || type !== "ambulance_request") return;
       if (!sessionId.startsWith("cs_")) return;
+      if (!fareDetails) return;
 
-      let tripData = fareDetails;
+      try {
+        setConfirmingPayment(true); // ✅ start loading
+        const tripData = {
+          ...fareDetails,
+          customerId: currentUser?.uid || userDoc?.userId,
+          customerEmail:
+            currentUser?.email || userDoc?.email || "unknown@email.com",
+          sessionId,
+          destination: destinationPlace || fareDetails.destination,
+          pickupLocation: pickupPlace || fareDetails.pickupLocation,
+          type: "ambulance_request",
+        };
 
-      console.log(tripData, "TRIP_DATA_XXX123");
+        const driver = await confirmPayment(
+          sessionId,
+          tripData,
+          tripData.customerId
+        );
 
-      // 🔹 Recover from localStorage if missing
-      if (!tripData) {
-        const stored = localStorage.getItem("fareDetails");
-        if (stored) {
-          tripData = JSON.parse(stored);
-          setFareDetails(tripData); // sync back to state
-        } else {
-          console.warn("No fareDetails found for confirming payment");
-          return;
-        }
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+
+        window.location.reload();
+      } catch (error) {
+        toastError("Payment confirmation failed. Please try again.");
+      } finally {
+        setConfirmingPayment(false);
       }
-
-      // 🔹 Add safe fallbacks for required fields
-      tripData = {
-        ...tripData,
-        customerId: currentUser?.uid || userDoc?.userId,
-        customerEmail:
-          currentUser?.email || userDoc?.email || "unknown@email.com",
-        destination:
-          destinationPlace || tripData?.hospital || tripData?.destination,
-        type: "ambulance_request",
-        pickupLocation: pickupPlace,
-      };
-
-      // Small delay so Firestore writes can settle
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      await confirmPayment(sessionId, tripData, tripData.customerId);
-
-      // Clean URL so refresh doesn’t confirm again
-      const cleanUrl = window.location.origin + window.location.pathname;
-      window.history.replaceState({}, document.title, cleanUrl);
-
-      localStorage.removeItem("fareDetails");
     };
 
     confirmPay();
@@ -172,6 +172,7 @@ export default function CustomerMap({ userDoc }) {
               lat: place.geometry.location.lat(),
               lng: place.geometry.location.lng(),
               address: place.formatted_address || place.name,
+              name: place.name || null,
             };
             setPickupPlace(p);
             // add marker
@@ -257,218 +258,258 @@ export default function CustomerMap({ userDoc }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Firestore listener → trip always overrides state
   useEffect(() => {
-    const fallback = { lat: -33.9249, lng: 18.4241 }; // Cape Town fallback
-
-    const init = async () => {
-      setLocationLoading(true);
-      try {
-        // 1. Init map immediately
-        const mapInstance = new google.maps.Map(mapRef.current, {
-          center: fallback,
-          zoom: 14,
-        });
-        setMap(mapInstance);
-
-        // 2. Set fallback origin immediately
-        setCurrentLocation(fallback);
-        setPickupPlace(fallback);
-
-        // 3. Try geolocation
-        await new Promise((resolve) => {
-          if (!navigator.geolocation) return resolve();
-
-          navigator.geolocation.getCurrentPosition(
-            ({ coords }) => {
-              const loc = { lat: coords.latitude, lng: coords.longitude };
-              setCurrentLocation(loc);
-              setPickupPlace(loc);
-              mapInstance.setCenter(loc);
-              resolve();
-            },
-            () => {
-              console.warn("GPS failed, using fallback");
-              resolve();
-            }
-          );
-        });
-      } catch (error) {
-        console.error("Error during initialization:", error);
-      } finally {
-        setLocationLoading(false);
-      }
-    };
-
-    init();
-  }, []);
-
-  useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser?.uid || !map) return;
 
     const tripsRef = collection(db, "trips");
     const q = query(
       tripsRef,
-      where("customerId", "==", currentUser?.uid),
+      where("customerId", "==", currentUser.uid),
       orderBy("createdAt", "desc"),
       limit(1)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (snapshot.empty) return;
+
       const trip = snapshot.docs[0].data();
 
-      if (
-        trip?.isPaid &&
-        (trip?.pickupLocation || trip.origin) &&
-        (trip?.hospital || trip?.destination)
-      ) {
-        // 👇 Recreate the route if trip is already paid
-        createRoute(trip.pickupLocation, trip.hospital, map);
+      // If trip already paid → set once, only draw route (skip state updates later)
+      if (trip.isPaid) {
         setFareDetails(trip);
         setRouteReady(true);
+
+        if (trip.pickupLocation && trip.hospital) {
+          createRoute(trip.pickupLocation, trip.hospital, map, {
+            skipState: true,
+            skipSave: true,
+          });
+        }
+        return;
+      }
+
+      // Not paid → normal update
+      const stableTrip = {
+        customerId: trip.customerId,
+        isPaid: trip.isPaid || false,
+        fare: trip.fare,
+      };
+
+      if (JSON.stringify(stableTrip) !== JSON.stringify(lastTripRef.current)) {
+        lastTripRef.current = stableTrip;
+        setFareDetails(trip);
+        setRouteReady(true);
+
+        if (trip.pickupLocation && trip.hospital) {
+          createRoute(trip.pickupLocation, trip.hospital, map, {
+            skipSave: true,
+          });
+        }
       }
     });
-
     return () => unsubscribe();
-  }, [map, currentUser?.uid]); // runs once map/currentUser is ready
+  }, [currentUser?.uid, map]);
 
-  const handleCreateRoute = () => {
+  // Track ambulances
+  useEffect(() => {
+    if (!map) return;
+    const location = destinationPlace || pickupPlace || currentLocation;
+    if (location) trackAmbulances(location, map, 450);
+  }, [map, currentLocation, pickupPlace, destinationPlace]);
+
+  // Route from driver to customer
+  useEffect(() => {
+    if (!currentUser?.uid || !map) return;
+
+    const fetchAndRoute = async () => {
+      const { trip, driver } = await getLatestTripWithDriver(currentUser.uid);
+      if (!trip || !driver) return;
+
+      // Clear previous driver → customer route
+      if (window.driverRouteRenderer) {
+        window.driverRouteRenderer.setMap(null);
+        window.driverRouteRenderer = null;
+      }
+
+      /**
+       *  TODO: Example object used only for testing when the customer and driver
+        are located very close to each other. This artificially offsets the
+        customer's coordinates (~200m north-east) so that the route line is
+        easier to visualize on the map. Remove or disable in production and use (trip.pickupLocation) .
+       */
+      // const testCustomerLoc = {
+      //   lat: trip.pickupLocation.lat + 0.002, // ~200m north
+      //   lng: trip.pickupLocation.lng + 0.002, // ~200m east
+      // };
+
+      // Draw driver → customer route (normal opacity)
+      window.driverRouteRenderer = createRouteCustomerToDriver(
+        driver.location,
+        trip.pickupLocation,
+        trip.hospital,
+        map,
+        setDirectionsRenderer
+      );
+
+      // Draw customer → hospital route (faded)
+      if (trip.hospital) {
+        if (window.customerRouteRenderer) {
+          window.customerRouteRenderer.setMap(null);
+          window.customerRouteRenderer = null;
+        }
+
+        window.customerRouteRenderer = await createRoute(
+          trip.pickupLocation,
+          trip.hospital,
+          map,
+          {
+            skipState: true,
+            polylineOptions: { strokeColor: "#0000FF", strokeOpacity: 0.3 },
+            skipSave: true,
+          }
+        );
+      }
+    };
+
+    fetchAndRoute();
+  }, [currentUser?.uid, map]);
+
+  // Create route handler
+  const handleCreateRoute = async () => {
     if (!pickupPlace && !currentLocation)
       return toastError("Pickup location missing");
     if (!destinationPlace) return toastError("Destination missing");
 
     setCalculatingTrip(true);
-    createRoute(pickupPlace || currentLocation, destinationPlace, map);
+
+    // Wait for createRoute to finish before enabling Request Ambulance
+    await createRoute(pickupPlace || currentLocation, destinationPlace, map);
+
+    setCalculatingTrip(false);
+    setRouteReady(true);
   };
 
-  // createRoute function - draws route, calculates distance/duration/fare, saves to firestore
-  function createRoute(origin, destination, gMap = map) {
-    setLocationLoading(true);
-    if (!gMap) {
-      console.error("Map not ready");
-      setCalculatingTrip(false);
-      return;
-    }
-    if (!origin || !destination) {
-      toastError("Origin or destination missing");
-      return;
-    }
+  // Draw route + save to Firestore
+  async function createRoute(origin, destination, gMap = map, options = {}) {
+    const {
+      skipState = false,
+      polylineOptions = {},
+      skipSave = false,
+    } = options;
+    if (!gMap) return;
 
     try {
-      // clear previous renderer
-      if (directionsRenderer) {
-        directionsRenderer.setMap(null);
-        setDirectionsRenderer(null);
-      }
-
-      const directionsService = new window.google.maps.DirectionsService();
       const renderer = new window.google.maps.DirectionsRenderer({
         suppressMarkers: true,
-      });
-      renderer.setMap(gMap);
-      setDirectionsRenderer(renderer);
-
-      const originParam =
-        typeof origin.lat === "function" || origin.lat === undefined
-          ? origin
-          : { lat: origin.lat, lng: origin.lng };
-
-      const destinationParam = { lat: destination.lat, lng: destination.lng };
-
-      directionsService.route(
-        {
-          origin: originParam,
-          destination: destinationParam,
-          travelMode: window.google.maps.TravelMode.DRIVING,
+        polylineOptions: {
+          strokeColor: polylineOptions.strokeColor || "#0000FF",
+          strokeOpacity: polylineOptions.strokeOpacity || 1.0,
+          strokeWeight: polylineOptions.strokeWeight || 6,
         },
-        async (result, status) => {
-          if (status === "OK") {
-            renderer.setDirections(result);
-            // pull leg info
-            const leg = result.routes[0].legs[0];
-            const distanceMeters = leg.distance?.value ?? 0;
-            const durationSeconds = leg.duration?.value ?? 0;
-            const distanceKm = distanceMeters / 1000;
-            const durationMin = Math.round(durationSeconds / 60);
-            const fare = (distanceKm * RATE_PER_KM).toFixed(2);
+      });
 
-            const originAddress = await getAddressFromLatLng(
-              origin.lat,
-              origin.lng
-            );
-            const destinationAddress = await getAddressFromLatLng(
-              destination.lat,
-              destination.lng
-            );
+      renderer.setMap(gMap);
 
-            const routeData = {
-              origin: {
-                lat: origin.lat,
-                lng: origin.lng,
-                address: originAddress,
-              },
-              destination: {
-                lat: destination.lat,
-                lng: destination.lng,
-                address: destinationAddress,
-              },
-              distance: distanceKm.toFixed(2),
-              duration: durationMin.toFixed(0),
-              fare,
-              customerId: currentUser?.uid || userDoc?.userId, // ✅ always set
-              customerName:
-                userDoc?.fullName || currentUser?.displayName || "Unknown", // ✅ fallback
-              customerEmail:
-                currentUser?.email || userDoc?.email || "unknown@email.com",
-              pickupLocation: {
-                lat: origin.lat,
-                lng: origin.lng,
-                address: originAddress,
-              },
-              hospital: {
-                lat: destination.lat,
-                lng: destination.lng,
-                address: destinationAddress,
-              },
-              type: "ambulance_request",
-            };
+      const directionsService = new window.google.maps.DirectionsService();
+      const normOrigin = normalizeLatLng(origin);
+      const normDestination = normalizeLatLng(destination);
 
-            // Save route to Firestore
-            try {
-              if (!currentUser) throw new Error("User not authenticated");
-              await saveCustomerRoute(currentUser?.uid, routeData);
+      return new Promise((resolve, reject) => {
+        directionsService.route(
+          {
+            origin: normOrigin,
+            destination: normDestination,
+            travelMode: window.google.maps.TravelMode.DRIVING,
+          },
+          async (result, status) => {
+            if (status === "OK") {
+              renderer.setDirections(result);
 
-              // Save to localStorage for persistence across page reloads
-              localStorage.setItem("fareDetails", JSON.stringify(routeData));
-              // set UI
-              setFareDetails(routeData);
-              setRouteReady(true);
-            } catch (saveErr) {
-              console.error("Failed to save route:", saveErr.message);
-              // still save locally so user can see cost even if save failed
-              localStorage.setItem("fareDetails", JSON.stringify(routeData));
-              // still set fareDetails so user can see cost even if save failed
-              setFareDetails(routeData);
-              setRouteReady(true);
+              // Fit map bounds
+              const bounds = new window.google.maps.LatLngBounds();
+              result.routes[0].overview_path.forEach((point) =>
+                bounds.extend(point)
+              );
+              gMap.fitBounds(bounds);
+              window.google.maps.event.addListenerOnce(gMap, "idle", () => {
+                const currentZoom = gMap.getZoom();
+                // Reduce zoom by 1-2 levels for extra space
+                const newZoom =
+                  currentZoom > 12 ? currentZoom - 2 : currentZoom;
+                gMap.setZoom(newZoom);
+              });
+
+              const leg = result.routes[0].legs[0];
+              const distanceKm = (leg.distance?.value ?? 0) / 1000;
+              const fare = (distanceKm * RATE_PER_KM).toFixed(2);
+
+              const normOrigin = normalizeLatLng(origin);
+              const normDestination = normalizeLatLng(destination);
+
+              const originAddress = await getAddressFromLatLng(
+                normOrigin.lat,
+                normOrigin.lng
+              );
+              const destinationAddress = await getAddressFromLatLng(
+                normDestination.lat,
+                normDestination.lng
+              );
+
+              const newFareDetails = {
+                origin: {
+                  ...normOrigin,
+                  address: originAddress,
+                },
+                destination: {
+                  ...normDestination,
+                  name: destination?.name || null,
+                  address: destinationAddress,
+                },
+                distance: distanceKm.toFixed(2),
+                duration: leg.duration?.text || "",
+                customerId: currentUser?.uid || userDoc?.userId, // ✅ always set
+                customerName:
+                  userDoc?.fullName || currentUser?.displayName || "Unknown", // ✅ fallback
+                customerEmail:
+                  currentUser?.email || userDoc?.email || "unknown@email.com",
+                pickupLocation: {
+                  lat: origin.lat,
+                  lng: origin.lng,
+                  address: originAddress,
+                },
+                hospital: {
+                  lat: destination.lat,
+                  lng: destination.lng,
+                  address: destinationAddress,
+                },
+                fare,
+                customerId: currentUser?.uid,
+                createdAt: new Date(),
+                sessionId,
+              };
+
+              if (!skipState) setFareDetails(newFareDetails);
+
+              // Save to Firestore
+              if (!skipSave && currentUser?.uid) {
+                try {
+                  await saveCustomerTrip(currentUser.uid, newFareDetails);
+                } catch (err) {
+                  console.error("Failed to save trip:", err);
+                }
+              }
+
+              resolve(renderer);
+            } else {
+              console.error("Failed to create route:", status);
+              reject(status);
             }
-
-            // center map to route start
-            if (pickupMarker) pickupMarker.setMap(gMap);
-            if (destMarker) destMarker.setMap(gMap);
-            gMap.panTo({ lat: destination.lat, lng: destination.lng });
-          } else {
-            console.error("Directions service failed:", status);
-            alert("Unable to create route: " + status);
           }
-          setCalculatingTrip(false);
-          setLocationLoading(false);
-        }
-      );
+        );
+      });
     } catch (err) {
-      console.error("createRoute error:", err.message);
-
-      setLocationLoading(false);
-      setCalculatingTrip(false);
+      console.error("createRoute error:", err);
     }
   }
 
@@ -507,34 +548,36 @@ export default function CustomerMap({ userDoc }) {
       },
       (err) => {
         console.error("Geolocation error:", err.message);
-        alert("Unable to get your location.");
+        toastError("Unable to get your location.");
       }
     );
   };
 
+  // Cancel route
   const handleCancelRoute = async () => {
-    if (directionsRenderer) {
-      directionsRenderer.setMap(null);
-      setDirectionsRenderer(null);
-    }
+    if (directionsRenderer) directionsRenderer.setMap(null);
+    setDirectionsRenderer(null);
     setFareDetails(null);
     setRouteReady(false);
     setDestinationPlace(null);
     if (destInputRef.current) destInputRef.current.value = "";
+
     try {
       if (!currentUser) throw new Error("User not authenticated");
-
-      const routesRef = collection(db, "customers", currentUser?.uid, "routes");
-      const q = query(routesRef, orderBy("createdAt", "desc"), limit(1));
+      const tripsRef = collection(db, "trips");
+      const q = query(
+        tripsRef,
+        where("customerId", "==", currentUser.uid),
+        orderBy("createdAt", "desc"),
+        limit(1)
+      );
       const snapshot = await getDocs(q);
 
-      if (snapshot.empty) {
-        // nothing to delete
-        return;
+      if (!snapshot.empty) {
+        const routeDoc = snapshot.docs[0];
+        await deleteCustomerRoute(currentUser.uid, routeDoc.id);
+        toastInfo("Route cancelled and removed from database.");
       }
-      const routeDoc = snapshot.docs[0];
-      await deleteCustomerRoute(user?.uid, routeDoc.id);
-      alert("Route cancelled and removed from database.");
     } catch (err) {
       console.error("Cancel route failed:", err.message);
     }
@@ -542,153 +585,40 @@ export default function CustomerMap({ userDoc }) {
 
   return (
     <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 pt-20 lg:pl-66 p-4">
-      {/* Sidebar */}
+      {confirmingPayment && <PaymentConfirmationLoader />}
+      <ArrivalCodeModal fareDetails={fareDetails} />
+
       <CustomerSidebarMenu userDoc={userDoc} />
 
-      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-4 sm:p-6 mb-6">
-        <h2 className=" text-xl sm:text-2xl font-bold text-gray-800 mb-4">
-          🚑 Request Ambulance
-        </h2>
-
-        {/* Pickup */}
-        <div className="flex flex-col sm:flex-row gap-2 mb-4">
-          <div className="relative w-full">
-            <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <input
-              title="Where should we pick you up?"
-              ref={pickupInputRef}
-              type="text"
-              placeholder="Enter pickup address or use current location"
-              className="flex-1 p-3 pl-10 border border-gray-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-            />
-          </div>
-
-          <button
-            title="Set pickup location to your current location"
-            onClick={useMyLocation}
-            className="bg-[#03045e] text-white font-semibold py-2 px-8 rounded-xl shadow-[0_4px_#999] 
-             active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] 
-             transition-all duration-200 ease-in-out cursor-pointer flex items-center gap-2 -mt-2"
-          >
-            <FaLocationDot className="h-4 w-5" />
-            <span>Use Current Location</span>
-          </button>
-        </div>
-
-        {/* Destination */}
-        <div className="relative mb-4">
-          <FiMapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-          <input
-            title="Where are you headed?"
-            ref={destInputRef}
-            type="text"
-            placeholder="Type destination (clinic, hospital, address or any place)..."
-            className="pl-10 p-3 border border-gray-300 text-black rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex flex-row gap-3 flex-wrap">
-          <button
-            onClick={handleCreateRoute}
-            disabled={locationLoading}
-            className={`flex-1 min-w-[120px] ${locationLoading
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-[#03045e] hover:bg-[#023e8a]"
-              } text-white font-semibold py-2.5 px-3 rounded-xl shadow transition-all`}
-          >
-            Create Route
-          </button>
-
-          <button
-            onClick={handleCancelRoute}
-            className="flex-1 min-w-[120px] bg-[#03045e] text-white font-semibold py-2.5 px-3 rounded-xl shadow hover:bg-[#023e8a] transition-all cursor-pointer"
-          >
-            Cancel Route
-          </button>
-        </div>
-
-        {/* Trip summary (distance/fare) */}
-        {calculatingTrip && (
-          <div className="mt-4 flex items-center justify-center gap-2 p-2 bg-blue-400 text-blue-800 rounded-md border border-blue-300 text-sm font-medium animate-pulse">
-            {/* Spinner */}
-            <svg
-              className="w-4 h-4 text-blue-800 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-              ></path>
-            </svg>
-            <span>Calculating trip...</span>
-          </div>
-        )}
-        {fareDetails && (
-          <div className="mt-4 bg-gray-50 text-black p-4 rounded border">
-            <h3 className="font-semibold mb-2">Trip summary</h3>
-            <p>
-              <strong>Destination:</strong>{" "}
-              {fareDetails?.hospital?.address ||
-                fareDetails?.destination?.address}
-            </p>
-            <p>
-              <strong>Distance:</strong> {fareDetails?.distance} km
-            </p>
-            <p>
-              <strong>Duration:</strong> {fareDetails?.duration} min
-            </p>
-            <p>
-              <strong>Fare:</strong> R{fareDetails?.fare}
-            </p>
-          </div>
-        )}
-
-        {/* Request Ambulance */}
-        <div className="mt-4">
-          <button
-            title="Request ambulance now"
-            onClick={() => setShowPay(true)}
-            disabled={!routeReady}
-            className={`w-full ${routeReady
-              ? "bg-red-600 hover:bg-red-700 active:translate-y-1 active:shadow-[0_2px_#666] transform transition-all duration-200 ease-in-out cursor-pointer"
-              : "bg-gray-300 cursor-not-allowed"
-              } text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] `}
-          >
-            Request Ambulance
-          </button>
-        </div>
-      </div>
-
+      <RequestSection
+        pickupInputRef={pickupInputRef}
+        destInputRef={destInputRef}
+        fareDetails={fareDetails}
+        calculatingTrip={calculatingTrip}
+        routeReady={routeReady}
+        setShowPay={setShowPay}
+        useMyLocation={useMyLocation}
+        handleCreateRoute={handleCreateRoute}
+        handleCancelRoute={handleCancelRoute}
+      />
       {/* Map */}
       <div
         ref={mapRef}
-        className="w-full max-w-6xl h-[480px] rounded-lg shadow-lg overflow-hidden"
+        className="w-full max-w-6xl h-[480px] sm:h-[400px] md:h-[500px] lg:h-[600px] rounded-lg shadow-lg overflow-hidden mx-auto"
       />
 
-      {/* Payment panel */}
-      {showPay && (
+      {/* Payment Section */}
+      {showPay && fareDetails && !fareDetails.isPaid && (
         <div
           ref={paySectionRef}
           className="w-full max-w-lg bg-white p-4 rounded-lg shadow mt-6"
         >
           <PayAmbulance
-            fare={fareDetails?.fare}
-            distance={fareDetails?.distance}
-            duration={fareDetails?.duration}
-            pickupLocation={fareDetails?.origin}
-            hospital={fareDetails?.destination}
+            fare={fareDetails.fare}
+            distance={fareDetails.distance}
+            duration={fareDetails.duration}
+            pickupLocation={fareDetails.origin}
+            hospital={fareDetails.destination}
             userDoc={userDoc}
           />
         </div>

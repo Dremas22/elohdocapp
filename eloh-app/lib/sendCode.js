@@ -26,34 +26,11 @@ import { toastInfo, toastError } from "@/helpers/toastHelper";
  *   await setDoc(doc(db, "trips", userId), { verificationCode: code }, { merge: true });
  * }
  */
-const sendArrivalCodeEmail = async (activeRequest, customerEmail) => {
-  if (!activeRequest || !customerEmail) return;
+const sendArrivalCodeEmail = async (activeRequest) => {
+  if (!activeRequest) return;
 
   try {
-    const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
-
-    const templateParams = {
-      customer_name: activeRequest.customerName,
-      code: code,
-      pickup_address:
-        activeRequest.pickupAddress || activeRequest.pickupLocation.address,
-      destination_address:
-        activeRequest.destinationAddress ||
-        activeRequest.hospital.address ||
-        "N/A",
-      fare: activeRequest.fare,
-      customer_email: customerEmail,
-    };
-
-    const result = await emailjs.send(
-      process.env.NEXT_PUBLIC_EMAIL_JS_SERVICE_ID_CODE,
-      process.env.NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID_CODE,
-      templateParams,
-      process.env.NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY
-    );
-
-    toastInfo(`${result.text} : Arrival code sent to ${customerEmail} `);
-
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
     return code;
   } catch (err) {
     console.error("Failed to send email:", err);

@@ -262,3 +262,21 @@ export const ROLE_COLLECTION_MAP = {
   driver: "drivers",
   customer: "customers",
 };
+
+/**
+ * Days of the week abbreviations starting from Sunday.
+ *
+ * Index mapping:
+ * - 0 → "Sun"
+ * - 1 → "Mon"
+ * - 2 → "Tue"
+ * - 3 → "Wed"
+ * - 4 → "Thu"
+ * - 5 → "Fri"
+ * - 6 → "Sat"
+ *
+ * @constant {string[]}
+ * @example
+ * daysOfWeek[new Date().getDay()]; // Returns today's day abbreviation
+ */
+export const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

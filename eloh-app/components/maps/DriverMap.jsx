@@ -25,6 +25,7 @@ import AmbulanceRequest from "../driver/AmbulanceRequest";
 import sendArrivalCodeEmail from "@/lib/sendCode";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import confirmPayment from "@/lib/confirmPayment";
+import { FiLoader } from "react-icons/fi";
 
 const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   // References & states
@@ -39,6 +40,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const [arrivalCode, setArrivalCode] = useState(null); // Code sent to customer on arrival
   const [showCodeInput, setShowCodeInput] = useState(false); // Whether to show code input
   const [enteredCode, setEnteredCode] = useState(""); // Input from driver
+  const [verifying, setVerifying] = useState(false);
   const { currentUser } = useCurrentUser();
 
   // Listen to latest trips for the current driver
@@ -135,7 +137,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
     const watchId = navigator.geolocation.watchPosition(
       ({ coords }) => updateDriverLocation(coords),
-      (error) => toastError(`Geolocation error: ${error}`, 5000),
+      (error) => console.error(`Geolocation error: ${error}`),
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
     );
 
@@ -144,7 +146,8 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
   // Accept an ambulance request
   const handleAcceptRequest = async (request) => {
-    if (!map || !currentLocation) return toastError("Map or location not ready");
+    if (!map || !currentLocation)
+      return toastError("Map or location not ready");
 
     if (directionsRenderer) directionsRenderer.setMap(null);
     const newRenderer = new window.google.maps.DirectionsRenderer();
@@ -156,10 +159,14 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     const origin = currentLocation;
     const destination = {
       lat: parseFloat(
-        request?.pickupLat || request?.destination.lat || request?.pickupLocation?.lat
+        request?.pickupLat ||
+          request?.destination.lat ||
+          request?.pickupLocation?.lat
       ),
       lng: parseFloat(
-        request?.pickupLng || request?.destination?.lng || request?.pickupLocation?.lng
+        request?.pickupLng ||
+          request?.destination?.lng ||
+          request?.pickupLocation?.lng
       ),
     };
 
@@ -233,11 +240,11 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
     try {
       const tripId = activeRequest?.customerId;
-      const code = await sendArrivalCodeEmail(activeRequest, activeRequest?.customerEmail);
+      const code = await sendArrivalCodeEmail(activeRequest);
 
       setArrivalCode(code);
       setShowCodeInput(true);
-      alert(`${code} here`);
+      toastSuccess("Code sent to customer");
 
       const tripRef = doc(db, "trips", tripId);
       await updateDoc(tripRef, {
@@ -246,7 +253,9 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
         arrivedAt: new Date(),
       });
 
-      toastSuccess(`Code sent to customer email`);
+      toastSuccess(
+        "Arrival code has been generated and shared with the customer."
+      );
     } catch (err) {
       console.error("Failed to send arrival code:", err.message);
       toastError("Failed to notify customer.");
@@ -286,16 +295,19 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
       );
 
       if (nextDriver) {
-        await fetch(`${process.env.NEXT_PUBLIC_URL}/api/send-ambulance-notification`, {
-          method: "POST",
-          body: JSON.stringify({
-            driverId: nextDriver?.userId || nextDriver?.id,
-            tripDetails: reqData,
-            customerId: auth?.currentUser?.uid,
-            excludedDrivers: updatedExclusions,
-          }),
-          headers: { "Content-Type": "application/json" },
-        });
+        await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/send-ambulance-notification`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              driverId: nextDriver?.userId || nextDriver?.id,
+              tripDetails: reqData,
+              customerId: auth?.currentUser?.uid,
+              excludedDrivers: updatedExclusions,
+            }),
+            headers: { "Content-Type": "application/json" },
+          }
+        );
 
         toastInfo(`Request reassigned to driver ${nextDriver.id}`);
       } else {
@@ -311,6 +323,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
   // Verify arrival code entered by driver
   const handleCodeVerification = async () => {
+    setVerifying(true);
     try {
       const tripId = activeRequest?.customerId;
       const tripRef = doc(db, "trips", tripId);
@@ -324,6 +337,8 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
           status: "completed",
           arrivalCode: null,
           isPaid: false,
+          sessionId: null,
+          isRatings: true,
           updatedAt: new Date(),
         });
         toastSuccess("Trip successfully completed!");
@@ -335,12 +350,13 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     } catch (err) {
       console.error("Verification failed:", err.message);
       toastError("Failed to verify code.");
+    } finally {
+      setVerifying(false);
     }
   };
 
   return (
     <div className="flex h-[690px] w-full sm:ml-10 bg-gray-100 relative">
-
       {/* Sidebar */}
       <DriverSidebarMenu
         userDoc={userDoc}
@@ -393,16 +409,25 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
               />
               <button
                 onClick={async () => await handleCodeVerification()}
-                className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded shadow text-sm font-semibold"
+                disabled={verifying}
+                className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded shadow text-sm font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                Verify Code
+                {verifying ? (
+                  <span className="flex items-center justify-center gap-2 text-white">
+                    <FiLoader className="animate-spin h-5 w-5" />
+                    Verifying...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2 text-white">
+                    Verify Code
+                  </span>
+                )}
               </button>
             </div>
           )}
         </div>
       </div>
     </div>
-
   );
 };
 
