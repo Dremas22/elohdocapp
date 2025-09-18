@@ -182,7 +182,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         ) : error ? (
           <p className="text-red-600 text-center mt-12 font-semibold">{error}</p>
         ) : doctor === 0 && nurse === 0 ? (
-          <div className="text-center lg:pr-40 mt-10 text-gray-400">
+          <div className="text-center mt-10 text-gray-400">
             <p className="italic mb-2">
               No consultation staff available because no payment has been made.
             </p>
