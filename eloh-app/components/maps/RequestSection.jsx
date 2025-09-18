@@ -107,7 +107,20 @@ export default function RequestSection(props) {
       </div>
 
       {calculatingTrip && <CalculatingTrip />}
-      {fareDetails && <FareDetails fareDetails={fareDetails} />}
+      {fareDetails && fareDetails.status === "pending" && (
+        <FareDetails fareDetails={fareDetails} />
+      )}
+
+      {fareDetails && fareDetails.status === "completed" && (
+        <div className="p-4 my-4 text-center rounded-xl shadow-md bg-green-50 border border-green-200">
+          <p className="text-green-700 font-semibold text-lg flex items-center justify-center gap-2">
+            ✅ Trip completed
+          </p>
+          <p className="text-green-600 text-sm mt-1">
+            Please create a new one to continue.
+          </p>
+        </div>
+      )}
 
       {/* Request Ambulance */}
       <div className="mt-4">
@@ -118,10 +131,12 @@ export default function RequestSection(props) {
         ) : (
           <button
             onClick={() => setShowPay(true)}
-            disabled={!routeReady}
-            className={`w-full py-3 rounded-xl text-white ${
-              routeReady ? "bg-red-600 hover:bg-red-700" : "bg-gray-300"
-            }`}
+            disabled={
+              !routeReady ||
+              fareDetails?.status === "completed" ||
+              fareDetails?.isPaid
+            }
+            className="w-full py-3 rounded-xl text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-all duration-200"
           >
             Request Ambulance
           </button>
