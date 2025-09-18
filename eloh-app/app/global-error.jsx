@@ -28,20 +28,17 @@ export default function GlobalError({ error, reset }) {
           content="We’re having trouble loading this page right now. Please try again or sign back in."
         />
       </head>
-      <body className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="text-center p-6 rounded-2xl shadow-lg bg-white">
-          <h2 className="text-2xl font-semibold text-red-600 mb-3">
-            Oops! Something went wrong 😥
-          </h2>
-          <p className="text-gray-700 mb-5">
-            We’re having trouble loading this page right now. Please try again
-            or sign back in.
+      <body className="min-h-screen bg-gray-100 pt-20 flex items-center justify-center">
+        <div className="text-center text-blue-600">
+          <h2 className="text-lg font-medium">Oops! Something went wrong 😥</h2>
+          <p className="text-sm mt-1">
+            We’re having trouble loading this page right now. Please try again or sign back in.
           </p>
           <button
-            onClick={() => handleAuthAction()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            onClick={handleAuthAction}
+            className="bg-[#03045e] text-white font-semibold py-3 px-8 mt-5 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
-            Try again
+            Try Again
           </button>
         </div>
       </body>
