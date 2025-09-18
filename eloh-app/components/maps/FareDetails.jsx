@@ -1,5 +1,4 @@
 const FareDetails = ({ fareDetails }) => {
-  console.log(fareDetails, "FAREDETAILS");
   return (
     <div className="mt-4 bg-gray-50 text-black p-4 rounded border">
       <h3 className="font-semibold mb-2">Trip summary</h3>

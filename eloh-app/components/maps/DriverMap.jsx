@@ -240,14 +240,11 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
     try {
       const tripId = activeRequest?.customerId;
-      const code = await sendArrivalCodeEmail(
-        activeRequest,
-        activeRequest?.customerEmail
-      );
+      const code = await sendArrivalCodeEmail(activeRequest);
 
       setArrivalCode(code);
       setShowCodeInput(true);
-      alert(`${code} here`);
+      toastSuccess("Code sent to customer");
 
       const tripRef = doc(db, "trips", tripId);
       await updateDoc(tripRef, {
@@ -256,7 +253,9 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
         arrivedAt: new Date(),
       });
 
-      toastSuccess(`Code sent to customer email`);
+      toastSuccess(
+        "Arrival code has been generated and shared with the customer."
+      );
     } catch (err) {
       console.error("Failed to send arrival code:", err.message);
       toastError("Failed to notify customer.");
