@@ -4,8 +4,6 @@ import DoctorsCollectionViewer from "./DoctorsCollectionViewer";
 import { serializeData } from "@/lib/queries";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import DoctorDashboardNavbar from "@/app/dashboard/doctor/doctorNav";
-import SidebarMenu from "./doctorSidebar";
 
 export const metadata = {
   title: "Doctor Dashboard | ElohApp",
@@ -28,6 +26,7 @@ const DoctorsDashboard = async () => {
     if (!doctorSnap.exists) redirect("/");
 
     const doctorData = serializeData(doctorSnap.data());
+
     let patients = [];
     if (doctorData.isVerified) {
       const patientsSnap = await db.collection("patients").get();
@@ -37,40 +36,13 @@ const DoctorsDashboard = async () => {
       }));
     }
 
+    // Pass all data to the collection viewer
     return (
-      <div className="min-h-screen flex flex-col bg-gray-950 text-white">
-        <DoctorDashboardNavbar />
-
-        <div className="relative z-10 flex flex-col lg:flex-row flex-grow min-h-0 mt-6">
-          {/* Desktop Sidebar */}
-          <aside className="hidden lg:flex lg:flex-col lg:w-1/4 lg:min-h-0">
-            <SidebarMenu
-              practiceNumber={doctorData.practiceNumber}
-              isVerified={doctorData.isVerified}
-              userDoc={doctorData}
-            />
-          </aside>
-
-          {/* Mobile Sidebar */}
-          <div className="block lg:hidden w-full max-w-xs pl-7 mt-10">
-            <SidebarMenu
-              practiceNumber={doctorData.practiceNumber}
-              isVerified={doctorData.isVerified}
-              userDoc={doctorData}
-              compact
-            />
-          </div>
-
-          {/* Main content */}
-          <main className="w-full flex flex-col flex-grow overflow-hidden px-4 sm:px-6 lg:px-8">
-            <DoctorsCollectionViewer
-              userDoc={doctorData}
-              patients={patients}
-              userId={uid}
-            />
-          </main>
-        </div>
-      </div>
+      <DoctorsCollectionViewer
+        userDoc={doctorData}
+        patients={patients}
+        userId={uid}
+      />
     );
   } catch (error) {
     console.error("Error in DoctorsDashboard:", error?.message);

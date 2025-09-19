@@ -123,7 +123,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
   return (
     <div className="lg:w-[168.5vh] w-full pl-5 min-h-screen bg-gray-950 relative pb-10">
       {/* Consultations Remaining */}
-      <div className="pt-10 lg:pr-50 -mr-3 flex justify-center">
+      <div className="pt-10 -mr-3 flex justify-center">
         <div className="bg-gradient-to-br from-[#0b2345] to-[#123158] p-4 rounded-2xl shadow-2xl w-full max-w-xs text-center transform transition-transform duration-300 hover:shadow-[#0d6efd]/50">
           <h2 className="text-sm font-bold mb-2 tracking-wide text-[#90e0ef]">
             Consultations Remaining
@@ -140,7 +140,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
       </div>
 
       {/* Welcome Banner */}
-      <div className="mt-5 lg:pr-50 px-4 sm:px-6 text-center">
+      <div className="mt-5 px-4 sm:px-6 text-center">
         <h1 className="bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text font-extrabold text-transparent text-2xl sm:text-3xl md:text-4xl">
           Welcome to Your Virtual Medical Consultation
         </h1>
@@ -182,7 +182,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
         ) : error ? (
           <p className="text-red-600 text-center mt-12 font-semibold">{error}</p>
         ) : doctor === 0 && nurse === 0 ? (
-          <div className="text-center lg:pr-40 mt-10 text-gray-400">
+          <div className="text-center mt-10 text-gray-400">
             <p className="italic mb-2">
               No consultation staff available because no payment has been made.
             </p>

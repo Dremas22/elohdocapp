@@ -4,7 +4,7 @@ const FareDetails = ({ fareDetails }) => {
       <h3 className="font-semibold mb-2">Trip summary</h3>
       <p>
         <strong>Destination:</strong>{" "}
-        {fareDetails?.hospital?.address || fareDetails?.destination?.address}
+        {fareDetails?.destination?.address || fareDetails?.destination?.address}
       </p>
       <p>
         <strong>Distance:</strong> {fareDetails?.distance} km

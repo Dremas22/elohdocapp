@@ -6,15 +6,15 @@ export const metadata = {
   description:
     "Learn more about ElohApp — our mission, vision, and team dedicated to providing accessible and high-quality telehealth services across Africa.",
 };
+
 const About = () => {
   return (
     <>
       <Navbar />
 
-      <div className="min-h-screen bg-gradient-to-br from-[#e0f7fa] to-[#f0f4f8] 
-      flex flex-col items-center justify-center text-gray-800 px-6 py-10">
-
-        <div className="relative w-full bg-black ">
+      <div className="min-h-screen mb-15 bg-gradient-to-br from-[#e0f7fa] to-[#f0f4f8] flex flex-col items-center justify-start text-gray-800 px-6 py-10">
+        {/* banner */}
+        <div className="w-full absolute top-0 left-0">
           <img
             src="/images/banner2b.png"
             alt="ElohDoc Banner"
@@ -22,10 +22,10 @@ const About = () => {
           />
         </div>
 
-        <div className="max-w-5xl w-full text-center space-y-8">
+        <div className="relative z-10 max-w-5xl w-full text-center space-y-8 mt-200">
           {/* Tagline */}
-          <h1 className="text-lg md:text-3xl font-extrabold text-black mt-10">
-            We’re on a mission to become a leading digital healthcare provider with a mission to 
+          <h1 className="text-lg md:text-3xl font-extrabold text-black">
+            We’re on a mission to become a leading digital healthcare provider with a mission to
             provide Africa with better access and efficient care for everyone.
           </h1>
 

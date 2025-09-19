@@ -34,17 +34,10 @@ const CustomerRegistrationForm = () => {
   // Handle input changes and clear errors for that field
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    setErrors((prev) => ({
-      ...prev,
-      [name]: undefined,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
-  // Validate form inputs before submission
   const validate = () => {
     const newErrors = {};
     if (!formData.fullName.trim()) {
@@ -65,17 +58,13 @@ const CustomerRegistrationForm = () => {
     return newErrors;
   };
 
-  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     setErrors(validationErrors);
-
-    // Prevent submission if validation errors exist
     if (Object.keys(validationErrors).length !== 0) return;
 
     setSubmitting(true);
-
     try {
       const combinedPhoneNumber = `${formData.phoneCode}${formData.phoneNumber}`;
 
@@ -95,7 +84,6 @@ const CustomerRegistrationForm = () => {
           body: JSON.stringify(payload),
         }
       );
-
       const result = await response.json();
 
       if (response.status === 200 && result.message === "User already exists") {
@@ -103,7 +91,6 @@ const CustomerRegistrationForm = () => {
       } else if (response.status === 201) {
         toast.success("Customer successfully registered");
         await currentUser?.getIdToken(true);
-        // Reset form after success
         setFormData({
           fullName: "",
           email: "",
@@ -123,18 +110,17 @@ const CustomerRegistrationForm = () => {
     }
   };
 
-  // Show loading indicator while user data loads
   if (loading)
     return (
       <p className="text-black text-center py-10 font-medium">Loading...</p>
     );
 
   return (
-    <div className="w-full max-w-xl mx-auto px-6 py-10 bg-white rounded-3xl shadow-xl border border-blue-100">
-      <h2 className="text-3xl font-bold mb-2 text-center text-blue-700">
+    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-10 bg-white rounded-3xl shadow-xl border border-blue-100">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-center text-blue-700">
         Ambulance Customer Registration 🚑
       </h2>
-      <p className="text-center text-gray-500 mb-6 text-sm">
+      <p className="text-center text-gray-500 mb-6 text-sm sm:text-base">
         Please complete the form below to request an ambulance.
       </p>
 
@@ -145,9 +131,9 @@ const CustomerRegistrationForm = () => {
         onSubmit={handleSubmit}
         noValidate
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-5">
           {/* Full Name */}
-          <div className="col-span-full">
+          <div>
             <input
               type="text"
               name="fullName"
@@ -168,7 +154,7 @@ const CustomerRegistrationForm = () => {
           </div>
 
           {/* Email */}
-          <div className="col-span-full">
+          <div>
             <input
               type="email"
               name="email"
@@ -181,14 +167,14 @@ const CustomerRegistrationForm = () => {
           </div>
 
           {/* Phone Code + Number */}
-          <div className="col-span-full">
-            <div className="flex flex-col sm:flex-row gap-3">
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <select
                 name="phoneCode"
                 value={formData.phoneCode}
                 onChange={handleChange}
                 title="Select your country phone code"
-                className="w-full sm:w-28 px-3 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 cursor-pointer"
+                className="w-full sm:w-32 px-3 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 cursor-pointer"
               >
                 {phoneCodes.map(({ code, label }) => (
                   <option key={label} value={code}>
@@ -216,22 +202,20 @@ const CustomerRegistrationForm = () => {
         </div>
 
         {/* Buttons container */}
-        <div className="flex justify-center mt-6 gap-4">
-          {/* Register Button */}
+        <div className="flex flex-col sm:flex-row justify-center mt-6 gap-4">
           <button
             type="submit"
             disabled={loading || submitting}
             title="Click to register as a customer"
-            className="bg-[#03045e] hover:bg-[#0077b6] text-white flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-400"
+            className="bg-[#03045e] hover:bg-[#0077b6] text-white flex justify-center items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_9px_#999] active:shadow-[0_5px_#666] active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-400 w-full sm:w-auto"
           >
             {submitting ? "Submitting..." : "Register"}
           </button>
 
-          {/* Cancel Registration Button */}
           <button
             type="button"
             onClick={() => router.push("/ambulance")}
-            className="bg-red-700 hover:bg-red-400 text-gray-100 flex items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transition-all duration-200 ease-in-out cursor-pointer"
+            className="bg-red-700 hover:bg-red-400 text-gray-100 flex justify-center items-center gap-3 py-3 px-6 text-lg font-semibold rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transition-all duration-200 ease-in-out cursor-pointer w-full sm:w-auto"
             title="Cancel registration and discard changes"
             disabled={submitting}
           >

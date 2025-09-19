@@ -17,13 +17,15 @@ const ActiveRequest = ({ activeRequest, handleCancelRoute, onTripEnded }) => {
         {/* Arrived button */}
         <div className="flex justify-center mt-3 sm:mt-4">
           <button
+            title="Tap once you’ve reached the customer’s destination to mark the trip as complete"
             onClick={onTripEnded}
-            className="bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-xl shadow transition-all duration-200 ease-in-out text-xs sm:text-sm font-medium flex items-center justify-center gap-1 shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            className="bg-green-600 hover:bg-[#023e8a] text-white text-xs sm:text-sm font-medium py-2 px-3 rounded-xl flex items-center justify-center gap-1 shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer"
           >
             <FiCheck className="h-5 w-5" />
             Arrived
           </button>
         </div>
+
       </div>
     </div>
   );

@@ -8,10 +8,10 @@ import { useEffect, useState } from "react";
 import { useUserStore } from "@/hooks/useUserStore";
 import AmbulanceDriverDashboardNavbar from "./driverNav";
 import DriverSidebarMenu from "./driverSidebar";
-import Earnings from "../doctor/doctorEarnings";
 import { FiX } from "react-icons/fi";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/db/client";
+import DriverEarnings from "./DriverEarnings";
 
 const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
   const [mapsReady, setMapsReady] = useState(false);
@@ -87,7 +87,7 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
         </aside>
 
         {/* Main content */}
-        <main className="w-full flex flex-col items-center mt-16">
+        <main className="w-full flex flex-col items-center mt-10">
           {isVerified === true ? (
             <>
               {mapsReady ? (
@@ -114,14 +114,18 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
                           Earnings
                         </h2>
 
-                        <Earnings role="driver" data={userDocState} />
+                        <DriverEarnings data={userDocState} />
                       </div>
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="flex items-center lg:pl-55 justify-center w-full h-[80vh]">
-                  <Loading message={<span className="text-gray-800">Loading Map...</span>} />
+                  <Loading
+                    message={
+                      <span className="text-gray-800">Loading Map...</span>
+                    }
+                  />
                 </div>
               )}
             </>
