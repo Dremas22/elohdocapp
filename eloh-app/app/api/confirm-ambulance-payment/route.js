@@ -35,6 +35,11 @@ export async function POST(req) {
       );
     }
 
+    // 2️⃣ Fetch customer info
+    const customerDoc = await db.collection("customers").doc(userId).get();
+    const customer = customerDoc.exists ? customerDoc.data() : null;
+    const customerName = customer?.fullName || "Unknown Customer";
+
     // 2️⃣ Find nearest driver
     const { pickupLocation } = tripData;
     const nearestDriver = await findNearestAvailableDriverServer(
@@ -56,6 +61,7 @@ export async function POST(req) {
       {
         ...tripData,
         userId,
+        customerName,
         driverId: nearestDriver?.userId || nearestDriver?.id,
         status: "paid",
         isPaid: true,

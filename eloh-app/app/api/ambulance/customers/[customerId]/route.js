@@ -17,7 +17,7 @@ export async function POST(request, { params }) {
 
     const data = await request.json();
     const { routeData } = data;
-    const { customerId } = params;
+    const { customerId } = await params;
 
     if (!customerId || decodedToken.uid !== customerId || !routeData) {
       return NextResponse.json(
