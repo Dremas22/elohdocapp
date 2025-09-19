@@ -51,13 +51,13 @@ const AmbulanceRequest = ({
         <div className="flex flex-col sm:flex-row justify-between mt-3 sm:mt-6 gap-2 sm:gap-3">
           <button
             onClick={() => handleAcceptRequest(ambulanceRequest)}
-            className="w-full sm:flex-1 bg-green-600 text-white py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl shadow hover:bg-green-700 hover:shadow-lg transition cursor-pointer text-sm sm:text-base"
+            className="w-full sm:flex-1 bg-green-600 text-white py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl hover:bg-green-700 shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer text-sm sm:text-base"
           >
             ✅ Accept
           </button>
           <button
             onClick={() => handleDecline()}
-            className="w-full sm:flex-1 bg-red-600 text-white py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl shadow hover:bg-red-700 hover:shadow-lg transition cursor-pointer text-sm sm:text-base"
+            className="w-full sm:flex-1 bg-red-600 text-white py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl hover:bg-red-700 text-sm sm:text-base shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           >
             ❌ Decline
           </button>

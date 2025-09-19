@@ -87,7 +87,7 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
         </aside>
 
         {/* Main content */}
-        <main className="w-full flex flex-col items-center mt-16">
+        <main className="w-full flex flex-col items-center mt-10">
           {isVerified === true ? (
             <>
               {mapsReady ? (

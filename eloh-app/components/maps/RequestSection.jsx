@@ -24,9 +24,6 @@ export default function RequestSection(props) {
       </h2>
 
       {/* Pickup */}
-      <label className="block text-lg sm:text-xl font-medium mb-2">
-        Pickup location
-      </label>
       <div className="flex flex-col sm:flex-row gap-2 mb-4">
         <div className="relative w-full">
           <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -35,28 +32,23 @@ export default function RequestSection(props) {
             type="text"
             placeholder="Enter pickup address"
             disabled={!!fareDetails?.isPaid}
-            className={`flex-1 p-3 pl-10 border rounded-lg w-full ${
-              fareDetails?.isPaid
-                ? "bg-gray-200 cursor-not-allowed"
-                : "border-gray-300"
-            }`}
+            className={`flex-1 p-3 pl-10 border rounded-lg w-full ${fareDetails?.isPaid
+              ? "bg-gray-200 cursor-not-allowed"
+              : "border-gray-300"
+              }`}
           />
         </div>
         <button
           onClick={useMyLocation}
           disabled={!!fareDetails?.isPaid}
-          className={`bg-[#03045e] text-white font-semibold py-2 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex items-center gap-2 -mt-2 ${
-            fareDetails?.isPaid ? "bg-gray-300 cursor-not-allowed" : ""
-          }`}
+          className={`bg-[#03045e] text-white font-semibold py-2 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex items-center gap-2 -mt-2 ${fareDetails?.isPaid ? "bg-gray-300 cursor-not-allowed" : ""
+            }`}
         >
           <FaLocationDot className="inline-block mr-1" /> Use My Location
         </button>
       </div>
 
       {/* Destination */}
-      <label className="block text-lg sm:text-xl font-medium mb-2">
-        Destination
-      </label>
       <div className="relative mb-4">
         <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
         <input
@@ -64,11 +56,10 @@ export default function RequestSection(props) {
           type="text"
           placeholder="Enter hospital or clinic"
           disabled={!!fareDetails?.isPaid}
-          className={`flex-1 p-3 pl-10 border rounded-lg w-full ${
-            fareDetails?.isPaid
-              ? "bg-gray-200 cursor-not-allowed"
-              : "border-gray-300"
-          }`}
+          className={`flex-1 p-3 pl-10 border rounded-lg w-full ${fareDetails?.isPaid
+            ? "bg-gray-200 cursor-not-allowed"
+            : "border-gray-300"
+            }`}
         />
       </div>
 
@@ -78,11 +69,10 @@ export default function RequestSection(props) {
         <button
           onClick={handleCreateRoute}
           disabled={fareDetails?.isPaid}
-          className={`flex-1 py-3 rounded-xl text-white ${
-            fareDetails?.isPaid
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-[#03045e] hover:bg-[#023e8a]"
-          }`}
+          className={`flex-1 py-3 rounded-xl text-white ${fareDetails?.isPaid
+            ? "bg-gray-300 cursor-not-allowed shadow-[0_4px_#999]"
+            : "bg-[#03045e] hover:bg-[#023e8a] shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+            }`}
         >
           Create Route
         </button>
@@ -92,14 +82,14 @@ export default function RequestSection(props) {
           (fareDetails.isPaid ? (
             <button
               disabled
-              className="bg-gray-400 text-white py-3 px-8 rounded-xl cursor-not-allowed"
+              className="flex-1 bg-gray-400 text-white py-3  rounded-xl cursor-not-allowed shadow-[0_4px_#999]"
             >
               Trip Paid – Cannot Cancel
             </button>
           ) : (
             <button
               onClick={handleCancelRoute}
-              className="bg-[#03045e] text-white py-3 px-8 rounded-xl"
+              className="flex-1 bg-[#03045e] text-white py-3 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
             >
               Cancel Route
             </button>
@@ -126,7 +116,7 @@ export default function RequestSection(props) {
       <div className="mt-4">
         {fareDetails?.isPaid ? (
           <p className="text-green-700 font-semibold text-center">
-            ✅ Your ambulance is on the way!
+            Your request has been received. An ambulance is on its way.
           </p>
         ) : (
           <button
