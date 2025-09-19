@@ -169,13 +169,13 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     const destination = {
       lat: parseFloat(
         request?.pickupLat ||
-        request?.destination.lat ||
-        request?.pickupLocation?.lat
+          request?.destination.lat ||
+          request?.pickupLocation?.lat
       ),
       lng: parseFloat(
         request?.pickupLng ||
-        request?.destination?.lng ||
-        request?.pickupLocation?.lng
+          request?.destination?.lng ||
+          request?.pickupLocation?.lng
       ),
     };
 
@@ -399,7 +399,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   };
 
   return (
-    <div className="flex lg:h-[97vh] sm:ml-10 bg-gray-100 relative lg:-mt-0.25 mt-7 lg:mt-0 mb-2 ">
+    <div className="flex lg:h-[97vh] sm:ml-10 bg-gray-100 relative mt-7 lg:mt-0 mb-2 ">
       {/* Sidebar */}
       <DriverSidebarMenu
         userDoc={userDoc}
@@ -407,19 +407,18 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
         isVerified={isVerified}
       />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex flex-col flex-1">
         {/* Navbar */}
-        <div className="lg:mb-15 sm:mb-10 mb-3">
+        <div className="mb-3 lg:mb-15 sm:mb-10">
           <AmbulanceDriverDashboardNavbar />
         </div>
 
         {/* Map and content container */}
-        <div className="flex-1 flex flex-col items-center w-full">
+        <div className="flex flex-col flex-1 items-center w-full">
           {/* Map stretches to fill available space */}
           <div
             ref={mapRef}
             className=" fixed lg:w-[330vh] w-[45vh] sm:w-[95vh] h-[600px] max-w-6xl lg:ml-70 -ml-2 rounded-lg shadow-lg overflow-hidden mx-auto "
-
           />
 
           {/* Incoming ambulance request */}
@@ -443,7 +442,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
           {/* Arrival code verification overlay */}
           {showCodeInput && (
             <div className="fixed inset-0 z-[9999] bg-black bg-opacity-30 flex items-center justify-center p-6 pointer-events-auto">
-              <div className="bg-white p-6 rounded-2xl shadow-2xl w-96 max-w-md flex flex-col gap-4">
+              <div className="flex flex-col gap-4 p-6 w-96 max-w-md bg-white rounded-2xl shadow-2xl">
                 <label className="text-base font-medium text-gray-700">
                   Enter arrival code from customer:
                 </label>
@@ -451,31 +450,17 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
                   type="text"
                   value={enteredCode}
                   onChange={(e) => setEnteredCode(e.target.value)}
-                  className="border p-3 rounded text-base text-gray-700 w-full"
+                  className="p-3 w-full text-base text-gray-700 rounded border"
                   placeholder="6-digit code"
                 />
                 <button
                   onClick={async () => await handleCodeVerification()}
                   disabled={verifying}
-                  className="
-                              bg-green-600 
-                              hover:bg-[#023e8a] 
-                              text-white 
-                              py-3 px-4 
-                              rounded-xl 
-                              text-base font-semibold 
-                              disabled:bg-gray-400 disabled:cursor-not-allowed 
-                              w-full 
-                              shadow-[0_4px_#999] active:shadow-[0_2px_#666] 
-                              transform active:translate-y-1 
-                              transition-all duration-200 ease-in-out 
-                              cursor-pointer
-"
-
+                  className="bg-green-600 hover:bg-[#023e8a] text-white py-3 px-4 rounded-xl text-base font-semibolddisabled:bg-gray-400 disabled:cursor-not-allowed w-full shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer"
                 >
                   {verifying ? (
-                    <span className="flex items-center justify-center gap-2 text-white">
-                      <FiLoader className="animate-spin h-5 w-5" />
+                    <span className="flex gap-2 justify-center items-center text-white">
+                      <FiLoader className="w-5 h-5 animate-spin" />
                       Verifying...
                     </span>
                   ) : (
