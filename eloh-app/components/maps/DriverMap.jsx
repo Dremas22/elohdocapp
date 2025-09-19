@@ -169,13 +169,13 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     const destination = {
       lat: parseFloat(
         request?.pickupLat ||
-          request?.destination.lat ||
-          request?.pickupLocation?.lat
+        request?.destination.lat ||
+        request?.pickupLocation?.lat
       ),
       lng: parseFloat(
         request?.pickupLng ||
-          request?.destination?.lng ||
-          request?.pickupLocation?.lng
+        request?.destination?.lng ||
+        request?.pickupLocation?.lng
       ),
     };
 
@@ -399,7 +399,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   };
 
   return (
-    <div className="flex h-[690px] w-full sm:ml-10 bg-gray-100 relative">
+    <div className="flex lg:h-[97vh] sm:ml-10 bg-gray-100 relative lg:-mt-0.25 mt-7 lg:mt-0 mb-2 ">
       {/* Sidebar */}
       <DriverSidebarMenu
         userDoc={userDoc}
@@ -409,14 +409,17 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
       <div className="flex-1 flex flex-col">
         {/* Navbar */}
-        <AmbulanceDriverDashboardNavbar />
+        <div className="lg:mb-15 sm:mb-10 mb-3">
+          <AmbulanceDriverDashboardNavbar />
+        </div>
 
         {/* Map and content container */}
         <div className="flex-1 flex flex-col items-center w-full">
           {/* Map stretches to fill available space */}
           <div
             ref={mapRef}
-            className="lg:w-[330vh] w-[45vh] sm:w-[95vh] h-[130px] lg:mt-15 mt-5 max-w-6xl lg:ml-70 -ml-2  flex-1 rounded-lg shadow-lg overflow-hidden mx-auto"
+            className=" fixed lg:w-[330vh] w-[45vh] sm:w-[95vh] h-[600px] max-w-6xl lg:ml-70 -ml-2 rounded-lg shadow-lg overflow-hidden mx-auto "
+
           />
 
           {/* Incoming ambulance request */}
@@ -439,22 +442,36 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
           {/* Arrival code verification overlay */}
           {showCodeInput && (
-            <div className="fixed inset-0 z-[9999] bg-black bg-opacity-30 flex items-end justify-end p-6 pointer-events-auto">
-              <div className="bg-white p-4 rounded-xl shadow-lg w-72 flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700">
+            <div className="fixed inset-0 z-[9999] bg-black bg-opacity-30 flex items-center justify-center p-6 pointer-events-auto">
+              <div className="bg-white p-6 rounded-2xl shadow-2xl w-96 max-w-md flex flex-col gap-4">
+                <label className="text-base font-medium text-gray-700">
                   Enter arrival code from customer:
                 </label>
                 <input
                   type="text"
                   value={enteredCode}
                   onChange={(e) => setEnteredCode(e.target.value)}
-                  className="border p-2 rounded text-sm text-gray-700 w-full"
+                  className="border p-3 rounded text-base text-gray-700 w-full"
                   placeholder="6-digit code"
                 />
                 <button
                   onClick={async () => await handleCodeVerification()}
                   disabled={verifying}
-                  className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded shadow text-sm font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed w-full"
+                  className="
+                              bg-green-600 
+                              hover:bg-[#023e8a] 
+                              text-white 
+                              py-3 px-4 
+                              rounded-xl 
+                              text-base font-semibold 
+                              disabled:bg-gray-400 disabled:cursor-not-allowed 
+                              w-full 
+                              shadow-[0_4px_#999] active:shadow-[0_2px_#666] 
+                              transform active:translate-y-1 
+                              transition-all duration-200 ease-in-out 
+                              cursor-pointer
+"
+
                 >
                   {verifying ? (
                     <span className="flex items-center justify-center gap-2 text-white">
