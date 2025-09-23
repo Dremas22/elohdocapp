@@ -262,7 +262,7 @@ const ChatList = ({ role }) => {
   }, [chats, input, selectedCategory]);
 
   return (
-    <div className="flex flex-col h-full max-h-[70vh] bg-gray-900 text-white rounded-lg overflow-hidden">
+    <div className="p-2 flex flex-col h-full max-h-[70vh] bg-gray-900 text-white rounded-lg overflow-hidden">
       {/* Top Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-3 sm:p-5 flex-shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 flex-1 bg-gray-800 rounded-lg px-2 sm:px-3 py-3 sm:py-2">
@@ -294,21 +294,19 @@ const ChatList = ({ role }) => {
         currentUser?.consultationType === "all" && (
           <div className="flex gap-2 py-1.5 px-4 lg:mb-3 -mt-2 mb-1 flex-shrink-0">
             <button
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg ${
-                activeSubType === "doctor"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-700 text-gray-300"
-              }`}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg ${activeSubType === "doctor"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-700 text-gray-300"
+                }`}
               onClick={() => setActiveSubType("doctor")}
             >
               Doctors
             </button>
             <button
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg ${
-                activeSubType === "nurse"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-700 text-gray-300"
-              }`}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg ${activeSubType === "nurse"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-700 text-gray-300"
+                }`}
               onClick={() => setActiveSubType("nurse")}
             >
               Nurses
@@ -322,11 +320,10 @@ const ChatList = ({ role }) => {
           <div
             key={chat?.chatId}
             onClick={() => handleSelect(chat)}
-            className={`flex items-center gap-5 p-3 sm:p-5 cursor-pointer border-b border-gray-600 transition-colors ${
-              chat?.isSeen
-                ? "bg-transparent hover:bg-gray-800"
-                : "bg-blue-600/50 hover:bg-blue-500/60"
-            }`}
+            className={`flex items-center gap-5 p-3 sm:p-5 cursor-pointer border-b border-gray-600 transition-colors ${chat?.isSeen
+              ? "bg-transparent hover:bg-gray-800"
+              : "bg-blue-600/50 hover:bg-blue-500/60"
+              }`}
           >
             {chat.user?.photoUrl ? (
               <img
