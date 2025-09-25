@@ -42,7 +42,7 @@ const NurseDashboardPage = async () => {
     }
 
     return (
-      <div className="bg-gray-950 sm:p-0 sm:pr-20 p-5">
+      <div className="bg-gray-950 sm:p-0 sm:pr-20 ">
         <NurseCollectionViewer userDoc={nurseData} patients={patients} />
       </div>
     );
