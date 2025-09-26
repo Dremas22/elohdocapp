@@ -71,7 +71,7 @@ const RichTextEditor = ({ roomID }) => {
   return (
     <>
       {isDoctor && patientData ? (
-        <div className="w-full p-4 bg-white text-black border-l border-gray-700 flex flex-col justify-between">
+        <div className="w-full p-4 bg-white text-black border-l border-gray-700 flex flex-col justify-between ">
           {/* Navigation bar for switching between modes */}
           <MeetingRoomNavbar mode={mode} setMode={setMode} doctorId={roomID} />
 
