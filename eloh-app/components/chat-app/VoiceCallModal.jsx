@@ -178,7 +178,7 @@ const VoiceCallModal = ({ user }) => {
           video={false}
           connectOptions={{ autoSubscribe: true }}
           onConnected={(room) => {
-            room.localParticipant.setMicrophoneEnabled(true);
+            room?.localParticipant?.setMicrophoneEnabled(true);
           }}
           roomName={roomName}
         >
