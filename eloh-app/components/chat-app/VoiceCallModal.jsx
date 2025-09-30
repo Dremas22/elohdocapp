@@ -120,6 +120,7 @@ const VoiceCallModal = ({ user }) => {
     await updateDoc(doc(db, "calls", callId), {
       status: "accepted",
       updatedAt: serverTimestamp(),
+      duration: 0,
     });
 
     stopRingtone();
@@ -176,6 +177,9 @@ const VoiceCallModal = ({ user }) => {
           audio
           video={false}
           connectOptions={{ autoSubscribe: true }}
+          onConnected={(room) => {
+            room.localParticipant.setMicrophoneEnabled(true);
+          }}
           roomName={roomName}
         >
           <RoomAudioRenderer />
