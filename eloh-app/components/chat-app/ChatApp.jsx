@@ -21,6 +21,8 @@ import { getDisplayName } from "@/lib/getDisplayName";
 import { sendNotificationToDoctor } from "@/lib/sendNotificationToStaff";
 import { toastError } from "@/helpers/toastHelper";
 import { useRouter } from "next/navigation";
+//import upload from "@/lib/uploadFile";
+
 import VoiceCallModal from "./VoiceCallModal";
 import VideoCallModal from "./VideoCallModal";
 
@@ -39,6 +41,8 @@ const ChatApp = () => {
 
   const endRef = useRef(null);
   const router = useRouter();
+
+  console.log(currentUser, "USER113");
 
   // Scroll to bottom when messages update
   useEffect(() => {
@@ -212,12 +216,12 @@ const ChatApp = () => {
           messages: arrayUnion({
             senderId: currentUser?.userId,
             text: text.trim(),
-            createdAt: serverTimestamp(),
+            createdAt: new Date(),
             photoURL: currentUser?.photoUrl || "/images/default_avatar.jpg",
             ...(imgUrl && { img: imgUrl }),
           }),
         },
-        { merge: true }
+        { merge: true } // 👈 ensures doc exists
       );
 
       // Update lastMessage and isSeen in userchats
@@ -288,7 +292,7 @@ const ChatApp = () => {
         {
           type: "video",
           status: "ringing",
-          token,
+          token: null,
           caller: {
             id: caller.userId,
             name: caller.fullName,

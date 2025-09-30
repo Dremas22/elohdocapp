@@ -120,6 +120,7 @@ const VoiceCallModal = ({ user }) => {
     await updateDoc(doc(db, "calls", callId), {
       status: "accepted",
       updatedAt: serverTimestamp(),
+      duration: 0,
     });
 
     stopRingtone();
