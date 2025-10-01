@@ -294,7 +294,7 @@ const ChatList = ({ role }) => {
         currentUser?.consultationType === "all" && (
           <div className="flex gap-2 py-1.5 px-4 lg:mb-3 -mt-2 mb-1 flex-shrink-0">
             <button
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg ${activeSubType === "doctor"
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${activeSubType === "doctor"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-700 text-gray-300"
                 }`}
@@ -303,7 +303,7 @@ const ChatList = ({ role }) => {
               Doctors
             </button>
             <button
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg ${activeSubType === "nurse"
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${activeSubType === "nurse"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-700 text-gray-300"
                 }`}
