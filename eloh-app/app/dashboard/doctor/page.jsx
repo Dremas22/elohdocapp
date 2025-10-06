@@ -15,8 +15,7 @@ const DoctorsDashboard = async () => {
   const cookieStore = await cookies();
   const session = cookieStore?.get("session")?.value;
 
-  if (!session)
-    return <p className="text-center mt-20 text-red-600">Unauthorized</p>;
+  if (!session) redirect("/sign-in?role=doctor");
 
   try {
     const decoded = await auth.verifySessionCookie(session, true);
