@@ -84,7 +84,7 @@ const Footer = () => {
             {/* Bottom Copyright Bar */}
             <div className="border-t border-gray-300">
                 <div className="md:w-[75%] mx-auto px-6 py-4 text-center text-sm text-gray-600">
-                    &copy; {new Date().getFullYear()} TruMD Health Care. All rights reserved.
+                    &copy; {new Date().getFullYear()} ElohDoc Health Care. All rights reserved.
                 </div>
             </div>
         </footer>
