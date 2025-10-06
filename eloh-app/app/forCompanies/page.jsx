@@ -111,7 +111,7 @@ const ForCompanies = () => {
             <section className="bg-[#03045e] py-16 px-6 md:px-0">
                 <div className="md:w-[75%] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
                     <h3 className="text-white text-2xl md:text-3xl font-semibold text-center md:text-left">
-                        Want to bring TruMD to your workplace?
+                        Want to bring Eloh-Doc to your workplace?
                     </h3>
                     <Link
                         href="/contact"
