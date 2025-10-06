@@ -1,7 +1,11 @@
 "use client";
 
 import { getDisplayName } from "@/lib/getDisplayName";
-import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
+import {
+  LiveKitRoom,
+  RoomAudioRenderer,
+  useRoomContext,
+} from "@livekit/components-react";
 import { useEffect, useState, useRef } from "react";
 import {
   doc,
@@ -12,8 +16,88 @@ import {
 import { db } from "@/db/client";
 import { useUserStore } from "@/hooks/useUserStore";
 
+/* -------- Local mic publisher inside LiveKitRoom -------- */
+function LocalAudioPublisher({ enabled }) {
+  const room = useRoomContext();
+
+  useEffect(() => {
+    if (!room || !enabled) return;
+
+    let mounted = true;
+
+    const enableMic = async () => {
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        if (!mounted || !room.localParticipant) return;
+
+        await room.localParticipant.setMicrophoneEnabled(true);
+        console.log(
+          "Local mic published:",
+          room.localParticipant.audioTrackPublications
+        );
+      } catch (err) {
+        console.error("Failed to publish mic:", err);
+      }
+    };
+
+    if (room.state === "connected") {
+      enableMic();
+    } else {
+      room.once("connected", enableMic);
+    }
+
+    return () => {
+      mounted = false;
+      if (room?.localParticipant) {
+        room.localParticipant.setMicrophoneEnabled(false).catch(() => {});
+      }
+    };
+  }, [room, enabled]);
+
+  return null;
+}
+
+/* -------- Logger for remote tracks -------- */
+function RemoteTrackLogger() {
+  const room = useRoomContext();
+
+  useEffect(() => {
+    if (!room) return;
+
+    const onSub = (pub, track) => {
+      console.log("trackSubscribed:", {
+        participant: pub?.publisher,
+        publicationSid: pub?.sid,
+        kind: pub?.kind,
+        trackId: track?.id,
+      });
+    };
+
+    const onUnsub = (pub) => {
+      console.log("trackUnsubscribed:", { publicationSid: pub?.sid });
+    };
+
+    const onParticipantLeave = (participant) => {
+      console.log("participant left:", participant.identity);
+    };
+
+    room.on("trackSubscribed", onSub);
+    room.on("trackUnsubscribed", onUnsub);
+    room.on("participantDisconnected", onParticipantLeave);
+
+    return () => {
+      room.off("trackSubscribed", onSub);
+      room.off("trackUnsubscribed", onUnsub);
+      room.off("participantDisconnected", onParticipantLeave);
+    };
+  }, [room]);
+
+  return null;
+}
+
+/* -------- Main VoiceCallModal -------- */
 const VoiceCallModal = ({ user }) => {
-  const { currentUser } = useUserStore();
+  const { currentUser, isLoading } = useUserStore();
   const [incomingCall, setIncomingCall] = useState(null);
   const [voiceCalling, setVoiceCalling] = useState(false);
   const [voiceToken, setVoiceToken] = useState(null);
@@ -21,7 +105,6 @@ const VoiceCallModal = ({ user }) => {
   const timerRef = useRef(null);
   const ringtoneRef = useRef(null);
 
-  // Determine staff vs patient
   const staffId = ["doctor", "nurse"].includes(currentUser?.role)
     ? currentUser.userId
     : ["doctor", "nurse"].includes(user?.role)
@@ -30,11 +113,12 @@ const VoiceCallModal = ({ user }) => {
 
   const patientId =
     staffId === currentUser.userId ? user?.userId : currentUser?.userId;
-
-  // Generate callId
   const callId = staffId && patientId ? `${staffId}_${patientId}` : null;
 
-  // Play/stop ringtone helpers
+  const isCaller = incomingCall?.caller?.id === currentUser?.userId;
+  const showAcceptButton = incomingCall?.status === "ringing" && !isCaller;
+
+  // Ringtone only for receiver
   const playRingtone = () => {
     if (!ringtoneRef.current) {
       const audio = new Audio("/ringtones/ringtone.mp3");
@@ -43,45 +127,36 @@ const VoiceCallModal = ({ user }) => {
       ringtoneRef.current = audio;
     }
   };
-
   const stopRingtone = () => {
     if (ringtoneRef.current) {
-      try {
-        ringtoneRef.current.pause();
-        ringtoneRef.current.currentTime = 0;
-      } catch {}
+      ringtoneRef.current.pause();
+      ringtoneRef.current.currentTime = 0;
       ringtoneRef.current = null;
     }
   };
 
-  // Listen to call updates
+  // Listen to call updates in Firestore
   useEffect(() => {
     if (!callId) return;
-
     const unsubscribe = onSnapshot(doc(db, "calls", callId), (snap) => {
       const data = snap.exists() ? snap.data() : null;
-
       if (!data) {
         setIncomingCall(null);
         setVoiceCalling(false);
         stopRingtone();
         return;
       }
-
       setIncomingCall(data);
+      setVoiceToken(data.token || null);
 
-      // Voice call logic
       if (data.type === "voice") {
-        setVoiceToken(data.token || null);
+        const active = ["ringing", "accepted"].includes(data.status);
+        setVoiceCalling(active);
 
-        if (["ringing", "accepted"].includes(data.status)) {
-          setVoiceCalling(true);
-          if (data.status === "ringing" && !isCaller) {
-            playRingtone();
-          } else {
-            stopRingtone();
-          }
-        } else if (["declined", "ended"].includes(data.status)) {
+        if (data.status === "ringing" && !isCaller) playRingtone();
+        else stopRingtone();
+
+        if (["declined", "ended"].includes(data.status)) {
           setVoiceCalling(false);
           stopRingtone();
         }
@@ -92,11 +167,7 @@ const VoiceCallModal = ({ user }) => {
       unsubscribe();
       stopRingtone();
     };
-  }, [callId, currentUser, user]);
-
-  const isCaller = incomingCall?.caller?.id === currentUser.userId;
-
-  const showAcceptButton = incomingCall?.status === "ringing" && !isCaller;
+  }, [callId, currentUser, user, isCaller]);
 
   // Call timer
   useEffect(() => {
@@ -107,36 +178,27 @@ const VoiceCallModal = ({ user }) => {
     return () => clearInterval(timerRef.current);
   }, [incomingCall?.status]);
 
-  const formatTime = (sec) => {
-    const m = String(Math.floor(sec / 60)).padStart(2, "0");
-    const s = String(sec % 60).padStart(2, "0");
-    return `${m}:${s}`;
-  };
-
   // Accept call
   const handleAcceptCall = async () => {
     if (!callId) return;
-
     await updateDoc(doc(db, "calls", callId), {
       status: "accepted",
       updatedAt: serverTimestamp(),
       duration: 0,
     });
-
     stopRingtone();
   };
 
-  // Decline/hangup call
+  // Decline / hangup
   const handleDeclineCall = async () => {
     if (!callId) return;
-
     await updateDoc(doc(db, "calls", callId), {
       status: "ended",
       updatedAt: serverTimestamp(),
       duration: elapsedTime || 0,
       token: null,
     });
-
+    setVoiceToken(null);
     stopRingtone();
     setVoiceCalling(false);
     setElapsedTime(0);
@@ -151,7 +213,7 @@ const VoiceCallModal = ({ user }) => {
         : "Incoming Voice Call"
       : "Voice Call in Progress...";
 
-  const roomName = `voice_${staffId}_${patientId}`;
+  const room = `${staffId}_${patientId}`;
 
   return (
     <div className="fixed inset-0 bg-black/80 flex flex-col items-center justify-center z-50">
@@ -165,7 +227,10 @@ const VoiceCallModal = ({ user }) => {
         <p className="text-gray-400">{statusText}</p>
         {incomingCall.status === "accepted" && (
           <p className="text-green-400 text-lg font-medium">
-            {formatTime(elapsedTime)}
+            {Math.floor(elapsedTime / 60)
+              .toString()
+              .padStart(2, "0")}
+            :{(elapsedTime % 60).toString().padStart(2, "0")}
           </p>
         )}
       </div>
@@ -177,12 +242,16 @@ const VoiceCallModal = ({ user }) => {
           audio
           video={false}
           connectOptions={{ autoSubscribe: true }}
-          onConnected={(room) => {
-            room?.localParticipant?.setMicrophoneEnabled(true);
-          }}
-          roomName={roomName}
+          roomName={room}
         >
-          <RoomAudioRenderer />
+          <LocalAudioPublisher
+            enabled={
+              incomingCall?.status === "accepted" ||
+              (isCaller && incomingCall?.status === "ringing")
+            }
+          />
+          <RemoteTrackLogger />
+          <RoomAudioRenderer volume={1.0} />
         </LiveKitRoom>
       )}
 
