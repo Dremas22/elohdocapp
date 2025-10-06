@@ -42,8 +42,6 @@ const ChatApp = () => {
   const endRef = useRef(null);
   const router = useRouter();
 
-  console.log(currentUser, "USER113");
-
   // Scroll to bottom when messages update
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });

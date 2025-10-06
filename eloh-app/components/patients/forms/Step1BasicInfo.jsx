@@ -25,7 +25,6 @@ const Step1BasicInfo = ({ formData, setFormData, errors }) => {
       </div>
 
       {/* Full Name */}
-      {/* Full Name */}
       <div className="col-span-full">
         <label className="block mb-1 text-sm font-medium text-blue-700">
           Full Name
