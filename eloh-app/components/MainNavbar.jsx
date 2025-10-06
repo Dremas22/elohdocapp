@@ -49,6 +49,16 @@ const Navbar = () => {
               Contact
             </Link>
           </li>
+          <li>
+            <Link
+              href="/forCompanies"
+              className="text-black text-xl font-semibold hover:text-white transition"
+            >
+              For Companies
+            </Link>
+          </li>
+
+
         </ul>
 
         {/* Hamburger Icon */}
@@ -93,9 +103,19 @@ const Navbar = () => {
               Contact
             </Link>
           </li>
+          <li>
+            <Link
+              href="/forCompanies"
+              className="text-black text-lg font-semibold hover:text-white transition"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              For Companies
+            </Link>
+          </li>
+
         </ul>
       </div>
-    </nav>
+    </nav >
   );
 };
 
