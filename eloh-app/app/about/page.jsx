@@ -1,98 +1,85 @@
-import Navbar from "@/components/MainNavbar";
-import { FaHeartbeat, FaUserMd, FaStethoscope } from "react-icons/fa";
+"use client";
 
-export const metadata = {
-  title: "About Us | ElohApp",
-  description:
-    "Learn more about ElohApp — our mission, vision, and team dedicated to providing accessible and high-quality telehealth services across Africa.",
-};
+import React from "react";
+import Image from "next/image";
+import Navbar from "@/components/MainNavbar";
+import PayToDoctor from "@/components/patients/payments/payToDoctor";
+import PayToNurse from "@/components/patients/payments/payToNurse";
 
 const About = () => {
   return (
-    <>
-      {/* Main Navigation */}
+    <main className="w-full bg-white min-h-screen">
+      {/* Navbar */}
       <Navbar />
 
-      {/* Page Container */}
-      <div className="relative min-h-screen bg-gradient-to-br from-[#e0f7fa] to-[#f0f4f8] flex flex-col items-center justify-start text-gray-800 px-4 sm:px-6 md:px-8 lg:px-10 pb-10">
+      {/* About Section */}
+      <section className="py-20 px-6 pt-10 md:px-0 md:w-[75%] mx-auto">
+        <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 text-center">
+          About Us
+        </h2>
 
-        {/* Banner Section */}
-        <div className="w-full absolute top-0 left-0">
-          <img
-            src="/images/banner2b.png"
-            alt="ElohDoc Banner"
-            className="w-full h-48 sm:h-60 md:h-72 lg:h-80 xl:h-96 object-cover"
-          />
-        </div>
-
-        {/* Content Wrapper */}
-        <div className="relative z-10 w-full max-w-6xl text-center space-y-8 pt-56 sm:pt-60 md:pt-72 lg:pt-80">
-
-          {/* Tagline */}
-          <h1 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-black leading-snug px-2 sm:px-4">
-            We’re on a mission to become a leading digital healthcare provider —
-            giving Africa better access to efficient care for everyone.
-          </h1>
-
-          {/* About & Vision Section */}
-          <div className="bg-white p-4 sm:p-6 md:p-8 lg:p-10 rounded-2xl shadow-xl text-left space-y-6 mx-auto max-w-4xl">
-            {/* Who We Are */}
-            <h2 className="text-xl sm:text-2xl font-bold text-[#0077b6]">Who We Are</h2>
-            <p className="text-sm sm:text-base">
-              <strong>Elohdoc</strong> is a cutting-edge telehealth platform
-              committed to revolutionizing access to medical care across Africa
-              and beyond. Whether you're a patient seeking consultation, a nurse
-              managing care, or a doctor delivering quality healthcare —
-              Elohdoc connects you seamlessly.
-            </p>
-
-            {/* Our Vision */}
-            <h2 className="text-xl sm:text-2xl font-bold text-[#0077b6]">Our Vision</h2>
-            <p className="text-sm sm:text-base">
-              To be Africa’s leading virtual health companion — delivering care
-              with compassion, clarity, and cutting-edge technology.
-            </p>
-          </div>
-
-          {/* Features Section */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 px-2">
-            {/* Feature 1 */}
-            <div className="bg-white p-5 sm:p-6 rounded-xl shadow hover:shadow-lg transition-all duration-300">
-              <div className="text-[#00b4d8] text-3xl mb-3 flex justify-center sm:justify-start">
-                <FaUserMd />
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold mb-2">Expert Doctors</h3>
-              <p className="text-xs sm:vdtext-sm text-gray-600">
-                Consult with licensed, experienced professionals from your
-                device.
-              </p>
+        <div className="mt-12 flex flex-col gap-16">
+          {/* 1st item */}
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <div className="relative w-full md:w-1/2 h-[250px]">
+              <Image
+                src="/images/1.jpeg"
+                alt="Accessible Healthcare"
+                fill
+                className="object-cover rounded-lg shadow-md"
+              />
             </div>
 
-            {/* Feature 2 */}
-            <div className="bg-white p-5 sm:p-6 rounded-xl shadow hover:shadow-lg transition-all duration-300">
-              <div className="text-[#00b4d8] text-3xl mb-3 flex justify-center sm:justify-start">
-                <FaStethoscope />
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold mb-2">Remote Diagnostics</h3>
-              <p className="text-xs sm:text-sm text-gray-600">
-                Accurate medical evaluations and prescriptions — from anywhere.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="bg-white p-5 sm:p-6 rounded-xl shadow hover:shadow-lg transition-all duration-300">
-              <div className="text-[#00b4d8] text-3xl mb-3 flex justify-center sm:justify-start">
-                <FaHeartbeat />
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold mb-2">Patient First</h3>
-              <p className="text-xs sm:text-sm text-gray-600">
-                We prioritize comfort, trust, and personalized care.
+            <div className="md:w-1/2">
+              <h3 className="text-xl font-semibold text-gray-800">
+                Accessible, Affordable, & Equitable Healthcare
+              </h3>
+              <p className="mt-2 text-gray-600">
+                ElohDoc is South Africa's premier provider of telemedicine and telehealth
+                services. We connect individuals with HPCSA-registered doctors, ensuring
+                quality medical care regardless of location or socioeconomic status. Through
+                technology and a supportive approach, we empower people to take control of
+                their health, fostering healthier communities and a better quality of life.
               </p>
             </div>
           </div>
         </div>
-      </div>
-    </>
+      </section>
+
+      {/* Payment Options Section */}
+      <section className="py-20 bg-[#f8faff] px-6 md:px-12">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-[#03045e] mb-6">
+            Consultation Packages
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto mb-12">
+            Explore our affordable teleconsultation options below. Whether you prefer to
+            speak with a doctor or a nurse, ElohDoc offers flexible packages to meet your
+            healthcare needs.
+          </p>
+
+          {/* Doctor Packages */}
+          <div className="mb-16">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-6">
+              Doctor Consultation Packages
+            </h3>
+            <div className="flex flex-wrap justify-center gap-8">
+              <PayToDoctor displayOnly />
+            </div>
+          </div>
+
+          {/* Nurse Packages */}
+          <div>
+            <h3 className="text-2xl font-semibold text-gray-800 mb-6">
+              Nurse Consultation Packages
+            </h3>
+            <div className="flex flex-wrap justify-center gap-8">
+              <PayToNurse displayOnly />
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 };
 
