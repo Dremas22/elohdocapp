@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
-import { MdOutlinePhoneCallback } from "react-icons/md";
-import { HiOutlinePhoneMissedCall } from "react-icons/hi";
 import {
   arrayUnion,
   doc,
@@ -25,14 +23,16 @@ import { toastError } from "@/helpers/toastHelper";
 import { useRouter } from "next/navigation";
 //import upload from "@/lib/uploadFile";
 
+import VoiceCallModal from "./VoiceCallModal";
+import VideoCallModal from "./VideoCallModal";
+
 const ChatApp = () => {
   const [chat, setChat] = useState({ messages: [] });
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [img, setImg] = useState({ file: null, url: "" });
   const [incomingCall, setIncomingCall] = useState(null);
-  const [calling, setCalling] = useState(false);
-  const [ringtone, setRingtone] = useState(null);
+  const ringtoneRef = useRef(null); // use ref to avoid re-renders
   const [progressData, setProgressData] = useState(null);
 
   const { currentUser } = useUserStore();
@@ -64,6 +64,7 @@ const ChatApp = () => {
     return () => unSub();
   }, [chatId]);
 
+  // Listen to call document for this pair (staff_patient)
   useEffect(() => {
     if (!currentUser || !user) return;
 
@@ -78,42 +79,98 @@ const ChatApp = () => {
       staffId = user.userId;
       patientId = currentUser.userId;
     } else {
-      console.warn("Video calls must involve a doctor/nurse and a patient");
+      // no staff involved — nothing to listen for
       return;
     }
 
     const callId = `${staffId}_${patientId}`;
-
     const callDocRef = doc(db, "calls", callId);
 
     const unsubscribe = onSnapshot(callDocRef, (snap) => {
-      if (!snap.exists()) return setIncomingCall(null);
+      if (!snap.exists()) {
+        setIncomingCall(null);
+        // stop ringtone if any
+        if (ringtoneRef.current) {
+          try {
+            ringtoneRef.current.pause();
+            ringtoneRef.current.currentTime = 0;
+          } catch (e) {}
+          ringtoneRef.current = null;
+        }
+        return;
+      }
 
       const data = snap.data();
 
-      if (
-        data?.status === "ringing" &&
-        data?.caller?.id !== currentUser?.userId
-      ) {
-        setIncomingCall(data);
-        if (!ringtone) {
-          const audio = new Audio("/ringtones/ringtone.mp3");
-          audio.loop = true;
-          audio.play().catch(() => console.error("Autoplay blocked"));
-          setRingtone(audio);
+      // Video calls
+      if (data?.type === "video") {
+        if (
+          data.status === "ringing" &&
+          data.caller?.id !== currentUser.userId
+        ) {
+          setIncomingCall(data);
+          if (!ringtoneRef.current) {
+            const audio = new Audio("/ringtones/ringtone.mp3");
+            audio.loop = true;
+            audio.play().catch(() => console.error("Autoplay blocked"));
+            ringtoneRef.current = audio;
+          }
+        } else if (["accepted", "declined"].includes(data.status)) {
+          setIncomingCall(null);
+          if (ringtoneRef.current) {
+            ringtoneRef.current.pause();
+            ringtoneRef.current.currentTime = 0;
+            ringtoneRef.current = null;
+          }
         }
-      } else if (data?.status === "accepted" || data?.status === "declined") {
-        if (ringtone) {
-          ringtone.pause();
-          ringtone.currentTime = 0;
-          setRingtone(null);
+      }
+
+      // Voice calls
+      if (data?.type === "voice") {
+        if (
+          data.status === "ringing" &&
+          data.token &&
+          data.caller?.id !== currentUser.userId
+        ) {
+          // 🔔 Incoming voice call
+          setIncomingCall(data);
+
+          if (!ringtoneRef.current) {
+            const audio = new Audio("/ringtones/ringtone.mp3");
+            audio.loop = true;
+            audio.play().catch(() => console.error("Autoplay blocked"));
+            ringtoneRef.current = audio;
+          }
+        } else if (data.status === "accepted") {
+          // ✅ Keep incomingCall so VoiceCallModal shows call in progress
+          setIncomingCall(data);
+
+          if (ringtoneRef.current) {
+            ringtoneRef.current.pause();
+            ringtoneRef.current.currentTime = 0;
+            ringtoneRef.current = null;
+          }
+        } else if (["declined", "ended"].includes(data.status)) {
+          if (ringtoneRef.current) {
+            ringtoneRef.current.pause();
+            ringtoneRef.current.currentTime = 0;
+            ringtoneRef.current = null;
+          }
         }
-        setIncomingCall(null);
       }
     });
 
-    return () => unsubscribe();
-  }, [currentUser?.userId, user?.userId]);
+    return () => {
+      unsubscribe();
+      if (ringtoneRef.current) {
+        try {
+          ringtoneRef.current.pause();
+          ringtoneRef.current.currentTime = 0;
+        } catch (e) {}
+        ringtoneRef.current = null;
+      }
+    };
+  }, [currentUser, user]);
 
   // Emoji selection
   const handleEmoji = (emojiData) => {
@@ -131,10 +188,7 @@ const ChatApp = () => {
       URL.revokeObjectURL(img.url);
     }
 
-    setImg({
-      file,
-      url: URL.createObjectURL(file),
-    });
+    setImg({ file, url: URL.createObjectURL(file) });
   };
 
   // Send message
@@ -152,7 +206,6 @@ const ChatApp = () => {
         // });
       }
 
-      // 👇 Define chatRef before using it
       const chatRef = doc(db, "chats", chatId);
 
       await setDoc(
@@ -176,10 +229,10 @@ const ChatApp = () => {
         const userChatsRef = doc(db, "userchats", id);
         const userChatsSnap = await getDoc(userChatsRef);
         if (userChatsSnap.exists()) {
-          const data = userChatsSnap.data();
+          const data = userChatsSnap.data() || {};
+          data.chats = data.chats || [];
           let chatIndex = data.chats.findIndex((c) => c.chatId === chatId);
           if (chatIndex >= 0) {
-            // Existing chat: update lastMessage
             data.chats[chatIndex] = {
               ...data.chats[chatIndex],
               lastMessage: text || "Image",
@@ -187,7 +240,6 @@ const ChatApp = () => {
               updatedAt: Date.now(),
             };
           } else {
-            // New chat (driver ↔ customer): initialize chat object
             data.chats.push({
               chatId,
               receiverId:
@@ -201,14 +253,15 @@ const ChatApp = () => {
         }
       }
     } catch (err) {
+      console.error(err);
     } finally {
       setText("");
       setImg({ file: null, url: "" });
     }
   };
 
-  // Make a video call
-  const handleMakeCall = async () => {
+  // Make a video call (create call doc so receiver sees it reliably)
+  const handleMakeVideoCall = async () => {
     if (!currentUser || !user) return;
 
     let staffId = null;
@@ -228,10 +281,40 @@ const ChatApp = () => {
       return;
     }
 
+    const callId = `${staffId}_${patientId}`;
+
     try {
-      // Send push notification
+      // create call doc so the other side sees it
+      await setDoc(
+        doc(db, "calls", callId),
+        {
+          type: "video",
+          status: "ringing",
+          token: null,
+          caller: {
+            id: caller.userId,
+            name: caller.fullName,
+            photoURL: caller.photoUrl || "/images/default_avatar.jpg",
+          },
+          callee: {
+            id: user.userId,
+            name: user.fullName,
+            photoURL: user.photoUrl || "/images/default_avatar.jpg",
+          },
+          doctorId: staffId,
+          patientId,
+          duration: 0,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      // Send push notification (may also attempt to play audio returned)
       const audio = await sendNotificationToDoctor(staffId, patientId, {
-        type: "incoming-call",
+        type: "video",
+        token: null,
+        duration: 0,
         caller: {
           id: caller.userId,
           name: caller.fullName,
@@ -239,34 +322,133 @@ const ChatApp = () => {
         },
       });
 
-      // Play ringtone if audio returned
-      if (audio) {
-        setRingtone(audio);
+      if (audio && !ringtoneRef.current) {
+        ringtoneRef.current = audio;
+        try {
+          ringtoneRef.current.loop = true;
+          ringtoneRef.current.play().catch(() => {});
+        } catch (e) {}
       }
 
       router.push(`/room?staffId=${staffId}&patientId=${patientId}`);
-      setCalling(true);
     } catch (err) {
       console.error("Error starting call:", err);
       toastError("Failed to start the call. Please try again.");
     }
   };
 
+  // Make a voice call
+  const handleMakeVoiceCall = async () => {
+    if (!currentUser || !user) return;
+
+    let staffId = null;
+    let patientId = null;
+
+    if (["doctor", "nurse"].includes(currentUser.role)) {
+      staffId = currentUser.userId;
+      patientId = user.userId;
+    } else if (["doctor", "nurse"].includes(user.role)) {
+      staffId = user.userId;
+      patientId = currentUser.userId;
+    } else {
+      toastError("Voice calls are only between doctors/nurses and patients.");
+      return;
+    }
+
+    try {
+      const room = `${staffId}_${patientId}`;
+      const encodedName = encodeURIComponent(user?.fullName || `${Date.now()}`);
+
+      // fetch LiveKit token for audio room
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/token?room=${room}&username=${encodedName}`
+      );
+      const { token } = await res.json();
+
+      // create call document so receiver gets an incoming call
+      const callId = `${staffId}_${patientId}`;
+      const caller = currentUser;
+
+      await setDoc(
+        doc(db, "calls", callId),
+        {
+          type: "voice",
+          status: "ringing",
+          token,
+          caller: {
+            id: caller.userId,
+            name: caller.fullName,
+            photoURL: caller.photoUrl || "/images/default_avatar.jpg",
+          },
+          callee: {
+            id: user.userId,
+            name: user.fullName,
+            photoURL: user.photoUrl || "/images/default_avatar.jpg",
+          },
+          doctorId: staffId,
+          patientId,
+          duration: 0,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      // notify the other user (push)
+      const audio = await sendNotificationToDoctor(staffId, patientId, {
+        type: "voice",
+        token: token,
+        duration: 0,
+        caller: {
+          id: currentUser.userId,
+          name: currentUser.fullName,
+          photoURL: currentUser.photoUrl || "/images/default_avatar.jpg",
+        },
+      });
+
+      if (ringtoneRef.current) {
+        ringtoneRef.current.pause();
+        ringtoneRef.current.currentTime = 0;
+        ringtoneRef.current = null;
+      }
+    } catch (err) {
+      console.error("Error starting voice call:", err);
+      toastError("Failed to start the voice call. Please try again.");
+    }
+  };
+
   const handleAcceptCall = async () => {
     if (!incomingCall) return;
+
     const callId = `${incomingCall?.doctorId}_${incomingCall?.patientId}`;
-    await updateDoc(doc(db, "calls", callId), {
-      status: "accepted",
-      updatedAt: serverTimestamp(),
-    });
-    if (ringtone) {
-      ringtone.pause();
-      ringtone.currentTime = 0;
-      setRingtone(null);
+
+    try {
+      // Update call status in Firestore
+      await updateDoc(doc(db, "calls", callId), {
+        status: "accepted",
+        updatedAt: serverTimestamp(),
+      });
+
+      // Stop ringtone if it's playing
+      if (ringtoneRef.current) {
+        try {
+          ringtoneRef.current.pause();
+          ringtoneRef.current.currentTime = 0;
+        } catch (e) {}
+        ringtoneRef.current = null;
+      }
+
+      if (incomingCall?.type === "video") {
+        // Redirect to LiveKit video room
+        router.push(
+          `/room?staffId=${incomingCall?.doctorId}&patientId=${incomingCall?.patientId}`
+        );
+        setIncomingCall(null);
+      }
+    } catch (err) {
+      console.error("Error accepting call:", err);
+      toastError("Failed to accept the call. Please try again.");
     }
-    router.push(
-      `/room?staffId=${incomingCall?.doctorId}&patientId=${incomingCall?.patientId}`
-    );
   };
 
   const handleDeclineCall = async () => {
@@ -274,15 +456,32 @@ const ChatApp = () => {
     const callId = `${incomingCall?.doctorId}_${incomingCall?.patientId}`;
     await updateDoc(doc(db, "calls", callId), {
       status: "declined",
+      token: null,
       updatedAt: serverTimestamp(),
     });
-    if (ringtone) {
-      ringtone.pause();
-      ringtone.currentTime = 0;
-      setRingtone(null);
+    if (ringtoneRef.current) {
+      try {
+        ringtoneRef.current.pause();
+        ringtoneRef.current.currentTime = 0;
+      } catch (e) {}
+      ringtoneRef.current = null;
     }
     setIncomingCall(null);
   };
+
+  // Revoke object URL for image preview when component unmounts
+  useEffect(() => {
+    return () => {
+      if (img?.url) URL.revokeObjectURL(img.url);
+      if (ringtoneRef.current) {
+        try {
+          ringtoneRef.current.pause();
+          ringtoneRef.current.currentTime = 0;
+        } catch (e) {}
+        ringtoneRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div className="flex-2 flex flex-col border-x border-gray-700 lg:h-[80vh] h-[70vh] ">
@@ -323,17 +522,15 @@ const ChatApp = () => {
                   title={`Start a video consultation with ${getDisplayName(
                     user
                   )}`}
-                  onClick={handleMakeCall}
+                  onClick={handleMakeVideoCall}
                 />
               )}
 
-              <a
-                className="lg:pt-2 pt-1"
-                href={`tel:${user?.phoneNumber}`}
-                title={`Click to join a call with ${getDisplayName(user)}`}
-              >
-                <IoCall className="cursor-pointer text-gray-400 hover:text-white lg:text-3xl md:text-3xl text-xl" />
-              </a>
+              <IoCall
+                className="cursor-pointer text-gray-400 hover:text-white"
+                title={`Start a voice call with ${getDisplayName(user)}`}
+                onClick={handleMakeVoiceCall}
+              />
             </div>
           </div>
         </div>
@@ -418,33 +615,15 @@ const ChatApp = () => {
       </div>
 
       {/* Incoming Call Modal */}
-      {incomingCall && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-gray-900 p-6 rounded-xl flex flex-col items-center gap-4 w-80">
-            <h2 className="text-white text-lg font-semibold">Incoming Call</h2>
-            <p className="text-gray-300 text-center">
-              {incomingCall.caller.name} is calling you
-            </p>
-            <div className="flex gap-4 mt-4">
-              <button
-                title="Click to accept the call"
-                onClick={handleAcceptCall}
-                className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-              >
-                <MdOutlinePhoneCallback className="w-5 h-5 text-green-500" />
-              </button>
-
-              <button
-                title="Click to decline the call"
-                onClick={handleDeclineCall}
-                className="bg-[#03045e] text-white font-semibold py-3 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-              >
-                <HiOutlinePhoneMissedCall className="w-5 h-5 text-red-500" />
-              </button>
-            </div>
-          </div>
-        </div>
+      {incomingCall && incomingCall?.type === "video" && (
+        <VideoCallModal
+          handleAcceptCall={handleAcceptCall}
+          handleDeclineCall={handleDeclineCall}
+          incomingCall={incomingCall}
+        />
       )}
+
+      <VoiceCallModal user={user} />
     </div>
   );
 };

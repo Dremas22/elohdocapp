@@ -8,39 +8,44 @@ import { db } from "@/db/client";
  * 1. Makes a POST request to the `/api/notify-doctor` endpoint with doctor and patient IDs,
  *    plus any additional payload data.
  * 2. If the response is not OK, throws an error with the returned error message.
- * 3. If the payload includes a `caller` object, creates a `calls/{doctorId_patientId}` document
+ * 3. If the payload includes a `caller` object, creates a `calls/{doctorId}_{patientId}` document
  *    in Firestore to represent an active ringing call.
  *
  * Firestore call document structure:
  * {
- *   type: "video-call",
+ *   type: "video" | "voice",
  *   status: "ringing",
  *   doctorId: string,
  *   patientId: string,
  *   caller: {
  *     id: string,
  *     name: string,
- *     photoUrl: string
+ *     photoURL: string
  *   },
+ *   token?: string, // for voice calls
  *   createdAt: serverTimestamp(),
  *   updatedAt: serverTimestamp()
  * }
  *
  * @param {string} doctorId - The ID of the doctor to notify.
  * @param {string} patientId - The ID of the patient initiating the action.
- * @param {object} [payload={}] - Additional data to send with the notification.
- *   @param {object} [payload.caller] - Caller info if initiating a call.
- *   @param {string} payload.caller.id - Caller user ID.
- *   @param {string} payload.caller.name - Caller display name.
- *   @param {string} [payload.caller.photoUrl] - Caller profile picture URL (defaults to `/images/default_avatar.jpg`).
+ * @param {Object} [payload={}] - Additional data to send with the notification.
+ * @param {Object} [payload.caller] - Caller information (required if initiating a call).
+ * @param {string} payload.caller.id - Caller user ID.
+ * @param {string} payload.caller.name - Caller display name.
+ * @param {string} [payload.caller.photoUrl='/images/default_avatar.jpg'] - Caller profile picture URL.
+ * @param {"video"|"voice"} [payload.type] - The type of the call.
+ * @param {string} [payload.token] - Token for voice calls.
  *
  * @returns {Promise<void>} Resolves when the notification is sent (and Firestore updated if applicable).
  */
+
 export const sendNotificationToDoctor = async (
   doctorId,
   patientId,
-  payload = {}
+  payload
 ) => {
+  if (!payload) return;
   try {
     // Trigger server-side push notification
     const res = await fetch(
@@ -58,10 +63,11 @@ export const sendNotificationToDoctor = async (
       throw new Error(errData.error || "Failed to send notification");
     }
 
-    if (payload.caller) {
+    if (payload && payload.caller) {
       const callId = `${doctorId}_${patientId}`;
       await setDoc(doc(db, "calls", callId), {
-        type: "video-call",
+        type: payload.type,
+        token: payload.token || null,
         status: "ringing",
         doctorId,
         patientId,
@@ -70,6 +76,7 @@ export const sendNotificationToDoctor = async (
           name: payload.caller.name,
           photoUrl: payload.caller.photoUrl || "/images/default_avatar.jpg",
         },
+        duration: payload.duration,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });

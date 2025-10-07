@@ -152,12 +152,15 @@ const NurseCollectionViewer = () => {
         </aside>
 
         {/* Main Content */}
-        <main className="w-full lg:w-3/4 p-6 md:pl-15 flex flex-col items-center justify-start text-center bg-transparent">
+        <main className="w-full flex flex-col flex-grow overflow-hidden px-4 sm:px-6 lg:px-8">
           {isVerified === true ? (
             <>
-              <h1 className="bg-gradient-to-r from-teal-300 via-blue-400 to-purple-500 bg-clip-text text-transparent font-extrabold text-4xl sm:text-5xl md:text-6xl leading-tight mt-10 mb-10">
-                Welcome Nurse!
-              </h1>
+              <div className="flex items-center justify-start text-sm mt-10 mb-10 ml-2 lg:ml-60">
+                <h1 className="bg-gradient-to-r from-teal-300 via-blue-400 to-purple-500 bg-clip-text text-transparent font-extrabold text-3xl sm:text-5xl md:text-6xl leading-tight whitespace-nowrap">
+                  Welcome Nurse!
+                </h1>
+              </div>
+
 
               {/* Earnings Modal */}
               {showEarnings && (
@@ -182,7 +185,7 @@ const NurseCollectionViewer = () => {
               )}
 
               {/* Search Bar */}
-              <div className="mt-8 w-full max-w-3xl px-4">
+              <div className="mt-5 w-full max-w-3xl lg:ml-40 px-4">
                 <SearchBar
                   onSearch={handleSearch}
                   query={query}
@@ -221,6 +224,11 @@ const NurseCollectionViewer = () => {
                 </div>
               )}
 
+              {/* Chat App */}
+              <div className="lg:w-[185vh] sm:w-[110vh] w-[45vh] lg:ml-5  md:-ml-5 -ml-3 h-auto flex flex-col pt-8 mb-9 flex-grow">
+                <ElohDocChatApp />
+              </div>
+
               {/* Mobile Sidebar under main content */}
               <div className="block lg:hidden w-80 mt-10 ">
                 <NurseSidebarMenu
@@ -232,10 +240,7 @@ const NurseCollectionViewer = () => {
                 />
               </div>
 
-              {/* Chat App */}
-              <div className="lg:w-[185vh] md:w-[90vh] w-[45vh] lg:ml-69 md:-ml-5 ml-0 h-auto flex flex-col pt-8 mb-9 flex-grow">
-                <ElohDocChatApp />
-              </div>
+
 
             </>
           ) : isVerified === false ? (
