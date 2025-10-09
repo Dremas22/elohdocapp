@@ -1,6 +1,3 @@
-// “use client” if you're in a Next.js app using app router / client component
-"use client";
-
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
