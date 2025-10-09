@@ -1,99 +1,213 @@
+import React from "react";
+import Image from "next/image";
 import Navbar from "@/components/MainNavbar";
-import { FaHeartbeat, FaUserMd, FaStethoscope } from "react-icons/fa";
+import Footer from "../forCompanies/footer";
 
-export const metadata = {
-  title: "About Us | ElohApp",
-  description:
-    "Learn more about ElohApp — our mission, vision, and team dedicated to providing accessible and high-quality telehealth services across Africa.",
-};
-
-const About = () => {
+const AboutUs = () => {
   return (
-    <>
-      {/* Main Navigation */}
+    <main className="w-full bg-white">
       <Navbar />
 
-      {/* Page Container */}
-      <div className="relative min-h-screen bg-gradient-to-br from-[#e0f7fa] to-[#f0f4f8] flex flex-col items-center justify-start text-gray-800 px-4 sm:px-6 md:px-8 lg:px-10 pb-10">
-
-        {/* Banner Section */}
-        <div className="w-full absolute top-0 left-0">
-          <img
-            src="/images/banner2b.png"
-            alt="ElohDoc Banner"
-            className="w-full h-48 sm:h-60 md:h-72 lg:h-80 xl:h-96 object-cover"
+      {/* Hero Section */}
+      <section className="relative w-full h-[400px] md:h-[500px] flex items-center justify-center overflow-hidden">
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/images/about.jpg"
+            alt="For Companies Hero"
+            fill
+            className="object-cover opacity-80"
           />
         </div>
 
-        {/* Content Wrapper */}
-        <div className="relative z-10 w-full max-w-6xl text-center space-y-8 pt-56 sm:pt-60 md:pt-72 lg:pt-80">
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/40"></div>
 
-          {/* Tagline */}
-          <h1 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-black leading-snug px-2 sm:px-4">
-            We’re on a mission to become a leading digital healthcare provider —
-            giving Africa better access to efficient care for everyone.
+        {/* Text over hero */}
+        <div className="relative z-10 text-center px-6 md:px-0">
+          <h1 className="text-white text-3xl md:text-5xl font-bold">
+            About Us
           </h1>
+          <p className="mt-4 text-white text-base md:text-lg max-w-2xl mx-auto">
+            We provide telehealth solutions tailored to businesses, enabling your
+            employees to access healthcare seamlessly.
+          </p>
+        </div>
+      </section>
 
-          {/* About & Vision Section */}
-          <div className="bg-white p-4 sm:p-6 md:p-8 lg:p-10 rounded-2xl shadow-xl text-left space-y-6 mx-auto max-w-4xl">
-            {/* Who We Are */}
-            <h2 className="text-xl sm:text-2xl font-bold text-[#0077b6]">Who We Are</h2>
-            <p className="text-sm sm:text-base">
-              <strong>Elohdoc</strong> is a cutting-edge telehealth platform
-              committed to revolutionizing access to medical care across Africa
-              and beyond. Whether you're a patient seeking consultation, a nurse
-              managing care, or a doctor delivering quality healthcare —
-              Elohdoc connects you seamlessly.
-            </p>
-
-            {/* Our Vision */}
-            <h2 className="text-xl sm:text-2xl font-bold text-[#0077b6]">Our Vision</h2>
-            <p className="text-sm sm:text-base">
-              To be Africa’s leading virtual health companion — delivering care
-              with compassion, clarity, and cutting-edge technology.
-            </p>
+      {/* Content Section: What We Offer */}
+      <section className="py-20 px-6 md:px-0 md:w-[75%] mx-auto">
+        <div className="mt-12 flex flex-col gap-16">
+          {/* 1st item */}
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <div className="relative w-full md:w-1/2 h-[250px]">
+              <Image
+                src="/images/telemedicine.jpg"
+                alt="Corporate Telemedicine"
+                fill
+                className="object-cover rounded-lg shadow-md"
+              />
+            </div>
+            <div className="md:w-1/2">
+              <h2 className="text-2xl md:text-3xl font-semibold text-gray-800">
+                About ElohDoc
+              </h2>
+              <h3 className="text-xl font-semibold text-gray-800 mt-2">
+                Corporate Telemedicine
+              </h3>
+              <p className="mt-3 text-gray-600">
+                We fully understand the importance of timely access to healthcare
+                services, which is why <strong>ElohDoc</strong> is committed to
+                providing convenience and efficiency at every step.
+                <br />
+                <br />
+                Whether you need preventive care, immediate attention for acute
+                conditions, or continuous management of chronic illnesses, our
+                platform ensures smooth and secure access to experienced healthcare
+                professionals.
+                <br />
+                <br />
+                By harnessing innovation and the power of technology,{" "}
+                <strong>ElohDoc</strong> is breaking barriers and empowering
+                individuals to receive quality medical care anytime, anywhere —
+                regardless of distance or circumstance.
+              </p>
+            </div>
           </div>
 
-          {/* Features Section */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10 px-2">
-            {/* Feature 1 */}
-            <div className="bg-white p-5 sm:p-6 rounded-xl shadow hover:shadow-lg transition-all duration-300">
-              <div className="text-[#00b4d8] text-3xl mb-3 flex justify-center sm:justify-start">
-                <FaUserMd />
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold mb-2">Expert Doctors</h3>
-              <p className="text-xs sm:vdtext-sm text-gray-600">
-                Consult with licensed, experienced professionals from your
-                device.
+          {/* 2nd item */}
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <div className="md:w-1/2">
+              <h3 className="text-xl font-semibold text-gray-800">
+                Leveraging International Medical Experience
+              </h3>
+              <p className="mt-3 text-gray-600">
+                We set ourselves apart from other healthcare providers by employing
+                local doctors, clinical associates, and nurses on a full-time
+                basis, guaranteeing immediate access to teleconsultation services
+                at the most affordable rates.
+                <br />
+                <br />
+                With a combined experience of over a century in the healthcare
+                field, <strong>ElohDoc</strong> stands as a trusted and reliable
+                partner for delivering comprehensive, patient-centered care.
               </p>
             </div>
-
-            {/* Feature 2 */}
-            <div className="bg-white p-5 sm:p-6 rounded-xl shadow hover:shadow-lg transition-all duration-300">
-              <div className="text-[#00b4d8] text-3xl mb-3 flex justify-center sm:justify-start">
-                <FaStethoscope />
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold mb-2">Remote Diagnostics</h3>
-              <p className="text-xs sm:text-sm text-gray-600">
-                Accurate medical evaluations and prescriptions — from anywhere.
-              </p>
+            <div className="relative w-full md:w-1/2 h-[250px]">
+              <Image
+                src="/images/doctors.jpg"
+                alt="Wellness Programs"
+                fill
+                className="object-cover rounded-lg shadow-md"
+              />
             </div>
+          </div>
 
-            {/* Feature 3 */}
-            <div className="bg-white p-5 sm:p-6 rounded-xl shadow hover:shadow-lg transition-all duration-300">
-              <div className="text-[#00b4d8] text-3xl mb-3 flex justify-center sm:justify-start">
-                <FaHeartbeat />
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold mb-2">Patient First</h3>
-              <p className="text-xs sm:text-sm text-gray-600">
-                We prioritize comfort, trust, and personalized care.
+          {/* 3rd item */}
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <div className="relative w-full md:w-1/2 h-[250px]">
+              <Image
+                src="/images/consultation.jpg"
+                alt="Analytics & Insights"
+                fill
+                className="object-cover rounded-lg shadow-md"
+              />
+            </div>
+            <div className="md:w-1/2">
+              <h3 className="text-xl font-semibold text-gray-800">
+                Analytics & Insights
+              </h3>
+              <p className="mt-3 text-gray-600">
+                Access anonymized health trends and reporting to guide your
+                corporate health strategy and improve workplace wellness outcomes.
               </p>
             </div>
           </div>
         </div>
-      </div>
-    </>
+      </section>
+
+      {/* Executive Team Section */}
+      <section className="py-20 bg-gradient-to-b from-[#e0f2fe] to-[#f8fafc]">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-[#023e8a]">
+            Meet Our Executive Team
+          </h2>
+          <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
+            Our leadership team combines global expertise and local insight,
+            driving ElohDoc’s mission to make healthcare accessible, efficient,
+            and patient-focused.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-8 md:gap-12 px-6 md:px-0">
+          {/* Team Member 1 */}
+          <div className="bg-white rounded-2xl shadow-lg w-[260px] text-center overflow-hidden border border-blue-100 hover:shadow-xl transition">
+            <div className="w-full h-64 relative">
+              <Image
+                src="/images/default_avatar.jpg"
+                alt="Mr. Letlhake Kealeboga"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="p-4 bg-gradient-to-r from-[#0077b6] to-[#00b4d8] h-full text-white">
+              <h3 className="text-lg font-semibold">Mr. Letlhake Kealeboga</h3>
+              <p className="text-sm">Non-Executive Chairperson of the Board</p>
+            </div>
+          </div>
+
+          {/* Team Member 2 */}
+          <div className="bg-white rounded-2xl shadow-lg w-[260px] text-center overflow-hidden border border-blue-100 hover:shadow-xl transition">
+            <div className="w-full h-64 relative">
+              <Image
+                src="/images/default_avatar.jpg"
+                alt="Dr. Tshepo Masilo"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="p-4 bg-gradient-to-r from-[#0077b6] to-[#00b4d8] h-full text-white">
+              <h3 className="text-lg font-semibold">Dr. Tshepo Masilo</h3>
+              <p className="text-sm">Co-Founder & Executive Director</p>
+            </div>
+          </div>
+
+          {/* Team Member 3 */}
+          <div className="bg-white rounded-2xl shadow-lg w-[260px] text-center overflow-hidden border border-blue-100 hover:shadow-xl transition">
+            <div className="w-full h-64 relative">
+              <Image
+                src="/images/default_avatar.jpg"
+                alt="Nurse Nelson Malgas"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="p-4 bg-gradient-to-r from-[#0077b6] to-[#00b4d8] h-full text-white">
+              <h3 className="text-lg font-semibold">Nurse Nelson Malgas</h3>
+              <p className="text-sm">Medical Director </p>
+            </div>
+          </div>
+
+          {/* Team Member 4 */}
+          <div className="bg-white rounded-2xl shadow-lg w-[260px] text-center overflow-hidden border border-blue-100 hover:shadow-xl transition">
+            <div className="w-full h-64 relative">
+              <Image
+                src="/images/default_avatar.jpg"
+                alt="Mr. Joe Phalwane"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="p-4 bg-gradient-to-r from-[#0077b6] to-[#00b4d8] h-full text-white">
+              <h3 className="text-lg font-semibold">Mr. Joe Phalwane</h3>
+              <p className="text-sm">Co-Founder & Executive Director</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <Footer />
+    </main>
   );
 };
 
-export default About;
+export default AboutUs;

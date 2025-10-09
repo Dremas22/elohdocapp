@@ -11,8 +11,12 @@ const Footer = () => {
             <div className="md:w-[75%] mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
                 {/* Column 1: About */}
                 <div>
-                    <h3 className="text-xl font-semibold text-gray-900">ElohDoc</h3>
-                    <p className="mt-2 text-gray-600 text-sm">
+                    <img
+                        src="/images/elohdoc.png"
+                        alt="ElohDoc Logo"
+                        className="lg:scale-400 h-10 lg:pl-2 w-auto object-contain mb-2"
+                    />
+                    <p className="text-gray-600 text-sm">
                         Operating under the medical practices of licensed doctors registered with the HPCSA.
                         ElohDoc is authorised under multiple doctor practice licenses.
                     </p>
@@ -27,9 +31,6 @@ const Footer = () => {
                         </li>
                         <li>
                             <Link href="/forCompanies">For Companies</Link>
-                        </li>
-                        <li>
-                            <Link href="/services">Our Services</Link>
                         </li>
                         <li>
                             <Link href="/contact">Contact Us</Link>
