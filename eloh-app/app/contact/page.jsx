@@ -44,7 +44,7 @@ const Contact = () => {
     <>
       <Navbar />
 
-      <div className="flex flex-col items-center justify-center w-full min-h-screen px-4 sm:px-6 py-12 bg-white text-gray-800">
+      <div className="flex flex-col items-center justify-center w-full min-h-screen px-4 sm:px-6 py-12 pt-25 bg-white text-gray-800">
         <h1 className="text-3xl sm:text-4xl font-bold text-[#03045e] mb-3 sm:mb-4 text-center">
           Contact Us
         </h1>

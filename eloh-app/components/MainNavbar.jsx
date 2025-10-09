@@ -8,7 +8,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-[#00b4d8] p-6 relative z-50">
+    <nav className="bg-[#00b4d8] p-6 fixed top-0 left-0 w-full z-50 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
 
         {/* Logo on the left that redirects to landing page */}
@@ -35,6 +35,14 @@ const Navbar = () => {
           </li>
           <li>
             <Link
+              href="/forCompanies"
+              className="text-black text-xl font-semibold hover:text-white transition"
+            >
+              For Companies
+            </Link>
+          </li>
+          <li>
+            <Link
               href="/ourTeam"
               className="text-black text-xl font-semibold hover:text-white transition"
             >
@@ -49,16 +57,6 @@ const Navbar = () => {
               Contact
             </Link>
           </li>
-          <li>
-            <Link
-              href="/forCompanies"
-              className="text-black text-xl font-semibold hover:text-white transition"
-            >
-              For Companies
-            </Link>
-          </li>
-
-
         </ul>
 
         {/* Hamburger Icon */}
