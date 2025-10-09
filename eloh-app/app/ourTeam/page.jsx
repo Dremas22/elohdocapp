@@ -39,7 +39,7 @@ const OurTeam = () => {
     <>
       <Navbar />
 
-      <div className="min-h-screen bg-gray-50 px-6 py-16">
+      <div className="pt-25 min-h-screen bg-gray-50 px-6 py-16">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-10">
           Our Team
         </h1>
