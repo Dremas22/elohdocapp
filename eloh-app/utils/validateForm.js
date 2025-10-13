@@ -1,27 +1,3 @@
-/**
- * Validates multi-step form data for patient intake.
- *
- * Validation is conditional based on the current step, but can also validate the entire form if `isFinal` is `true`.
- *
- * Steps:
- * - Step 0: Validates `idNumber`
- * - Step 1: Validates location (`country`, `city`, `addressLine`), `phoneNumber`, and `email`
- * - Step 2: Normalizes and prepares social history data (e.g., smoking, alcohol use)
- * - Step 3: Ensures at least one allergy is provided
- * - Step 4: Checks that all required medical history fields are filled
- *
- * @param {number} step - The current step of the form being validated (0–4).
- * @param {Object} formData - The complete form data for the patient.
- * @param {boolean} [isFinal=false] - Whether to validate the entire form regardless of the step.
- * @returns {Object} An object containing validation errors. Keys correspond to field names and values are error messages.
- *
- * @example
- * const errors = validateStep(1, formData);
- * if (Object.keys(errors).length) {
- *   // Show errors to user
- * }
- */
-
 export const validateStep = (step, formData, isFinal = false) => {
   const errors = {};
   const {
@@ -53,17 +29,17 @@ export const validateStep = (step, formData, isFinal = false) => {
 
   if (step === 2 || isFinal) {
     const {
-      isSmoker = false,
+      diet = [],
+      exercise = [],
+      hobbies = [],
+      livingSituation = [],
+      isSmoker,
       smoking = { status: "never", packYears: "" },
-      usesAlcohol = false,
+      usesAlcohol,
       alcohol = { type: "None", frequency: "", amount: "" },
-      usesDrugs = false,
+      usesDrugs,
       drugs = { type: "None", frequency: "", route: "" },
-      diet = "",
-      exercise = "",
-      hobbies = "",
-      livingSituation = "",
-    } = formData.socialHistory;
+    } = socialHistory;
 
     // Optional: Normalize data to avoid undefined issues later
     socialHistory.smoking = smoking;
@@ -76,48 +52,60 @@ export const validateStep = (step, formData, isFinal = false) => {
     socialHistory.isSmoker = isSmoker;
     socialHistory.usesAlcohol = usesAlcohol;
     socialHistory.usesDrugs = usesDrugs;
+
+    if (!diet.length) errors.diet = "Select at least one diet option.";
+    if (!exercise.length)
+      errors.exercise = "Select at least one exercise option.";
+    if (!hobbies.length) errors.hobbies = "Select at least one hobby.";
+    if (!livingSituation.length)
+      errors.livingSituation = "Select at least one living situation.";
   }
 
   if (step === 3 || isFinal) {
-    const { medications, food, environmental, other } = allergies;
-    if (
-      !medications.length &&
-      !food.length &&
-      !environmental.length &&
-      !other.length
-    ) {
-      errors.allergies = "Add at least one allergy.";
+    const {
+      medications = [],
+      food = [],
+      environmental = [],
+      other = { isChecked: false, text: "" },
+    } = allergies;
+
+    if (!medications.length)
+      errors.medications = "Add at least one medication allergy.";
+    if (!food.length) errors.food = "Add at least one food allergy.";
+    if (!environmental.length)
+      errors.environmental = "Add at least one environmental allergy.";
+
+    if (other.isChecked && !other.text.trim()) {
+      errors.other = "Please specify other allergies.";
     }
   }
 
   if (step === 4 || isFinal) {
-    const {
-      childhoodIllnesses,
-      adultIllnesses,
-      surgeries,
-      hospitalizations,
-      majorInjuries,
-    } = medicalHistory;
+    const fields = [
+      "childhoodIllnesses",
+      "adultIllnesses",
+      "surgeries",
+      "hospitalizations",
+      "majorInjuries",
+    ];
 
-    if (!childhoodIllnesses.length) {
-      errors.childhoodIllnesses = "Childhood illnesses are required.";
-    }
-
-    if (!adultIllnesses.length) {
-      errors.adultIllnesses = "Adult illnesses are required.";
-    }
-
-    if (!surgeries.length) {
-      errors.surgeries = "Surgical history is required.";
-    }
-
-    if (!hospitalizations.length) {
-      errors.hospitalizations = "Hospitalization history is required.";
-    }
-
-    if (!majorInjuries.length) {
-      errors.majorInjuries = "Major injuries history is required.";
-    }
+    fields.forEach((field) => {
+      if (!medicalHistory[field] || medicalHistory[field].length === 0) {
+        errors[field] = `${field
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, (str) => str.toUpperCase())} is required.`;
+      }
+      if (medicalHistory[field]?.includes("Other")) {
+        const otherField = `other${
+          field.charAt(0).toUpperCase() + field.slice(1)
+        }`;
+        if (!medicalHistory[otherField]?.trim()) {
+          errors[otherField] = `Please specify other ${field
+            .replace(/([A-Z])/g, " $1")
+            .toLowerCase()}.`;
+        }
+      }
+    });
   }
 
   return errors;
