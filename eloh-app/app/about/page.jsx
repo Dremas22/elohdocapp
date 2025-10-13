@@ -1,7 +1,12 @@
-import React from "react";
 import Image from "next/image";
 import Navbar from "@/components/MainNavbar";
 import Footer from "../forCompanies/footer";
+
+export const metadata = {
+  title: "About Us | ElohApp",
+  description:
+    "Learn more about ElohApp — our mission, vision, and team dedicated to providing accessible and high-quality telehealth services across Africa.",
+};
 
 const AboutUs = () => {
   return (
@@ -14,7 +19,7 @@ const AboutUs = () => {
         <div className="absolute inset-0">
           <Image
             src="/images/about.jpg"
-            alt="For Companies Hero"
+            alt="About us Hero"
             fill
             className="object-cover opacity-80"
           />
@@ -29,8 +34,8 @@ const AboutUs = () => {
             About Us
           </h1>
           <p className="mt-4 text-white text-base md:text-lg max-w-2xl mx-auto">
-            We provide telehealth solutions tailored to businesses, enabling your
-            employees to access healthcare seamlessly.
+            We provide telehealth solutions tailored to businesses, enabling
+            your employees to access healthcare seamlessly.
           </p>
         </div>
       </section>
@@ -56,15 +61,15 @@ const AboutUs = () => {
                 Corporate Telemedicine
               </h3>
               <p className="mt-3 text-gray-600">
-                We fully understand the importance of timely access to healthcare
-                services, which is why <strong>ElohDoc</strong> is committed to
-                providing convenience and efficiency at every step.
+                We fully understand the importance of timely access to
+                healthcare services, which is why <strong>ElohDoc</strong> is
+                committed to providing convenience and efficiency at every step.
                 <br />
                 <br />
                 Whether you need preventive care, immediate attention for acute
                 conditions, or continuous management of chronic illnesses, our
-                platform ensures smooth and secure access to experienced healthcare
-                professionals.
+                platform ensures smooth and secure access to experienced
+                healthcare professionals.
                 <br />
                 <br />
                 By harnessing innovation and the power of technology,{" "}
@@ -82,10 +87,10 @@ const AboutUs = () => {
                 Leveraging International Medical Experience
               </h3>
               <p className="mt-3 text-gray-600">
-                We set ourselves apart from other healthcare providers by employing
-                local doctors, clinical associates, and nurses on a full-time
-                basis, guaranteeing immediate access to teleconsultation services
-                at the most affordable rates.
+                We set ourselves apart from other healthcare providers by
+                employing local doctors, clinical associates, and nurses on a
+                full-time basis, guaranteeing immediate access to
+                teleconsultation services at the most affordable rates.
                 <br />
                 <br />
                 With a combined experience of over a century in the healthcare
@@ -119,7 +124,8 @@ const AboutUs = () => {
               </h3>
               <p className="mt-3 text-gray-600">
                 Access anonymized health trends and reporting to guide your
-                corporate health strategy and improve workplace wellness outcomes.
+                corporate health strategy and improve workplace wellness
+                outcomes.
               </p>
             </div>
           </div>

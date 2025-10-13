@@ -41,12 +41,17 @@ export const validateStep = (step, formData, isFinal = false) => {
       drugs = { type: "None", frequency: "", route: "" },
     } = socialHistory;
 
+    // Optional: Normalize data to avoid undefined issues later
     socialHistory.smoking = smoking;
     socialHistory.alcohol = alcohol;
     socialHistory.drugs = drugs;
-    socialHistory.isSmoker = isSmoker ?? false;
-    socialHistory.usesAlcohol = usesAlcohol ?? false;
-    socialHistory.usesDrugs = usesDrugs ?? false;
+    socialHistory.diet = diet || "";
+    socialHistory.exercise = exercise || "";
+    socialHistory.hobbies = hobbies || "";
+    socialHistory.livingSituation = livingSituation || "";
+    socialHistory.isSmoker = isSmoker;
+    socialHistory.usesAlcohol = usesAlcohol;
+    socialHistory.usesDrugs = usesDrugs;
 
     if (!diet.length) errors.diet = "Select at least one diet option.";
     if (!exercise.length)
@@ -71,7 +76,7 @@ export const validateStep = (step, formData, isFinal = false) => {
       errors.environmental = "Add at least one environmental allergy.";
 
     if (other.isChecked && !other.text.trim()) {
-      errors.otherText = "Please specify other allergies.";
+      errors.other = "Please specify other allergies.";
     }
   }
 
