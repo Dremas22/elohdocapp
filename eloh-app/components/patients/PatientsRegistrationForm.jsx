@@ -61,7 +61,10 @@ const PatientsRegistrationForm = () => {
       medications: [],
       food: [],
       environmental: [],
-      other: [],
+      other: {
+        isChecked: false,
+        text: "",
+      },
     },
   };
 
@@ -140,6 +143,8 @@ const PatientsRegistrationForm = () => {
 
   if (loading)
     return <p className="text-center text-black py-10">Loading...</p>;
+
+  console.log(formData, "FORM_DATA");
 
   return (
     <div className="w-full max-w-2xl mx-auto px-6 py-8 bg-white rounded-3xl transition-all duration-500">
