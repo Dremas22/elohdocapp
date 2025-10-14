@@ -10,12 +10,14 @@ export const validateStep = (step, formData, isFinal = false) => {
     medicalHistory,
   } = formData;
 
+  // Step 0 → Basic Info
   if (step === 0 || isFinal) {
     if (!idNumber.trim()) errors.idNumber = "ID number is required.";
     else if (!/^\d{13}$/.test(idNumber.trim()))
       errors.idNumber = "Must be 13 digits.";
   }
 
+  // Step 1 → Contact Info
   if (step === 1 || isFinal) {
     if (!location.country.trim()) errors.country = "Country is required.";
     if (!location.city.trim()) errors.city = "City is required.";
@@ -27,60 +29,8 @@ export const validateStep = (step, formData, isFinal = false) => {
     if (!email.trim()) errors.email = "Email is required.";
   }
 
+  // Step 2 → Medical History (previously step 4)
   if (step === 2 || isFinal) {
-    const {
-      diet = [],
-      exercise = [],
-      hobbies = [],
-      livingSituation = [],
-      isSmoker,
-      smoking = { status: "never", packYears: "" },
-      usesAlcohol,
-      alcohol = { type: "None", frequency: "", amount: "" },
-      usesDrugs,
-      drugs = { type: "None", frequency: "", route: "" },
-    } = socialHistory;
-
-    // Optional: Normalize data to avoid undefined issues later
-    socialHistory.smoking = smoking;
-    socialHistory.alcohol = alcohol;
-    socialHistory.drugs = drugs;
-    socialHistory.diet = diet || "";
-    socialHistory.exercise = exercise || "";
-    socialHistory.hobbies = hobbies || "";
-    socialHistory.livingSituation = livingSituation || "";
-    socialHistory.isSmoker = isSmoker;
-    socialHistory.usesAlcohol = usesAlcohol;
-    socialHistory.usesDrugs = usesDrugs;
-
-    if (!diet.length) errors.diet = "Select at least one diet option.";
-    if (!exercise.length)
-      errors.exercise = "Select at least one exercise option.";
-    if (!hobbies.length) errors.hobbies = "Select at least one hobby.";
-    if (!livingSituation.length)
-      errors.livingSituation = "Select at least one living situation.";
-  }
-
-  if (step === 3 || isFinal) {
-    const {
-      medications = [],
-      food = [],
-      environmental = [],
-      other = { isChecked: false, text: "" },
-    } = allergies;
-
-    if (!medications.length)
-      errors.medications = "Add at least one medication allergy.";
-    if (!food.length) errors.food = "Add at least one food allergy.";
-    if (!environmental.length)
-      errors.environmental = "Add at least one environmental allergy.";
-
-    if (other.isChecked && !other.text.trim()) {
-      errors.other = "Please specify other allergies.";
-    }
-  }
-
-  if (step === 4 || isFinal) {
     const fields = [
       "childhoodIllnesses",
       "adultIllnesses",
@@ -106,6 +56,61 @@ export const validateStep = (step, formData, isFinal = false) => {
         }
       }
     });
+  }
+
+  // Step 3 → Allergies (previously step 3)
+  if (step === 3 || isFinal) {
+    const {
+      medications = [],
+      food = [],
+      environmental = [],
+      other = { isChecked: false, text: "" },
+    } = allergies;
+
+    if (!medications.length)
+      errors.medications = "Add at least one medication allergy.";
+    if (!food.length) errors.food = "Add at least one food allergy.";
+    if (!environmental.length)
+      errors.environmental = "Add at least one environmental allergy.";
+
+    if (other.isChecked && !other.text.trim()) {
+      errors.other = "Please specify other allergies.";
+    }
+  }
+
+  // Step 4 → Social History (previously step 2)
+  if (step === 4 || isFinal) {
+    const {
+      diet = [],
+      exercise = [],
+      hobbies = [],
+      livingSituation = [],
+      isSmoker,
+      smoking = { status: "never", packYears: "" },
+      usesAlcohol,
+      alcohol = { type: "None", frequency: "", amount: "" },
+      usesDrugs,
+      drugs = { type: "None", frequency: "", route: "" },
+    } = socialHistory;
+
+    // Normalize data to avoid undefined issues
+    socialHistory.smoking = smoking;
+    socialHistory.alcohol = alcohol;
+    socialHistory.drugs = drugs;
+    socialHistory.diet = diet || "";
+    socialHistory.exercise = exercise || "";
+    socialHistory.hobbies = hobbies || "";
+    socialHistory.livingSituation = livingSituation || "";
+    socialHistory.isSmoker = isSmoker;
+    socialHistory.usesAlcohol = usesAlcohol;
+    socialHistory.usesDrugs = usesDrugs;
+
+    if (!diet.length) errors.diet = "Select at least one diet option.";
+    if (!exercise.length)
+      errors.exercise = "Select at least one exercise option.";
+    if (!hobbies.length) errors.hobbies = "Select at least one hobby.";
+    if (!livingSituation.length)
+      errors.livingSituation = "Select at least one living situation.";
   }
 
   return errors;
