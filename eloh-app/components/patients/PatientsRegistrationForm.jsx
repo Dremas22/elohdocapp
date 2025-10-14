@@ -62,8 +62,9 @@ const PatientsRegistrationForm = () => {
       food: [],
       environmental: [],
       other: {
-        isChecked: false,
-        text: "",
+        medications: { isChecked: false, text: "" },
+        food: { isChecked: false, text: "" },
+        environmental: { isChecked: false, text: "" },
       },
     },
   };
