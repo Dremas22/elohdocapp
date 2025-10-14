@@ -14,9 +14,9 @@ import ProgressBar from "./ProgressBar";
 const steps = [
   Step1BasicInfo,
   Step2ContactInfo,
-  Step3SocialHistory,
-  Step4Allergies,
   Step5MedicalHistory,
+  Step4Allergies,
+  Step3SocialHistory,
 ];
 
 const PatientsRegistrationForm = () => {
@@ -144,8 +144,6 @@ const PatientsRegistrationForm = () => {
   if (loading)
     return <p className="text-center text-black py-10">Loading...</p>;
 
-  console.log(formData, "FORM_DATA");
-
   return (
     <div className="w-full max-w-2xl mx-auto px-6 py-8 bg-white rounded-3xl transition-all duration-500">
       <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">
@@ -155,7 +153,7 @@ const PatientsRegistrationForm = () => {
       {/* Progress Bar */}
       <ProgressBar
         currentStep={currentStep}
-        steps={["Personal", "Contact", "Social", "Allergies", "Medical"]}
+        steps={["Personal", "Contact", "Medical", "Allergies", "Social"]}
       />
 
       <CurrentStepComponent
