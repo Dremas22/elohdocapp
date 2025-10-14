@@ -92,7 +92,7 @@ const useSaveMedicalHistory = () => {
 
       const result = await res.json();
 
-      const msg = `${noteLabelMap[mode] || "Note"} saved successfully.`;
+      const msg = `${noteType || "Note"} saved successfully.`;
       setSuccessMessage(msg);
 
       return { success: true, data: result, message: msg };

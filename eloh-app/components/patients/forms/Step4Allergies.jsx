@@ -1,12 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  FaHeartbeat,
-  FaPills,
-  FaUtensils,
-  FaLeaf,
-} from "react-icons/fa";
+import { FaHeartbeat, FaPills, FaUtensils, FaLeaf } from "react-icons/fa";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 
 const groupedAllergySections = [
@@ -79,28 +74,33 @@ const Step4Allergies = ({ formData, setFormData, errors }) => {
       },
     });
   };
-
-  const handleOtherCheckbox = () => {
+  const handleOtherCheckbox = (type) => {
     setFormData({
       ...formData,
       allergies: {
         ...allergies,
         other: {
           ...allergies.other,
-          isChecked: !allergies.other.isChecked,
+          [type]: {
+            ...allergies.other[type],
+            isChecked: !allergies.other[type].isChecked,
+          },
         },
       },
     });
   };
 
-  const handleOtherTextChange = (text) => {
+  const handleOtherTextChange = (type, text) => {
     setFormData({
       ...formData,
       allergies: {
         ...allergies,
         other: {
           ...allergies.other,
-          text,
+          [type]: {
+            ...allergies.other[type],
+            text,
+          },
         },
       },
     });
@@ -151,9 +151,7 @@ const Step4Allergies = ({ formData, setFormData, errors }) => {
                     <input
                       type="checkbox"
                       checked={allergies[group.field]?.includes(option)}
-                      onChange={() =>
-                        handleCheckboxChange(group.field, option)
-                      }
+                      onChange={() => handleCheckboxChange(group.field, option)}
                       className="h-5 w-5 accent-[#0077b6] cursor-pointer"
                     />
                   </label>
@@ -164,20 +162,22 @@ const Step4Allergies = ({ formData, setFormData, errors }) => {
                   <label className="flex items-center gap-2 text-sm font-semibold text-gray-900 mb-2">
                     <input
                       type="checkbox"
-                      checked={allergies.other?.isChecked || false}
-                      onChange={handleOtherCheckbox}
+                      checked={
+                        allergies.other?.[group.field]?.isChecked || false
+                      }
+                      onChange={() => handleOtherCheckbox(group.field)}
                       className="h-5 w-5 accent-[#0077b6]"
                     />
                     <span>Other</span>
                   </label>
 
-                  {allergies.other?.isChecked && (
+                  {allergies.other?.[group.field]?.isChecked && (
                     <input
                       type="text"
                       placeholder="Please specify"
-                      value={allergies.other?.text || ""}
+                      value={allergies.other?.[group.field]?.text || ""}
                       onChange={(e) =>
-                        handleOtherTextChange(e.target.value)
+                        handleOtherTextChange(group.field, e.target.value)
                       }
                       className="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-[#0077b6] outline-none"
                     />
