@@ -22,17 +22,25 @@ export default function GlobalError({ error, reset }) {
   return (
     <html lang="en">
       <head>
-        <title>Error 🚨</title>
+        <title>Something Went Wrong 🚨 | ElohApp</title>
         <meta
           name="description"
-          content="We’re having trouble loading this page right now. Please try again or sign back in."
+          content="Oops! We’re having trouble loading this page right now. Please try again or return to the homepage."
+        />
+        <meta name="robots" content="noindex" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link
+          rel="shortcut icon"
+          href="/images/elohdoc.png"
+          type="image/x-icon"
         />
       </head>
       <body className="min-h-screen bg-gray-100 pt-20 flex items-center justify-center">
         <div className="text-center text-blue-600">
           <h2 className="text-lg font-medium">Oops! Something went wrong 😥</h2>
           <p className="text-sm mt-1">
-            We’re having trouble loading this page right now. Please try again or sign back in.
+            We’re having trouble loading this page right now. Please try again
+            or sign back in.
           </p>
           <button
             onClick={handleAuthAction}

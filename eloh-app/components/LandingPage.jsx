@@ -4,7 +4,8 @@ import React from "react";
 import ChooseDesignation from "../components/selection";
 import Video from "../components/video";
 import Navbar from "./MainNavbar";
-import AmbulanceButton from "./AmbulanceButton";
+import Subscriptions from "./subscriptions/page";
+
 
 const LandingPage = () => {
   return (
@@ -12,8 +13,12 @@ const LandingPage = () => {
       <Navbar />
       <div>
         <Video />
+        <div className="mb-25">
+          <Subscriptions />
+        </div>
+
         <ChooseDesignation />
-        <div className="relative w-full bg-black ">
+        <div className="relative -mt-5 w-full bg-black ">
           <img
             src="/images/banner1a.png"
             alt="ElohDoc Banner"
