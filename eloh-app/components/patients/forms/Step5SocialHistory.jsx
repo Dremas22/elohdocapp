@@ -4,7 +4,6 @@ import { useState } from "react";
 import { FaHeartbeat, FaRunning, FaGlassCheers, FaHome } from "react-icons/fa";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 
-// Sections and fields
 const groupedSections = [
   {
     title: "Substance Use",
@@ -23,13 +22,30 @@ const groupedSections = [
   },
 ];
 
-// Options per field
 const fieldOptions = {
   alcohol: ["Current", "Occasional", "None", "Other"],
-  smoking: ["Current", "Occasional", "Never", "None", "Other"], // fixed
+  smoking: ["Current", "Occasional", "Never", "None", "Other"],
   drugs: ["Current", "Occasional", "None", "Other"],
-  diet: ["Balanced", "Vegetarian", "Vegan", "Low-carb", "High-Protein", "Mediterranean", "Unhealthy", "Skips Meals", "Other"],
-  exercise: ["Never", "Light", "Moderate", "Intense", "Home-Gym", "Sedentary", "Other"],
+  diet: [
+    "Balanced",
+    "Vegetarian",
+    "Vegan",
+    "Low-carb",
+    "High-Protein",
+    "Mediterranean",
+    "Unhealthy",
+    "Skips Meals",
+    "Other",
+  ],
+  exercise: [
+    "Never",
+    "Light",
+    "Moderate",
+    "Intense",
+    "Home-Gym",
+    "Sedentary",
+    "Other",
+  ],
   hobbies: ["Reading", "Sports", "Travel", "Music", "None", "Other"],
   livingSituation: [
     "Alone",
@@ -43,10 +59,6 @@ const fieldOptions = {
   ],
 };
 
-
-
-
-// Labels for display
 const fieldLabels = {
   alcohol: "Alcohol Use",
   smoking: "Smoking Habits",
@@ -57,24 +69,24 @@ const fieldLabels = {
   livingSituation: "",
 };
 
-const Step5SocialHistory = ({ formData, setFormData }) => {
+const Step5SocialHistory = ({ formData, setFormData, errors }) => {
   const [expanded, setExpanded] = useState(null);
   const { socialHistory } = formData;
 
-  const toggleSection = (index) => setExpanded(expanded === index ? null : index);
+  const toggleSection = (index) =>
+    setExpanded(expanded === index ? null : index);
 
   const handleCheckboxChange = (field, value) => {
-    const current = Array.isArray(socialHistory[field]) ? socialHistory[field] : [];
+    const current = Array.isArray(socialHistory[field])
+      ? socialHistory[field]
+      : [];
     const updated = current.includes(value)
       ? current.filter((v) => v !== value)
       : [...current, value];
 
     setFormData({
       ...formData,
-      socialHistory: {
-        ...socialHistory,
-        [field]: updated,
-      },
+      socialHistory: { ...socialHistory, [field]: updated },
     });
   };
 
@@ -91,8 +103,7 @@ const Step5SocialHistory = ({ formData, setFormData }) => {
   return (
     <section className="mt-6 bg-white text-gray-800 border border-gray-200 rounded-3xl p-4 sm:p-6 shadow-md">
       <h3 className="text-2xl font-bold text-[#023e8a] mb-6 flex items-center gap-3">
-        <FaHeartbeat className="text-red-500 text-xl" />
-        Social History
+        <FaHeartbeat className="text-red-500 text-xl" /> Social History
       </h3>
 
       <div className="space-y-5">
@@ -108,7 +119,9 @@ const Step5SocialHistory = ({ formData, setFormData }) => {
             >
               <div className="flex items-center gap-2 sm:gap-3">
                 {group.icon}
-                <h4 className="text-lg font-semibold text-gray-800">{group.title}</h4>
+                <h4 className="text-lg font-semibold text-gray-800">
+                  {group.title}
+                </h4>
               </div>
               {expanded === index ? (
                 <MdExpandLess className="text-2xl text-gray-600" />
@@ -123,7 +136,11 @@ const Step5SocialHistory = ({ formData, setFormData }) => {
                 {group.fields.map((field) => (
                   <div
                     key={field}
-                    className={`bg-[#f9fafb] rounded-xl lg:-ml-5 p-4 sm:p-4 border border-gray-100 w-[26vh] ${["livingSituation", "drugs", "hobbies"].includes(field) ? "lg:w-[45vh]" : ""}`}
+                    className={`bg-[#f9fafb] rounded-xl lg:-ml-5 p-4 sm:p-4 border border-gray-100 w-[26vh] ${
+                      ["livingSituation", "drugs", "hobbies"].includes(field)
+                        ? "lg:w-[45vh]"
+                        : ""
+                    }`}
                   >
                     {fieldLabels[field] && (
                       <h5 className="text-sm sm:text-base font-bold text-gray-900 mb-2 sm:mb-3">
@@ -136,9 +153,17 @@ const Step5SocialHistory = ({ formData, setFormData }) => {
                       {fieldOptions[field].map((option) => (
                         <label
                           key={option}
-                          className={`flex flex-wrap w-[32vh] items-center justify-between bg-white hover:bg-[#f1f5f9] rounded-lg p-2 sm:p-3 border border-gray-200 transition-all duration-200 font-semibold text-gray-900 w-full ${["livingSituation", "drugs", "hobbies"].includes(field) ? "lg:w-[35vh]" : ""}`}
+                          className={`flex flex-wrap items-center justify-between bg-white hover:bg-[#f1f5f9] rounded-lg p-2 sm:p-3 border border-gray-200 transition-all duration-200 font-semibold text-gray-900 w-full ${
+                            ["livingSituation", "drugs", "hobbies"].includes(
+                              field
+                            )
+                              ? "lg:w-[35vh]"
+                              : ""
+                          }`}
                         >
-                          <span className="text-sm sm:text-base font-semibold break-words">{option}</span>
+                          <span className="text-sm sm:text-base font-semibold break-words">
+                            {option}
+                          </span>
                           <input
                             type="checkbox"
                             checked={
@@ -152,7 +177,7 @@ const Step5SocialHistory = ({ formData, setFormData }) => {
                         </label>
                       ))}
 
-                      {/* Only show 'Other' input if 'Other' selected */}
+                      {/* 'Other' input */}
                       {Array.isArray(socialHistory[field]) &&
                         socialHistory[field].includes("Other") && (
                           <input
@@ -160,12 +185,40 @@ const Step5SocialHistory = ({ formData, setFormData }) => {
                             placeholder="Please specify"
                             value={
                               socialHistory[
-                              `other${field.charAt(0).toUpperCase() + field.slice(1)}`
+                                `other${
+                                  field.charAt(0).toUpperCase() + field.slice(1)
+                                }`
                               ] || ""
                             }
-                            onChange={(e) => handleOtherChange(field, e.target.value)}
+                            onChange={(e) =>
+                              handleOtherChange(field, e.target.value)
+                            }
                             className="w-full border border-gray-300 rounded-lg p-2 sm:p-2.5 text-sm sm:text-base focus:ring-2 focus:ring-[#0077b6] outline-none mt-2"
                           />
+                        )}
+
+                      {/* Validation errors */}
+                      {errors[field] && (
+                        <p className="text-sm text-red-600 mt-1">
+                          {errors[field]}
+                        </p>
+                      )}
+                      {Array.isArray(socialHistory[field]) &&
+                        socialHistory[field].includes("Other") &&
+                        errors[
+                          `other${
+                            field.charAt(0).toUpperCase() + field.slice(1)
+                          }`
+                        ] && (
+                          <p className="text-sm text-red-600 mt-1">
+                            {
+                              errors[
+                                `other${
+                                  field.charAt(0).toUpperCase() + field.slice(1)
+                                }`
+                              ]
+                            }
+                          </p>
                         )}
                     </div>
                   </div>
