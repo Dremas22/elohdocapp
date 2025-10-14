@@ -4,7 +4,6 @@ import {
   FaSmoking,
   FaHeartbeat,
   FaUtensils,
-  FaPills,
   FaRunning,
   FaGlassCheers,
   FaHome,
