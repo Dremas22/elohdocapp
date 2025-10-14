@@ -5,18 +5,18 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { useRouter } from "next/navigation";
 import Step1BasicInfo from "./forms/Step1BasicInfo";
 import Step2ContactInfo from "./forms/Step2ContactInfo";
-import Step3SocialHistory from "./forms/Step3SocialHistory";
+import Step3MedicalHistory from "./forms/Step3MedicalHistory";
 import Step4Allergies from "./forms/Step4Allergies";
-import Step5MedicalHistory from "./forms/Step5MedicalHistory";
+import Step5SocialHistory from "./forms/Step5SocialHistory";
 import { validateStep } from "@/utils/validateForm";
 import ProgressBar from "./ProgressBar";
 
 const steps = [
   Step1BasicInfo,
   Step2ContactInfo,
-  Step5MedicalHistory,
+  Step3MedicalHistory,
   Step4Allergies,
-  Step3SocialHistory,
+  Step5SocialHistory,
 ];
 
 const PatientsRegistrationForm = () => {
