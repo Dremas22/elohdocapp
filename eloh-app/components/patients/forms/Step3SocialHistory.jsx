@@ -1,254 +1,194 @@
 "use client";
 
+import { useState } from "react";
 import {
-  dietOptions,
-  exerciseOptions,
-  hobbiesOptions,
-  livingSituationOptions,
-} from "@/constants/socialOptions";
+  FaSmoking,
+  FaHeartbeat,
+  FaUtensils,
+  FaRunning,
+  FaGlassCheers,
+  FaHome,
+  FaStar,
+  FaCannabis,
+} from "react-icons/fa";
+import { MdExpandMore, MdExpandLess } from "react-icons/md";
 
-const Step3SocialHistory = ({ formData, setFormData, errors }) => {
-  const { socialHistory } = formData;
+const groupedSections = [
+  {
+    title: "Substance Use",
+    icon: <FaGlassCheers className="text-yellow-600" />,
+    fields: ["usesAlcohol", "alcohol", "isSmoker", "smoking", "usesDrugs", "drugs"],
+  },
+  {
+    title: "Lifestyle & Habits",
+    icon: <FaRunning className="text-blue-700" />,
+    fields: ["diet", "exercise", "hobbies"],
+  },
+  {
+    title: "Living Situation",
+    icon: <FaHome className="text-indigo-600" />,
+    fields: ["livingSituation"],
+  },
+];
 
-  const handleCheckboxChange = (field, value) => {
-    const currentArray = socialHistory[field] || [];
-    if (currentArray.includes(value)) {
-      setFormData({
-        ...formData,
-        socialHistory: {
-          ...socialHistory,
-          [field]: currentArray.filter((v) => v !== value),
-        },
-      });
-    } else {
-      setFormData({
-        ...formData,
-        socialHistory: {
-          ...socialHistory,
-          [field]: [...currentArray, value],
-        },
-      });
-    }
+const fieldLabels = {
+  usesAlcohol: "Do you currently use alcohol?",
+  alcohol: "Alcohol Details",
+  isSmoker: "Do you currently smoke?",
+  smoking: "Smoking Details",
+  usesDrugs: "Do you use recreational drugs?",
+  drugs: "Drug Details",
+  diet: "Dietary Habits",
+  exercise: "Exercise Routine",
+  hobbies: "Hobbies & Interests",
+  livingSituation: "Living Situation",
+};
+
+const Step3SocialHistory = ({ formData, setFormData }) => {
+  const [expanded, setExpanded] = useState(null);
+  const socialHistory = formData.socialHistory;
+
+  const toggleSection = (index) => {
+    setExpanded(expanded === index ? null : index);
   };
 
-  const handleOtherChange = (field, value) => {
-    setFormData({
-      ...formData,
+  const handleCheckboxChange = (key) => {
+    setFormData((prev) => ({
+      ...prev,
+      socialHistory: { ...prev.socialHistory, [key]: !prev.socialHistory[key] },
+    }));
+  };
+
+  const handleInputChange = (key, subKey, value) => {
+    setFormData((prev) => ({
+      ...prev,
       socialHistory: {
-        ...socialHistory,
-        [`other${field.charAt(0).toUpperCase() + field.slice(1)}`]: value,
+        ...prev.socialHistory,
+        [key]: typeof prev.socialHistory[key] === "object"
+          ? { ...prev.socialHistory[key], [subKey]: value }
+          : value,
       },
-    });
+    }));
   };
-
-  const renderArrayOptions = (field, options) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-      {options.map((option) => (
-        <label key={option} className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={socialHistory[field]?.includes(option) || false}
-            onChange={() => handleCheckboxChange(field, option)}
-            className="w-5 h-5"
-          />
-          <span className="text-gray-700">{option}</span>
-        </label>
-      ))}
-
-      {socialHistory[field]?.includes("Other") && (
-        <>
-          <input
-            type="text"
-            placeholder="Please specify"
-            value={
-              socialHistory[
-                `other${field.charAt(0).toUpperCase() + field.slice(1)}`
-              ] || ""
-            }
-            onChange={(e) => handleOtherChange(field, e.target.value)}
-            className="mt-2 w-full border border-gray-300 rounded-lg text-black px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
-          />
-          {errors[`other${field.charAt(0).toUpperCase() + field.slice(1)}`] && (
-            <p className="text-sm text-red-600 mt-1">
-              {errors[`other${field.charAt(0).toUpperCase() + field.slice(1)}`]}
-            </p>
-          )}
-        </>
-      )}
-
-      {errors[field] && (
-        <p className="text-sm text-red-600 mt-1">{errors[field]}</p>
-      )}
-    </div>
-  );
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-md border border-blue-100 space-y-6">
-      <h2 className="text-xl font-semibold text-blue-800">Social History</h2>
-      <p className="text-sm text-gray-500">
-        Please select your lifestyle and habits. You may choose more than one.
-      </p>
+    <section className="mt-6 bg-white text-gray-800 border border-gray-200 rounded-3xl p-6 shadow-md">
+      <h3 className="text-2xl font-bold text-[#023e8a] mb-6 flex items-center gap-3">
+        <FaHeartbeat className="text-red-500 text-xl" />
+        Social History
+      </h3>
 
-      <div>
-        <h3 className="text-md font-medium text-blue-700 mb-2">Smoking</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {["Never", "Former", "Current", "Other"].map((option) => (
-            <label key={option} className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="smoking"
-                checked={socialHistory.smoking.status === option}
-                onChange={() =>
-                  setFormData({
-                    ...formData,
-                    socialHistory: {
-                      ...socialHistory,
-                      smoking: { ...socialHistory.smoking, status: option },
-                    },
-                  })
-                }
-                className="w-5 h-5"
-              />
-              <span className="text-gray-700">{option}</span>
-            </label>
-          ))}
-          {socialHistory.smoking.status === "Other" && (
-            <input
-              type="text"
-              placeholder="Please specify"
-              value={socialHistory.smoking.packYears}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  socialHistory: {
-                    ...socialHistory,
-                    smoking: {
-                      ...socialHistory.smoking,
-                      packYears: e.target.value,
-                    },
-                  },
-                })
-              }
-              className="mt-2 w-full border border-gray-300 rounded-lg text-black px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            />
-          )}
-        </div>
-      </div>
+      <div className="space-y-5">
+        {groupedSections.map((group, index) => (
+          <div
+            key={group.title}
+            className="border border-gray-200 rounded-2xl shadow-sm bg-gray-50 hover:shadow-md transition-all duration-300"
+          >
+            <button
+              onClick={() => toggleSection(index)}
+              className="w-full flex justify-between items-center px-5 py-4 text-left rounded-t-2xl"
+            >
+              <div className="flex items-center gap-3">
+                {group.icon}
+                <h4 className="text-lg font-semibold text-gray-800">
+                  {group.title}
+                </h4>
+              </div>
+              {expanded === index ? (
+                <MdExpandLess className="text-2xl text-gray-600" />
+              ) : (
+                <MdExpandMore className="text-2xl text-gray-600" />
+              )}
+            </button>
 
-      <div>
-        <h3 className="text-md font-medium text-blue-700 mb-2">Alcohol</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {["None", "Occasionally", "Regularly", "Other"].map((option) => (
-            <label key={option} className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="alcohol"
-                checked={socialHistory.alcohol.type === option}
-                onChange={() =>
-                  setFormData({
-                    ...formData,
-                    socialHistory: {
-                      ...socialHistory,
-                      alcohol: { ...socialHistory.alcohol, type: option },
-                    },
-                  })
-                }
-                className="w-5 h-5"
-              />
-              <span className="text-gray-700">{option}</span>
-            </label>
-          ))}
-          {socialHistory.alcohol.type === "Other" && (
-            <input
-              type="text"
-              placeholder="Please specify"
-              value={socialHistory.alcohol.frequency}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  socialHistory: {
-                    ...socialHistory,
-                    alcohol: {
-                      ...socialHistory.alcohol,
-                      frequency: e.target.value,
-                    },
-                  },
-                })
-              }
-              className="mt-2 w-full border border-gray-300 rounded-lg text-black px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            />
-          )}
-        </div>
-      </div>
+            {expanded === index && (
+              <div className="px-6 pb-5 grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-gray-200 bg-white rounded-b-2xl">
+                {group.fields.map((key) => {
+                  const value = socialHistory?.[key];
 
-      <div>
-        <h3 className="text-md font-medium text-blue-700 mb-2">Drugs</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {["None", "Occasionally", "Regularly", "Other"].map((option) => (
-            <label key={option} className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="drugs"
-                checked={socialHistory.drugs.type === option}
-                onChange={() =>
-                  setFormData({
-                    ...formData,
-                    socialHistory: {
-                      ...socialHistory,
-                      drugs: { ...socialHistory.drugs, type: option },
-                    },
-                  })
-                }
-                className="w-5 h-5"
-              />
-              <span className="text-gray-700">{option}</span>
-            </label>
-          ))}
-          {socialHistory.drugs.type === "Other" && (
-            <input
-              type="text"
-              placeholder="Please specify"
-              value={socialHistory.drugs.frequency}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  socialHistory: {
-                    ...socialHistory,
-                    drugs: {
-                      ...socialHistory.drugs,
-                      frequency: e.target.value,
-                    },
-                  },
-                })
-              }
-              className="mt-2 w-full border border-gray-300 rounded-lg text-black px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            />
-          )}
-        </div>
-      </div>
+                  // Checkboxes for Yes/No fields
+                  if (typeof value === "boolean") {
+                    return (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between bg-[#f9fafb] hover:bg-[#f1f5f9] rounded-xl p-3 transition-all duration-200 border border-gray-100"
+                      >
+                        <label
+                          htmlFor={key}
+                          className="text-sm font-semibold text-gray-900 cursor-pointer"
+                        >
+                          {fieldLabels[key]}
+                        </label>
+                        <input
+                          id={key}
+                          type="checkbox"
+                          checked={value}
+                          onChange={() => handleCheckboxChange(key)}
+                          className="h-5 w-5 accent-[#0077b6] cursor-pointer"
+                        />
+                      </div>
+                    );
+                  }
 
-      <div>
-        <h3 className="text-md font-medium text-blue-700 mb-2">Diet</h3>
-        {renderArrayOptions("diet", dietOptions)}
-      </div>
+                  // Text inputs for object fields
+                  if (typeof value === "object" && value !== null) {
+                    return (
+                      <div
+                        key={key}
+                        className="bg-[#f9fafb] rounded-xl p-3 border border-gray-100"
+                      >
+                        <h5 className="text-sm font-semibold text-gray-900 mb-2">
+                          {fieldLabels[key]}
+                        </h5>
+                        <div className="space-y-2">
+                          {Object.entries(value).map(([subKey, subValue]) => (
+                            <div key={subKey}>
+                              <label className="block text-xs text-gray-600 capitalize mb-1">
+                                {subKey}
+                              </label>
+                              <input
+                                type="text"
+                                value={subValue || ""}
+                                onChange={(e) =>
+                                  handleInputChange(key, subKey, e.target.value)
+                                }
+                                className="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-[#0077b6] outline-none"
+                                placeholder={`Enter ${subKey}...`}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
 
-      <div>
-        <h3 className="text-md font-medium text-blue-700 mb-2">Exercise</h3>
-        {renderArrayOptions("exercise", exerciseOptions)}
+                  // Regular text inputs (e.g., diet, hobbies)
+                  return (
+                    <div
+                      key={key}
+                      className="bg-[#f9fafb] rounded-xl p-3 border border-gray-100"
+                    >
+                      <label className="text-sm font-semibold text-gray-900 mb-1 block">
+                        {fieldLabels[key]}
+                      </label>
+                      <input
+                        type="text"
+                        value={value || ""}
+                        onChange={(e) =>
+                          handleInputChange(key, null, e.target.value)
+                        }
+                        className="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-[#0077b6] outline-none"
+                        placeholder={`Enter ${fieldLabels[key]}...`}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
-
-      <div>
-        <h3 className="text-md font-medium text-blue-700 mb-2">Hobbies</h3>
-        {renderArrayOptions("hobbies", hobbiesOptions)}
-      </div>
-
-      <div>
-        <h3 className="text-md font-medium text-blue-700 mb-2">
-          Living Situation
-        </h3>
-        {renderArrayOptions("livingSituation", livingSituationOptions)}
-      </div>
-    </div>
+    </section>
   );
 };
 
