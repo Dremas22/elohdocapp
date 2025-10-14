@@ -8,7 +8,9 @@ import {
   doc,
   getDoc,
   onSnapshot,
+  query,
   setDoc,
+  where,
 } from "firebase/firestore";
 import { FiSearch } from "react-icons/fi";
 import AddUser from "./AddUser";
@@ -61,10 +63,20 @@ const ChatList = ({ role }) => {
 
     const mergeAndSet = () => {
       const unique = new Map();
+
+      // Filter userChatsData for patients to remove unavailable staff
+      const filteredUserChatsData =
+        currentUser.role === "patient" || currentUser.role === "customer"
+          ? userChatsData.filter((c) => c.user?.available !== false)
+          : userChatsData;
+
+      // Merge defaultUsersData
       defaultUsersData.forEach((u) => {
         if (u?.user?.userId) unique.set(u.user.userId, u);
       });
-      userChatsData.forEach((c) => {
+
+      // Merge filteredUserChatsData
+      filteredUserChatsData.forEach((c) => {
         if (c?.user?.userId) unique.set(c.user.userId, c);
       });
 
@@ -76,12 +88,8 @@ const ChatList = ({ role }) => {
         currentUser.consultationType === "all"
       ) {
         finalChats = finalChats.filter((c) => {
-          if (activeSubType === "doctor") {
-            return c.user?.role === "doctor";
-          }
-          if (activeSubType === "nurse") {
-            return c.user?.role === "nurse";
-          }
+          if (activeSubType === "doctor") return c.user?.role === "doctor";
+          if (activeSubType === "nurse") return c.user?.role === "nurse";
           return true;
         });
       }
@@ -187,7 +195,20 @@ const ChatList = ({ role }) => {
     }
 
     collectionsToListen.forEach((col) => {
-      const unSubCol = onSnapshot(collection(db, col), (snap) => {
+      let q;
+
+      if (currentUser?.role === "patient") {
+        // ✅ Patients only see available staff
+        if (col === "doctors" || col === "nurses") {
+          q = query(collection(db, col), where("available", "==", true));
+        } else {
+          q = collection(db, col);
+        }
+      } else {
+        q = collection(db, col);
+      }
+
+      const unSubCol = onSnapshot(q, (snap) => {
         defaultUsersData = snap.docs.map((docSnap) => ({
           chatId: docSnap.id,
           receiverId: docSnap.id,
@@ -198,6 +219,7 @@ const ChatList = ({ role }) => {
         }));
         mergeAndSet();
       });
+
       unsubs.push(unSubCol);
     });
 
@@ -294,19 +316,21 @@ const ChatList = ({ role }) => {
         currentUser?.consultationType === "all" && (
           <div className="flex gap-2 py-1.5 px-4 lg:mb-3 -mt-2 mb-1 flex-shrink-0">
             <button
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${activeSubType === "doctor"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-700 text-gray-300"
-                }`}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${
+                activeSubType === "doctor"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-700 text-gray-300"
+              }`}
               onClick={() => setActiveSubType("doctor")}
             >
               Doctors
             </button>
             <button
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${activeSubType === "nurse"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-700 text-gray-300"
-                }`}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer ${
+                activeSubType === "nurse"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-700 text-gray-300"
+              }`}
               onClick={() => setActiveSubType("nurse")}
             >
               Nurses
@@ -320,10 +344,11 @@ const ChatList = ({ role }) => {
           <div
             key={chat?.chatId}
             onClick={() => handleSelect(chat)}
-            className={`flex items-center gap-5 p-3 sm:p-5 cursor-pointer border-b border-gray-600 transition-colors ${chat?.isSeen
-              ? "bg-transparent hover:bg-gray-800"
-              : "bg-blue-600/50 hover:bg-blue-500/60"
-              }`}
+            className={`flex items-center gap-5 p-3 sm:p-5 cursor-pointer border-b border-gray-600 transition-colors ${
+              chat?.isSeen
+                ? "bg-transparent hover:bg-gray-800"
+                : "bg-blue-600/50 hover:bg-blue-500/60"
+            }`}
           >
             {chat.user?.photoUrl ? (
               <img
