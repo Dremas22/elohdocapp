@@ -82,7 +82,7 @@ const groupedMedicalSections = [
   },
 ];
 
-const Step5MedicalHistory = ({ formData, setFormData, errors }) => {
+const Step3MedicalHistory = ({ formData, setFormData, errors }) => {
   const [expanded, setExpanded] = useState(null);
   const { medicalHistory } = formData;
 
@@ -209,4 +209,4 @@ const Step5MedicalHistory = ({ formData, setFormData, errors }) => {
   );
 };
 
-export default Step5MedicalHistory;
+export default Step3MedicalHistory;
