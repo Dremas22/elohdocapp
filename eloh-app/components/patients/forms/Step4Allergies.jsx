@@ -35,6 +35,7 @@ const allergyOptions = {
     "Sulfa drugs",
     "Morphine / Opioids",
     "Antibiotic",
+    "None",
   ],
   food: [
     "Peanuts",
@@ -45,6 +46,7 @@ const allergyOptions = {
     "Eggs",
     "Wheat / Gluten",
     "Soy",
+    "None",
   ],
   environmental: [
     "Pollen",
@@ -53,6 +55,7 @@ const allergyOptions = {
     "Pet dander",
     "Insect stings",
     "Grass",
+    "None",
   ],
 };
 
