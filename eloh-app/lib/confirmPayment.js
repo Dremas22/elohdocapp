@@ -16,15 +16,17 @@ const confirmPayment = async (
       }
     );
 
+    const data = await res.json();
+
     if (!res.ok) {
-      const err = await res.json();
-      toastError(`Payment confirm failed: ${err.error}`);
+      toastError(`Payment confirm failed: ${data.error || "Unknown error"}`);
       return;
     }
 
-    const driver = await res.json();
+    const { driver, message } = data;
 
-    toastSuccess("Payment successful! Ambulance dispatched 🚑");
+    toastSuccess(`${message}` || "Payment successful! Ambulance dispatched 🚑");
+
     return driver;
   } catch (err) {
     console.error("Confirm payment error:", err);
