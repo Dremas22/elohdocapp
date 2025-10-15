@@ -7,7 +7,7 @@ import { useChatStore } from "@/hooks/useChatStore";
 
 const UserInfo = ({ setOpenChat }) => {
   const { currentUser } = useUserStore();
-  const { chatId, setChatId } = useChatStore(); // Access chat store
+  const { setChatId } = useChatStore();
   const fullName = getDisplayName(currentUser);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
