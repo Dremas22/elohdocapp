@@ -226,7 +226,7 @@ const NurseCollectionViewer = () => {
 
               {/* Chat App */}
               <div className="lg:w-[185vh] sm:w-[110vh] w-[45vh] lg:ml-5  md:-ml-5 -ml-3 h-auto flex flex-col pt-8 mb-9 flex-grow">
-                <ElohDocChatApp />
+                <ElohDocChatApp role="nurse" />
               </div>
 
               {/* Mobile Sidebar under main content */}
@@ -249,7 +249,7 @@ const NurseCollectionViewer = () => {
                 Verification Pending
               </h2>
               <p>
-                Once verified, you can access patient records and tools here.
+                Once verified, you can access nurse records and tools here.
               </p>
             </div>
           ) : (
