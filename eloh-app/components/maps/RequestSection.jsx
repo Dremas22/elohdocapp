@@ -116,7 +116,7 @@ export default function RequestSection(props) {
       <div className="mt-4">
         {fareDetails?.isPaid ? (
           <p className="text-green-700 font-semibold text-center">
-            Your request has been received. An ambulance is on its way.
+            Request received, we’re currently assigning the best available driver for you.
           </p>
         ) : (
           <button

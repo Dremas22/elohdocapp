@@ -133,7 +133,7 @@ const AboutUs = () => {
       </section>
 
       {/* Executive Team Section */}
-      <section className="py-20 bg-gradient-to-b from-[#e0f2fe] to-[#f8fafc]">
+      {/* <section className="py-20 bg-gradient-to-b from-[#e0f2fe] to-[#f8fafc]">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-[#023e8a]">
             Meet Our Executive Team
@@ -146,7 +146,7 @@ const AboutUs = () => {
         </div>
 
         <div className="flex flex-wrap justify-center gap-8 md:gap-12 px-6 md:px-0">
-          {/* Team Member 1 */}
+
           <div className="bg-white rounded-2xl shadow-lg w-[260px] text-center overflow-hidden border border-blue-100 hover:shadow-xl transition">
             <div className="w-full h-64 relative">
               <Image
@@ -162,7 +162,6 @@ const AboutUs = () => {
             </div>
           </div>
 
-          {/* Team Member 2 */}
           <div className="bg-white rounded-2xl shadow-lg w-[260px] text-center overflow-hidden border border-blue-100 hover:shadow-xl transition">
             <div className="w-full h-64 relative">
               <Image
@@ -178,7 +177,6 @@ const AboutUs = () => {
             </div>
           </div>
 
-          {/* Team Member 3 */}
           <div className="bg-white rounded-2xl shadow-lg w-[260px] text-center overflow-hidden border border-blue-100 hover:shadow-xl transition">
             <div className="w-full h-64 relative">
               <Image
@@ -194,7 +192,6 @@ const AboutUs = () => {
             </div>
           </div>
 
-          {/* Team Member 4 */}
           <div className="bg-white rounded-2xl shadow-lg w-[260px] text-center overflow-hidden border border-blue-100 hover:shadow-xl transition">
             <div className="w-full h-64 relative">
               <Image
@@ -210,7 +207,7 @@ const AboutUs = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
       <Footer />
     </main>
   );

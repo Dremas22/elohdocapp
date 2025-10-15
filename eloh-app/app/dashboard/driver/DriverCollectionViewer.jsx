@@ -130,12 +130,12 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
               )}
             </>
           ) : isVerified === false ? (
-            <div className="text-gray-400 text-center pt-30 lg:pl-55">
-              <h2 className="lg:text-3xl text-2xl font-semibold mb-2">
+            <div className="text-gray-400 text-center pt-30 lg:ml-150">
+              <h2 className="lg:text-3xl text-2xl lg:mr-100 font-semibold mb-2">
                 Verification Pending
               </h2>
-              <p className="lg:text-2xl text-xl">
-                Once your account is verified, you'll access patient information
+              <p className="lg:text-2xl lg:mr-100 text-xl">
+                Once your account is verified, you'll access driver information
                 here.
               </p>
             </div>
