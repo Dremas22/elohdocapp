@@ -12,13 +12,13 @@ const LandingPage = () => {
     <div className="flex flex-col min-h-screen relative">
       <Navbar />
       <div>
-        <Video />
-        <div className="mb-25">
-          <Subscriptions />
+        <div className="mt-15" >
+          <Video />
         </div>
-
-        <ChooseDesignation />
-        <div className="relative -mt-5 w-full bg-black ">
+        <div className="lg:mt-5 mt-30">
+          <ChooseDesignation />
+        </div>
+        <div className="relative lg:-mt-5 w-full ">
           <img
             src="/images/banner1a.png"
             alt="ElohDoc Banner"
