@@ -191,7 +191,7 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
           ) : isVerified === false ? (
             <div className="text-gray-600 mt-10 text-center">
               <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
-              <p>Once your account is verified, you'll access patient information here.</p>
+              <p>Once your account is verified, you'll access doctor information here.</p>
             </div>
           ) : (
             <div className="text-red-600 mt-10 text-center">

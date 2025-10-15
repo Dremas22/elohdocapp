@@ -1,29 +1,18 @@
+"use client";
+
 import Navbar from "@/components/MainNavbar";
+import Image from "next/image";
 import Link from "next/link";
-import {
-  FaHeartbeat,
-  FaStethoscope,
-  FaUserMd,
-  FaAmbulance,
-  FaLaptopMedical,
-  FaHandsHelping,
-} from "react-icons/fa";
 
-export const metadata = {
-  title: "Our Team | ElohApp",
-  description:
-    "Meet the doctors, nurses, drivers, and healthcare innovators behind ElohApp — united in delivering compassionate, accessible, and world-class telehealth services.",
-};
-
-const OurTeam = () => {
+const OurTeamPage = () => {
   const teamMembers = [
     {
       id: 1,
-      name: "Dr. Alice Johnson",
-      role: "Chief Medical Officer",
+      name: "Tshepo Masilo",
+      role: "Founder & Lead Developer",
       description:
-        "Leads our clinical operations and ensures ElohApp delivers safe, effective, and patient-centered healthcare.",
-      icon: <FaUserMd className="text-4xl text-[#00b4d8]" />,
+        "Qualified software developer with 2 years experience, robust background in leadership management, and more than 6 years entrepreneurship. Very talented at crafting intuitive design structures and architectural frameworks. As a natural optimist committed to integrity and collaboration, he aims to bring innovation, leadership, and technical proficiency to the forefront of the venture.",
+      image: "/images/tshepo.jpeg",
     },
     {
       id: 2,
@@ -31,7 +20,7 @@ const OurTeam = () => {
       role: "Senior Nurse",
       description:
         "Brings over 15 years of experience in emergency and outpatient care, ensuring quality support for every patient.",
-      icon: <FaStethoscope className="text-4xl text-[#00b4d8]" />,
+      image: "/images/default_avatar.jpg",
     },
     {
       id: 3,
@@ -39,7 +28,7 @@ const OurTeam = () => {
       role: "Telehealth Specialist",
       description:
         "Leads ElohApp’s remote consultation program, making healthcare accessible from anywhere, anytime.",
-      icon: <FaHeartbeat className="text-4xl text-[#00b4d8]" />,
+      image: "/images/default_avatar.jpg",
     },
     {
       id: 4,
@@ -47,7 +36,7 @@ const OurTeam = () => {
       role: "Emergency Response Driver",
       description:
         "Coordinates and executes urgent transportation for patients needing immediate medical attention.",
-      icon: <FaAmbulance className="text-4xl text-[#00b4d8]" />,
+      image: "/images/default_avatar.jpg",
     },
     {
       id: 5,
@@ -55,7 +44,7 @@ const OurTeam = () => {
       role: "Digital Health Coordinator",
       description:
         "Manages the integration of technology in our healthcare delivery, improving efficiency and accessibility.",
-      icon: <FaLaptopMedical className="text-4xl text-[#00b4d8]" />,
+      image: "/images/default_avatar.jpg",
     },
     {
       id: 6,
@@ -63,9 +52,10 @@ const OurTeam = () => {
       role: "Community Health Director",
       description:
         "Oversees outreach programs and partnerships to extend ElohApp’s impact into rural and underserved areas.",
-      icon: <FaHandsHelping className="text-4xl text-[#00b4d8]" />,
+      image: "/images/default_avatar.jpg",
     },
   ];
+
 
   return (
     <>
@@ -106,21 +96,14 @@ const OurTeam = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
             {[
               {
-                icon: <FaHeartbeat className="text-4xl text-[#00b4d8] mb-4" />,
                 title: "Compassion",
                 desc: "We treat every patient with empathy, dignity, and respect.",
               },
               {
-                icon: (
-                  <FaLaptopMedical className="text-4xl text-[#00b4d8] mb-4" />
-                ),
                 title: "Innovation",
                 desc: "We leverage technology to make healthcare more accessible and efficient.",
               },
               {
-                icon: (
-                  <FaHandsHelping className="text-4xl text-[#00b4d8] mb-4" />
-                ),
                 title: "Collaboration",
                 desc: "We work together — across departments and communities — to save lives.",
               },
@@ -129,7 +112,6 @@ const OurTeam = () => {
                 key={index}
                 className="bg-white rounded-2xl p-8 shadow hover:shadow-lg transition duration-300"
               >
-                {value.icon}
                 <h3 className="text-xl font-semibold text-[#03045e] mb-2">
                   {value.title}
                 </h3>
@@ -151,9 +133,6 @@ const OurTeam = () => {
           <p className="text-gray-600 mb-12 max-w-2xl mx-auto">
             Our multidisciplinary team blends clinical expertise with
             technological innovation to bring healthcare closer to you.
-            <span className="block mt-2 text-sm italic text-gray-500">
-              (All profiles below are mock data and will be replaced soon.)
-            </span>
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
@@ -162,13 +141,21 @@ const OurTeam = () => {
                 key={member.id}
                 className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-8 flex flex-col items-center text-center border border-gray-100 hover:-translate-y-1"
               >
-                <div className="flex justify-center items-center bg-[#e0f7ff] w-20 h-20 rounded-full mb-5 shadow-inner">
-                  {member.icon}
+                <div className="relative w-24 h-24 mb-5 rounded-full overflow-hidden shadow-md border-4 border-[#e0f7ff]">
+                  <Image
+                    src={member.image}
+                    alt={member.name}
+                    fill
+                    sizes="100%"
+                    className="object-cover"
+                  />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800">
                   {member.name}
                 </h3>
-                <p className="text-[#00b4d8] font-medium mb-2">{member.role}</p>
+                <p className="text-[#00b4d8] font-medium mb-2">
+                  {member.role}
+                </p>
                 <p className="text-gray-600 text-sm leading-relaxed">
                   {member.description}
                 </p>
@@ -199,4 +186,4 @@ const OurTeam = () => {
   );
 };
 
-export default OurTeam;
+export default OurTeamPage;
