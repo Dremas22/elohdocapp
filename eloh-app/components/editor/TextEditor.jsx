@@ -65,6 +65,18 @@ const RichTextEditor = ({ roomID }) => {
     fetchPatientData();
   }, [patientId]);
 
+  // 🔹 Automatically clear messages after 5 seconds
+  useEffect(() => {
+    if (error || successMessage) {
+      const timer = setTimeout(() => {
+        resetError();
+        resetSuccess();
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error, successMessage]);
+
   // Show loading message while user or auth state is loading
   if (loading || !currentUser) return <p>Loading...</p>;
 
