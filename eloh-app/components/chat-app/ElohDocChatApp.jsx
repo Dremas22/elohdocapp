@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 
 const ElohDocChatApp = ({ setOpenChat, role }) => {
   const { currentUser, isLoading } = useUserStore();
-  const { chatId, setChatId } = useChatStore();
+  const { chatId } = useChatStore();
   const router = useRouter();
   const [viewMode, setViewMode] = useState("desktop");
 
@@ -70,7 +70,7 @@ const ElohDocChatApp = ({ setOpenChat, role }) => {
       {viewMode === "mobile" && (
         <>
           {!chatId ? (
-            <List />
+            <List setOpenChat={setOpenChat} />
           ) : (
             <div className="flex flex-col w-full h-[60vh] relative">
               <ChatApp role={role} />
