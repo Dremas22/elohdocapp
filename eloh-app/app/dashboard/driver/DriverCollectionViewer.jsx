@@ -37,8 +37,6 @@ const DriverCollectionViewer = ({ userDoc, customers, userId }) => {
     return () => unsubscribe();
   }, [userId]);
 
-  // TODO: CUSTOMERS HERE
-  console.log(customers, "CUSTOMERS");
 
   if (!userDocState) {
     return (
