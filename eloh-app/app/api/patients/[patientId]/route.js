@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(req, { params }) {
   try {
-    const { patientId } = params;
+    const { patientId } = await params;
 
     if (!patientId) {
       return NextResponse.json(

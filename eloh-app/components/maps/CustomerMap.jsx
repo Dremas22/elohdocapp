@@ -168,7 +168,7 @@ export default function CustomerMap({ userDoc }) {
           pickupAutocomplete.addListener("place_changed", () => {
             const place = pickupAutocomplete.getPlace();
             if (!place.geometry || !place.geometry.location) {
-              alert("Pickup place has no geometry");
+              console.log("Pickup place has no geometry");
               return;
             }
             const p = {
