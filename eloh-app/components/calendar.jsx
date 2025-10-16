@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useUserStore } from "@/hooks/useUserStore";
-import { useRouter } from "next/navigation";
 import { daysOfWeek } from "@/constants";
 import { getDaysInMonth } from "@/lib/timeUntil";
 import AppointmentCard from "./appointment/Appointment";
@@ -16,7 +15,15 @@ const roleTargets = {
   customer: "driver",
 };
 
-const Calendar = () => {
+/**
+ * Calendar component for scheduling and viewing appointments.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {Object} props.userDoc - Optional user document to use as context
+ * @returns {JSX.Element} Calendar UI with appointment scheduling
+ */
+const Calendar = ({ userDoc }) => {
   const today = new Date();
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
@@ -24,28 +31,31 @@ const Calendar = () => {
   const [time, setTime] = useState("");
   const [note, setNote] = useState("");
   const [scheduledAppointments, setScheduledAppointments] = useState([]);
-  const [patients, setPatients] = useState([]);
-  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [relatedUsers, setRelatedUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
   const { currentUser } = useUserStore();
-  const router = useRouter();
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
 
-  // Fetch appointments & patients
+  // Fetch appointments & related users (patients or staff)
   const fetchAppointments = async () => {
-    if (!currentUser) return;
+    if (!currentUser || !userDoc) return;
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/appointments`,
-        { method: "GET" }
+        {
+          method: "GET",
+        }
       );
       const data = await res.json();
+
       if (res.ok && data.authenticated) {
         setScheduledAppointments(data.appointments || []);
-        setPatients(data.patients || []);
-        // auto-select first patient if available
-        if (data.patients?.length) setSelectedPatient(data.patients[0]);
+        setRelatedUsers(data.relatedUsers || []);
+
+        // auto-select first related user if available
+        if (data.relatedUsers?.length) setSelectedUser(data.relatedUsers[0]);
       }
     } catch (err) {
       console.error("Error fetching appointments:", err);
@@ -54,7 +64,7 @@ const Calendar = () => {
 
   useEffect(() => {
     fetchAppointments();
-  }, [currentUser?.userId]);
+  }, [currentUser?.userId, userDoc?.userId]);
 
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
@@ -88,22 +98,44 @@ const Calendar = () => {
       return;
     }
 
-    if (["doctor", "nurse"].includes(currentUser.role) && !selectedPatient) {
-      toast.error("Please select a patient.");
+    if (
+      ["doctor", "nurse", "patient"].includes(currentUser.role) &&
+      !selectedUser
+    ) {
+      toast.error("Please select a user to schedule with.");
       return;
     }
 
     try {
+      const isStaff = ["doctor", "nurse"].includes(currentUser.role);
+      const isPatient = currentUser.role === "patient";
+
+      const staffId = isStaff ? currentUser.userId : selectedUser?.userId;
+      const patientId = isPatient ? currentUser.userId : selectedUser?.userId;
+
+      // Only construct meeting link if both IDs exist
+      const meetingLink =
+        staffId && patientId
+          ? `/room?staffId=${staffId}&patientId=${patientId}`
+          : null;
+
       const newAppointment = {
         date: selectedDate.toDateString(),
-        staffName: currentUser?.fullName,
-        patientName: selectedPatient?.fullName,
         time,
-        note,
-        targetRole: roleTargets[currentUser?.role],
-        role: currentUser?.role,
-        patientId: selectedPatient?.userId || undefined,
-        link: `/room?staffId=${currentUser?.userId}&patientId=${selectedPatient?.userId}`,
+        note: note || "",
+        targetRole: roleTargets[currentUser.role],
+        role: currentUser.role,
+
+        staffName: isStaff
+          ? currentUser.fullName
+          : selectedUser?.fullName || "",
+        patientName: isPatient
+          ? currentUser.fullName
+          : selectedUser?.fullName || "",
+
+        staffId: staffId || "",
+        patientId: patientId || "",
+        meetingLink,
       };
 
       const res = await fetch(
@@ -204,28 +236,31 @@ const Calendar = () => {
             Schedule for {selectedDate.toDateString()}
           </h3>
 
-          {/* Patient Dropdown for doctor/nurse */}
-          {["doctor", "nurse"].includes(currentUser?.role) && (
+          {/* User Dropdown */}
+          {["doctor", "nurse", "patient"].includes(currentUser?.role) && (
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Patient
+                {["doctor", "nurse"].includes(currentUser.role)
+                  ? "Select Patient"
+                  : "Select Doctor/Nurse"}
               </label>
               <select
-                value={selectedPatient?.userId}
+                value={selectedUser?.userId}
                 onChange={(e) =>
-                  setSelectedPatient(
-                    patients.find((p) => p.userId === e.target.value) || null
+                  setSelectedUser(
+                    relatedUsers.find((u) => u.userId === e.target.value) ||
+                      null
                   )
                 }
-                disabled={patients?.length === 0}
+                disabled={relatedUsers?.length === 0}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0d6efd]"
               >
-                {patients?.length === 0 && (
-                  <option value="">No patients available</option>
+                {relatedUsers?.length === 0 && (
+                  <option value="">No users available</option>
                 )}
-                {patients?.map((p) => (
-                  <option key={p.userId} value={p.userId}>
-                    {p.fullName || p.email || "Unnamed Patient"}
+                {relatedUsers?.map((u) => (
+                  <option key={u.userId} value={u.userId}>
+                    {u.fullName || u.email || "Unnamed"}
                   </option>
                 ))}
               </select>
@@ -286,7 +321,12 @@ const Calendar = () => {
           </h3>
           <ul className="space-y-4 text-gray-700">
             {scheduledAppointments.map((appt) => (
-              <AppointmentCard key={appt.id} appt={appt} />
+              <AppointmentCard
+                key={appt.id}
+                appt={appt}
+                onUpdated={() => fetchAppointments()}
+                onDeleted={() => fetchAppointments()}
+              />
             ))}
           </ul>
         </div>
