@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { db, auth } from "@/db/server";
 import { ROLE_COLLECTION_MAP } from "@/constants";
+import { v4 as uuidv4 } from "uuid";
+import { cookies } from "next/headers";
 
 // Map user role to Firestore collection
 function getUserCollection(role) {
   return ROLE_COLLECTION_MAP[role];
 }
 
+// GET: Fetch appointments and related users (patients or staff)
 export async function GET(request) {
   try {
     const sessionCookie = request.cookies.get("session")?.value;
@@ -35,19 +38,39 @@ export async function GET(request) {
       ...doc.data(),
     }));
 
-    let patients = [];
-    // If doctor/nurse, fetch all patients
+    let relatedUsers = [];
+
     if (["doctor", "nurse"].includes(role)) {
-      const patientsRef = db?.collection("patients");
-      const patientsSnapshot = await patientsRef.get();
-      patients = patientsSnapshot.docs.map((doc) => ({
-        id: doc.id,
+      // Fetch all patients for doctors/nurses
+      const patientsSnapshot = await db.collection("patients").get();
+      relatedUsers = patientsSnapshot.docs.map((doc) => ({
+        userId: doc.id,
         ...doc.data(),
       }));
+    } else if (role === "patient") {
+      // Fetch all doctors & nurses for patients
+      const doctorsSnapshot = await db.collection("doctors").get();
+      const nursesSnapshot = await db.collection("nurses").get();
+
+      const doctors = doctorsSnapshot.docs.map((doc) => ({
+        userId: doc.id,
+        ...doc.data(),
+      }));
+
+      const nurses = nursesSnapshot.docs.map((doc) => ({
+        userId: doc.id,
+        ...doc.data(),
+      }));
+
+      relatedUsers = [...doctors, ...nurses];
     }
 
     return NextResponse.json(
-      { authenticated: true, appointments, patients },
+      {
+        authenticated: true,
+        appointments,
+        relatedUsers,
+      },
       { status: 200 }
     );
   } catch (error) {
@@ -56,10 +79,11 @@ export async function GET(request) {
   }
 }
 
-// POST a new appointment for the current user
+// POST: Create a new appointment
 export async function POST(request) {
   try {
-    const sessionCookie = request.cookies.get("session")?.value;
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("session")?.value;
     if (!sessionCookie) {
       return NextResponse.json({ authenticated: false }, { status: 200 });
     }
@@ -68,6 +92,7 @@ export async function POST(request) {
     const uid = decoded.uid;
     const role = decoded.role;
     const userCollection = getUserCollection(role);
+
     if (!userCollection) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
@@ -79,42 +104,73 @@ export async function POST(request) {
       note,
       targetRole,
       patientId,
-      link,
+      meetingLink,
       staffName,
       patientName,
+      staffId,
     } = body;
 
-    if (!date || !time || !patientName || !patientId) {
+    if (!date || !time || !patientName || !patientId || !staffId) {
       return NextResponse.json(
-        { error: "Date , time , PatientId & patientName are required" },
+        {
+          error:
+            "Missing required fields: date, time, patientId, staffId, or names",
+        },
         { status: 400 }
       );
     }
 
+    const appointmentId = uuidv4();
+
     const newAppointment = {
+      id: appointmentId,
       date,
       time,
       note: note || "",
       targetRole,
       createdAt: new Date(),
       patientId,
-      meetingLink: link,
-      userId: uid,
+      staffId,
+      meetingLink,
       staffName,
       patientName,
+      createdBy: uid,
     };
 
+    // Save appointment under current user
     await db
       .collection(userCollection)
       .doc(uid)
       .collection("appointments")
-      .add(newAppointment);
-
-    await db
-      ?.collection("patients")
-      .doc(patientId)
-      .collection("appointments")
-      .add(newAppointment);
+      .doc(appointmentId)
+      .set(newAppointment);
+    // Save appointment under the other participant
+    if (role === "patient") {
+      // Try doctor first, fallback to nurse
+      const staffCollection = await db.collection("doctors").doc(staffId).get();
+      if (staffCollection.exists) {
+        await db
+          .collection("doctors")
+          .doc(staffId)
+          .collection("appointments")
+          .doc(appointmentId)
+          .set(newAppointment);
+      } else {
+        await db
+          .collection("nurses")
+          .doc(staffId)
+          .collection("appointments")
+          .doc(appointmentId)
+          .set(newAppointment);
+      }
+    } else {
+      await db
+        .collection("patients")
+        .doc(patientId)
+        .collection("appointments")
+        .doc(appointmentId)
+        .set(newAppointment);
+    }
 
     return NextResponse.json(
       { success: true, appointment: newAppointment },

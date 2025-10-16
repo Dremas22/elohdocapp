@@ -74,6 +74,7 @@ const Step4Allergies = ({ formData, setFormData, errors }) => {
       },
     });
   };
+
   const handleOtherCheckbox = (type) => {
     setFormData({
       ...formData,
@@ -184,18 +185,30 @@ const Step4Allergies = ({ formData, setFormData, errors }) => {
                   )}
                 </div>
 
-                {/* Validation Errors */}
-                {errors[group.field] && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors[group.field]}
-                  </p>
-                )}
-                {allergies.other?.isChecked && errors.otherText && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.otherText}
-                  </p>
+                {/* Inner field errors (only show if expanded) */}
+                {expanded === index && (
+                  <>
+                    {errors[group.field] && (
+                      <p className="text-sm text-red-600 mt-1">
+                        {errors[group.field]}
+                      </p>
+                    )}
+                    {allergies.other?.[group.field]?.isChecked &&
+                      errors.otherText && (
+                        <p className="text-sm text-red-600 mt-1">
+                          {errors.otherText}
+                        </p>
+                      )}
+                  </>
                 )}
               </div>
+            )}
+
+            {/* Always-visible outer errors (below dropdown) */}
+            {errors[group.field] && expanded !== index && (
+              <p className="text-sm text-red-600 px-5 pb-2">
+                {errors[group.field]}
+              </p>
             )}
           </div>
         ))}

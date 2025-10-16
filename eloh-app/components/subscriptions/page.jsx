@@ -2,7 +2,7 @@ import { FaCheck } from "react-icons/fa";
 
 const Subscriptions = () => {
   return (
-    <section className="bg-gray-50 py-16">
+    <section className="bg-white py-16">
       {/* Header Section */}
       <div className="text-center mb-12 px-4">
         <p className="text-sm font-semibold text-blue-600 tracking-wide">

@@ -135,7 +135,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
 
       // Update driver's location in Firestore
       try {
-        const user = auth.currentUser;
+        const user = currentUser;
         if (!user) return;
         const driverRef = doc(db, "drivers", user.uid);
         await updateDoc(driverRef, { location });
@@ -275,32 +275,40 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   const handleDecline = async () => {
     if (!ambulanceRequest) return;
 
-    const currentDriverId = auth.currentUser?.uid;
+    const currentDriverId = currentUser?.uid;
     const updatedExclusions = [...excludedDrivers, currentDriverId];
     setExcludedDrivers(updatedExclusions);
 
+    // Create pickupLocation using values from ambulanceRequest directly
     const pickupLocation = {
-      lat: parseFloat(ambulanceRequest?.pickupLat),
-      lng: parseFloat(ambulanceRequest?.pickupLng),
+      lat: ambulanceRequest.pickupLocation.lat
+        ? parseFloat(ambulanceRequest.pickupLocation.lat)
+        : 0,
+      lng: ambulanceRequest.pickupLocation.lng
+        ? parseFloat(ambulanceRequest.pickupLocation.lng)
+        : 0,
     };
 
     const reqData = {
-      customerName: ambulanceRequest?.customerName,
-      pickupAddress: ambulanceRequest?.pickupAddress,
-      fare: parseFloat(ambulanceRequest?.fare),
-      distance: ambulanceRequest?.distance,
-      duration: ambulanceRequest?.duration,
+      ...ambulanceRequest,
+      customerName: ambulanceRequest.customerName,
+      pickupAddress: ambulanceRequest.pickupAddress,
+      fare: parseFloat(ambulanceRequest.fare),
+      distance: ambulanceRequest.distance,
+      duration: ambulanceRequest.duration,
       pickupLocation,
-      type: ambulanceRequest?.type,
-      sessionId: ambulanceRequest?.sessionId,
+      type: ambulanceRequest.type,
+      sessionId: ambulanceRequest.sessionId,
+      customerId: ambulanceRequest.customerId,
     };
 
     try {
+      // Pass the updated exclusions directly
       const nextDriver = await confirmPayment(
-        ambulanceRequest?.sessionId,
+        reqData.sessionId,
         reqData,
-        ambulanceRequest?.customerId,
-        excludedDrivers
+        reqData.customerId,
+        updatedExclusions
       );
 
       if (nextDriver) {
@@ -311,7 +319,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
             body: JSON.stringify({
               driverId: nextDriver?.userId || nextDriver?.id,
               tripDetails: reqData,
-              customerId: auth?.currentUser?.uid,
+              customerId: ambulanceRequest?.customerId,
               excludedDrivers: updatedExclusions,
             }),
             headers: { "Content-Type": "application/json" },
