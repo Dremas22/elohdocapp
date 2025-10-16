@@ -180,9 +180,10 @@ const Appointments = ({ onClose }) => {
                     </button>
                     <button
                       onClick={() => handleDelete(appt)}
-                      className="p-2 rounded-full hover:bg-red-100 hover:cursor-pointer dark:hover:bg-red-900"
+                      disabled={true}
+                      className="p-2 rounded-full text-red-500 hover:bg-red-100 dark:hover:bg-red-900 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
                     >
-                      <FiTrash2 className="h-5 w-5 text-red-500" />
+                      <FiTrash2 className="h-5 w-5" />
                     </button>
                   </div>
                 )}

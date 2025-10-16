@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { db, auth } from "@/db/server";
 import { ROLE_COLLECTION_MAP } from "@/constants";
+import { v4 as uuidv4 } from "uuid";
+import { cookies } from "next/headers";
 
 // Map user role to Firestore collection
 function getUserCollection(role) {
@@ -80,7 +82,8 @@ export async function GET(request) {
 // POST: Create a new appointment
 export async function POST(request) {
   try {
-    const sessionCookie = request.cookies.get("session")?.value;
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("session")?.value;
     if (!sessionCookie) {
       return NextResponse.json({ authenticated: false }, { status: 200 });
     }
@@ -117,7 +120,10 @@ export async function POST(request) {
       );
     }
 
+    const appointmentId = uuidv4();
+
     const newAppointment = {
+      id: appointmentId,
       date,
       time,
       note: note || "",
@@ -131,33 +137,39 @@ export async function POST(request) {
       createdBy: uid,
     };
 
-    // Save appointment under both users (staff and patient)
+    // Save appointment under current user
     await db
       .collection(userCollection)
       .doc(uid)
       .collection("appointments")
-      .add(newAppointment);
-
-    // If patient and staff are different, also save for the other side
+      .doc(appointmentId)
+      .set(newAppointment);
+    // Save appointment under the other participant
     if (role === "patient") {
-      await db
-        .collection("doctors")
-        .doc(staffId)
-        .collection("appointments")
-        .add(newAppointment)
-        .catch(() =>
-          db
-            .collection("nurses")
-            .doc(staffId)
-            .collection("appointments")
-            .add(newAppointment)
-        );
+      // Try doctor first, fallback to nurse
+      const staffCollection = await db.collection("doctors").doc(staffId).get();
+      if (staffCollection.exists) {
+        await db
+          .collection("doctors")
+          .doc(staffId)
+          .collection("appointments")
+          .doc(appointmentId)
+          .set(newAppointment);
+      } else {
+        await db
+          .collection("nurses")
+          .doc(staffId)
+          .collection("appointments")
+          .doc(appointmentId)
+          .set(newAppointment);
+      }
     } else {
       await db
         .collection("patients")
         .doc(patientId)
         .collection("appointments")
-        .add(newAppointment);
+        .doc(appointmentId)
+        .set(newAppointment);
     }
 
     return NextResponse.json(

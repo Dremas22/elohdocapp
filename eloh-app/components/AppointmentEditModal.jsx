@@ -54,7 +54,7 @@ const AppointmentEditModal = ({ appointment, onClose, onSave }) => {
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
         <button
           onClick={onClose}
-          className="absolute right-3 top-3 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+          className="absolute right-3 top-3 p-2 rounded-full hover:bg-gray-200 hover:cursor-pointer dark:hover:bg-gray-700 transition"
           aria-label="Close edit modal"
         >
           <FiX className="h-5 w-5 text-gray-600 dark:text-gray-300" />
@@ -104,13 +104,13 @@ const AppointmentEditModal = ({ appointment, onClose, onSave }) => {
           <div className="flex justify-end space-x-3 mt-4">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+              className="px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 hover:cursor-pointer dark:hover:bg-gray-700 transition"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 hover:cursor-pointer transition"
             >
               Save Changes
             </button>

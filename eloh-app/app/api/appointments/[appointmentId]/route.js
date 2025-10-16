@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db, auth } from "@/db/server";
 import { ROLE_COLLECTION_MAP } from "@/constants";
+import { cookies } from "next/headers";
 
 // Helper to map role → collection name
 function getUserCollection(role) {
@@ -16,7 +17,8 @@ export async function PUT(request, { params }) {
     const { appointmentId } = await params;
 
     // 🔹 Check session
-    const sessionCookie = request.cookies.get("session")?.value;
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("session")?.value;
     if (!sessionCookie) {
       return NextResponse.json({ authenticated: false }, { status: 200 });
     }
@@ -138,7 +140,8 @@ export async function DELETE(request, { params }) {
     const { appointmentId } = await params;
 
     // 🔹 Check session
-    const sessionCookie = request.cookies.get("session")?.value;
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("session")?.value;
     if (!sessionCookie) {
       return NextResponse.json({ authenticated: false }, { status: 200 });
     }
@@ -152,6 +155,7 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
+    // 🔹 Reference to user's appointment doc
     const userDocRef = db
       .collection(userCollection)
       .doc(uid)
@@ -172,38 +176,34 @@ export async function DELETE(request, { params }) {
     // 🔹 Delete user's own appointment
     await userDocRef.delete();
 
-    // 🔹 Try deleting mirrored copy
+    // 🔹 Delete mirrored appointment in other participant's collection
     try {
       if (role === "patient" && staffId) {
-        await db
-          .collection("doctors")
-          .doc(staffId)
-          .collection("appointments")
-          .where("patientId", "==", patientId)
-          .where("date", "==", appointmentData.date)
-          .get()
-          .then((snap) =>
-            snap.forEach((doc) => doc.ref.delete().catch(() => null))
-          )
-          .catch(async () => {
-            const nurseSnap = await db
-              .collection("nurses")
-              .doc(staffId)
-              .collection("appointments")
-              .where("patientId", "==", patientId)
-              .where("date", "==", appointmentData.date)
-              .get();
-            nurseSnap.forEach((doc) => doc.ref.delete().catch(() => null));
-          });
+        // Patient deleting -> delete staff's copy
+        const staffCollection = ["doctors", "nurses"];
+        for (const col of staffCollection) {
+          const staffDocRef = db
+            .collection(col)
+            .doc(staffId)
+            .collection("appointments")
+            .doc(appointmentId);
+          const staffSnap = await staffDocRef.get();
+          if (staffSnap.exists) {
+            await staffDocRef.delete();
+            break; // stop after deleting the correct one
+          }
+        }
       } else if (["doctor", "nurse"].includes(role) && patientId) {
-        const patientSnap = await db
+        // Staff deleting -> delete patient's copy
+        const patientDocRef = db
           .collection("patients")
           .doc(patientId)
           .collection("appointments")
-          .where("staffId", "==", staffId)
-          .where("date", "==", appointmentData.date)
-          .get();
-        patientSnap.forEach((doc) => doc.ref.delete().catch(() => null));
+          .doc(appointmentId);
+        const patientSnap = await patientDocRef.get();
+        if (patientSnap.exists) {
+          await patientDocRef.delete();
+        }
       }
     } catch (cleanupError) {
       console.warn("⚠️ Mirror cleanup failed:", cleanupError);
