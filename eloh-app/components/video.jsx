@@ -1,33 +1,32 @@
 "use client";
 
 import React from "react";
+import Subscriptions from "./subscriptions/page";
 
 /**
  * Video component for the landing page.
- * - Displays a responsive video background.
- * - Adjusts height and vertical positioning based on screen size.
- * - Keeps the layout responsive without affecting desktop design.
+ * - Responsive full-width background video
+ * - Contains the Subscriptions section directly below the video
  */
-
 const Video = () => {
   return (
-    // Outer container for video — controls size and layout
-    <div
-      className="relative w-full bg-black overflow-hidden
-                 h-[70vh] xs:h-[65vh] sm:h-[70vh] md:h-[90vh]"
-    >
-      <video
-        // Full width and responsive height based on screen size
-        className="w-full 
-                   h-[50%] xs:h-[110%] sm:h-[112%]
-                   object-cover
-                   translate-y-[-8%] xs:translate-y-[-8%] sm:translate-y-[-5%]"
-        src="/videos/elohdocvid2.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
-      />
+    <div className="relative w-full bg-white overflow-hidden">
+      {/* 🎥 Video Background */}
+      <div className="relative w-full overflow-hidden">
+        <video
+          className="w-full min-h-[70vh] sm:min-h-[80vh] md:min-h-[90vh] lg:-mt-15 -mt-30.75 -mb-30 object-contain"
+          src="/videos/elohdocvid2.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+      </div>
+
+      {/* 💡 Subscriptions Section */}
+      <div className="relative z-10 -mt-10 sm:-mt-14 md:-mt- lg:mb-25 mb-35">
+        <Subscriptions />
+      </div>
     </div>
   );
 };

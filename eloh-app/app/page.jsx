@@ -35,7 +35,7 @@ export default async function Home() {
 
   // Fallback: show landing page
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <LandingPage />
     </div>
   );
