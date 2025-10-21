@@ -156,17 +156,13 @@ const MainPatientDashboard = () => {
 
   return (
     <div className="lg:min-h-screen flex flex-col pt-18 relative bg-gray-950 text-white overflow-hidden">
-      {/* <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      {/* {showChat && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg h-[80vh] relative">
-
-            <Chat
-              showChat={showChat}
-              setShowChat={setShowChat}
-              userDoc={userDoc}
-              currentUser={currentUser}
-            />
+            <Chat setShowChat={setShowChat} />
           </div>
-        </div> */}
+        </div>
+      )} */}
 
       {/* Fixed Navbar */}
       <PatientDashboardNavbar />

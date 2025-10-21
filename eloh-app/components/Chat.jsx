@@ -24,9 +24,12 @@ const Chat = ({ setShowChat }) => {
           const userRef = doc(db, "patients", currentUser.uid);
           const userSnap = await getDoc(userRef);
           const userData = userSnap.data();
+          const consultations = userData?.consultations || {
+            doctor: 0,
+            nurse: 0,
+          };
 
-          const consultations = userData?.numberOfConsultations || 0;
-          if (consultations >= 1) {
+          if (consultations.doctor >= 1 || consultations.nurse >= 1) {
             toast.info(
               "You already have consultations available. Redirecting..."
             );
@@ -45,17 +48,16 @@ const Chat = ({ setShowChat }) => {
   }, [currentUser?.uid]);
 
   useEffect(() => {
-  if (!loading && currentUser && messages.length === 0) {
-    setMessages([
-      {
-        role: "assistant",
-        content:
-          "Hi, I am Elohdoc app, your doctor assistant. What's the matter with your health?",
-      },
-    ]);
-  }
-}, [currentUser, loading]);
-
+    if (!loading && currentUser && messages.length === 0) {
+      setMessages([
+        {
+          role: "assistant",
+          content:
+            "Hi, I am Elohdoc app, your doctor assistant. What's the matter with your health?",
+        },
+      ]);
+    }
+  }, [currentUser, loading]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
