@@ -6,56 +6,44 @@ import Link from "next/link";
 
 const OurTeamPage = () => {
   const teamMembers = [
+
+
+
     {
       id: 1,
+      name: "Dr. Winile Nkosi",
+      role: "Radiologist",
+      description: `Dr. Winile Nkosi is an interventional radiologist. Her areas of strong interest and expertise include:
+                   Interventional radiology focused on combining advanced diagnostic capabilities with minimally invasive therapeutic procedures to improve patient outcomes.
+                    Dr. Nkosi holds a Master of Medicine in Radiology (MMed Rad D) and a Fellowship of the College of Radiologists (FC Rad Diag, SA). She has a special interest in creating more health equity in Africa.`,
+      image: "/images/Dr.WinileNkosi.jpeg",
+    },
+    {
+      id: 2,
+      name: "Dr Schalk Berger",
+      role: "Telehealth Specialist",
+      description:
+        "Dr Schalk graduated with an MBCHB  in 1995 and has worked in private practice since 2000. His special interests are in telemedicine and rural medicine and providing medical care for people without access to adequate healthcare in Africa. He has over ten years experience in Telemedicine. He is an advisor to elohdoc.",
+      image: "/images/DrSchalkBerger.jpeg",
+    },
+
+    {
+      id: 3,
+      name: "Joe Phalwane",
+      role: "Co-Founder & CEO",
+      description:
+        "Joe Phalwane is a multiple award-winning entrepreneur with extensive international business experience spanning technology and strategic leadership. Over the past decade, Joe has successfully founded and led ventures across Africa and abroad, focusing on creating impactful, tech-driven solutions that address real-world challenges.",
+      image: "/images/JoePhalwane.jpeg",
+    },
+    {
+      id: 4,
       name: "Tshepo Masilo",
-      role: "Founder & Lead Developer",
+      role: "Co-Founder & Lead Developer",
       description:
         "Qualified software developer with 2 years experience, robust background in leadership management, and more than 6 years entrepreneurship. Very talented at crafting intuitive design structures and architectural frameworks. As a natural optimist committed to integrity and collaboration, he aims to bring innovation, leadership, and technical proficiency to the forefront of the venture.",
       image: "/images/tshepo.jpeg",
     },
-    {
-      id: 2,
-      name: "Nurse Michael Smith",
-      role: "Senior Nurse",
-      description:
-        "Brings over 15 years of experience in emergency and outpatient care, ensuring quality support for every patient.",
-      image: "/images/default_avatar.jpg",
-    },
-    {
-      id: 3,
-      name: "Dr. Sarah Lee",
-      role: "Telehealth Specialist",
-      description:
-        "Leads ElohApp’s remote consultation program, making healthcare accessible from anywhere, anytime.",
-      image: "/images/default_avatar.jpg",
-    },
-    {
-      id: 4,
-      name: "James Daniels",
-      role: "Emergency Response Driver",
-      description:
-        "Coordinates and executes urgent transportation for patients needing immediate medical attention.",
-      image: "/images/default_avatar.jpg",
-    },
-    {
-      id: 5,
-      name: "Linda Perez",
-      role: "Digital Health Coordinator",
-      description:
-        "Manages the integration of technology in our healthcare delivery, improving efficiency and accessibility.",
-      image: "/images/default_avatar.jpg",
-    },
-    {
-      id: 6,
-      name: "Dr. Ethan Mokoena",
-      role: "Community Health Director",
-      description:
-        "Oversees outreach programs and partnerships to extend ElohApp’s impact into rural and underserved areas.",
-      image: "/images/default_avatar.jpg",
-    },
   ];
-
 
   return (
     <>
@@ -90,7 +78,7 @@ const OurTeamPage = () => {
       {/* VALUES SECTION */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-[#03045e] mb-10">
+          <h2 className="text-3xl font-bold text-[#03045e] mb-5">
             Our Core Values
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
@@ -135,7 +123,7 @@ const OurTeamPage = () => {
             technological innovation to bring healthcare closer to you.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 gap-10">
             {teamMembers.map((member) => (
               <div
                 key={member.id}
