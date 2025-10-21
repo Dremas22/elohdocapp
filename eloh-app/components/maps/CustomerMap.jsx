@@ -29,7 +29,6 @@ import { normalizeLatLng } from "@/lib/normalizeLatLng";
 import PaymentConfirmationLoader from "../ambulance/customers/PaymentConfirmationLoader";
 import RequestSection from "./RequestSection";
 import confirmPayment from "@/lib/confirmPayment";
-import ArrivalCodeModal from "./ArrivalCodeModal";
 
 const RATE_PER_KM = 10;
 
@@ -360,17 +359,6 @@ export default function CustomerMap({ userDoc }) {
         window.driverRouteRenderer = null;
       }
 
-      /**
-       *  TODO: Example object used only for testing when the customer and driver
-        are located very close to each other. This artificially offsets the
-        customer's coordinates (~200m north-east) so that the route line is
-        easier to visualize on the map. Remove or disable in production and use (trip.pickupLocation) .
-       */
-      // const testCustomerLoc = {
-      //   lat: trip.pickupLocation.lat + 0.002, // ~200m north
-      //   lng: trip.pickupLocation.lng + 0.002, // ~200m east
-      // };
-
       // Draw driver → customer route (normal opacity)
       window.driverRouteRenderer = createRouteCustomerToDriver(
         driver.location,
@@ -615,7 +603,6 @@ export default function CustomerMap({ userDoc }) {
   return (
     <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 pt-20 lg:pl-66 p-4">
       {confirmingPayment && <PaymentConfirmationLoader />}
-      <ArrivalCodeModal fareDetails={fareDetails} />
 
       <CustomerSidebarMenu userDoc={userDoc} />
 
