@@ -19,7 +19,6 @@ import Calendar from "@/components/calendar";
 import { useRouter } from "next/navigation";
 import { messagingPromise } from "@/db/client";
 import Appointments from "@/components/Appointments";
-import Calendar from "@/components/calendar";
 import { IoCloseCircleSharp } from "react-icons/io5";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
@@ -153,7 +152,7 @@ const PatientSidebarMenu = ({
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-22 px-4 w-64 h-[calc(110vh-5rem)] fixed top-1 left-0 overflow-y-auto scrollbar-thin scrollbar-thumb-[#0d6efd]/70 scrollbar-track-[#0b2451]/40 hover:scrollbar-thumb-[#1a73e8]/90
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-22 px-4 w-64 h-[calc(120vh-5rem)] fixed -top-1 left-0 overflow-y-auto scrollbar-thin scrollbar-thumb-[#0d6efd]/70 scrollbar-track-[#0b2451]/40 hover:scrollbar-thumb-[#1a73e8]/90
           ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
         `}
       >
