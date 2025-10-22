@@ -8,31 +8,7 @@ import AppointmentEditModal from "../AppointmentEditModal";
 import { toastError, toastSuccess } from "@/helpers/toastHelper";
 
 /**
- * Renders a single appointment card with date, time, role, and optional note.
- * Clicking the card navigates the user to the appointment's meeting link.
- *
- * @component
- * @param {Object} props - Component props.
- * @param {Object} props.appt - Appointment details.
- * @param {string} props.appt.date - Appointment date (e.g., "2025-09-12").
- * @param {string} props.appt.time - Appointment time (e.g., "10:30 AM").
- * @param {string} props.appt.targetRole - The role the appointment is with (e.g., "Doctor" or "Nurse").
- * @param {string} props.appt.meetingLink - URL for the appointment meeting.
- * @param {string} [props.appt.note] - Optional note about the appointment.
- * @param {string} [props.appt.staffId] - ID of staff
- * @param {string} [props.appt.patientId] - ID of patient
- *
- * @example
- * const appt = {
- *   date: "2025-09-12",
- *   time: "10:30 AM",
- *   targetRole: "Doctor",
- *   meetingLink: "/meeting/123",
- *   note: "Bring medical history"
- *    .....
- * };
- *
- * <AppointmentCard appt={appt} />
+ * AppointmentCard – displays appointment info with edit/delete controls.
  */
 const AppointmentCard = ({ appt, onUpdated, onDeleted }) => {
   const { updateAppointment, deleteAppointment } = useAppointmentActions();
@@ -41,7 +17,7 @@ const AppointmentCard = ({ appt, onUpdated, onDeleted }) => {
   const handleSave = async (updatedData) => {
     const updated = await updateAppointment(appt.id, updatedData);
     if (updated) {
-      if (onUpdated) onUpdated(updated);
+      onUpdated?.(updated);
       setEditing(false);
       toastSuccess("Appointment updated successfully");
     } else {
@@ -50,13 +26,21 @@ const AppointmentCard = ({ appt, onUpdated, onDeleted }) => {
   };
 
   const handleDelete = async (e) => {
-    e.preventDefault(); // prevent Link navigation
+    e.preventDefault();
+    e.stopPropagation();
     const confirmDelete = confirm(
       "Are you sure you want to delete this appointment?"
     );
     if (!confirmDelete) return;
+
     const success = await deleteAppointment(appt.id);
-    if (success && onDeleted) onDeleted(appt.id);
+    if (success) onDeleted?.(appt.id);
+  };
+
+  const handleEditClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditing(true);
   };
 
   return (
@@ -73,13 +57,11 @@ const AppointmentCard = ({ appt, onUpdated, onDeleted }) => {
           )}
         </Link>
 
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* ✅ Buttons visible by default on mobile, hover-only on desktop */}
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex space-x-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              setEditing(true);
-            }}
-            className="text-blue-600 hover:text-blue-800 hover:cursor-pointer p-1 rounded"
+            onClick={handleEditClick}
+            className="text-blue-600 hover:text-blue-800 p-1 rounded cursor-pointer"
             title="Edit appointment"
           >
             <FiEdit size={16} />
@@ -87,7 +69,7 @@ const AppointmentCard = ({ appt, onUpdated, onDeleted }) => {
 
           <button
             onClick={handleDelete}
-            className="text-red-600 hover:text-red-800 hover:cursor-pointer p-1 rounded"
+            className="text-red-600 hover:text-red-800 p-1 rounded cursor-pointer"
             title="Delete appointment"
           >
             <FiTrash2 size={16} />
