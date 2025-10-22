@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
 import { useUserStore } from "@/hooks/useUserStore";
 import { daysOfWeek } from "@/constants";
 import { getDaysInMonth } from "@/lib/timeUntil";
 import AppointmentCard from "./appointment/Appointment";
+import { toastError, toastSuccess } from "@/helpers/toastHelper";
 
 const roleTargets = {
   doctor: "patient",
@@ -94,7 +94,7 @@ const Calendar = ({ userDoc }) => {
 
   const handleSchedule = async () => {
     if (!selectedDate || !time) {
-      toast.error("Please select a date and enter a time.");
+      toastError("Please select a date and enter a time.");
       return;
     }
 
@@ -102,7 +102,7 @@ const Calendar = ({ userDoc }) => {
       ["doctor", "nurse", "patient"].includes(currentUser.role) &&
       !selectedUser
     ) {
-      toast.error("Please select a user to schedule with.");
+      toastError("Please select a user to schedule with.");
       return;
     }
 
@@ -150,7 +150,7 @@ const Calendar = ({ userDoc }) => {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        toast.success(
+        toastSuccess(
           `Appointment set for ${selectedDate.toDateString()} at ${time}.`
         );
         setSelectedDate(null);
@@ -160,6 +160,7 @@ const Calendar = ({ userDoc }) => {
       }
     } catch (error) {
       console.error("Error scheduling appointment:", error);
+      toastError(`Error scheduling appointment:, ${error}`);
     }
   };
 
