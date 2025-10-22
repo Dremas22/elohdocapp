@@ -1,19 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
 import { useUserStore } from "@/hooks/useUserStore";
-import { daysOfWeek } from "@/constants";
+import { daysOfWeek, roleTargets } from "@/constants";
 import { getDaysInMonth } from "@/lib/timeUntil";
 import AppointmentCard from "./appointment/Appointment";
-
-const roleTargets = {
-  doctor: "patient",
-  nurse: "patient",
-  patient: "doctor/nurse",
-  driver: "customer",
-  customer: "driver",
-};
+import { toastError, toastSuccess } from "@/helpers/toastHelper";
 
 /**
  * Calendar component for scheduling and viewing appointments.
@@ -31,6 +23,7 @@ const Calendar = ({ userDoc }) => {
   const [time, setTime] = useState("");
   const [note, setNote] = useState("");
   const [scheduledAppointments, setScheduledAppointments] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [relatedUsers, setRelatedUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const { currentUser } = useUserStore();
@@ -41,6 +34,8 @@ const Calendar = ({ userDoc }) => {
   // Fetch appointments & related users (patients or staff)
   const fetchAppointments = async () => {
     if (!currentUser || !userDoc) return;
+
+    setLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/appointments`,
@@ -59,6 +54,8 @@ const Calendar = ({ userDoc }) => {
       }
     } catch (err) {
       console.error("Error fetching appointments:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,7 +91,7 @@ const Calendar = ({ userDoc }) => {
 
   const handleSchedule = async () => {
     if (!selectedDate || !time) {
-      toast.error("Please select a date and enter a time.");
+      toastError("Please select a date and enter a time.");
       return;
     }
 
@@ -102,7 +99,7 @@ const Calendar = ({ userDoc }) => {
       ["doctor", "nurse", "patient"].includes(currentUser.role) &&
       !selectedUser
     ) {
-      toast.error("Please select a user to schedule with.");
+      toastError("Please select a user to schedule with.");
       return;
     }
 
@@ -119,11 +116,15 @@ const Calendar = ({ userDoc }) => {
           ? `/room?staffId=${staffId}&patientId=${patientId}`
           : null;
 
+      const targetRole =
+        roleTargets[currentUser.role]?.[selectedUser?.role] ||
+        `${currentUser.role.toUpperCase()} → ${selectedUser?.role?.toUpperCase()}`;
+
       const newAppointment = {
         date: selectedDate.toDateString(),
         time,
         note: note || "",
-        targetRole: roleTargets[currentUser.role],
+        targetRole: targetRole,
         role: currentUser.role,
 
         staffName: isStaff
@@ -150,7 +151,7 @@ const Calendar = ({ userDoc }) => {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        toast.success(
+        toastSuccess(
           `Appointment set for ${selectedDate.toDateString()} at ${time}.`
         );
         setSelectedDate(null);
@@ -160,6 +161,7 @@ const Calendar = ({ userDoc }) => {
       }
     } catch (error) {
       console.error("Error scheduling appointment:", error);
+      toastError(`Error scheduling appointment:, ${error}`);
     }
   };
 
@@ -258,11 +260,41 @@ const Calendar = ({ userDoc }) => {
                 {relatedUsers?.length === 0 && (
                   <option value="">No users available</option>
                 )}
-                {relatedUsers?.map((u) => (
-                  <option key={u.userId} value={u.userId}>
-                    {u.fullName || u.email || "Unnamed"}
-                  </option>
-                ))}
+
+                {/* Group users by their roles */}
+                {currentUser?.role === "patient" && (
+                  <>
+                    {/* Doctors Group */}
+                    <optgroup label="Doctors">
+                      {relatedUsers
+                        .filter((u) => u.role === "doctor")
+                        .map((u) => (
+                          <option key={u.userId} value={u.userId}>
+                            {u.fullName || u.email || "Unnamed"}
+                          </option>
+                        ))}
+                    </optgroup>
+
+                    {/* Nurses Group */}
+                    <optgroup label="Nurses">
+                      {relatedUsers
+                        .filter((u) => u.role === "nurse")
+                        .map((u) => (
+                          <option key={u.userId} value={u.userId}>
+                            {u.fullName || u.email || "Unnamed"}
+                          </option>
+                        ))}
+                    </optgroup>
+                  </>
+                )}
+
+                {/* Default behavior for other roles */}
+                {currentUser?.role !== "patient" &&
+                  relatedUsers.map((u) => (
+                    <option key={u.userId} value={u.userId}>
+                      {u.fullName || u.email || "Unnamed"}
+                    </option>
+                  ))}
               </select>
             </div>
           )}
@@ -305,9 +337,18 @@ const Calendar = ({ userDoc }) => {
           <div className="text-right mt-4">
             <button
               onClick={handleSchedule}
-              className="bg-[#03045e] text-white font-semibold px-6 py-2 rounded-lg shadow-[0_4px_#999] active:shadow-[0_2px_#666] active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+              disabled={loading}
+              className={`relative flex items-center justify-center gap-2 px-6 py-2 rounded-lg font-semibold text-white shadow-[0_4px_#999] transition-all duration-200 ease-in-out 
+                  ${
+                    loading
+                      ? "bg-[#023e8a] cursor-not-allowed opacity-80"
+                      : "bg-[#03045e] hover:bg-[#023e8a] active:shadow-[0_2px_#666] active:translate-y-1"
+                  }`}
             >
-              Save Appointment
+              {loading && (
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              )}
+              {loading ? "Saving..." : "Save Appointment"}
             </button>
           </div>
         </div>

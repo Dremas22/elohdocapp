@@ -19,6 +19,8 @@ import Calendar from "@/components/calendar";
 import { useRouter } from "next/navigation";
 import { messagingPromise } from "@/db/client";
 import Appointments from "@/components/Appointments";
+import Calendar from "@/components/calendar";
+import { IoCloseCircleSharp } from "react-icons/io5";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
@@ -74,11 +76,12 @@ const PatientSidebarMenu = ({
   const [profileLoading, setProfileLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [calendarOpen, setCalendarOpen] = useState(false); // ✅ NEW
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     let unsubscribe = () => { };
+
     const setupMessaging = async () => {
       const messaging = await messagingPromise;
       if (!messaging) return;
@@ -113,25 +116,31 @@ const PatientSidebarMenu = ({
     {
       title: "Sick Notes",
       icon: <FiFile className="h-6 w-6" />,
-      onClick: () => { setMode?.("sick-notes"); setNoteOpen?.((p) => !p); },
-      showTitle: true,
-    },
-    {
-      title: "Payments",
-      icon: <FaMoneyCheckAlt className="h-6 w-6" />,
-      onClick: () => router.push("/payment"),
+      onClick: () => {
+        if (setMode) setMode("sick-notes");
+        if (setNoteOpen) setNoteOpen((prev) => !prev);
+      },
       showTitle: true,
     },
     {
       title: "Appointments",
       icon: <FiBell className="h-6 w-6" />,
-      onClick: () => setAppointmentOpen((p) => !p),
+      onClick: () => {
+        if (setMode) setMode("appointments");
+        if (setAppointmentOpen) setAppointmentOpen((prev) => !prev);
+      },
       showTitle: true,
     },
     {
       title: "Schedule",
       icon: <FiCalendar className="h-6 w-6" />,
       onClick: () => setCalendarOpen(true),
+      showTitle: true,
+    },
+    {
+      title: "Payments",
+      icon: <FaMoneyCheckAlt className="h-6 w-6" />,
+      onClick: () => router.push("/payment"),
       showTitle: true,
     },
   ];
@@ -142,28 +151,75 @@ const PatientSidebarMenu = ({
       {profileOpen && <ProfileModal userDoc={userDoc} onClose={() => setProfileOpen(false)} loading={profileLoading} />}
       {appointmentOpen && <Appointments onClose={setAppointmentOpen} />}
 
-      {/* DESKTOP SIDEBAR */}
-      <div className={`hidden mb-5 lg:flex flex-col h-[150vh] bg-[#123158] pt-20 px-4 w-64 h-[calc(110vh-5rem)] fixed top-0.5 left-0 overflow-y-auto ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"} transition-transform`}>
-        <ActionButtons buttons={actionButtons} notificationCount={notificationCount} payload={notificationPayload} compact={false} />
+      {/* Desktop Sidebar */}
+      <div
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-22 px-4 w-64 h-[calc(110vh-5rem)] fixed top-1 left-0 overflow-y-auto scrollbar-thin scrollbar-thumb-[#0d6efd]/70 scrollbar-track-[#0b2451]/40 hover:scrollbar-thumb-[#1a73e8]/90
+          ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
+        `}
+      >
+        <ActionButtons
+          buttons={actionButtons}
+          notificationCount={notificationCount}
+          payload={notificationPayload}
+          compact={false}
+        />
       </div>
 
-      {/* CALENDAR MODAL */}
-      <div className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 flex flex-col ${calendarOpen ? "translate-x-0" : "translate-x-full"}`}>
-        {/* Calendar fills available space */}
-        <div className="flex-1 overflow-auto">
-          <Calendar userDoc={userDoc} />
-        </div>
+      {/* Mobile Sidebar Toggle Button */}
+      <div className="lg:hidden fixed bottom-1 -right-2 z-50 group cursor-pointer flex items-center space-x-2 bg-blue-300/1 text-white rounded-full px-2 py-2 shadow-sm select-none scale-80 backdrop-blur-sm">
+        <button
+          onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+          title={mobileSidebarOpen ? "Hide menu options" : "Show menu options"}
+          className="flex items-center gap-2 focus:outline-none"
+          aria-expanded={mobileSidebarOpen}
+          aria-controls="mobile-sidebar-actions"
+          type="button"
+        >
+          {mobileSidebarOpen ? (
+            <>
+              <FiChevronDown className="h-6 w-6" />
+              <span className="text-sm font-semibold">Hide menu</span>
+            </>
+          ) : (
+            <>
+              <FiChevronUp className="h-6 w-6" />
+              <span className="text-sm font-semibold">Show menu</span>
+            </>
+          )}
+        </button>
+      </div>
 
-        {/* Close button at top-right */}
-        <div className="absolute top-75 right-0.5">
-          <button
-            onClick={() => setCalendarOpen(false)}
-            className="p-1 rounded-full bg-red-500 text-white hover:bg-red-600 flex items-center justify-center"
-            aria-label="Close Calendar"
-          >
-            <FiX className="h-4 w-4" />
-          </button>
-        </div>
+      {/* Slide-up Mobile Sidebar */}
+      <div
+        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40
+          sm:h-[38vh] h-[33vh] px-4 py-3 overflow-auto backdrop-blur-md flex flex-col items-center gap-7
+          transition-transform duration-500 ease-in-out bg-gray-900/20
+          ${mobileSidebarOpen
+            ? "translate-y-0 opacity-100"
+            : "translate-y-full opacity-0 pointer-events-none"
+          }
+        `}
+      >
+        <ActionButtons
+          buttons={actionButtons}
+          notificationCount={notificationCount}
+          payload={notificationPayload}
+          compact={true}
+        />
+      </div>
+
+      <div
+        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+      >
+        <button
+          title="Close Calendar"
+          onClick={() => setCalendarOpen(false)}
+          className="absolute pt-51.5 scale-200 right-1.5 text-red-600 text-sm hover:underline z-50"
+        >
+          <IoCloseCircleSharp />
+        </button>
+        <Calendar userDoc={userDoc} />
       </div>
     </>
   );
