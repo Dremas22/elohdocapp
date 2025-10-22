@@ -245,9 +245,6 @@ const MeetingRoom = () => {
               className={`${isMobile ? "w-full h-1/2 border-t" : "flex-[0.4] min-w-[400px] border-l"
                 } bg-white border-[#90e0ef] shadow-inner overflow-y-auto p-4`}
             >
-              <h2 className="text-xl font-semibold text-[#0077b6] mb-4">
-                Doctor’s Notes
-              </h2>
               <RichTextEditor roomID={doctorId} />
             </div>
           )}
