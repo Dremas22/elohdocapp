@@ -617,17 +617,12 @@ export default function CustomerMap({ userDoc }) {
         handleCreateRoute={handleCreateRoute}
         handleCancelRoute={handleCancelRoute}
       />
-      {/* Map */}
-      <div
-        ref={mapRef}
-        className="w-full max-w-6xl h-[480px] sm:h-[400px] md:h-[500px] lg:h-[600px] rounded-lg shadow-lg overflow-hidden mx-auto"
-      />
 
       {/* Payment Section */}
       {showPay && fareDetails && !fareDetails.isPaid && (
         <div
           ref={paySectionRef}
-          className="w-full max-w-lg bg-white p-4 rounded-lg shadow mt-6"
+          className="w-full bg-gray-100 max-w-lg p-4 mb-5"
         >
           <PayAmbulance
             fare={fareDetails.fare}
@@ -639,6 +634,13 @@ export default function CustomerMap({ userDoc }) {
           />
         </div>
       )}
+
+      {/* Map */}
+      <div
+        ref={mapRef}
+        className="w-full max-w-6xl h-[480px] sm:h-[400px] md:h-[500px] lg:h-[600px] rounded-lg shadow-lg overflow-hidden mx-auto"
+      />
+
     </div>
   );
 }
