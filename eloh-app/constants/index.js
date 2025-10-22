@@ -280,3 +280,47 @@ export const ROLE_COLLECTION_MAP = {
  * daysOfWeek[new Date().getDay()]; // Returns today's day abbreviation
  */
 export const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+/**
+ * Defines the display labels for appointment relationships based on the roles
+ * of the user making the appointment and the target user.
+ *
+ * Structure:
+ * {
+ *   [userRole]: {
+ *     [targetRole]: "DISPLAY STRING",
+ *     ...
+ *   },
+ *   ...
+ * }
+ *
+ * Example usage:
+ *   roleTargets["patient"]["doctor"] // "PATIENT → DOCTOR"
+ *
+ * Roles:
+ * - doctor
+ * - nurse
+ * - patient
+ * - driver
+ * - customer
+ *
+ * @type {Object<string, Object<string, string>>}
+ */
+export const roleTargets = {
+  doctor: {
+    patient: "DOCTOR → PATIENT",
+  },
+  nurse: {
+    patient: "NURSE → PATIENT",
+  },
+  patient: {
+    doctor: "PATIENT → DOCTOR",
+    nurse: "PATIENT → NURSE",
+  },
+  driver: {
+    customer: "DRIVER → CUSTOMER",
+  },
+  customer: {
+    driver: "CUSTOMER → DRIVER",
+  },
+};

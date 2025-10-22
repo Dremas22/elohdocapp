@@ -58,7 +58,7 @@ const AppointmentCard = ({ appt, onUpdated, onDeleted }) => {
         </Link>
 
         {/* ✅ Buttons visible by default on mobile, hover-only on desktop */}
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex space-x-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+        <div className="absolute right-3 bottom-3 -translate-y-1/2 flex space-x-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <button
             onClick={handleEditClick}
             className="text-blue-600 hover:text-blue-800 p-1 rounded cursor-pointer"
