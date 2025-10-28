@@ -62,27 +62,46 @@ const ChatList = ({ role }) => {
     };
 
     const mergeAndSet = () => {
+      const isDriver = currentUser.role === "driver";
+      const isCustomer = currentUser.role === "customer";
       const unique = new Map();
 
-      // Filter userChatsData for patients to remove unavailable staff
+      // 🧭 For drivers and customers → only show trip-based users
+      if (isDriver || isCustomer) {
+        defaultUsersData.forEach((u) => {
+          if (u?.user?.userId) unique.set(u.user.userId, u);
+        });
+
+        let finalChats = Array.from(unique.values());
+        finalChats.sort(
+          (a, b) => asMillis(b.updatedAt) - asMillis(a.updatedAt)
+        );
+
+        setChats(finalChats);
+        updateUnseenCount(finalChats);
+        return;
+      }
+
+      // 🧩 Everyone else (patients, doctors, nurses, etc.)
+      // Filter userChatsData for patients/customers to remove unavailable staff
       const filteredUserChatsData =
         currentUser.role === "patient" || currentUser.role === "customer"
           ? userChatsData.filter((c) => c.user?.available !== false)
           : userChatsData;
 
-      // Merge defaultUsersData
+      // Merge defaultUsersData (default visible users)
       defaultUsersData.forEach((u) => {
         if (u?.user?.userId) unique.set(u.user.userId, u);
       });
 
-      // Merge filteredUserChatsData
+      // Merge filteredUserChatsData (chat history + unseen messages)
       filteredUserChatsData.forEach((c) => {
         if (c?.user?.userId) unique.set(c.user.userId, c);
       });
 
       let finalChats = Array.from(unique.values());
 
-      // 🔹 filter by active subtype if consultationType === "all"
+      // 🔹 Apply active subtype filtering for patients viewing all staff
       if (
         currentUser.role === "patient" &&
         currentUser.consultationType === "all"
@@ -94,7 +113,9 @@ const ChatList = ({ role }) => {
         });
       }
 
+      // Sort chats by recent activity
       finalChats.sort((a, b) => asMillis(b.updatedAt) - asMillis(a.updatedAt));
+
       setChats(finalChats);
       updateUnseenCount(finalChats);
     };
@@ -188,10 +209,64 @@ const ChatList = ({ role }) => {
       }
     } else if (["doctor", "nurse"].includes(currentUser.role)) {
       collectionsToListen.push("patients");
-    } else if (currentUser.role === "driver") {
-      collectionsToListen.push("customers");
-    } else if (currentUser.role === "customer") {
-      collectionsToListen.push("drivers");
+    } else if (
+      currentUser.role === "driver" ||
+      currentUser.role === "customer"
+    ) {
+      // 🔹 Special trip-based chat visibility for drivers & customers
+      const tripsRef = collection(db, "trips");
+      const tripField =
+        currentUser.role === "driver" ? "driverId" : "customerId";
+
+      const activeTripQuery = query(
+        tripsRef,
+        where(tripField, "==", currentUser.userId),
+        where("status", "==", "accepted")
+      );
+
+      const unSubTrip = onSnapshot(activeTripQuery, async (snap) => {
+        if (snap.empty) {
+          // No active trips → clear default users
+          defaultUsersData = [];
+          mergeAndSet();
+          return;
+        }
+
+        const tripDocs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+        const otherRole =
+          currentUser.role === "driver" ? "customers" : "drivers";
+
+        // Fetch corresponding users from the opposite role
+        const userPromises = tripDocs.map(async (trip) => {
+          const otherUserId =
+            currentUser.role === "driver" ? trip.customerId : trip.driverId;
+          if (!otherUserId) return null;
+
+          const otherUserDoc = await getDoc(doc(db, otherRole, otherUserId));
+          if (!otherUserDoc.exists()) return null;
+
+          const otherUser = {
+            userId: otherUserDoc.id,
+            ...otherUserDoc.data(),
+          };
+
+          return {
+            chatId: `${currentUser.userId}_${otherUserId}`,
+            receiverId: otherUserId,
+            lastMessage: "",
+            updatedAt: new Date(),
+            isSeen: true,
+            user: otherUser,
+          };
+        });
+
+        const tripUsers = (await Promise.all(userPromises)).filter(Boolean);
+        defaultUsersData = tripUsers;
+        mergeAndSet();
+      });
+
+      unsubs.push(unSubTrip);
     }
 
     collectionsToListen.forEach((col) => {
