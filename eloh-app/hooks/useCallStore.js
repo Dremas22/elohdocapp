@@ -12,6 +12,17 @@ import {
 } from "firebase/firestore";
 import { db } from "@/db/client";
 
+/**
+ * Zustand store for managing incoming calls, ringtone, and navigation for telehealth sessions.
+ *
+ * @typedef {Object} Call
+ * @property {string} id - Firestore document ID of the call
+ * @property {string} staffId - ID of the staff member
+ * @property {string} patientId - ID of the patient
+ * @property {string} status - Status of the call ("ringing", "accepted", "declined")
+ * @property {Object} caller - Info about who initiated the call
+ * @property {string} otherUserId - ID of the other participant in the call
+ */
 export const useCallStore = create((set, get) => ({
   incomingCall: null,
   ringtone: null,

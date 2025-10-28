@@ -9,6 +9,15 @@ import List from "./List/List";
 import ChatApp from "./ChatApp";
 import { useState, useEffect } from "react";
 
+/**
+ * ElohDocChatApp – Chat interface for staff/patient users.
+ * Renders chat list, active chat, and chat details depending on screen size.
+ *
+ * @param {Object} props
+ * @param {Function} props.setOpenChat - Function to toggle chat panel open state
+ * @param {string} props.role - Role of the current user ("doctor", "nurse", "patient","driver", "customer")
+ * @returns {JSX.Element}
+ */
 const ElohDocChatApp = ({ setOpenChat, role }) => {
   const { currentUser, isLoading } = useUserStore();
   const { chatId } = useChatStore();
