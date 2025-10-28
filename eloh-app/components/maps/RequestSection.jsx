@@ -123,7 +123,7 @@ export default function RequestSection(props) {
             🚑 A driver has accepted your request and is on the way. Please stay
             ready — you’ll be notified once they arrive!
           </p>
-        ) : fareDetails?.isPaid && fareDetails.status === "pending" ? (
+        ) : fareDetails?.isPaid && fareDetails.status === "paid" ? (
           <p className="text-green-700 font-semibold text-center">
             Request received, we’re currently assigning the best available
             driver for you.

@@ -439,7 +439,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
           )}
 
           {/* Active trip display */}
-          {activeRequest && <ActiveRequest />}
+          {activeRequest && <ActiveRequest activeRequest={activeRequest} />}
         </div>
       </div>
     </div>
