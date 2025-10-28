@@ -1,5 +1,6 @@
 "use client";
 import { db } from "@/db/client";
+import { toastSuccess } from "@/helpers/toastHelper";
 import { useUserStore } from "@/hooks/useUserStore";
 import {
   collection,
@@ -49,6 +50,7 @@ const ActiveRequest = ({ activeRequest }) => {
         status: "completed",
         arrivedAt: new Date(),
       });
+      toastSuccess("✅ Trip marked as completed!");
     } catch (err) {
       console.error("❌ Error updating trip:", err);
     } finally {
