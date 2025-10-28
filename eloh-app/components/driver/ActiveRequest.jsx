@@ -12,6 +12,17 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
+/**
+ * ActiveRequest Component
+ *
+ * Displays a floating popup for drivers with an active ambulance trip.
+ * Allows the driver to mark the trip as "arrived", updating the trip status in Firestore.
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.activeRequest - Optional prop representing the active request
+ *
+ * @returns {JSX.Element|null} - Returns the active trip UI if a trip is accepted, otherwise null.
+ */
 const ActiveRequest = ({ activeRequest }) => {
   const { currentUser } = useUserStore();
   const [tripId, setTripId] = useState(null);
@@ -61,10 +72,7 @@ const ActiveRequest = ({ activeRequest }) => {
   if (!tripId) return null;
 
   return (
-    <div
-      className="fixed bottom-3 right-3 z-50 animate-slide-up
-                 w-[95%] max-w-sm mx-auto sm:bottom-10 sm:right-10"
-    >
+    <div className="fixed bottom-3 right-3 z-50 animate-slide-up w-[95%] max-w-sm mx-auto sm:bottom-10 sm:right-10">
       <div className="bg-white rounded-2xl shadow-2xl border-l-4 border-green-600 p-3 sm:p-4 relative overflow-hidden">
         {/* Header */}
         <h3 className="text-base sm:text-lg text-center font-bold mb-3 text-black">
