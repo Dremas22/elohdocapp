@@ -152,9 +152,12 @@ const PatientSidebarMenu = ({
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] pt-22 px-4 w-64 h-[calc(120vh-5rem)] fixed -top-1 left-0 overflow-y-auto scrollbar-thin scrollbar-thumb-[#0d6efd]/70 scrollbar-track-[#0b2451]/40 hover:scrollbar-thumb-[#1a73e8]/90
-          ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
-        `}
+        className={`hidden lg:flex flex-col transition-transform duration-300 z-20 bg-[#123158] 
+    pt-22 pb-5 px-4 w-64 fixed top-0 left-0 
+    h-screen overflow-y-auto
+    scrollbar-thin scrollbar-thumb-[#0d6efd]/70 scrollbar-track-[#0b2451]/40 hover:scrollbar-thumb-[#1a73e8]/90
+    ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
+  `}
       >
         <ActionButtons
           buttons={actionButtons}
@@ -163,6 +166,7 @@ const PatientSidebarMenu = ({
           compact={false}
         />
       </div>
+
 
       {/* Mobile Sidebar Toggle Button */}
       <div className="lg:hidden fixed bottom-1 -right-2 z-50 group cursor-pointer flex items-center space-x-2 bg-blue-300/1 text-white rounded-full px-2 py-2 shadow-sm select-none scale-80 backdrop-blur-sm">
