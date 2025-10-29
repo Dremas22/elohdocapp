@@ -194,7 +194,7 @@ const PatientMeetingSetup = ({ mode, noteOpen, userDoc, setNoteOpen }) => {
             </Link>
           </div>
         ) : (
-          <main className="lg:w-[90vw] w-[49.5vh] lg:-ml-[4px] -ml-[40px] flex flex-col flex-grow h-full lg:mt-6">
+          <main className="lg:w-[80vw] w-[49.5vh] lg:-ml-[0px] -ml-[40px] flex flex-col flex-grow h-full lg:mt-6">
             <div className="flex flex-col flex-grow overflow-auto px-2 sm:px-4">
               <ElohDocChatApp role="patient" />
             </div>
