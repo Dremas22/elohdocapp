@@ -251,11 +251,23 @@ const ChatList = ({ role }) => {
             ...otherUserDoc.data(),
           };
 
+          // 🔹 Get last message from chat
+          const chatSnap = await getDoc(doc(db, "chats", trip.id));
+          const messages = chatSnap.exists()
+            ? chatSnap.data()?.messages || []
+            : [];
+          const lastMessage = messages.length
+            ? messages[messages.length - 1].text || "Image"
+            : "";
+
           return {
-            chatId: `${currentUser.userId}_${otherUserId}`,
+            chatId: trip.id,
             receiverId: otherUserId,
-            lastMessage: "",
-            updatedAt: new Date(),
+            lastMessage,
+            updatedAt: messages.length
+              ? messages[messages.length - 1].createdAt?.toMillis?.() ||
+                new Date().getTime()
+              : new Date().getTime(),
             isSeen: true,
             user: otherUser,
           };
