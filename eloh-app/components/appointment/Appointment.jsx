@@ -6,6 +6,7 @@ import Link from "next/link";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import AppointmentEditModal from "../AppointmentEditModal";
 import { toastError, toastSuccess } from "@/helpers/toastHelper";
+import { useRouter } from "next/navigation";
 
 /**
  * AppointmentCard – displays appointment info with edit/delete controls.
@@ -13,6 +14,7 @@ import { toastError, toastSuccess } from "@/helpers/toastHelper";
 const AppointmentCard = ({ appt, onUpdated, onDeleted }) => {
   const { updateAppointment, deleteAppointment } = useAppointmentActions();
   const [editing, setEditing] = useState(false);
+  const router = useRouter();
 
   const handleSave = async (updatedData) => {
     const updated = await updateAppointment(appt.id, updatedData);
@@ -34,7 +36,10 @@ const AppointmentCard = ({ appt, onUpdated, onDeleted }) => {
     if (!confirmDelete) return;
 
     const success = await deleteAppointment(appt.id);
-    if (success) onDeleted?.(appt.id);
+    if (success) {
+      onDeleted?.(appt.id);
+      router.refresh();
+    }
   };
 
   const handleEditClick = (e) => {
