@@ -225,7 +225,7 @@ const NurseCollectionViewer = () => {
               )}
 
               {/* Chat App */}
-              <div className="lg:w-[185vh] sm:w-[110vh] w-[45vh] lg:ml-5  md:-ml-5 -ml-3 h-auto flex flex-col pt-8 mb-9 flex-grow">
+              <div className="lg:w-[185vh] sm:w-[110vh] w-[45vh] lg:ml-0  md:-ml-5 -ml-3 h-auto flex flex-col pt-8 mb-9 flex-grow">
                 <ElohDocChatApp role="nurse" />
               </div>
 
