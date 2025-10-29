@@ -32,17 +32,19 @@ export default function RequestSection(props) {
             type="text"
             placeholder="Enter pickup address"
             disabled={!!fareDetails?.isPaid}
-            className={`flex-1 p-3 pl-10 border rounded-lg w-full ${fareDetails?.isPaid
-              ? "bg-gray-200 cursor-not-allowed"
-              : "border-gray-300"
-              }`}
+            className={`flex-1 p-3 pl-10 border rounded-lg w-full ${
+              fareDetails?.isPaid
+                ? "bg-gray-200 cursor-not-allowed"
+                : "border-gray-300"
+            }`}
           />
         </div>
         <button
           onClick={useMyLocation}
           disabled={!!fareDetails?.isPaid}
-          className={`bg-[#03045e] text-white font-semibold py-2 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex items-center gap-2 -mt-2 ${fareDetails?.isPaid ? "bg-gray-300 cursor-not-allowed" : ""
-            }`}
+          className={`bg-[#03045e] text-white font-semibold py-2 px-8 rounded-xl shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out flex items-center gap-2 -mt-2 ${
+            fareDetails?.isPaid ? "bg-gray-300 cursor-not-allowed" : ""
+          }`}
         >
           <FaLocationDot className="inline-block mr-1" /> Use My Location
         </button>
@@ -56,10 +58,11 @@ export default function RequestSection(props) {
           type="text"
           placeholder="Enter hospital or clinic"
           disabled={!!fareDetails?.isPaid}
-          className={`flex-1 p-3 pl-10 border rounded-lg w-full ${fareDetails?.isPaid
-            ? "bg-gray-200 cursor-not-allowed"
-            : "border-gray-300"
-            }`}
+          className={`flex-1 p-3 pl-10 border rounded-lg w-full ${
+            fareDetails?.isPaid
+              ? "bg-gray-200 cursor-not-allowed"
+              : "border-gray-300"
+          }`}
         />
       </div>
 
@@ -69,10 +72,11 @@ export default function RequestSection(props) {
         <button
           onClick={handleCreateRoute}
           disabled={fareDetails?.isPaid}
-          className={`flex-1 py-3 rounded-xl text-white ${fareDetails?.isPaid
-            ? "bg-gray-300 cursor-not-allowed shadow-[0_4px_#999]"
-            : "bg-[#03045e] hover:bg-[#023e8a] shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
-            }`}
+          className={`flex-1 py-3 rounded-xl text-white ${
+            fareDetails?.isPaid
+              ? "bg-gray-300 cursor-not-allowed shadow-[0_4px_#999]"
+              : "bg-[#03045e] shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
+          }`}
         >
           Create Route
         </button>
@@ -114,9 +118,15 @@ export default function RequestSection(props) {
 
       {/* Request Ambulance */}
       <div className="mt-4">
-        {fareDetails?.isPaid ? (
+        {fareDetails?.isPaid && fareDetails?.status === "accepted" ? (
+          <p className="text-green-700 font-semibold text-center bg-green-100 border border-green-300 rounded-xl px-4 py-3 shadow-sm">
+            🚑 A driver has accepted your request and is on the way. Please stay
+            ready — you’ll be notified once they arrive!
+          </p>
+        ) : fareDetails?.isPaid && fareDetails.status === "paid" ? (
           <p className="text-green-700 font-semibold text-center">
-            Request received, we’re currently assigning the best available driver for you.
+            Request received, we’re currently assigning the best available
+            driver for you.
           </p>
         ) : (
           <button

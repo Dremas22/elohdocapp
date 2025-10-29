@@ -29,7 +29,6 @@ import { normalizeLatLng } from "@/lib/normalizeLatLng";
 import PaymentConfirmationLoader from "../ambulance/customers/PaymentConfirmationLoader";
 import RequestSection from "./RequestSection";
 import confirmPayment from "@/lib/confirmPayment";
-import ArrivalCodeModal from "./ArrivalCodeModal";
 
 const RATE_PER_KM = 10;
 
@@ -360,17 +359,6 @@ export default function CustomerMap({ userDoc }) {
         window.driverRouteRenderer = null;
       }
 
-      /**
-       *  TODO: Example object used only for testing when the customer and driver
-        are located very close to each other. This artificially offsets the
-        customer's coordinates (~200m north-east) so that the route line is
-        easier to visualize on the map. Remove or disable in production and use (trip.pickupLocation) .
-       */
-      // const testCustomerLoc = {
-      //   lat: trip.pickupLocation.lat + 0.002, // ~200m north
-      //   lng: trip.pickupLocation.lng + 0.002, // ~200m east
-      // };
-
       // Draw driver → customer route (normal opacity)
       window.driverRouteRenderer = createRouteCustomerToDriver(
         driver.location,
@@ -615,7 +603,6 @@ export default function CustomerMap({ userDoc }) {
   return (
     <div className="flex flex-col items-center w-full justify-center min-h-screen bg-gray-100 pt-20 lg:pl-66 p-4">
       {confirmingPayment && <PaymentConfirmationLoader />}
-      <ArrivalCodeModal fareDetails={fareDetails} />
 
       <CustomerSidebarMenu userDoc={userDoc} />
 
@@ -630,17 +617,12 @@ export default function CustomerMap({ userDoc }) {
         handleCreateRoute={handleCreateRoute}
         handleCancelRoute={handleCancelRoute}
       />
-      {/* Map */}
-      <div
-        ref={mapRef}
-        className="w-full max-w-6xl h-[480px] sm:h-[400px] md:h-[500px] lg:h-[600px] rounded-lg shadow-lg overflow-hidden mx-auto"
-      />
 
       {/* Payment Section */}
       {showPay && fareDetails && !fareDetails.isPaid && (
         <div
           ref={paySectionRef}
-          className="w-full max-w-lg bg-white p-4 rounded-lg shadow mt-6"
+          className="w-full bg-gray-100 max-w-lg p-4 mb-5"
         >
           <PayAmbulance
             fare={fareDetails.fare}
@@ -652,6 +634,13 @@ export default function CustomerMap({ userDoc }) {
           />
         </div>
       )}
+
+      {/* Map */}
+      <div
+        ref={mapRef}
+        className="w-full max-w-6xl h-[480px] sm:h-[400px] md:h-[500px] lg:h-[600px] rounded-lg shadow-lg overflow-hidden mx-auto"
+      />
+
     </div>
   );
 }

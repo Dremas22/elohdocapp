@@ -244,32 +244,32 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
   };
 
   // End trip & send arrival code
-  const handleTripEnded = async () => {
-    if (!activeRequest || !currentUser) return;
+  // const handleTripEnded = async () => {
+  //   if (!activeRequest || !currentUser) return;
 
-    try {
-      const tripId = activeRequest?.customerId;
-      const code = await sendArrivalCodeEmail(activeRequest);
+  //   try {
+  //     const tripId = activeRequest?.customerId;
+  //     const code = await sendArrivalCodeEmail(activeRequest);
 
-      setShowCodeInput(true);
-      toastSuccess("Code sent to customer");
+  //     setShowCodeInput(true);
+  //     toastSuccess("Code sent to customer");
 
-      const tripRef = doc(db, "trips", tripId);
-      await updateDoc(tripRef, {
-        arrivalCode: code,
-        status: "driver_arrived",
-        arrivedAt: new Date(),
-        showInput: true,
-      });
+  //     const tripRef = doc(db, "trips", tripId);
+  //     await updateDoc(tripRef, {
+  //       arrivalCode: code,
+  //       status: "driver_arrived",
+  //       arrivedAt: new Date(),
+  //       showInput: true,
+  //     });
 
-      toastSuccess(
-        "Arrival code has been generated and shared with the customer."
-      );
-    } catch (err) {
-      console.error("Failed to send arrival code:", err.message);
-      toastError("Failed to notify customer.");
-    }
-  };
+  //     toastSuccess(
+  //       "Arrival code has been generated and shared with the customer."
+  //     );
+  //   } catch (err) {
+  //     console.error("Failed to send arrival code:", err.message);
+  //     toastError("Failed to notify customer.");
+  //   }
+  // };
 
   // Decline an ambulance request and reassign
   const handleDecline = async () => {
@@ -338,73 +338,73 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     setAmbulanceRequest(null); // Clear current view
   };
 
-  // Verify arrival code entered by driver
-  const handleCodeVerification = async () => {
-    setVerifying(true);
-    try {
-      const tripId = activeRequest?.customerId;
-      const tripRef = doc(db, "trips", tripId);
-      const tripSnap = await getDoc(tripRef);
-      const data = tripSnap.data();
+  // // Verify arrival code entered by driver
+  // const handleCodeVerification = async () => {
+  //   setVerifying(true);
+  //   try {
+  //     const tripId = activeRequest?.customerId;
+  //     const tripRef = doc(db, "trips", tripId);
+  //     const tripSnap = await getDoc(tripRef);
+  //     const data = tripSnap.data();
 
-      if (!tripSnap.exists() || !data) {
-        toastError("Trip not found");
-        return;
-      }
+  //     if (!tripSnap.exists() || !data) {
+  //       toastError("Trip not found");
+  //       return;
+  //     }
 
-      if (enteredCode === data.arrivalCode) {
-        await updateDoc(tripRef, {
-          status: "completed",
-          arrivalCode: null,
-          isPaid: false,
-          sessionId: null,
-          isRatings: true,
-          updatedAt: new Date(),
-          showInput: false,
-        });
+  //     if (enteredCode === data.arrivalCode) {
+  //       await updateDoc(tripRef, {
+  //         status: "completed",
+  //         arrivalCode: null,
+  //         isPaid: false,
+  //         sessionId: null,
+  //         isRatings: true,
+  //         updatedAt: new Date(),
+  //         showInput: false,
+  //       });
 
-        const driverId = data.driverId || currentUser?.uid;
-        if (!driverId) return toastError("Driver ID missing");
+  //       const driverId = data.driverId || currentUser?.uid;
+  //       if (!driverId) return toastError("Driver ID missing");
 
-        const driverRef = doc(db, "drivers", driverId);
-        const driverSnap = await getDoc(driverRef);
-        const driverData = driverSnap.exists() ? driverSnap.data() : {};
+  //       const driverRef = doc(db, "drivers", driverId);
+  //       const driverSnap = await getDoc(driverRef);
+  //       const driverData = driverSnap.exists() ? driverSnap.data() : {};
 
-        const previousEarnings = parseFloat(driverData.earnings || 0);
-        const previousTrips = parseInt(driverData.numberOfTrips || 0);
-        const fare = parseFloat(activeRequest?.fare || 0);
+  //       const previousEarnings = parseFloat(driverData.earnings || 0);
+  //       const previousTrips = parseInt(driverData.numberOfTrips || 0);
+  //       const fare = parseFloat(activeRequest?.fare || 0);
 
-        await setDoc(
-          driverRef,
-          {
-            earnings: previousEarnings + fare,
-            numberOfTrips: previousTrips + 1,
-            totalPlatformFees: (driverData.totalPlatformFees || 0) + fare * 0.1,
-            earningsUpdatedAt: new Date(),
-          },
-          { merge: true }
-        );
+  //       await setDoc(
+  //         driverRef,
+  //         {
+  //           earnings: previousEarnings + fare,
+  //           numberOfTrips: previousTrips + 1,
+  //           totalPlatformFees: (driverData.totalPlatformFees || 0) + fare * 0.1,
+  //           earningsUpdatedAt: new Date(),
+  //         },
+  //         { merge: true }
+  //       );
 
-        // ✅ Clear map directions
-        if (directionsRenderer) {
-          directionsRenderer.setMap(null);
-          setDirectionsRenderer(null);
-        }
+  //       // ✅ Clear map directions
+  //       if (directionsRenderer) {
+  //         directionsRenderer.setMap(null);
+  //         setDirectionsRenderer(null);
+  //       }
 
-        toastSuccess("Trip successfully completed!");
-        setActiveRequest(null);
-        setAmbulanceRequest(null);
-        setShowCodeInput(false);
-      } else {
-        toastError("Incorrect code. Please try again.");
-      }
-    } catch (err) {
-      console.error("Verification failed:", err.message);
-      toastError("Failed to verify code.");
-    } finally {
-      setVerifying(false);
-    }
-  };
+  //       toastSuccess("Trip successfully completed!");
+  //       setActiveRequest(null);
+  //       setAmbulanceRequest(null);
+  //       setShowCodeInput(false);
+  //     } else {
+  //       toastError("Incorrect code. Please try again.");
+  //     }
+  //   } catch (err) {
+  //     console.error("Verification failed:", err.message);
+  //     toastError("Failed to verify code.");
+  //   } finally {
+  //     setVerifying(false);
+  //   }
+  // };
 
   return (
     <div className="flex lg:h-[97vh] sm:ml-10 bg-gray-100 relative mt-7 lg:mt-0 mb-2 ">
@@ -439,45 +439,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
           )}
 
           {/* Active trip display */}
-          {activeRequest && (
-            <ActiveRequest
-              activeRequest={activeRequest}
-              handleCancelRoute={handleCancelRoute}
-              onTripEnded={handleTripEnded}
-            />
-          )}
-
-          {/* Arrival code verification overlay */}
-          {showCodeInput && (
-            <div className="fixed inset-0 z-[9999] bg-black bg-opacity-30 flex items-center justify-center p-6 pointer-events-auto">
-              <div className="flex flex-col gap-4 p-6 w-96 max-w-md bg-white rounded-2xl shadow-2xl">
-                <label className="text-base font-medium text-gray-700">
-                  Enter arrival code from customer:
-                </label>
-                <input
-                  type="text"
-                  value={enteredCode}
-                  onChange={(e) => setEnteredCode(e.target.value)}
-                  className="p-3 w-full text-base text-gray-700 rounded border"
-                  placeholder="6-digit code"
-                />
-                <button
-                  onClick={async () => await handleCodeVerification()}
-                  disabled={verifying}
-                  className="bg-green-600 hover:bg-[#023e8a] text-white py-3 px-4 rounded-xl text-base font-semibolddisabled:bg-gray-400 disabled:cursor-not-allowed w-full shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out cursor-pointer"
-                >
-                  {verifying ? (
-                    <span className="flex gap-2 justify-center items-center text-white">
-                      <FiLoader className="w-5 h-5 animate-spin" />
-                      Verifying...
-                    </span>
-                  ) : (
-                    "Verify Code"
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
+          {activeRequest && <ActiveRequest activeRequest={activeRequest} />}
         </div>
       </div>
     </div>

@@ -5,18 +5,19 @@ import {
   FiChevronUp,
   FiChevronDown,
   FiMessageCircle,
-  FiCalendar,
   FiUser,
 } from "react-icons/fi";
 import { IoCloseCircleSharp } from "react-icons/io5";
 import { FaFirstAid } from "react-icons/fa";
-import { messagingPromise } from "@/db/client";
+import { messagingPromise, db } from "@/db/client";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { onMessage } from "firebase/messaging";
 import Calendar from "@/components/calendar";
 import NotificationModal from "@/components/NotificationModal";
 import ProfileModal from "@/components/ProfileModal";
 import { useRouter } from "next/navigation";
 import ElohDocChatApp from "@/components/chat-app/ElohDocChatApp";
+import { useUserStore } from "@/hooks/useUserStore";
 
 const ActionButtons = ({ buttons, notificationCount, payload, compact }) => {
   const layout = compact
@@ -88,10 +89,13 @@ const CustomerSidebarMenu = ({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [openChat, setOpenChat] = useState(false);
+  const [hasActiveTrip, setHasActiveTrip] = useState(false);
+  const { currentUser } = useUserStore();
+
   const router = useRouter();
 
   useEffect(() => {
-    let unsubscribe = () => { };
+    let unsubscribe = () => {};
 
     const setupMessaging = async () => {
       const messaging = await messagingPromise;
@@ -110,6 +114,23 @@ const CustomerSidebarMenu = ({
       if (unsubscribe) unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (!userDoc?.userId || !currentUser?.userId) return;
+
+    const tripsRef = collection(db, "trips");
+    const q = query(
+      tripsRef,
+      where("customerId", "==", userDoc?.userId || currentUser?.userId),
+      where("status", "==", "accepted")
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setHasActiveTrip(!snapshot.empty);
+    });
+
+    return () => unsubscribe();
+  }, [userDoc?.userId, currentUser?.userId]);
 
   const handleProfileSave = async (updatedData) => {
     setProfileLoading(true);
@@ -147,12 +168,16 @@ const CustomerSidebarMenu = ({
       onClick: () => alert("Request Emergency Support Clicked"),
       showTitle: true,
     },
-    {
-      title: "Chat",
-      icon: <FiMessageCircle className="h-6 w-6" />,
-      onClick: () => setOpenChat(true),
-      showTitle: true,
-    },
+    ...(hasActiveTrip
+      ? [
+          {
+            title: "Chat",
+            icon: <FiMessageCircle className="h-6 w-6" />,
+            onClick: () => setOpenChat(true),
+            showTitle: true,
+          },
+        ]
+      : []),
     // {
     //   title: "Schedule",
     //   icon: <FiCalendar className="h-6 w-6" />,
@@ -230,10 +255,11 @@ const CustomerSidebarMenu = ({
 
       {/* Mobile Sidebar */}
       <div
-        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[19vh] px-4 sm:px-6 md:px-8 py-4 overflow-auto bg-gray-900/80 backdrop-blur-md flex flex-col items-center gap-4 rounded-t-2xl shadow-lg transition-transform duration-500 ease-in-out ${mobileSidebarOpen
-          ? "translate-y-0 opacity-100"
-          : "translate-y-full opacity-0 pointer-events-none"
-          }`}
+        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[19vh] px-4 sm:px-6 md:px-8 py-4 overflow-auto bg-gray-900/80 backdrop-blur-md flex flex-col items-center gap-4 rounded-t-2xl shadow-lg transition-transform duration-500 ease-in-out ${
+          mobileSidebarOpen
+            ? "translate-y-0 opacity-100"
+            : "translate-y-full opacity-0 pointer-events-none"
+        }`}
       >
         <ActionButtons
           buttons={actionButtons}
@@ -245,8 +271,9 @@ const CustomerSidebarMenu = ({
 
       {/* Slide-in Calendar */}
       <div
-        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${calendarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
+          calendarOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <button
           title="Close Calendar"

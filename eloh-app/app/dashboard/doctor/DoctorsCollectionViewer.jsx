@@ -184,13 +184,13 @@ const DoctorsCollectionViewer = ({ userDoc, patients, userId }) => {
               )}
 
               {/* Chat App */}
-              <div className="lg:w-[185vh] md:w-[90vh] w-[44vh] lg:ml-10 md:-ml-5 -ml-3 h-auto flex flex-col pt-8 mb-25 flex-grow">
+              <div className="lg:w-[185vh] md:w-[60vh] w-[44vh] -ml-3 h-auto flex flex-col pt-8 mb-25 flex-grow">
                 <ElohDocChatApp />
               </div>
             </>
           ) : isVerified === false ? (
-            <div className="text-gray-600 mt-10 text-center">
-              <h2 className="text-lg font-semibold mb-2">Verification Pending</h2>
+            <div className="text-gray-600 mt-25 text-center">
+              <h2 className="text-2xl font-semibold mb-2">Verification Pending</h2>
               <p>Once your account is verified, you'll access doctor information here.</p>
             </div>
           ) : (

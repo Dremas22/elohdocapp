@@ -94,7 +94,7 @@ const ChatApp = () => {
           try {
             ringtoneRef.current.pause();
             ringtoneRef.current.currentTime = 0;
-          } catch (e) {}
+          } catch (e) { }
           ringtoneRef.current = null;
         }
         return;
@@ -166,7 +166,7 @@ const ChatApp = () => {
         try {
           ringtoneRef.current.pause();
           ringtoneRef.current.currentTime = 0;
-        } catch (e) {}
+        } catch (e) { }
         ringtoneRef.current = null;
       }
     };
@@ -326,8 +326,8 @@ const ChatApp = () => {
         ringtoneRef.current = audio;
         try {
           ringtoneRef.current.loop = true;
-          ringtoneRef.current.play().catch(() => {});
-        } catch (e) {}
+          ringtoneRef.current.play().catch(() => { });
+        } catch (e) { }
       }
 
       router.push(`/room?staffId=${staffId}&patientId=${patientId}`);
@@ -434,7 +434,7 @@ const ChatApp = () => {
         try {
           ringtoneRef.current.pause();
           ringtoneRef.current.currentTime = 0;
-        } catch (e) {}
+        } catch (e) { }
         ringtoneRef.current = null;
       }
 
@@ -463,7 +463,7 @@ const ChatApp = () => {
       try {
         ringtoneRef.current.pause();
         ringtoneRef.current.currentTime = 0;
-      } catch (e) {}
+      } catch (e) { }
       ringtoneRef.current = null;
     }
     setIncomingCall(null);
@@ -477,7 +477,7 @@ const ChatApp = () => {
         try {
           ringtoneRef.current.pause();
           ringtoneRef.current.currentTime = 0;
-        } catch (e) {}
+        } catch (e) { }
         ringtoneRef.current = null;
       }
     };
@@ -526,11 +526,11 @@ const ChatApp = () => {
                 />
               )}
 
-              <IoCall
-                className="cursor-pointer text-gray-400 hover:text-white"
+              {/* <IoCall
+                className="cursor-pointer hover:text-white text-[#03045e] lg:mt-1.5 mt-1 lg:text-4xl md:text-2xl text-2xl"
                 title={`Start a voice call with ${getDisplayName(user)}`}
                 onClick={handleMakeVoiceCall}
-              />
+              /> */}
             </div>
           </div>
         </div>
@@ -603,11 +603,10 @@ const ChatApp = () => {
           title="Send message"
           onClick={handleSend}
           disabled={isCurrentUserBlocked || isReceiverBlocked}
-          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-xl text-white text-sm md:text-base shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out ${
-            isCurrentUserBlocked || isReceiverBlocked
-              ? "bg-blue-400/60 cursor-not-allowed"
-              : "bg-[#03045e] hover:bg-[#023e8a] cursor-pointer"
-          }`}
+          className={`flex-shrink-0 flex items-center gap-1 px-3 md:px-4 py-2 rounded-xl text-white text-sm md:text-base shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 transition-all duration-200 ease-in-out ${isCurrentUserBlocked || isReceiverBlocked
+            ? "bg-blue-400/60 cursor-not-allowed"
+            : "bg-[#03045e] hover:bg-[#023e8a] cursor-pointer"
+            }`}
         >
           <span className="hidden md:inline">Send</span>
           <IoSend />
