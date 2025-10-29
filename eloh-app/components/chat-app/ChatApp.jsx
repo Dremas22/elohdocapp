@@ -526,11 +526,11 @@ const ChatApp = () => {
                 />
               )}
 
-              <IoCall
+              {/* <IoCall
                 className="cursor-pointer hover:text-white text-[#03045e] lg:mt-1.5 mt-1 lg:text-4xl md:text-2xl text-2xl"
                 title={`Start a voice call with ${getDisplayName(user)}`}
                 onClick={handleMakeVoiceCall}
-              />
+              /> */}
             </div>
           </div>
         </div>
