@@ -15,6 +15,9 @@ import ProfileModal from "@/components/ProfileModal";
 import DriverAvailabilityButton from "@/components/ambulance/DriverAvailabilityButton";
 import ElohDocChatApp from "@/components/chat-app/ElohDocChatApp";
 import { toastSuccess } from "@/helpers/toastHelper";
+import { useUserStore } from "@/hooks/useUserStore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { db } from "@/db/client";
 
 /**
  * Action Buttons component
@@ -65,6 +68,8 @@ const DriverSidebarMenu = ({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [openChat, setOpenChat] = useState(false);
+  const [hasActiveTrip, setHasActiveTrip] = useState(false);
+  const { currentUser } = useUserStore();
 
   const [fetching, setFetching] = useState(false);
   const [isAvailable, setIsAvailable] = useState(false);
@@ -86,6 +91,23 @@ const DriverSidebarMenu = ({
     };
     fetchAvailability();
   }, []);
+
+  useEffect(() => {
+    if (!userDoc?.userId || !currentUser?.userId) return;
+
+    const tripsRef = collection(db, "trips");
+    const q = query(
+      tripsRef,
+      where("driverId", "==", userDoc?.userId || currentUser?.userId),
+      where("status", "==", "accepted")
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setHasActiveTrip(!snapshot.empty);
+    });
+
+    return () => unsubscribe();
+  }, [userDoc?.userId, currentUser?.userId]);
 
   const handleToggle = async () => {
     setFetching(true);
@@ -137,11 +159,15 @@ const DriverSidebarMenu = ({
       icon: <FiDollarSign className="h-6 w-6" />,
       onClick: () => setShowEarnings((pre) => !pre),
     },
-    {
-      title: "Chat",
-      icon: <FiMessageCircle className="h-6 w-6" />,
-      onClick: () => setOpenChat(true),
-    },
+    ...(hasActiveTrip
+      ? [
+          {
+            title: "Chat",
+            icon: <FiMessageCircle className="h-6 w-6" />,
+            onClick: () => setOpenChat(true),
+          },
+        ]
+      : []),
     {
       title: "Schedule",
       icon: <FiCalendar className="h-6 w-6" />,

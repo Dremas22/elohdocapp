@@ -1,3 +1,21 @@
+/**
+ * Creates a Google Maps marker for a customer/patient with optional label, title, and jitter to avoid overlap.
+ *
+ * @param {Object} location - The location for the marker.
+ * @param {number} location.lat - Latitude of the marker.
+ * @param {number} location.lng - Longitude of the marker.
+ * @param {google.maps.Map} map - The Google Maps instance where the marker will be added.
+ * @param {string} [label="🧍"] - Emoji or text to display as the marker icon.
+ * @param {string} [title="Patient"] - Title shown on hover over the marker.
+ * @param {number} [index=0] - Index used to slightly offset the marker if multiple markers are at the same location.
+ * @returns {google.maps.Marker|null} The created Google Maps marker, or null if Google Maps is not loaded.
+ *
+ * @example
+ * const customerMarker = createCustomerMarker({ lat: -25.7479, lng: 28.2293 }, mapInstance);
+ *
+ * // Multiple customer markers with slight jitter
+ * const customerMarker2 = createCustomerMarker({ lat: -25.7479, lng: 28.2293 }, mapInstance, "🧍", "Patient 2", 1);
+ */
 export const createCustomerMarker = (
   location,
   map,

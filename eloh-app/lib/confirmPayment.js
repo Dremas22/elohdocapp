@@ -1,5 +1,20 @@
 import { toastError, toastSuccess } from "@/helpers/toastHelper";
 
+/**
+ * Confirms a payment for an ambulance trip and optionally returns the assigned driver.
+ *
+ * @async
+ * @function confirmPayment
+ * @param {string} sessionId - The payment session ID to confirm.
+ * @param {Object} tripData - The trip details object containing trip info.
+ * @param {string} userId - The ID of the user making the payment.
+ * @param {string[]} [excludedDrivers=[]] - Optional array of driver IDs to exclude from assignment.
+ * @returns {Promise<Object|undefined>} Returns the assigned driver object if successful; otherwise, undefined.
+ *
+ * @example
+ * const driver = await confirmPayment("sess_123", trip, "user_456", ["driver_1"]);
+ * if (driver) console.log("Assigned driver:", driver);
+ */
 const confirmPayment = async (
   sessionId,
   tripData,

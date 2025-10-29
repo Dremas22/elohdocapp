@@ -1,5 +1,4 @@
-import emailjs from "@emailjs/browser";
-import { toastInfo, toastError } from "@/helpers/toastHelper";
+import { toastError } from "@/helpers/toastHelper";
 
 /**
  * Sends a unique 6-digit ambulance arrival verification code
