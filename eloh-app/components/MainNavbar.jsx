@@ -76,6 +76,15 @@ const Navbar = () => {
         <ul className="flex flex-col items-center gap-4 py-4">
           <li>
             <Link
+              href="/"
+              className="text-black text-lg font-semibold hover:text-white transition"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link
               href="/about"
               className="text-black text-lg font-semibold hover:text-white transition"
               onClick={() => setIsMenuOpen(false)}

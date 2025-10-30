@@ -3,7 +3,7 @@
 const AmbulanceRequest = (props) => {
   const { ambulanceRequest, handleDecline, handleAcceptRequest } = props;
   return (
-    <div className="fixed bottom-3 right-3 z-50 animate-slide-up w-[95%] max-w-sm mx-auto sm:bottom-10 sm:right-10">
+    <div className="fixed bottom-12 right-3 z-50 animate-slide-up w-[95%] max-w-sm mx-auto sm:bottom-10 sm:right-10">
       <div className="bg-white rounded-2xl shadow-2xl border-l-4 border-gray-300 p-3 sm:p-6 relative overflow-hidden">
         {/* Header */}
         <h3 className="text-base sm:text-xl font-bold mb-2 sm:mb-3 flex items-center text-black">

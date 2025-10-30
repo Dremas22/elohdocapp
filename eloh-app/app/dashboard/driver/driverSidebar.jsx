@@ -3,14 +3,12 @@
 import { useEffect, useState } from "react";
 import {
   FiUser,
-  FiCalendar,
   FiChevronUp,
   FiChevronDown,
   FiDollarSign,
   FiMessageCircle,
 } from "react-icons/fi";
 import { IoCloseCircleSharp } from "react-icons/io5";
-import Calendar from "@/components/calendar";
 import ProfileModal from "@/components/ProfileModal";
 import DriverAvailabilityButton from "@/components/ambulance/DriverAvailabilityButton";
 import ElohDocChatApp from "@/components/chat-app/ElohDocChatApp";
@@ -61,7 +59,6 @@ const DriverSidebarMenu = ({
   compact = false,
   isVerified,
 }) => {
-  const [calendarOpen, setCalendarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [isSidebarOpen] = useState(true);
@@ -161,18 +158,13 @@ const DriverSidebarMenu = ({
     },
     ...(hasActiveTrip
       ? [
-          {
-            title: "Chat",
-            icon: <FiMessageCircle className="h-6 w-6" />,
-            onClick: () => setOpenChat(true),
-          },
-        ]
+        {
+          title: "Chat",
+          icon: <FiMessageCircle className="h-6 w-6" />,
+          onClick: () => setOpenChat(true),
+        },
+      ]
       : []),
-    {
-      title: "Schedule",
-      icon: <FiCalendar className="h-6 w-6" />,
-      onClick: () => setCalendarOpen(true),
-    },
   ];
 
   return (
@@ -189,7 +181,7 @@ const DriverSidebarMenu = ({
 
       {/* Chat Modal */}
       {openChat && (
-        <div className="fixed text-white inset-0 z-50 lg:-ml-68 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+        <div className="fixed text-white inset-0 z-[70] lg:-ml-68 bg-black/40 backdrop-blur-sm flex items-center justify-center">
           <div className="w-full max-w-2xl mx-auto p-4">
             <ElohDocChatApp setOpenChat={setOpenChat} role="driver" />
           </div>
@@ -198,9 +190,8 @@ const DriverSidebarMenu = ({
 
       {/* Desktop Sidebar */}
       <div
-        className={`hidden lg:flex flex-col z-30 bg-[#123158] pt-30 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 transition-transform duration-300 ease-in-out  ${
-          !isSidebarOpen ? "-translate-x-full" : "translate-x-0"
-        }`}
+        className={`hidden lg:flex flex-col z-30 bg-[#123158] pt-30 px-4 w-64 h-[calc(110vh-5rem)] fixed top-18 left-0 transition-transform duration-300 ease-in-out  ${!isSidebarOpen ? "-translate-x-full" : "translate-x-0"
+          }`}
       >
         {isVerified ? (
           <>
@@ -227,7 +218,7 @@ const DriverSidebarMenu = ({
       </div>
 
       {/* Mobile Toggle Button */}
-      <div className="lg:hidden fixed bottom-1 right-1 text-xl z-50 flex items-center space-x-2 text-white rounded-full px-2 py-2 backdrop-blur-sm bg-[#03045e]/45">
+      <div className="lg:hidden fixed bottom-1 right-1 text-xl z-[70] flex items-center space-x-2 text-white rounded-full px-2 py-2 backdrop-blur-sm bg-[#03045e]/45">
         <button
           onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
           title={mobileSidebarOpen ? "Hide menu" : "Show menu"}
@@ -249,11 +240,10 @@ const DriverSidebarMenu = ({
 
       {/* Mobile Sidebar */}
       <div
-        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[33vh] px-4 py-4 overflow-auto bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-4 transition-transform duration-500 ease-in-out ${
-          mobileSidebarOpen
-            ? "translate-y-0 opacity-100"
-            : "translate-y-full opacity-0 pointer-events-none"
-        }`}
+        className={`lg:hidden fixed bottom-0 right-0 left-0 z-[60] h-[33vh] px-4 py-4 overflow-auto bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-4 transition-transform duration-500 ease-in-out ${mobileSidebarOpen
+          ? "translate-y-0 opacity-100"
+          : "translate-y-full opacity-0 pointer-events-none"
+          }`}
       >
         {isVerified && (
           <>
@@ -263,16 +253,8 @@ const DriverSidebarMenu = ({
               compact={true}
             />
 
-            {/* Schedule + On-Duty Toggle side by side */}
+            {/* On-Duty Toggle side by side */}
             <div className="flex justify-center items-center gap-2 mt-2">
-              <div className="mr-[-4px]">
-                <ActionButtons
-                  buttons={actionButtons.filter(
-                    (btn) => btn.title === "Schedule"
-                  )}
-                  compact={true}
-                />
-              </div>
               <div className="-ml-[150px]">
                 <DriverAvailabilityButton
                   isAvailable={isAvailable}
@@ -285,21 +267,6 @@ const DriverSidebarMenu = ({
         )}
       </div>
 
-      {/* Slide-in Calendar */}
-      <div
-        className={`fixed top-19 right-0 h-[calc(100vh-5rem)] w-full max-w-md bg-white text-black z-50 shadow-lg transition-transform duration-300 ease-in-out ${
-          calendarOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <button
-          title="Close Calendar"
-          onClick={() => setCalendarOpen(false)}
-          className="absolute bottom-75 scale-150 right-2 text-red-600 z-50 cursor-pointer"
-        >
-          <IoCloseCircleSharp />
-        </button>
-        <Calendar userDoc={userDoc} />
-      </div>
     </>
   );
 };
