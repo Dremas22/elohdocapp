@@ -61,16 +61,6 @@ export default function CustomerMap({ userDoc }) {
 
   const router = useRouter();
 
-  // Scroll to payment section
-  useEffect(() => {
-    if (showPay && paySectionRef.current) {
-      paySectionRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  }, [showPay]);
-
   // Confirm payment if session_id exists
   useEffect(() => {
     const confirmPay = async () => {
