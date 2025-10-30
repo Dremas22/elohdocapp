@@ -243,34 +243,6 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
     }
   };
 
-  // End trip & send arrival code
-  // const handleTripEnded = async () => {
-  //   if (!activeRequest || !currentUser) return;
-
-  //   try {
-  //     const tripId = activeRequest?.customerId;
-  //     const code = await sendArrivalCodeEmail(activeRequest);
-
-  //     setShowCodeInput(true);
-  //     toastSuccess("Code sent to customer");
-
-  //     const tripRef = doc(db, "trips", tripId);
-  //     await updateDoc(tripRef, {
-  //       arrivalCode: code,
-  //       status: "driver_arrived",
-  //       arrivedAt: new Date(),
-  //       showInput: true,
-  //     });
-
-  //     toastSuccess(
-  //       "Arrival code has been generated and shared with the customer."
-  //     );
-  //   } catch (err) {
-  //     console.error("Failed to send arrival code:", err.message);
-  //     toastError("Failed to notify customer.");
-  //   }
-  // };
-
   // Decline an ambulance request and reassign
   const handleDecline = async () => {
     if (!ambulanceRequest) return;
@@ -326,7 +298,7 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
           }
         );
 
-        toastInfo(`Request reassigned to driver ${nextDriver.id}`);
+        toastInfo(`Request reassigned to driver ${nextDriver.fullName}`);
       } else {
         toastInfo("No other available drivers nearby.");
       }
@@ -335,76 +307,8 @@ const DriverMap = ({ userDoc, isVerified, setShowEarnings }) => {
       toastError("Failed to reassign request.");
     }
 
-    setAmbulanceRequest(null); // Clear current view
+    setAmbulanceRequest(null);
   };
-
-  // // Verify arrival code entered by driver
-  // const handleCodeVerification = async () => {
-  //   setVerifying(true);
-  //   try {
-  //     const tripId = activeRequest?.customerId;
-  //     const tripRef = doc(db, "trips", tripId);
-  //     const tripSnap = await getDoc(tripRef);
-  //     const data = tripSnap.data();
-
-  //     if (!tripSnap.exists() || !data) {
-  //       toastError("Trip not found");
-  //       return;
-  //     }
-
-  //     if (enteredCode === data.arrivalCode) {
-  //       await updateDoc(tripRef, {
-  //         status: "completed",
-  //         arrivalCode: null,
-  //         isPaid: false,
-  //         sessionId: null,
-  //         isRatings: true,
-  //         updatedAt: new Date(),
-  //         showInput: false,
-  //       });
-
-  //       const driverId = data.driverId || currentUser?.uid;
-  //       if (!driverId) return toastError("Driver ID missing");
-
-  //       const driverRef = doc(db, "drivers", driverId);
-  //       const driverSnap = await getDoc(driverRef);
-  //       const driverData = driverSnap.exists() ? driverSnap.data() : {};
-
-  //       const previousEarnings = parseFloat(driverData.earnings || 0);
-  //       const previousTrips = parseInt(driverData.numberOfTrips || 0);
-  //       const fare = parseFloat(activeRequest?.fare || 0);
-
-  //       await setDoc(
-  //         driverRef,
-  //         {
-  //           earnings: previousEarnings + fare,
-  //           numberOfTrips: previousTrips + 1,
-  //           totalPlatformFees: (driverData.totalPlatformFees || 0) + fare * 0.1,
-  //           earningsUpdatedAt: new Date(),
-  //         },
-  //         { merge: true }
-  //       );
-
-  //       // ✅ Clear map directions
-  //       if (directionsRenderer) {
-  //         directionsRenderer.setMap(null);
-  //         setDirectionsRenderer(null);
-  //       }
-
-  //       toastSuccess("Trip successfully completed!");
-  //       setActiveRequest(null);
-  //       setAmbulanceRequest(null);
-  //       setShowCodeInput(false);
-  //     } else {
-  //       toastError("Incorrect code. Please try again.");
-  //     }
-  //   } catch (err) {
-  //     console.error("Verification failed:", err.message);
-  //     toastError("Failed to verify code.");
-  //   } finally {
-  //     setVerifying(false);
-  //   }
-  // };
 
   return (
     <div className="flex lg:h-[97vh] sm:ml-10 bg-gray-100 relative mt-7 lg:mt-0 mb-2 ">

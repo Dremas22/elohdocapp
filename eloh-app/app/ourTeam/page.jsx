@@ -1,14 +1,15 @@
-"use client";
-
 import Navbar from "@/components/MainNavbar";
 import Image from "next/image";
 import Link from "next/link";
 
+export const metadata = {
+  title: "Our Team | ElohApp",
+  description:
+    "Meet the dedicated team behind ElohApp — passionate professionals committed to delivering accessible, high-quality telehealth services across Africa.",
+};
+
 const OurTeamPage = () => {
   const teamMembers = [
-
-
-
     {
       id: 1,
       name: "Dr. Winile Nkosi",
@@ -141,9 +142,7 @@ const OurTeamPage = () => {
                 <h3 className="text-xl font-semibold text-gray-800">
                   {member.name}
                 </h3>
-                <p className="text-[#00b4d8] font-medium mb-2">
-                  {member.role}
-                </p>
+                <p className="text-[#00b4d8] font-medium mb-2">{member.role}</p>
                 <p className="text-gray-600 text-sm leading-relaxed">
                   {member.description}
                 </p>

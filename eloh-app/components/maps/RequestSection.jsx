@@ -74,7 +74,7 @@ export default function RequestSection(props) {
           disabled={fareDetails?.isPaid}
           className={`flex-1 py-3 rounded-xl text-white ${
             fareDetails?.isPaid
-              ? "bg-gray-300 cursor-not-allowed shadow-[0_4px_#999]"
+              ? "bg-gray-300 hover:bg-gray-200 cursor-not-allowed shadow-[0_4px_#999]"
               : "bg-[#03045e] shadow-[0_4px_#999] active:shadow-[0_2px_#666] transform active:translate-y-1 hover:bg-[#023e8a] transition-all duration-200 ease-in-out cursor-pointer"
           }`}
         >
