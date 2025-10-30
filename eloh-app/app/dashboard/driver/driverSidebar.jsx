@@ -9,7 +9,6 @@ import {
   FiMessageCircle,
 } from "react-icons/fi";
 import { IoCloseCircleSharp } from "react-icons/io5";
-import Calendar from "@/components/calendar";
 import ProfileModal from "@/components/ProfileModal";
 import DriverAvailabilityButton from "@/components/ambulance/DriverAvailabilityButton";
 import ElohDocChatApp from "@/components/chat-app/ElohDocChatApp";
@@ -182,7 +181,7 @@ const DriverSidebarMenu = ({
 
       {/* Chat Modal */}
       {openChat && (
-        <div className="fixed text-white inset-0 z-50 lg:-ml-68 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+        <div className="fixed text-white inset-0 z-[70] lg:-ml-68 bg-black/40 backdrop-blur-sm flex items-center justify-center">
           <div className="w-full max-w-2xl mx-auto p-4">
             <ElohDocChatApp setOpenChat={setOpenChat} role="driver" />
           </div>
@@ -219,7 +218,7 @@ const DriverSidebarMenu = ({
       </div>
 
       {/* Mobile Toggle Button */}
-      <div className="lg:hidden fixed bottom-1 right-1 text-xl z-50 flex items-center space-x-2 text-white rounded-full px-2 py-2 backdrop-blur-sm bg-[#03045e]/45">
+      <div className="lg:hidden fixed bottom-1 right-1 text-xl z-[70] flex items-center space-x-2 text-white rounded-full px-2 py-2 backdrop-blur-sm bg-[#03045e]/45">
         <button
           onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
           title={mobileSidebarOpen ? "Hide menu" : "Show menu"}
@@ -241,9 +240,9 @@ const DriverSidebarMenu = ({
 
       {/* Mobile Sidebar */}
       <div
-        className={`lg:hidden fixed bottom-0 right-0 left-0 z-40 h-[33vh] px-4 py-4 overflow-auto bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-4 transition-transform duration-500 ease-in-out ${mobileSidebarOpen
-            ? "translate-y-0 opacity-100"
-            : "translate-y-full opacity-0 pointer-events-none"
+        className={`lg:hidden fixed bottom-0 right-0 left-0 z-[60] h-[33vh] px-4 py-4 overflow-auto bg-gray-900/20 backdrop-blur-md flex flex-col items-center gap-4 transition-transform duration-500 ease-in-out ${mobileSidebarOpen
+          ? "translate-y-0 opacity-100"
+          : "translate-y-full opacity-0 pointer-events-none"
           }`}
       >
         {isVerified && (

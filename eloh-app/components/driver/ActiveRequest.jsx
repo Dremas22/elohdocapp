@@ -115,7 +115,7 @@ const ActiveRequest = ({ activeRequest }) => {
   if (!tripId) return null;
 
   return (
-    <div className="fixed bottom-3 right-3 z-50 animate-slide-up w-[95%] max-w-sm mx-auto sm:bottom-10 sm:right-10">
+    <div className="fixed bottom-2 left-3  z-50 animate-slide-up w-[60%] max-w-sm mx-auto">
       <div className="bg-white rounded-2xl shadow-2xl border-l-4 border-green-600 p-3 sm:p-4 relative overflow-hidden">
         {/* Header */}
         <h3 className="text-base sm:text-lg text-center font-bold mb-3 text-black">
@@ -131,11 +131,10 @@ const ActiveRequest = ({ activeRequest }) => {
         <button
           onClick={handleArrived}
           disabled={loading}
-          className={`w-full py-2.5 sm:py-3 rounded-xl font-semibold text-white text-sm sm:text-base transition-all duration-200 ${
-            loading
+          className={`w-full py-2.5 sm:py-3 rounded-xl font-semibold text-white text-sm sm:text-base transition-all duration-200 ${loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-green-600 hover:bg-green-700"
-          }`}
+            }`}
         >
           {loading ? "Updating..." : "✅ Arrived"}
         </button>
