@@ -10,7 +10,7 @@ const FareDetails = ({ fareDetails }) => {
         <strong>Distance:</strong> {fareDetails?.distance} km
       </p>
       <p>
-        <strong>Duration:</strong> {fareDetails?.duration} min
+        <strong>Duration:</strong> {fareDetails?.duration}
       </p>
       <p>
         <strong>Fare:</strong> R{fareDetails?.fare}

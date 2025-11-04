@@ -34,7 +34,7 @@ const confirmPayment = async (
     const data = await res.json();
 
     if (!res.ok) {
-      toastError(`Payment confirm failed: ${data.error || "Unknown error"}`);
+      console.error(`Payment confirm failed: ${data.error || "Unknown error"}`);
       return;
     }
 
