@@ -20,15 +20,6 @@ const OurTeamPage = () => {
       image: "/images/Dr.WinileNkosi.jpeg",
     },
     {
-      id: 2,
-      name: "Dr Schalk Berger",
-      role: "Telehealth Specialist",
-      description:
-        "Dr Schalk graduated with an MBCHB  in 1995 and has worked in private practice since 2000. His special interests are in telemedicine and rural medicine and providing medical care for people without access to adequate healthcare in Africa. He has over ten years experience in Telemedicine. He is an advisor to elohdoc.",
-      image: "/images/DrSchalkBerger.jpeg",
-    },
-
-    {
       id: 3,
       name: "Joe Phalwane",
       role: "Co-Founder & CEO",
